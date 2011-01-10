@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: gecko2.Gecko2
+SplashScreen-Image: images/gecko2_a_large.png
+
+	
