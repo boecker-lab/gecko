@@ -90,6 +90,10 @@ public class GenomeSelector extends JDialog {
 		tablePanel.add(scrollpane);
 		mainpanel.add(tablePanel,BorderLayout.CENTER);
 		
+		table.setBackground(Color.WHITE);
+		scrollpane.setBackground(Color.WHITE);
+		scrollpane.getViewport().setBackground(Color.WHITE);
+		
 		JPanel lowerpanel = new JPanel();
 		lowerpanel.setLayout(new BorderLayout(0,0));
 		JButton okButton = new JButton();

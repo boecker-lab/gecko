@@ -212,11 +212,12 @@ public class GenomeBrowser extends JScrollPane implements Adjustable {
 		this.flowlayout.setVgap(0);
 		this.contentPanel.setLayout(this.flowlayout);
 		this.genome = g;
+		this.setBackground(Color.WHITE);
 		this.contentPanel.setBackground(Color.WHITE);
 		this.adjustSize();
 		leftspace = new JPanel();
-		rightspace = new JPanel(); 
-		
+		rightspace = new JPanel();
+		this.setViewportBorder(null);
 		this.setViewportView(this.contentPanel);
 		this.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
 		this.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_NEVER);

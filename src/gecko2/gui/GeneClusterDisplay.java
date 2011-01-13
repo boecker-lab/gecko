@@ -23,7 +23,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 
 
 public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionListener {
@@ -74,6 +73,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 	private void update() {
 		masterPanel.removeAll();
 		if (annotations!=null) {
+
 			/*
 			 * Get the mouselisteners
 			 */
@@ -107,7 +107,6 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			masterPanel.add(involvedChrTitle);
 			
 			masterPanel.add(Box.createVerticalStrut(5));
-
 			for (int i=0; i<gOcc.getSubsequences().length; i++) {
 				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 				if (!s.isValid()) continue;
@@ -119,7 +118,6 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 				Chromosome c = GeckoInstance.getInstance().getGenomes()[i].getChromosomes().get(s.getChromosome());
 				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i)));
 				TextLabel textLabel = new TextLabel(c.getName());
-				textLabel.setFont(monoFont);
 				cpanel.add(textLabel);
 				masterPanel.add(cpanel);
 			}
@@ -253,12 +251,15 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			masterPanel.add(Box.createHorizontalGlue());
 			masterPanel.repaint();
 			flowpanel.repaint();
+		
+			
 		}
 		this.repaint();
 		this.revalidate();
+		this.getVerticalScrollBar().setValue(0);
 	}
 	
-	private class TextLabel extends JTextField {	
+	private class TextLabel extends JLabel {	
 		/**
 		 * Random generated serialization UID
 		 */
@@ -266,10 +267,10 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
 		public TextLabel(String s) {
 			super(s);
-			setEditable(false);
 			setBorder(null);
-			
+			setBackground(Color.WHITE);
 		}
+		
 	}
 
 

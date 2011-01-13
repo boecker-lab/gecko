@@ -103,6 +103,7 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 //	
 	public MultipleGenomesBrowser() {
 		gecko = GeckoInstance.getInstance();
+		this.setBackground(Color.WHITE);
 		this.addSelectionListener(this);
 		this.setPreferredSize(new Dimension(0,0));
 		this.wheelListener = new ScrollListener();

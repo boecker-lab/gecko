@@ -7,6 +7,7 @@ import gecko2.event.ClusterSelectionListener;
 import gecko2.event.LocationSelectionEvent;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -72,6 +73,9 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		checkBox.addActionListener(checkBoxListener);
 		this.add(checkBox, BorderLayout.PAGE_END);
 		table.addMouseListener(mouseListener);
+		table.setBackground(Color.WHITE);
+		scrollPane.getViewport().setBackground(Color.WHITE);
+		scrollPane.setBackground(Color.WHITE);
 	}
 	
 	private ActionListener checkBoxListener = new ActionListener() {
