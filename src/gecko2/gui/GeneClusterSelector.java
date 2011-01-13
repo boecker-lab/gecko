@@ -2,24 +2,34 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 import gecko2.algorithm.GeneCluster;
+import gecko2.algorithm.GeneClusterOccurrence;
+import gecko2.event.ClusterSelectionEvent;
+import gecko2.event.ClusterSelectionListener;
+import gecko2.event.LocationSelectionEvent;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.EventListenerList;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -30,6 +40,7 @@ public class GeneClusterSelector extends JPanel {
 
 	private static final long serialVersionUID = -4860132931042035952L;
 	private GeneClusterSelectorModel model;
+	private JCheckBox checkBox;
 	private JTable table;
 	
 	public static final short COL_ID = 0;
@@ -44,11 +55,14 @@ public class GeneClusterSelector extends JPanel {
 	}
 	
 	public GeneClusterSelector() {
-		this.setLayout(new GridLayout(1,1));
-		this.setPreferredSize(new Dimension(50,50));
-		this.setBackground(Color.WHITE);
+		this.setLayout(new BorderLayout());
+		checkBox = new JCheckBox("show suboptimal hits");
+		checkBox.setVisible(false);
+		checkBox.addActionListener(actionListener);
+		this.add(checkBox, BorderLayout.PAGE_END);
+		this.setPreferredSize(new Dimension(50,200));
 		table = new JTable();
-		table.setBackground(this.getBackground());
+		table.setBackground(Color.WHITE);
 		model = new GeneClusterSelectorModel();
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setModel(model);
@@ -61,66 +75,99 @@ public class GeneClusterSelector extends JPanel {
 		cm.getColumn(2).setPreferredWidth(70); // #Genomes
 		cm.getColumn(3).setPreferredWidth(60); // pValue
 		cm.getColumn(4).setPreferredWidth(200); // Genes
-		for (MouseListener m : table.getMouseListeners()) 
-			table.removeMouseListener(m);
-		for (MouseMotionListener m : table.getMouseMotionListeners())
-			table.removeMouseMotionListener(m);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		TableMouseListener m = new TableMouseListener();
-		table.addMouseListener(m);
-		table.addMouseMotionListener(m);
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.getViewport().setBackground(this.getBackground());
-		this.add(scrollPane);
-		table.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					GeckoInstance.getInstance().highLightCluster((Integer) table.getValueAt(table.getSelectedRow(), 0));
-					e.consume();
-				}
-			}
-		});
+		scrollPane.getViewport().setBackground(Color.WHITE);
+		this.add(scrollPane, BorderLayout.CENTER);
+		table.getSelectionModel().addListSelectionListener(listSelectionListener);
+		for (MouseListener l : table.getMouseListeners())
+			table.removeMouseListener(l);
+		for (MouseMotionListener l : table.getMouseMotionListeners())
+			table.removeMouseMotionListener(l);
+		table.addMouseListener(mouseListener);
+		table.addKeyListener(keyListener);
 	}
 	
-	
-	
-	class TableMouseListener extends MouseAdapter implements MouseMotionListener  {
-		
-		private JTable t;
-		
-		public TableMouseListener() {
-			t = GeneClusterSelector.this.table;
+	private ListSelectionListener listSelectionListener = new ListSelectionListener() {
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			int row = table.getSelectedRow();
+			if (row<0) return;
+			GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
+			if (gc!=null && !(gc.getType()==GeneCluster.TYPE_REFERENCE))
+				fireSelectionEvent(false);
 		}
-		
-		
-		public void mouseDragged(MouseEvent e) {
-			mousePressed(e);
-		}
+	};
+	
+	private KeyListener keyListener = new KeyAdapter() {
 		
 		@Override
-		public void mousePressed(MouseEvent e) {
-			int row = table.rowAtPoint(e.getPoint());
-			if (row!=-1)
-				table.setRowSelectionInterval(row, row);
-			table.requestFocus();
+		public void keyPressed(KeyEvent e) {
+			if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+				fireSelectionEvent(true);
+				e.consume();
+			}
+		};
+	};
+	
+	private ActionListener actionListener = new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			fireSelectionEvent(true);
+		}
+	};
+	
+	private void fireSelectionEvent(boolean instant) {
+		int row = table.getSelectedRow();
+		if (row<0) return;
+		GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
+		if (gc.getType()==GeneCluster.TYPE_CENTER || gc.getType()==GeneCluster.TYPE_MEDIAN) {
+			checkBox.setVisible(false);
+			fireSelectionEvent(new ClusterSelectionEvent(GeneClusterSelector.this, 
+					gc,
+					instant));
+		} else {
+			checkBox.setVisible(true);
+			int[] subselections = new int[GeckoInstance.getInstance().getGenomes().length];
+			Arrays.fill(subselections, 0);
+			GeneClusterOccurrence gOcc;
+			if (checkBox.isSelected())
+				gOcc = gc.getAllOccurrences()[0];
+			else
+				gOcc = gc.getOccurrences()[0];
+			fireSelectionEvent(new LocationSelectionEvent(GeneClusterSelector.this,
+					gc,
+					gOcc,
+					subselections,
+					instant));
+		}
 			
-		}
-		
-		public void mouseClicked(MouseEvent e) {
-			if (e.getClickCount()==2)
-				GeckoInstance.getInstance().highLightCluster((Integer) t.getValueAt(t.getSelectedRow(), 0));
-		}
-
-		public void mouseMoved(MouseEvent arg0) {
-			// TODO Auto-generated method stub	
-		}
-		
 	}
 	
+	private MouseListener mouseListener = new MouseAdapter() {
+		
+		public void mouseDragged(MouseEvent e) {
+			e.consume();
+		};
+		
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (e.getClickCount()==1) {
+				table.requestFocus();
+				int row = table.rowAtPoint(e.getPoint());
+				if (row>=0) table.setRowSelectionInterval(row, row);
+				e.consume();
+			} else if (e.getClickCount()==2) 
+				fireSelectionEvent(true);
+		};
+	};	
+		
 	public void refresh() {
+		table.clearSelection();
 		model.refreshMachingClusters();
 		model.fireTableDataChanged();
+		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
 		TableCellRenderer r = table.getDefaultRenderer(String.class);
 		int maxWidth = 0;
 		for (int i=0; i<model.getRowCount(); i++) {
@@ -134,8 +181,8 @@ public class GeneClusterSelector extends JPanel {
 	class GeneClusterSelectorModel extends AbstractTableModel {
 
 		private static final long serialVersionUID = -8389126835229250539L;
-		private final Class<?>[] columns = {Integer.class, Integer.class, Integer.class, String.class, String.class};
-		private final String[] columnNames = {"ID","#Genes","#Genomes","Score","Genes"};
+		private final Class<?>[] columns = {Integer.class, Integer.class, Integer.class, Double.class, String.class};
+		private final String[] columnNames = {"ID","#Genes","#Genomes","P-value","Genes"};
 		private GeckoInstance instance;
 		
 		private ArrayList<GeneCluster> matchingClusters;
@@ -183,8 +230,11 @@ public class GeneClusterSelector extends JPanel {
 			case 2:
 				return matchingClusters.get(rowIndex).getSize();
 			case 3:
-				DecimalFormat twoPlaces = new DecimalFormat("#.##");
-				return twoPlaces.format(-Math.log(matchingClusters.get(rowIndex).getpValue()));
+//				DecimalFormat twoPlaces = new DecimalFormat("#.##");
+//TODO UNCOMMENT
+//				return twoPlaces.format(-Math.log(matchingClusters.get(rowIndex).getpValue()));
+//				return 1;
+				return matchingClusters.get(rowIndex).getBestPValue();
 			case 4:
 				if (instance.getGenLabelMap()!=null) {
 					int[] genes = matchingClusters.get(rowIndex).getGenes();
@@ -206,4 +256,18 @@ public class GeneClusterSelector extends JPanel {
 		
 	}
 	
+	private EventListenerList eventListener = new EventListenerList();
+	
+	public void addSelectionListener(ClusterSelectionListener s) {
+		eventListener.add(ClusterSelectionListener.class, s);
+	}
+	public void removeSelectionListener(ClusterSelectionListener s) {
+		eventListener.remove(ClusterSelectionListener.class, s);
+	}
+	public void fireSelectionEvent(ClusterSelectionEvent e) {
+		for (ClusterSelectionListener l : eventListener.getListeners(ClusterSelectionListener.class))
+			l.selectionChanged(e);
+	}
+	
 }
+

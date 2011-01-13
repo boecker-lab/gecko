@@ -2,9 +2,7 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
-import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
-import gecko2.algorithm.Subsequence;
 import gecko2.util.FileUtils;
 import gecko2.util.PrintUtils;
 
@@ -70,6 +68,10 @@ public class Gui {
 		return mainframe;
 	}
 	
+	public GeneClusterSelector getGcSelector() {
+		return gcSelector;
+	}
+	
 	public Gui() {
 		this.gecko = GeckoInstance.getInstance();
 		this.gecko.setGui(this);
@@ -95,6 +97,13 @@ public class Gui {
 		mainframe.setPreferredSize(startDimension);
 		mainframe.setLayout(new BorderLayout());
 		
+		// The Splitpane that contains the two selectors (GeneClusterSelector
+		// and OccurrenceSelector)
+		JSplitPane selectorSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		selectorSplitPane.setTopComponent(this.gcSelector);
+		OccurrenceSelector occurrenceSelector = new OccurrenceSelector(this.gcDisplay);
+		selectorSplitPane.setBottomComponent(occurrenceSelector);
+		this.gcSelector.addSelectionListener(occurrenceSelector);
 				
 		// SplitPane arrangements
 		horiSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);	
@@ -102,8 +111,8 @@ public class Gui {
 		
 		vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		vertSplit.setResizeWeight(0.5);
-		this.gecko.setClusters(new GeneCluster[0]);
-		vertSplit.setTopComponent(this.gcSelector);
+		this.gecko.setClusters(null);
+		vertSplit.setTopComponent(selectorSplitPane);
 		
 		vertSplit.setBottomComponent(gcDisplay);
 
@@ -131,7 +140,9 @@ public class Gui {
 		
 		navigator = new GenomeNavigator();
 		gecko.addDataListener(navigator);
+		
 		mgb.addBrowserContentListener(navigator);
+		occurrenceSelector.addSelectionListener(mgb);
 		
 		
 		upperPanel.add(navigator, BorderLayout.SOUTH);
@@ -225,6 +236,14 @@ public class Gui {
 		mainframe.add(southpanel,BorderLayout.SOUTH);
 		changeMode(MODE_NO_SESSION);
 
+		
+		// Listener stuff
+		occurrenceSelector.addSelectionListener(gcDisplay);
+		gcSelector.addSelectionListener(gcDisplay);
+		gcSelector.addSelectionListener(navigator);
+		gcSelector.addSelectionListener(mgb);
+		occurrenceSelector.addSelectionListener(navigator);
+		mgb.addSelectionListener(gcDisplay);
 
 		
 		// Show JFrame
@@ -267,31 +286,9 @@ public class Gui {
 				this.mgb.addGenome(g);
 	}
 	
-	public void refreshClusterList() {
-		this.gcSelector.refresh();
-		this.gcDisplay.clearDisplay();
-	}
-	
-	public void showCluster(int id) {
-		mgb.clearHighlight();
-		mgb.clearGrey();
-		GeneCluster cluster = this.gecko.getClusters()[id];
-		for (int i=0;i<cluster.getSubsequences().length;i++) {
-			Subsequence s = cluster.getSubsequences()[i];
-			if (mgb.getBrowser(i).isFlipped())
-				this.mgb.scrollToPosition(i, s.getChromosome(), (int) Math.floor((s.getStart()-1+s.getStop()-1)/2));
-			else
-				this.mgb.scrollToPosition(i, s.getChromosome(), (int) Math.ceil((s.getStart()-1+s.getStop()-1)/2));
-			if (i==cluster.getRefSeqIndex())				
-				this.mgb.highlightCluster(i, s.getChromosome(), s.getStart()-1, s.getStop()-1, GeneElement.COLOR_HIGHLIGHT_REFCLUST);
-			else
-				this.mgb.highlightCluster(i, s.getChromosome(), s.getStart()-1, s.getStop()-1, GeneElement.COLOR_HIGHLIGHT_DEFAULT);			
-		}
-	}
-	
-	public void updateGeneClusterDisplay(GeneCluster c) {
-		this.gcDisplay.setContent(c);
-	}
+//	public void refreshClusterList() {
+//		this.gcSelector.refresh();
+//	}
 	
 	public MultipleGenomesBrowser getMgb() {
 		return mgb;
@@ -393,9 +390,7 @@ public class Gui {
 	}
 	
 	public void handleFileError(short error) {
-		mgb.clear();
-		updateViewscreen();
-		gcDisplay.clearDisplay();
+		closeCurrentSession();
 		changeMode(Gui.MODE_NO_SESSION);		
 		JOptionPane.showMessageDialog(mainframe, "The input file is not a valid COG file", "Wrong file format", JOptionPane.ERROR_MESSAGE);
 	}
@@ -405,7 +400,6 @@ public class Gui {
 		gecko.setGenomes(null);
 		gcSelector.refresh();
 		mgb.clear();
-		gcDisplay.clearDisplay();
 	}
 	
 	public void updategcSelector() {
@@ -459,7 +453,6 @@ public class Gui {
 			mgb.clearHighlight();
 			mgb.clearGrey();
 			mgb.unflipAll();
-			gcDisplay.clearDisplay();
 		}
 		
 	};

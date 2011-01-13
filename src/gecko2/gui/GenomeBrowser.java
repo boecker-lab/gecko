@@ -3,6 +3,7 @@ package gecko2.gui;
 import gecko2.GeckoInstance;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
+import gecko2.event.BrowserContentEvent;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -36,6 +37,7 @@ public class GenomeBrowser extends JScrollPane implements Adjustable {
 	private JPanel contentPanel;
 	private GenomeBrowserMouseDrag genomebrowsermousedrag;
 	private HashMap<GeneElement, Integer[]> backmap;
+	private 
 	GeckoInstance gecko;
 	
 	private boolean flipped = false;
@@ -137,29 +139,30 @@ public class GenomeBrowser extends JScrollPane implements Adjustable {
 		if (flipped) {
 			contentPanel.setBackground(BG_COLOR_FLIPPED);
 			for (int j=genElements.length-1;j>=0;j--) {
-				contentPanel.add(new ChromsomeEnd(contentPanel.getBackground(), ChromsomeEnd.LEFT));
+				contentPanel.add(new ChromosomeEnd(contentPanel.getBackground(), ChromosomeEnd.LEFT));
 				for (int i=genElements[j].size()-1; i>=0; i--) {
 					genElements[j].get(i).setBackground(contentPanel.getBackground());
 					contentPanel.add(genElements[j].get(i));
 					if (changeOrientation) genElements[j].get(i).flipOrientation();
 				}
-				contentPanel.add(new ChromsomeEnd(contentPanel.getBackground(), ChromsomeEnd.RIGHT));
+				contentPanel.add(new ChromosomeEnd(contentPanel.getBackground(), ChromosomeEnd.RIGHT));
 
 			}
 		} else  {
 			contentPanel.setBackground(Color.WHITE);
 			for (ArrayList<GeneElement> chromo : genElements) {
-				contentPanel.add(new ChromsomeEnd(contentPanel.getBackground(), ChromsomeEnd.LEFT));
+				contentPanel.add(new ChromosomeEnd(contentPanel.getBackground(), ChromosomeEnd.LEFT));
 				for (GeneElement e : chromo) {
 					contentPanel.add(e);
 					e.setBackground(contentPanel.getBackground());
 					if (changeOrientation) e.flipOrientation();
 				}
-				contentPanel.add(new ChromsomeEnd(contentPanel.getBackground(), ChromsomeEnd.RIGHT));
+				contentPanel.add(new ChromosomeEnd(contentPanel.getBackground(), ChromosomeEnd.RIGHT));
 			}
 		}
 		contentPanel.add(rightspace);
 		contentPanel.revalidate();
+		this.gecko.getGui().getMgb().fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
 	}
 	
 	private void arrangeGeneElements() {

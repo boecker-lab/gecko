@@ -18,5 +18,11 @@ public class Genome implements Serializable {
 		return chromosomes;
 	}
 	
+	public Gene[] getSubsequence(Subsequence s) {
+		ArrayList<Gene> geneList = new ArrayList<Gene>();
+		for (int i=s.getStart()-1; i<s.getStop(); i++) 
+			geneList.add(chromosomes.get(s.getChromosome()).getGenes().get(i));
+		return geneList.toArray(new Gene[0]);
+	}
 
 }

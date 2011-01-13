@@ -3,9 +3,12 @@ package gecko2;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
+import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
 import gecko2.algorithm.Subsequence;
+import gecko2.event.DataEvent;
+import gecko2.event.DataListener;
 import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
 import gecko2.util.PrintUtils;
@@ -26,8 +29,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.EventListener;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -122,7 +123,7 @@ public class GeckoInstance {
 		if (clusters==null) return;
 		String[] searchPatterns = searchPattern.split(" ");
 		for (int i=0; i<searchPatterns.length; i++) 
-			searchPatterns[i] = Pattern.quote(searchPatterns[i]);
+			searchPatterns[i] = Pattern.quote(searchPatterns[i].toLowerCase());
 		if (searchPatterns[0].equals("")) 
 			for (GeneCluster c : clusters)
 				c.setMatch(true);
@@ -144,23 +145,30 @@ public class GeckoInstance {
 				
 				// Check if there is a match in the genes annotations
 				if (!c.isMatch()) {
-					HashMap<Integer, Gene[]> an = generateAnnotations(c);
-					for (Gene[] geneArray : an.values()) {
-						for (Gene gene : geneArray) {
-							for (String pattern: searchPatterns) {
-								if (gene!=null && gene.getSummary().matches(".*"+pattern+".*")) {
-									c.setMatch(true);
-									break;
+					
+					// ... no comment ...
+					for (GeneClusterOccurrence gOcc : c.getAllOccurrences()) {
+						for (int genome=0; genome<gOcc.getSubsequences().length; genome++) {
+							Subsequence[] subseqs = gOcc.getSubsequences()[genome];
+							for (Subsequence s : subseqs) {
+								for (Gene g : genomes[genome].getSubsequence(s)) {
+									for (String pattern: searchPatterns)
+										if (g.getSummary().toLowerCase().matches(".*"+pattern+".*")) {
+											c.setMatch(true);
+											break;
+										}
+									if (c.isMatch()) break;
 								}
+								if (c.isMatch()) break;
 							}
 							if (c.isMatch()) break;
-						}
+						}				
 						if (c.isMatch()) break;
 					}
 				}
 			}
 		}
-		gui.refreshClusterList();
+		gui.getGcSelector().refresh();
 		
 	}
 	
@@ -219,17 +227,11 @@ public class GeckoInstance {
 	
 	public void setClusters(GeneCluster[] clusters) {
 		this.clusters = clusters;
-		gui.refreshClusterList();
+		gui.getGcSelector().refresh();
 	}
 	
 	public GeneCluster[] getClusters() {
 		return clusters;
-	}
-	
-	public void highLightCluster(int id) {
-		this.highlightedCluster = id;
-		gui.updateGeneClusterDisplay(clusters[id]);
-		gui.showCluster(id);
 	}
 	
 	/**
@@ -242,16 +244,16 @@ public class GeckoInstance {
 	 * a gene with that id does not occur in the subsequence (that is refered by the GeneCluster)
 	 * of that genome.
 	 */
-	public HashMap<Integer, Gene[]> generateAnnotations(GeneCluster c) {
+	public HashMap<Integer, Gene[]> generateAnnotations(GeneCluster c, GeneClusterOccurrence gOcc, int[] subselection) {
 		int[] genes = c.getGenes();
-		Subsequence[] subsequences = c.getSubsequences();
+		Subsequence[][] subsequences = gOcc.getSubsequences();
 		HashMap<Integer, Gene[]> map = new HashMap<Integer, Gene[]>();
 		for (int gene : genes) {
 			if (geneLabelMap[gene]!=0)
 				map.put(gene, new Gene[subsequences.length]);
 		}
 		for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
-			Subsequence subseq = subsequences[seqnum];
+			Subsequence subseq = subsequences[seqnum][subselection[seqnum]];
 			Chromosome chromosome = genomes[seqnum].getChromosomes().get(subseq.getChromosome());
 			for (int i=subseq.getStart()-1; i<subseq.getStop(); i++) {
 				Gene gene = chromosome.getGenes().get(i);
@@ -316,7 +318,7 @@ public class GeckoInstance {
 	
 	public void performClusterDetection(Parameter p) {
 		this.lastParameter = p;
-		p.setAlphabetSize(geneLabelMap.length);
+		p.setAlphabetSize(geneLabelMap.length-1);
 		p.setCodingTable(geneLabelMap);
 		gui.changeMode(Gui.MODE_PREPARING_COMPUTATION);
 		new ComputationThread(p);
@@ -326,7 +328,7 @@ public class GeckoInstance {
 		if (this.clusters==null) {
 			this.clusters = new GeneCluster[0];
 		}
-		gui.refreshClusterList();
+		gui.getGcSelector().refresh();
 		gui.changeMode(Gui.MODE_SESSION_IDLE);
 	}
 	
@@ -696,29 +698,7 @@ public class GeckoInstance {
 		  
 	}
 
-	public interface DataListener extends EventListener {
-		/**
-		 * This method is called when the input data, i.e. the genomes currently
-		 * observed in this session changed.
-		 * @param e The data event that references the {@link GeckoInstance} object
-		 * handled the data update
-		 */
-		public void dataChanged(DataEvent e);
-	}
+
 	
-	public class DataEvent extends EventObject {
-
-		private static final long serialVersionUID = 2868748485667954767L;
-
-		public DataEvent(GeckoInstance source) {
-			super(source);
-		}
-		
-		@Override
-		public GeckoInstance getSource() {
-			return (GeckoInstance) super.getSource();
-		}
-		
-	}
 	
 }

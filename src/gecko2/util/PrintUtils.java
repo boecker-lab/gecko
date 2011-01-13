@@ -8,5 +8,5 @@ public class PrintUtils {
 		if (GeckoInstance.getInstance().isDebugEnabled())
 			System.err.println(s);
 	}
-
+	
 }

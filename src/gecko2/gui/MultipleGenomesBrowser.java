@@ -3,12 +3,21 @@ package gecko2.gui;
 import gecko2.GeckoInstance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.GeneCluster;
+import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Genome;
 import gecko2.algorithm.Subsequence;
+import gecko2.event.BrowserContentEvent;
+import gecko2.event.BrowserContentListener;
+import gecko2.event.ClusterSelectionEvent;
+import gecko2.event.ClusterSelectionListener;
+import gecko2.event.LocationSelectionEvent;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyAdapter;
@@ -17,26 +26,29 @@ import java.awt.event.MouseWheelListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EventListener;
-import java.util.EventObject;
 import java.util.HashMap;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
 
-public class MultipleGenomesBrowser extends JPanel {
+public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionListener {
 
 	private static final long serialVersionUID = -6769789368841494821L;
 	private JPanel leftpanel ;
 	private JPanel centerpanel;
+
 	private JPanel rightPanel;
 	private ArrayList<GenomeBrowser> genomeBrowsers;
 	private ScrollListener wheelListener;
+	private LocationSelectionEvent lastLocationEvent;
+	private ArrayList<GBNavigator> gbNavigators;
 	
 	GeckoInstance gecko;
 
@@ -91,14 +103,18 @@ public class MultipleGenomesBrowser extends JPanel {
 //	
 	public MultipleGenomesBrowser() {
 		gecko = GeckoInstance.getInstance();
+		this.addSelectionListener(this);
 		this.setPreferredSize(new Dimension(0,0));
 		this.wheelListener = new ScrollListener();
 		this.genomeBrowsers = new ArrayList<GenomeBrowser>();
+		this.gbNavigators = new ArrayList<GBNavigator>();
 		this.setLayout(new BorderLayout());
 		this.leftpanel = new JPanel();
 		this.centerpanel = new JPanel();
 		centerpanel.setBackground(Color.WHITE);
 		this.rightPanel = new JPanel();
+		rightPanel.setBackground(Color.WHITE);
+		rightPanel.setVisible(false);
 		this.leftpanel.setLayout(new BoxLayout(leftpanel,BoxLayout.Y_AXIS));
 		this.centerpanel.setLayout(new BoxLayout(centerpanel,BoxLayout.Y_AXIS));
 		this.centerpanel.setPreferredSize(new Dimension(200,200));
@@ -161,10 +177,95 @@ public class MultipleGenomesBrowser extends JPanel {
 		boxPanel.add(n);
 		boxPanel.add(Box.createRigidArea(new Dimension(4, 0)));
 		boxPanel.add(gb);
+		GBNavigator nav = new GBNavigator(boxPanel,genomeBrowsers.size()-1);
+		this.gbNavigators.add(nav);
 		this.centerpanel.add(boxPanel);
+		rightPanel.add(nav);
 		this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight()+gb.getGBHeight()));
 		this.repaint();
 		this.revalidate();
+	}
+	
+	public class GBNavigator  extends JPanel implements ActionListener {
+		
+		/**
+		 * Random generated serialization UID
+		 */
+		private static final long serialVersionUID = -1597716317000549154L;
+		private JButton prev=new JButton("<"),next=new JButton(">");
+		private JComponent sizeReference;
+		private int genome;
+		
+		private final ComponentListener componentListener = new ComponentAdapter() {
+			
+			@Override
+			public void componentResized(java.awt.event.ComponentEvent e) {
+				GBNavigator.this.invalidate();
+				GBNavigator.this.getParent().doLayout();
+				GBNavigator.this.doLayout();
+			};
+		};
+		
+		public JButton getPrev() {
+			return prev;
+		}
+		
+		public JButton getNext() {
+			return next;
+		}
+		
+		public GBNavigator(JComponent sizeReference, int genome) {
+			this.genome = genome;
+			sizeReference.addComponentListener(componentListener);
+			this.setBackground(Color.WHITE);
+			prev.putClientProperty("JButton.buttonType", "bevel");
+			next.putClientProperty("JButton.buttonType", "bevel");
+			next.addActionListener(this);
+			prev.addActionListener(this);
+			this.sizeReference = sizeReference;
+			this.setLayout(new GridLayout(1, 2));
+			this.add(prev);
+			this.add(next);
+		}
+		
+		@Override
+		public Dimension getMaximumSize() {
+			return getPreferredSize();
+		}
+		
+		@Override
+		public Dimension getMinimumSize() {
+			return getPreferredSize();
+		}
+		
+		@Override
+		public Dimension getPreferredSize() {
+			if (sizeReference!=null) {
+				return new Dimension(80,sizeReference.getHeight());
+			} else
+				return new Dimension(0,0);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource()==next) {
+				int[] subselections = lastLocationEvent.getsubselection();
+				subselections[genome] = subselections[genome] + 1;
+				Arrays.toString(subselections);
+				fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this, 
+						lastLocationEvent.getSelection(), 
+						lastLocationEvent.getgOcc(), 
+						subselections));
+			} else if (e.getSource()==prev) {
+				int[] subselections = lastLocationEvent.getsubselection();
+				subselections[genome] = subselections[genome] - 1;
+				fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this, 
+						lastLocationEvent.getSelection(), 
+						lastLocationEvent.getgOcc(), 
+						subselections));
+			}
+		}
+		
 	}
 
 	
@@ -172,6 +273,9 @@ public class MultipleGenomesBrowser extends JPanel {
 		this.setPreferredSize(new Dimension(0,0));
 		this.centerpanel.removeAll();
 		this.genomeBrowsers.clear();
+		this.rightPanel.removeAll();
+		this.rightPanel.setVisible(false);
+		this.gbNavigators.clear();
 		this.repaint();
 	}
 	
@@ -246,18 +350,23 @@ public class MultipleGenomesBrowser extends JPanel {
 	}
 	
 	public void centerCurrentClusterAt(int geneID) {
-		GeneCluster cluster = gecko.getClusters()[gecko.getHighlightedCluster()];
-		Subsequence[] subseqs = cluster.getSubsequences();
-		int[] positions = new int[subseqs.length];
+		int[] subselections 		= lastLocationEvent.getsubselection();
+		GeneClusterOccurrence gOcc 	= lastLocationEvent.getgOcc();
+		
+		int[] positions = new int[gOcc.getSubsequences().length];
 		Arrays.fill(positions, -1);
 		ArrayList<Integer> minus = new ArrayList<Integer>();
 		ArrayList<Integer> plus = new ArrayList<Integer>();
-		for (int i=0; i<subseqs.length;i++) {
+		for (int i=0; i<positions.length;i++) {
+			// If genome i is not in the cluser, skip
+			if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+				continue;
 			ArrayList<Chromosome> genes = gecko.getGenomes()[i].getChromosomes();
-			for (int j=subseqs[i].getStart()-1;j<subseqs[i].getStop();j++) {
-				if (Math.abs(genes.get(subseqs[i].getChromosome()).getGenes().get(j).getId())==geneID) {
+			Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
+			for (int j=s.getStart()-1;j<s.getStop();j++) {
+				if (Math.abs(genes.get(s.getChromosome()).getGenes().get(j).getId())==geneID) {
 					positions[i] = j;
-					if (genes.get(subseqs[i].getChromosome()).getGenes().get(j).getId()<0) 
+					if (genes.get(s.getChromosome()).getGenes().get(j).getId()<0) 
 						minus.add(i);
 					else
 						plus.add(i);
@@ -277,7 +386,9 @@ public class MultipleGenomesBrowser extends JPanel {
 				if (genomeBrowsers.get(i).isFlipped()) genomeBrowsers.get(i).flip();
 		}
 		for (int i=0;i<positions.length;i++) //TODO REFIX THIS
-			if (positions[i]!=-1) scrollToPosition(i, subseqs[i].getChromosome(), positions[i]);
+			if (positions[i]!=-1) scrollToPosition(i, 
+					gOcc.getSubsequences()[i][subselections[i]].getChromosome(), 
+					positions[i]);
 	}
 	
 	private HashMap<GenomeBrowser, GenomeScollThread> lastScrollThreads = new HashMap<GenomeBrowser, GenomeScollThread>();
@@ -416,7 +527,10 @@ public class MultipleGenomesBrowser extends JPanel {
 			} else {
 				int sleepTime = 10;
 				for (int i=0; i<absunits; i=i+steps) {
+					
 					if (stop) break;
+					
+//					System.err.println("I/ABSUNITS "+i+"/"+absunits);
 					
 					final int finalsign = sign;
 					final int finalsteps = steps;
@@ -436,24 +550,29 @@ public class MultipleGenomesBrowser extends JPanel {
 //					if (i<absunits-1500)
 //						steps = absunits-1000;
 //					else 
-					if (i<absunits-1000) {
+					if (i<absunits-11000) {
+						steps = 6000;
+						sleepTime= 30;
+					} else if (i<absunits-8000) {
+						steps = 4000;
+						sleepTime=30;
+					} else if (i<absunits-5000) {
+						steps = 2000;
+						sleepTime=30;
+					} else if (i<absunits-2000) {
 						steps = 500;
-						sleepTime= 3;
-					} else if (i<absunits-300) {
-						sleepTime=10;
-						steps = 40;
-					} else if (i<absunits-200) {
-						sleepTime=10;
-						steps = 14;
+						sleepTime=30;
+					} else if (i<absunits-500) {
+						steps = 250;
+						sleepTime=30;
 					}
-						
 					else if (i<absunits-100) {
-						sleepTime = 10;
-						steps = 10;
+						steps = 30;
+						sleepTime = 30;
 					}
 					else if (i<absunits-80) {
-						sleepTime = 10;
-						steps = 8;
+						sleepTime = 30;
+						steps = 20;
 					} else if (i<absunits-60) {
 						sleepTime = 10;
 						steps = 4;
@@ -475,38 +594,50 @@ public class MultipleGenomesBrowser extends JPanel {
 		
 	}
 	
+	private void updateButtons(GeneClusterOccurrence gOcc, int[] subselection) {
+		Subsequence[][] subseqs = gOcc.getSubsequences();
+		for (int i=0; i<subseqs.length;i++) {
+			GBNavigator gbn = gbNavigators.get(i);
+			if (subselection[i]<subseqs[i].length-1)
+				gbn.getNext().setEnabled(true);
+			else
+				gbn.getNext().setEnabled(false);
+			if (subselection[i]>0)
+				gbn.getPrev().setEnabled(true);
+			else
+				gbn.getPrev().setEnabled(false);
+		}
+	}
+	
+	private void visualizeCluster(GeneCluster gc, GeneClusterOccurrence gOcc, int[] subselection) {
+		System.err.println("visualizing cluster "+Arrays.toString(subselection));
+		clearHighlight();
+		clearGrey();
+		if (gc.getType()==GeneCluster.TYPE_REFERENCE)
+			rightPanel.setVisible(true);
+		else
+			rightPanel.setVisible(false);
+		updateButtons(gOcc,subselection);
+		for (int i=0;i<subselection.length;i++) {
+			if (subselection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) continue;
+			Subsequence s = gOcc.getSubsequences()[i][subselection[i]];
+//			if (s==null) continue; // must actually not be the case
+			if (getBrowser(i).isFlipped())
+				scrollToPosition(i, s.getChromosome(), (int) Math.floor((s.getStart()-1+s.getStop()-1)/2));
+			else
+				scrollToPosition(i, s.getChromosome(), (int) Math.ceil((s.getStart()-1+s.getStop()-1)/2));
+			if (i==gc.getRefSeqIndex())				
+				highlightCluster(i, s.getChromosome(), s.getStart()-1, s.getStop()-1, GeneElement.COLOR_HIGHLIGHT_REFCLUST);
+			else
+				highlightCluster(i, s.getChromosome(), s.getStart()-1, s.getStop()-1, GeneElement.COLOR_HIGHLIGHT_DEFAULT);			
+		}		
+	}
+	
 
 	/*
 	 * BrowserContentEvents
 	 */
 	
-	public interface BrowserContentListener extends EventListener {
-		void browserContentChanged(BrowserContentEvent e);
-	}
-	
-	public class BrowserContentEvent extends EventObject {
-		
-		public static final short SCROLL_VALUE_CHANGED = 1;
-		public static final short ZOOM_FACTOR_CHANGED = 2;
-		
-		private short eventType;
-		private static final long serialVersionUID = 1382632021469547584L;
-
-		public BrowserContentEvent(MultipleGenomesBrowser source, short eventType) {
-			super(source);
-			this.eventType = eventType;
-		}
-		
-		public short getEventType() {
-			return eventType;
-		}
-		
-		@Override
-		public MultipleGenomesBrowser getSource() {
-			return (MultipleGenomesBrowser) super.getSource();
-		}
-	}
-
 	private EventListenerList eventListener = new EventListenerList();
 
 	
@@ -523,9 +654,37 @@ public class MultipleGenomesBrowser extends JPanel {
 			d.browserContentChanged(new BrowserContentEvent(this,type));
 		}
 	}
+	
+
+	public void addSelectionListener(ClusterSelectionListener s) {
+		eventListener.add(ClusterSelectionListener.class, s);
+	}
+	public void removeSelectionListener(ClusterSelectionListener s) {
+		eventListener.remove(ClusterSelectionListener.class, s);
+	}
+	
+	protected synchronized void fireSelectionEvent(ClusterSelectionEvent e) {
+		for (ClusterSelectionListener l : eventListener.getListeners(ClusterSelectionListener.class))
+			l.selectionChanged(e);
+	}
 	/*
 	 * END BrowserContentEvents
 	 */
+
+	@Override
+	public void selectionChanged(ClusterSelectionEvent e) {
+		// We don't care if only a gene cluster was selected, we only need
+		// to do something if a particular location of a gene cluster was
+		// selected
+		if (e instanceof LocationSelectionEvent) {
+			lastLocationEvent = (LocationSelectionEvent) e;
+			if (e.getSelection()!=null)
+				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.getgOcc(), lastLocationEvent.getsubselection());
+		}
+	}
+
+
+
 
 
 }

@@ -1,26 +1,46 @@
 package gecko2.algorithm;
 
 import java.io.Serializable;
+
+/**
+ * 
+ * @author Leon Kuchenbecker <lkuchenb@inf.fu-berlin.de>
+ *
+ */
 public class GeneCluster implements Serializable {
+	
+	public final static char TYPE_MEDIAN = 'm';
+	public final static char TYPE_CENTER = 'c';
+	public final static char TYPE_REFERENCE = 'r';
 
 	private static final long serialVersionUID = -5371037483783752995L;
 
 	int id;
-	Subsequence[] subsequences;
 	int[] genes;
 	int size;
 	private boolean match;
-	private double pValue;
-	private int totalDist;
+	private double bestPValue;
+	private int minTotalDist;
+	private GeneClusterOccurrence[] bestOccurrences;
+	private GeneClusterOccurrence[] allOccurrences;
+	private char type;
 	// The index of the subsequence containing the reference genecluster
 	private int refSeqIndex;
 	
-	public double getpValue() {
-		return pValue;
+	public char getType() {
+		return type;
 	}
 	
-	public int getTotalDist() {
-		return totalDist;
+	public GeneClusterOccurrence[] getAllOccurrences() {
+		return allOccurrences;
+	}
+	
+	public double getBestPValue() {
+		return bestPValue;
+	}
+	
+	public int getMinTotalDist() {
+		return minTotalDist;
 	}
 	
 	public boolean isMatch() {
@@ -31,54 +51,45 @@ public class GeneCluster implements Serializable {
 		this.match = match;
 	}
 	
-	public GeneCluster() {
-		match = true;
-		// This constructer is used in the native methode of GeckoInstance!
-		// TODO check if this is still true
-	}
-	
 	public int getRefSeqIndex() {
 		return refSeqIndex;
 	}
+	
+	public GeneClusterOccurrence[] getOccurrences() {
+		return bestOccurrences;
+	}
 		
-	public GeneCluster(int id, int[][] subsequences, int[] genes, double pValue, int totalDist, int refSeqIndex) {
-		System.err.println("REFCLUSTER "+refSeqIndex);
+	public GeneCluster(int id, 
+			GeneClusterOccurrence[] bestOccurrences, 
+			GeneClusterOccurrence[] allOccurrences, 
+			int[] genes, 
+			double bestPValue, 
+			int minTotalDist, 
+			int refSeqIndex,
+			char type) 
+	{
 		match=true;
+		//TODO check if this right
 		size=0;
-		this.pValue = pValue;
+		if (allOccurrences!=null && allOccurrences.length!=0)
+			for (Subsequence[] subSeqs : allOccurrences[0].getSubsequences())
+				if (subSeqs.length>0) size++;
+		
+		this.bestPValue = bestPValue;
+		this.bestOccurrences = bestOccurrences;
+		this.allOccurrences = allOccurrences;
 		this.refSeqIndex = refSeqIndex;
-		this.totalDist = totalDist;
-		this.subsequences = new Subsequence[subsequences.length];
-		for (int i=0;i<subsequences.length;i++) {
-			if (subsequences[i][0]>=0 && subsequences[i][1]>=0) size++;
-			this.subsequences[i] = new Subsequence(subsequences[i][0],subsequences[i][1], subsequences[i][2], subsequences[i][3]);
-		}
+		this.minTotalDist = minTotalDist;
+		this.type = type;
+
 		this.genes = genes;
 		this.id = id;
 	}
 	
-//	public GeneCluster(int id, Subsequence[] subsequences, int[] genes) {
-//		this.id = id;
-//		this.subsequences = subsequences;
-//		this.genes = genes;
-//		match=true;
-//	}
-	
 	public int getId() {
 		return id;
 	}
-	
-	public Subsequence[] getSubsequences() {
-		return subsequences;
-	}
-	
-	public void setSubsequences(Subsequence[] subsequences) {
-		size=0;
-		for (Subsequence s : subsequences)
-			if (s.getStart()>=0 && s.getStop()>=0) size++;
-		this.subsequences = subsequences;
-	}
-	
+		
 	public int[] getGenes() {
 		return genes;
 	}

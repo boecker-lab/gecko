@@ -4,7 +4,11 @@ import gecko2.GeckoInstance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
+import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Subsequence;
+import gecko2.event.ClusterSelectionEvent;
+import gecko2.event.ClusterSelectionListener;
+import gecko2.event.LocationSelectionEvent;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,15 +23,18 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 
-public class GeneClusterDisplay extends JScrollPane {
+public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionListener {
 
 	private static final long serialVersionUID = -2156280340296694286L;
 	private JPanel masterPanel;
 	private JPanel flowpanel;
 	private HashMap<Integer, Gene[]> annotations;
 	private GeneCluster cluster;
+	private GeneClusterOccurrence gOcc;
+	private int[] subselections;
 	
 	private static final String VALUES_TITLE = "Global cluster information:";
 	private static final String LOCAL_VALUES_TITLE = "Distance to center/median per dataset:";
@@ -44,18 +51,25 @@ public class GeneClusterDisplay extends JScrollPane {
 		update();
 	}
 
-	public void setContent(GeneCluster c) {
-		this.cluster = c;
-		if (c!=null)
-			this.annotations = GeckoInstance.getInstance().generateAnnotations(c);
-		else
+	@Override
+	public void selectionChanged(ClusterSelectionEvent e) {
+		if (! (e instanceof LocationSelectionEvent))
+			return;
+		LocationSelectionEvent l = (LocationSelectionEvent) e;
+		this.cluster = l.getSelection();
+		if (this.cluster!=null) {
+			this.annotations = GeckoInstance.getInstance().generateAnnotations(l.getSelection(), 
+					l.getgOcc(), 
+					l.getsubselection());
+			this.subselections = l.getsubselection();
+			this.gOcc = l.getgOcc();
+		} else {
 			this.annotations = null;
+			this.subselections = null;
+		}
 		update();
 	}
 	
-	public void clearDisplay() {
-		this.setContent(null);
-	}
 	
 	private void update() {
 		masterPanel.removeAll();
@@ -65,8 +79,9 @@ public class GeneClusterDisplay extends JScrollPane {
 			 */
 			GeckoInstance instance = GeckoInstance.getInstance();
 			ArrayList<MouseListener> mlisteners = new ArrayList<MouseListener>();
-			for (int i=0;i<cluster.getSubsequences().length;i++) {
-				Subsequence s = cluster.getSubsequences()[i];
+
+			for (int i=0;i<gOcc.getSubsequences().length;i++) {
+				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 				if (s.isValid())
 					mlisteners.add(i, instance.getGenomes()[i].getChromosomes().get(s.getChromosome()).getChromosomeMouseListener());
 				else
@@ -92,8 +107,9 @@ public class GeneClusterDisplay extends JScrollPane {
 			masterPanel.add(involvedChrTitle);
 			
 			masterPanel.add(Box.createVerticalStrut(5));
-			for (int i=0; i<cluster.getSubsequences().length; i++) {
-				Subsequence s = cluster.getSubsequences()[i];
+
+			for (int i=0; i<gOcc.getSubsequences().length; i++) {
+				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 				if (!s.isValid()) continue;
 				JPanel cpanel = new JPanel();
 				FlowLayout f = new FlowLayout(FlowLayout.LEFT);
@@ -102,7 +118,7 @@ public class GeneClusterDisplay extends JScrollPane {
 				cpanel.setBackground(masterPanel.getBackground());
 				Chromosome c = GeckoInstance.getInstance().getGenomes()[i].getChromosomes().get(s.getChromosome());
 				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i)));
-				JLabel textLabel = new JLabel(c.getName());
+				TextLabel textLabel = new TextLabel(c.getName());
 				textLabel.setFont(monoFont);
 				cpanel.add(textLabel);
 				masterPanel.add(cpanel);
@@ -125,9 +141,10 @@ public class GeneClusterDisplay extends JScrollPane {
 			title1.add(Box.createHorizontalGlue());
 			masterPanel.add(title1);
 			
-			String[] titles = {"Total distance: ", 
-					           "         Score: "};
-			Object[] values = { cluster.getTotalDist(), -Math.log(cluster.getpValue()) };
+			String[] titles = {"Best total distance: ", 
+					           "       Best P-value: "};
+			Object[] values = { gOcc.getTotalDist(), 
+								gOcc.getpValue() };
 			masterPanel.add(Box.createVerticalStrut(5));
 			for (int i=0; i<titles.length; i++) {
 				JPanel cpanel = new JPanel();
@@ -135,7 +152,7 @@ public class GeneClusterDisplay extends JScrollPane {
 				f.setVgap(1);
 				cpanel.setLayout(f);
 				cpanel.setBackground(masterPanel.getBackground());
-				JLabel textLabel = new JLabel(titles[i]+values[i]);
+				TextLabel textLabel = new TextLabel(titles[i]+values[i]);
 				textLabel.setFont(monoFont);
 				cpanel.add(textLabel);
 				masterPanel.add(cpanel);
@@ -164,11 +181,12 @@ public class GeneClusterDisplay extends JScrollPane {
 			f.setVgap(1);
 			cpanel.setLayout(f);
 			cpanel.setBackground(masterPanel.getBackground());
-			for (int i=0; i<cluster.getSubsequences().length; i++) {
-				Subsequence s = cluster.getSubsequences()[i];
+
+			for (int i=0; i<gOcc.getSubsequences().length; i++) {
+				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 				if (s.getStart()>s.getStop()) continue;
 				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i)));
-				JLabel textLabel = new JLabel(Integer.toString(s.getDist()));
+				TextLabel textLabel = new TextLabel(Integer.toString(s.getDist()));
 				textLabel.setFont(monoFont);
 				cpanel.add(textLabel);
 				cpanel.add(Box.createHorizontalStrut(5));
@@ -185,7 +203,7 @@ public class GeneClusterDisplay extends JScrollPane {
 			title2.setLayout(new BoxLayout(title2,BoxLayout.X_AXIS));
 
 			{
-				JLabel label = new JLabel(GENES_TITLE);
+				TextLabel label = new TextLabel(GENES_TITLE);
 				label.setFont(boldFont);
 				title2.add(label);
 			}
@@ -218,7 +236,7 @@ public class GeneClusterDisplay extends JScrollPane {
 							((FlowLayout)refPanel.getLayout()).setHgap(0);
 							refPanel.add(Box.createRigidArea(new Dimension((int)e.getPreferredSize().getWidth(), 0)));
 						}
-						JLabel l = new JLabel(genes[i].getSummary());
+						TextLabel l = new TextLabel(genes[i].getSummary());
 						l.setFont(monoFont);
 						NumberInRectangle n = new NumberInRectangle(i+1,refPanel.getBackground(), mlisteners.get(i));
 						refPanel.add(n);
@@ -240,5 +258,20 @@ public class GeneClusterDisplay extends JScrollPane {
 		this.revalidate();
 	}
 	
+	private class TextLabel extends JTextField {	
+		/**
+		 * Random generated serialization UID
+		 */
+		private static final long serialVersionUID = -741356610359230027L;
+
+		public TextLabel(String s) {
+			super(s);
+			setEditable(false);
+			setBorder(null);
+			
+		}
+	}
+
+
 
 }

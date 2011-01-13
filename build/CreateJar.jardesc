@@ -11,8 +11,8 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <folder path="/Gecko2/images"/>
+        <folder path="/Gecko2/lib"/>
         <javaElement handleIdentifier="=Gecko2/src"/>
-        <javaElement handleIdentifier="=Gecko2/&lt;images"/>
-        <javaElement handleIdentifier="=Gecko2/&lt;lib.libgecko2"/>
     </selectedElements>
 </jardesc>

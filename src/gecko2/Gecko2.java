@@ -11,6 +11,7 @@ import javax.swing.UIManager;
 public class Gecko2 {
 	
 	public static void main (String[] args) {
+		
 		String lcOSName = System.getProperty("os.name").toLowerCase();
 		System.err.println(lcOSName);
 		boolean IS_MAC = lcOSName.startsWith("mac os x");
@@ -39,6 +40,7 @@ public class Gecko2 {
 	    		
 		GeckoInstance.getInstance(); 
 		Gui.startUp();
+
 	}
 	
 	

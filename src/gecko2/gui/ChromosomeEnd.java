@@ -9,7 +9,7 @@ import java.awt.Graphics;
 import javax.swing.JPanel;
 
 
-public class ChromsomeEnd extends JPanel implements Adjustable {
+public class ChromosomeEnd extends JPanel implements Adjustable {
 
 	private static final long serialVersionUID = 3167399537083845840L;
 
@@ -17,9 +17,9 @@ public class ChromsomeEnd extends JPanel implements Adjustable {
 	public static final short RIGHT = 2;
 	private short orientation;
 	
-	private GeckoInstance gecko = GeckoInstance.getInstance();
+	private static GeckoInstance gecko = GeckoInstance.getInstance();
 	
-	public ChromsomeEnd(Color c, short orientation) {
+	public ChromosomeEnd(Color c, short orientation) {
 		this.setBackground(c);
 		this.adjustSize();
 		this.orientation = orientation;
@@ -27,8 +27,13 @@ public class ChromsomeEnd extends JPanel implements Adjustable {
 
 	
 	public void adjustSize() {
-		this.setPreferredSize(new Dimension(4+gecko.getGeneElementHight(),4+gecko.getGeneElementHight()));
+		this.setPreferredSize(computeDimension());
 		this.setSize(this.getPreferredSize());
+	}
+	
+	public static Dimension computeDimension() {
+		int w = 4+gecko.getGeneElementHight();
+		return new Dimension(w,w);
 	}
 	
 	@Override
