@@ -140,9 +140,9 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			masterPanel.add(title1);
 			
 			String[] titles = {"Best total distance: ", 
-					           "       Best P-value: "};
+					           "         Best score: "};
 			Object[] values = { gOcc.getTotalDist(), 
-								gOcc.getpValue() };
+								gOcc.getBestScore() };
 			masterPanel.add(Box.createVerticalStrut(5));
 			for (int i=0; i<titles.length; i++) {
 				JPanel cpanel = new JPanel();

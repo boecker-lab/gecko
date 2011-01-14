@@ -110,12 +110,9 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 				g.setColor(new Color(145,0,20));
 				for (Subsequence s : gOcc.getSubsequences()[i]) {
 					int chrom = s.getChromosome();
-					System.err.println("chrom = "+chrom);
 					int gcount;
 					if (gb.isFlipped()) {
-						System.err.println("chrom = "+gb.getGenome().getChromosomes().size()+"-"+chrom+"- 1");
 						chrom = gb.getGenome().getChromosomes().size() - chrom -1;
-						System.err.println("chomosome "+chrom);
 						gcount = gb.getGenome().getChromosomes().get(s.getChromosome()).getGenes().size() - 1 - ((int) Math.ceil(((s.getStart()+s.getStop()-2)/2.0)));
 					} else 
 						gcount = ((int) ((s.getStart()+s.getStop()-2)/2.0));	

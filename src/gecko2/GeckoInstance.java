@@ -45,7 +45,7 @@ public class GeckoInstance {
 	private HashMap<Integer, Color> colormap;
 	private GeneCluster[] clusters;
 	private int highlightedCluster;
-	private boolean debug = true;
+	private boolean debug = false;
 	private boolean animationEnabled = true;
 	private File lastSavedFile = null, lastOpenedFile = null;
 	private Parameter lastParameter;
@@ -457,12 +457,9 @@ public class GeckoInstance {
 					ArrayList<Gene> genes = new ArrayList<Gene>();
 					// Forward file pointer to genomes first gene
 					reader.jumpToLine(occ.getStart_line()+2);
-					boolean printed = false;
 					while (reader.getCurrentLineNumber()<=occ.getEnd_line() && (line=reader.readLine())!=null) {
 						if (!line.equals("")) {
 							String[] explode = line.split("\t");
-							if (!printed) System.err.println("=> "+Arrays.toString(explode));
-							printed=true;
 							int id = Integer.parseInt(explode[0]);
 							int sign; if (explode[1].equals("-")) sign=-1; else sign = 1;
 							if (id!=0 && backmap.containsKey(id)) {
@@ -561,7 +558,6 @@ public class GeckoInstance {
 	}
 	
 	public void initProgressBar(int maxvalue) {
-		System.err.println("CALL INIT PROGRESS");
 		final int maxv = maxvalue;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {

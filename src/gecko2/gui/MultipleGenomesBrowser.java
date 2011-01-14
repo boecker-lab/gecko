@@ -530,9 +530,7 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 				for (int i=0; i<absunits; i=i+steps) {
 					
 					if (stop) break;
-					
-//					System.err.println("I/ABSUNITS "+i+"/"+absunits);
-					
+										
 					final int finalsign = sign;
 					final int finalsteps = steps;
 					SwingUtilities.invokeLater(new Runnable() {
@@ -611,7 +609,6 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 	}
 	
 	private void visualizeCluster(GeneCluster gc, GeneClusterOccurrence gOcc, int[] subselection) {
-		System.err.println("visualizing cluster "+Arrays.toString(subselection));
 		clearHighlight();
 		clearGrey();
 		if (gc.getType()==GeneCluster.TYPE_REFERENCE)

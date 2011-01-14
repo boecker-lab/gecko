@@ -44,6 +44,14 @@ public class GeneClusterOccurrence {
 	}
 	
 	/**
+	 * Returns the best score of this occurrence
+	 * @return the best score of this occurrence
+	 */
+	public double getBestScore() {
+		return -Math.log(pValue);
+	}
+	
+	/**
 	 * Returns the ID of this {@link GeneClusterOccurrence}.
 	 * @return The ID of this {@link GeneClusterOccurrence}
 	 */
@@ -60,10 +68,10 @@ public class GeneClusterOccurrence {
 	}
 	
 	/**
-	 * Returns the pValue
-	 * @return The pValue
+	 * Returns the best pValue
+	 * @return The best pValue
 	 */
-	public double getpValue() {
+	public double getBestpValue() {
 		return pValue;
 	}
 	

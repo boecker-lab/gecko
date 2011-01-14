@@ -28,14 +28,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
@@ -91,7 +95,33 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			table.removeMouseMotionListener(l);
 		table.addMouseListener(mouseListener);
 		table.addKeyListener(keyListener);
+//		table.setDefaultRenderer(Double.class, new DoubleCellRenderer());
+		table.getRowSorter().setSortKeys(Arrays.asList(new RowSorter.SortKey[] { new RowSorter.SortKey(3, SortOrder.DESCENDING) }));
+
 	}
+	
+	public static class DoubleCellRenderer extends  DefaultTableCellRenderer.UIResource {
+
+		/**
+		 * Random generated serialization UID
+		 */
+		private static final long serialVersionUID = 3185195801465019965L;
+
+		public DoubleCellRenderer() {
+		    super();
+		    setHorizontalAlignment(JLabel.RIGHT);
+		}
+		
+		@Override
+		protected void setValue(Object value) {
+			if (value==null || (!(value instanceof Double))) {
+				setText("");
+			} else
+				setText(String.format("%13.2e",value));
+		}
+		
+	}
+	
 	
 	private ListSelectionListener listSelectionListener = new ListSelectionListener() {
 		@Override
@@ -200,7 +230,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 
 		private static final long serialVersionUID = -8389126835229250539L;
 		private final Class<?>[] columns = {Integer.class, Integer.class, Integer.class, Double.class, String.class};
-		private final String[] columnNames = {"ID","#Genes","#Genomes","P-value","Genes"};
+		private final String[] columnNames = {"ID","#Genes","#Genomes","Score","Genes"};
 		private GeckoInstance instance;
 		
 		private ArrayList<GeneCluster> matchingClusters;
@@ -248,11 +278,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			case 2:
 				return matchingClusters.get(rowIndex).getSize();
 			case 3:
-//				DecimalFormat twoPlaces = new DecimalFormat("#.##");
-//TODO UNCOMMENT
-//				return twoPlaces.format(-Math.log(matchingClusters.get(rowIndex).getpValue()));
-//				return 1;
-				return matchingClusters.get(rowIndex).getBestPValue();
+				return matchingClusters.get(rowIndex).getBestScore();
 			case 4:
 				if (instance.getGenLabelMap()!=null) {
 					int[] genes = matchingClusters.get(rowIndex).getGenes();

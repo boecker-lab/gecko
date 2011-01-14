@@ -2,6 +2,7 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 import gecko2.algorithm.Gene;
+import gecko2.util.PrintUtils;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -162,7 +163,7 @@ public class GeneElement extends JPanel implements Adjustable {
 		}
 		if (!this.unknown) {
 			if (geneColor == null) {
-				System.err.println("Color?!");
+				PrintUtils.printDebug("COLOR ERROR");
 				geneColor = Color.blue;
 			} 
 			if (geneColor.getRed() + geneColor.getGreen() + geneColor.getBlue() > 450) {

@@ -13,7 +13,9 @@ public class Gecko2 {
 	public static void main (String[] args) {
 		
 		String lcOSName = System.getProperty("os.name").toLowerCase();
-		System.err.println(lcOSName);
+		System.err.println("You are running "+
+				System.getProperty("os.arch")+
+				"-Java on "+System.getProperty("os.name"));
 		boolean IS_MAC = lcOSName.startsWith("mac os x");
 		if (IS_MAC) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -36,7 +38,7 @@ public class Gecko2 {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		System.out.println(":o)");
+		System.err.println(":o)");
 	    		
 		GeckoInstance.getInstance(); 
 		Gui.startUp();

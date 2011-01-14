@@ -39,6 +39,10 @@ public class GeneCluster implements Serializable {
 		return bestPValue;
 	}
 	
+	public double getBestScore() {
+		return -Math.log(bestPValue);
+	}
+	
 	public int getMinTotalDist() {
 		return minTotalDist;
 	}

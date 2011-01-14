@@ -23,6 +23,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  * The {@link OccurrenceSelector} lets the user choose between the occurrences
@@ -65,6 +66,10 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		cm.getColumn(1).setPreferredWidth(20);
 		cm.getColumn(2).setPreferredWidth(20);
 //		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		
+//		table.setDefaultRenderer(Double.class, new GeneClusterSelector.DoubleCellRenderer());
+		TableRowSorter<AbstractTableModel> rowSorter = new TableRowSorter<AbstractTableModel>(model);
+		table.setRowSorter(rowSorter);
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		this.setLayout(new BorderLayout());
@@ -167,7 +172,7 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		 */
 		private static final long serialVersionUID = 4474685987973352693L;
 		private final Class<?>[] columns = {Integer.class,Integer.class, Double.class, Integer.class};
-		private final String[] columnNames = {"ID", "#Genomes", "P-value","Distance"};
+		private final String[] columnNames = {"ID", "#Genomes", "Score","Distance"};
 		private final static int COL_ID = 0;
 		private final static int COL_NGENOMES = 1;
 		private final static int COL_PVALUE = 2;
@@ -186,7 +191,7 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 			case COL_NGENOMES:
 				return getOccurrences(selection)[rowIndex].getSupport();
 			case COL_PVALUE:
-				return getOccurrences(selection)[rowIndex].getpValue();
+				return getOccurrences(selection)[rowIndex].getBestScore();
 			case COL_DIST:
 				return getOccurrences(selection)[rowIndex].getTotalDist();
 			default:

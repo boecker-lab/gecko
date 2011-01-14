@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -272,15 +271,11 @@ public class StartComputationDialog extends JDialog {
 					Map<Integer, Integer> revIDMap = SortUtils.invertIntArray(gecko.getGenLabelMap());
 					for (String id : refClusterField.getText().split(" "))
 						if (id!=null && (!(id.equals("")))) {
-							System.err.println("STRING IS '"+id+"'");
 							Integer iid = revIDMap.get(Integer.parseInt(id));
 							if (iid!=null)
 								genes.add(new Gene("", iid));
 						}
 					cluster.getChromosomes().add(new Chromosome("Reference cluster", genes));
-					ArrayList<Gene> invgenes = new ArrayList<Gene>(genes);
-					Collections.reverse(invgenes);
-					cluster.getChromosomes().add(new Chromosome("Reference cluster", invgenes));
 					genomes[0] = cluster;
 					for (int i=0;i<oldGenomes.length;i++) {
 						genomes[i+1] = oldGenomes[i];
