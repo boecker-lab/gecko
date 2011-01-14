@@ -5,6 +5,8 @@ import gecko2.GenomeOccurence;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SortUtils {
@@ -15,6 +17,13 @@ public class SortUtils {
 	
 	public static void resortGenomeOccurencesByStart(ArrayList<GenomeOccurence> occs) {
 		Collections.sort(occs, new GenomeOccurenceStartComparator());
+	}
+	
+	public static Map<Integer, Integer> invertIntArray(int[] orig) {
+		HashMap<Integer, Integer> result = new HashMap<Integer, Integer>();
+		for (int i=0;i<orig.length;i++)
+			result.put(orig[i], i);
+		return result;		
 	}
 	
 }

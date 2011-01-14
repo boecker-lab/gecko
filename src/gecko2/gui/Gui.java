@@ -250,9 +250,8 @@ public class Gui {
 		mainframe.pack();
 		mainframe.setLocationRelativeTo(null);
 		mainframe.addKeyListener(mgb.getWheelListener());
+		mainframe.setIconImage(createImageIcon("images/gecko2_a_small.png").getImage());
 		mainframe.setVisible(true);
-	
-		
 	}
 	
 	public void setInfobarText(String text) {
@@ -395,7 +394,7 @@ public class Gui {
 		JOptionPane.showMessageDialog(mainframe, "The input file is not a valid COG file", "Wrong file format", JOptionPane.ERROR_MESSAGE);
 	}
 
-	private void closeCurrentSession() {
+	public void closeCurrentSession() {
 		gecko.setClusters(null);
 		gecko.setGenomes(null);
 		gcSelector.refresh();

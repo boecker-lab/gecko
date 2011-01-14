@@ -8,6 +8,7 @@ public class Parameter {
 	private int[] codingTable;
 	private int q;
 	private short qtype;
+	private char refType;
 	private char operationMode;
 	
 	// used to interrupt the c function when requested by the user.
@@ -25,13 +26,18 @@ public class Parameter {
 		return run;
 	}	
 	
-	public Parameter(int delta, int minClusterSize, int q, short qtype, char operationMode) {
+	public Parameter(int delta, int minClusterSize, int q, short qtype, char operationMode, char refType) {
 		this.delta = delta;
 		this.minClusterSize = minClusterSize;
 		this.q= q;
 		this.qtype = qtype;
 		this.operationMode = operationMode;
+		this.refType = refType;
 	}
+	
+	public char getRefType() {
+		return refType;
+	};
 		
 	public void setOperationMode(char opmode) {
 		this.operationMode = opmode;

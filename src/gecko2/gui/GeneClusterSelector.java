@@ -10,6 +10,11 @@ import gecko2.event.LocationSelectionEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -36,7 +41,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 
-public class GeneClusterSelector extends JPanel {
+public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 
 	private static final long serialVersionUID = -4860132931042035952L;
 	private GeneClusterSelectorModel model;
@@ -103,6 +108,19 @@ public class GeneClusterSelector extends JPanel {
 		
 		@Override
 		public void keyPressed(KeyEvent e) {
+			Toolkit def = Toolkit.getDefaultToolkit();
+			int modifiers = def.getMenuShortcutKeyMask();
+			if (e.getModifiers() == modifiers && e.getKeyChar()=='c') {
+				int row = table.getSelectedRow();
+				if (row<0) return;
+				GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
+				String geneIDs = "";
+				for (int geneID : gc.getGenes())
+					geneIDs += GeckoInstance.getInstance().getGenLabelMap()[geneID]+" ";
+				def.getSystemClipboard().setContents(new StringSelection(geneIDs), GeneClusterSelector.this);
+				e.consume();
+			}
+
 			if (e.getKeyCode()==KeyEvent.VK_ENTER) {
 				fireSelectionEvent(true);
 				e.consume();
@@ -267,6 +285,11 @@ public class GeneClusterSelector extends JPanel {
 	public void fireSelectionEvent(ClusterSelectionEvent e) {
 		for (ClusterSelectionListener l : eventListener.getListeners(ClusterSelectionListener.class))
 			l.selectionChanged(e);
+	}
+
+	@Override
+	public void lostOwnership(Clipboard clipboard, Transferable contents) {
+		// Do nothing		
 	}
 	
 }

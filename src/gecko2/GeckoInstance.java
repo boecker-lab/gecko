@@ -218,6 +218,7 @@ public class GeckoInstance {
 			scd = new StartComputationDialog(genomes.length);
 		else
 			scd = null;
+		GeckoInstance.this.gui.updateViewscreen();
 		this.fireDataChanged();
 	}
 	
@@ -291,22 +292,6 @@ public class GeckoInstance {
 		this.clusters = new GeneCluster[0];
 		this.setGeneElementHight(20);
 		ToolTipManager.sharedInstance().setInitialDelay(0);
-		// Handle global keyboard event
-//		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-//
-//			public boolean dispatchKeyEvent(KeyEvent e) {
-//				if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-//					if (e.getID() == KeyEvent.KEY_PRESSED) {
-//						multipleScroll = true;
-//					} else {
-//						multipleScroll = false;
-//					}
-//				}
-//					
-//				return false;
-//			}
-//			
-//		});
 	}
 	
 	public static synchronized GeckoInstance getInstance() {
@@ -343,7 +328,7 @@ public class GeckoInstance {
 		
 		public void run() {
 			// We do this very ugly with a 3D integer array to make things easier
-			// during the 
+			// during the JNI<->JAVA phase
 			int genomes[][][] = new int[GeckoInstance.this.genomes.length][][];
 			for (int i=0;i<genomes.length;i++) {
 				genomes[i] = new int[GeckoInstance.this.genomes[i].getChromosomes().size()][];

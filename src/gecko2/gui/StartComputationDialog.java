@@ -1,15 +1,24 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
+import gecko2.algorithm.Chromosome;
+import gecko2.algorithm.Gene;
+import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
 import gecko2.util.PrintUtils;
+import gecko2.util.SortUtils;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -22,24 +31,29 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.ToolTipManager;
 
 
 public class StartComputationDialog extends JDialog {
 
 	private static final long serialVersionUID = -5635614016950101153L;
 	private int quorum;
-	private char opMode;
+	private char opMode,refType;
+	private JComboBox refCombo;
+	private JLabel refLabel;
+	private GeckoInstance gecko = GeckoInstance.getInstance();
 
 	public StartComputationDialog(int ngenomes) {
 		this.setModal(true);
 		this.setResizable(false);
 		JPanel panel = new JPanel(new FlowLayout());
-		panel.setPreferredSize(new Dimension(430,220));
-		JPanel gridpanel = new JPanel();
-		gridpanel.setPreferredSize(new Dimension(410,160));
-		gridpanel.setLayout(new GridLayout(4,2));
+		panel.setPreferredSize(new Dimension(430,280));
+		final JPanel gridpanel = new JPanel();
+		gridpanel.setPreferredSize(new Dimension(410,220));
+		gridpanel.setLayout(new GridLayout(6,2));
 		
 		final JSpinner dSpinner = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
 		dSpinner.setPreferredSize(new Dimension(150,30));
@@ -53,7 +67,7 @@ public class StartComputationDialog extends JDialog {
 			qValues[i-2] = Integer.toString(i);
 		final JComboBox qCombo = new JComboBox(qValues);
 		qCombo.setSelectedIndex(qValues.length-1);
-		qCombo.setPreferredSize(new Dimension(150,30));
+		qCombo.setPreferredSize(new Dimension(190,30));
 		qCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (qCombo.getSelectedIndex()==qValues.length-1)
@@ -67,10 +81,15 @@ public class StartComputationDialog extends JDialog {
 		final String[] modes = {"median", "center", "reference"};
 		final JComboBox modeCombo = new JComboBox(modes);
 
-		modeCombo.setPreferredSize(new Dimension(120,30));
+		modeCombo.setPreferredSize(new Dimension(190,30));
 
 		this.opMode = 'm';
 		modeCombo.setSelectedIndex(0);
+		
+		final String[] refModes = {"all against all", "fixed genome", "manual cluster"};
+		refLabel = new JLabel("Reference:");
+		refCombo = new JComboBox(refModes);
+		refCombo.setPreferredSize(new Dimension(190, 30));
 		
 		modeCombo.addActionListener(new ActionListener() {
 			
@@ -101,6 +120,7 @@ public class StartComputationDialog extends JDialog {
 		p1b.add(dSpinner);
 		gridpanel.add(p1b);
 		
+		
 		JPanel p2a = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		((FlowLayout) p2a.getLayout()).setVgap(12);
 		p2a.add(new JLabel("Minimum cluster size: "));
@@ -125,7 +145,105 @@ public class StartComputationDialog extends JDialog {
 		p4b.add(modeCombo);
 		gridpanel.add(p4b);
 		
+		JPanel p5a = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		((FlowLayout) p5a.getLayout()).setVgap(12);
+		p5a.add(refLabel);
+		gridpanel.add(p5a);
+		JPanel p5b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		p5b.add(refCombo);
+		gridpanel.add(p5b);
+		
+		JLabel refValueLabel = new JLabel();
+		final JTextField refClusterField = new JTextField() {
+			
+			/**
+			 * Random generated serilization UID
+			 */
+			private static final long serialVersionUID = 8768959243069148651L;
+
+			@Override
+			public Point getToolTipLocation(MouseEvent event) {
+				Point p = this.getLocation();
+				p.y = p.y + getHeight();
+				return p;
+			}
+			
+		};
+		
+		Genome[] genomes = GeckoInstance.getInstance().getGenomes();
+		String[] revGenomes = new String[genomes.length];
+		for (int i=0;i<revGenomes.length;i++) {
+			revGenomes[i] = genomes[i].getChromosomes().get(0).getName();
+			if (genomes[i].getChromosomes().size()>1)
+				revGenomes[i] = revGenomes[i]+" [and more...]";
+		}
+		
+		final JComboBox refGenomeCombo = new JComboBox(revGenomes);
+		refGenomeCombo.setPreferredSize(new Dimension(190, 30));
+		refClusterField.setPreferredSize(new Dimension(190, 30));
+		
+		
+		JPanel p6a = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		((FlowLayout) p6a.getLayout()).setVgap(12);
+		p6a.add(refValueLabel);
+		gridpanel.add(p6a);
+		final JPanel p6b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		gridpanel.add(p6b);
+		
 		panel.add(gridpanel);
+		
+		refCombo.setEnabled(false);
+		ActionListener modeActionListener = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (modeCombo.getSelectedIndex()==2) { 
+					refCombo.setEnabled(true);
+				} else { 
+					refCombo.setEnabled(false);
+				}
+			}
+		};
+		modeCombo.addActionListener(modeActionListener);
+	
+		refClusterField.setToolTipText("<html><B>Hint</B>:<br>Instead of entering a sequence of genes by<br>" +
+				"hand you can also select a gene cluster from<br>" +
+				"the result list and copy it!</html>");
+	
+		
+		ActionListener refGenomeComboListener = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				switch (refCombo.getSelectedIndex()) {
+				case 1:
+					p6b.remove(refClusterField);
+					p6b.add(refGenomeCombo);
+					refType = 'g';
+					break;
+				case 2:
+					p6b.add(refClusterField);
+					ToolTipManager.sharedInstance().mouseMoved(
+					        new MouseEvent(refClusterField, 0, 0, 0,
+					                (int) refClusterField.getLocation().getX(), // X-Y of the mouse for the tool tip
+					                (int) refClusterField.getLocation().getY(),
+					                0, false));
+					refType = 'c';
+					p6b.remove(refGenomeCombo);
+					break;
+				default:
+					p6b.remove(refClusterField);
+					p6b.remove(refGenomeCombo);		
+					refType = 'd';
+				}
+				p6b.validate();
+				gridpanel.validate();
+				
+				StartComputationDialog.this.repaint();
+				
+			}
+		};
+		refCombo.addActionListener(refGenomeComboListener);
 		
 		JPanel lowerpanel = new JPanel();
 		lowerpanel.setLayout(new BoxLayout(lowerpanel,BoxLayout.X_AXIS));
@@ -135,7 +253,46 @@ public class StartComputationDialog extends JDialog {
 			private static final long serialVersionUID = 6197096728152587585L;
 			public void actionPerformed(ActionEvent e) {
 				StartComputationDialog.this.setVisible(false);
-				GeckoInstance.getInstance().performClusterDetection(new Parameter((Integer) dSpinner.getValue(), (Integer) sSpinner.getValue(),quorum,Parameter.QUORUM_NO_COST, opMode));
+				// Reorder the genomes if necessary
+				if (opMode=='r' && refType=='g' && refGenomeCombo.getSelectedIndex()!=0) {
+					PrintUtils.printDebug("swapping genomes");
+					Genome[] genomes = GeckoInstance.getInstance().getGenomes();
+					Genome first = genomes[0];
+					genomes[0] = genomes[refGenomeCombo.getSelectedIndex()];
+					genomes[refGenomeCombo.getSelectedIndex()] = first;
+					
+					gecko.getGui().closeCurrentSession();
+					gecko.setGenomes(genomes);
+					//TODO improve
+				} else if (opMode=='r' && refType=='c') {
+					Genome[] oldGenomes = gecko.getGenomes();
+					Genome[] genomes = new Genome[oldGenomes.length+1];
+					Genome cluster = new Genome();
+					ArrayList<Gene> genes = new ArrayList<Gene>();
+					Map<Integer, Integer> revIDMap = SortUtils.invertIntArray(gecko.getGenLabelMap());
+					for (String id : refClusterField.getText().split(" "))
+						if (id!=null && (!(id.equals("")))) {
+							System.err.println("STRING IS '"+id+"'");
+							Integer iid = revIDMap.get(Integer.parseInt(id));
+							if (iid!=null)
+								genes.add(new Gene("", iid));
+						}
+					cluster.getChromosomes().add(new Chromosome("Reference cluster", genes));
+					ArrayList<Gene> invgenes = new ArrayList<Gene>(genes);
+					Collections.reverse(invgenes);
+					cluster.getChromosomes().add(new Chromosome("Reference cluster", invgenes));
+					genomes[0] = cluster;
+					for (int i=0;i<oldGenomes.length;i++) {
+						genomes[i+1] = oldGenomes[i];
+					}
+					gecko.getGui().closeCurrentSession();
+					gecko.setGenomes(genomes);
+				}
+				GeckoInstance.getInstance().performClusterDetection(new Parameter((Integer) dSpinner.getValue(), 
+						(Integer) sSpinner.getValue(),
+						quorum,Parameter.QUORUM_NO_COST, 
+						opMode,
+						refType));
 			}
 			
 		};
