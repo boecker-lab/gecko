@@ -84,8 +84,10 @@ public class LibraryUtils {
 			fos.flush();
 			fos.close();
 			is.close();
-		} else
+		} else {
+			source = new File(source).getAbsolutePath();
 			System.err.println("Trying to load library from "+source);
+		}
 		
 		try {
 			if (fixedPath)
