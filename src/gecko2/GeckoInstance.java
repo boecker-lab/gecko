@@ -606,9 +606,10 @@ public class GeckoInstance {
 		@SuppressWarnings("unchecked")
 		public void run() {
 			FileInputStream fis = null;
+			ObjectInputStream o = null;
 			try {
 				fis = new FileInputStream(f);
-				ObjectInputStream o = new ObjectInputStream(fis);
+				o = new ObjectInputStream(fis);
 				genomes = (Genome[]) o.readObject();
 				geneLabelMap = (int[]) o.readObject();
 				colormap = (HashMap<Integer, Color>) o.readObject();
@@ -621,7 +622,9 @@ public class GeckoInstance {
 					public void run() {
 						gui.updateViewscreen();
 						gui.updategcSelector();
-						gui.changeMode(Gui.MODE_SESSION_IDLE);						
+						GeckoInstance.this.fireDataChanged();
+						gui.changeMode(Gui.MODE_SESSION_IDLE);		
+
 					}
 				});
 			} catch (IOException e) {
@@ -633,6 +636,7 @@ public class GeckoInstance {
 								JOptionPane.ERROR_MESSAGE);
 					}
 				});
+				handleFailedSessionLoad();
 			} catch (ClassNotFoundException e) {
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
@@ -642,8 +646,17 @@ public class GeckoInstance {
 								JOptionPane.ERROR_MESSAGE);
 					}
 				});
+				handleFailedSessionLoad();
 			}
 		}
+	}
+	
+	private void handleFailedSessionLoad() {
+		genomes = null;
+		geneLabelMap = null;
+		colormap = null;
+		clusters = null;
+		gui.changeMode(Gui.MODE_SESSION_IDLE);		
 	}
 		
 	/**

@@ -17,6 +17,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -24,14 +25,20 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
@@ -95,10 +102,30 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			table.removeMouseMotionListener(l);
 		table.addMouseListener(mouseListener);
 		table.addKeyListener(keyListener);
-//		table.setDefaultRenderer(Double.class, new DoubleCellRenderer());
+		ActionMap am =  table.getActionMap();
+		am.put("copy", tableAction);
+		table.setDefaultRenderer(Double.class, new DoubleCellRenderer());
 		table.getRowSorter().setSortKeys(Arrays.asList(new RowSorter.SortKey[] { new RowSorter.SortKey(3, SortOrder.DESCENDING) }));
-
 	}
+	
+	private Action tableAction = new AbstractAction() {
+		
+		/**
+		 * Random generated serialization UID
+		 */
+		private static final long serialVersionUID = 8912874714540056321L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			int row = table.getSelectedRow();
+			if (row<0) return;
+			GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
+			String geneIDs = "";
+			for (int geneID : gc.getGenes())
+				geneIDs += GeckoInstance.getInstance().getGenLabelMap()[geneID]+" ";
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(geneIDs), GeneClusterSelector.this);
+		}
+	};
 	
 	public static class DoubleCellRenderer extends  DefaultTableCellRenderer.UIResource {
 
@@ -117,7 +144,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			if (value==null || (!(value instanceof Double))) {
 				setText("");
 			} else
-				setText(String.format("%13.2e",value));
+				setText(String.format("%1.3f",value));
 		}
 		
 	}
@@ -138,18 +165,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		
 		@Override
 		public void keyPressed(KeyEvent e) {
-			Toolkit def = Toolkit.getDefaultToolkit();
-			int modifiers = def.getMenuShortcutKeyMask();
-			if (e.getModifiers() == modifiers && e.getKeyChar()=='c') {
-				int row = table.getSelectedRow();
-				if (row<0) return;
-				GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
-				String geneIDs = "";
-				for (int geneID : gc.getGenes())
-					geneIDs += GeckoInstance.getInstance().getGenLabelMap()[geneID]+" ";
-				def.getSystemClipboard().setContents(new StringSelection(geneIDs), GeneClusterSelector.this);
-				e.consume();
-			}
 
 			if (e.getKeyCode()==KeyEvent.VK_ENTER) {
 				fireSelectionEvent(true);

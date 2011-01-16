@@ -36,7 +36,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 	private int[] subselections;
 	
 	private static final String VALUES_TITLE = "Global cluster information:";
-	private static final String LOCAL_VALUES_TITLE = "Distance to center/median per dataset:";
+
 	private static final String GENES_TITLE = "Genes in this Cluster:";
 	
 	public GeneClusterDisplay() {
@@ -166,7 +166,13 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			title3.setLayout(new BoxLayout(title3,BoxLayout.X_AXIS));
 
 			{
-				JLabel label = new JLabel(LOCAL_VALUES_TITLE);
+				JLabel label = new JLabel();
+				if (cluster.getType() == 'm')
+					label.setText("Distance to median per dataset:");
+				else if (cluster.getType()=='c')
+					label.setText("Distance to center set per dataset:");
+				else
+					label.setText("Distance to reference gene set per dataset:");
 				label.setFont(boldFont);
 				title3.add(label);
 			}

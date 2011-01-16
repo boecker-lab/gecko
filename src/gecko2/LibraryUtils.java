@@ -50,46 +50,63 @@ public class LibraryUtils {
 	
 	 /**
 	  * Try to load the specified library from the jar file.
-	  * @param libname
+	  * @param source
 	  * @throws PlatformNotSupportedException
 	  */
-	public static void loadLibrary(String libname) throws PlatformNotSupportedException,IOException {
+	public static void loadLibrary(String source, boolean fixedPath) throws PlatformNotSupportedException,IOException {
 	
 		// find out what library version we need to extract from the
 		// jar file by checking the hosts operating system and architecture
 		
+		File f = null;
 		String os 	= System.getProperty("os.name").toLowerCase().split(" ")[0];
 		String arch = System.getProperty("os.arch").toLowerCase();
-
-		String loadPath = "/lib/"+libname+"/"+os+"__"+arch+".jni";
-		System.err.println("Trying to load library from "+loadPath);
+		if (!fixedPath) {
 		
-		InputStream is = LibraryUtils.class.getResourceAsStream(loadPath);
-		if (is==null) {
-			throw new PlatformNotSupportedException(os, arch);
-		}
-		
-		
-		File f = File.createTempFile("libgecko", ".jni");
-		f.deleteOnExit();
-		FileOutputStream fos = new FileOutputStream(f);
-		
-		while (is.available()!=0) {
-			fos.write(is.read());
-		}
-		
-		fos.flush();
-		fos.close();
-		is.close();
+	
+			String loadPath = "/lib/"+source+"/"+os+"__"+arch+".jni";
+			System.err.println("Trying to load library from "+loadPath);
+			
+			InputStream is = LibraryUtils.class.getResourceAsStream(loadPath);
+			if (is==null) {
+				throw new PlatformNotSupportedException(os, arch);
+			}
+			
+			
+			f = File.createTempFile("libgecko", ".jni");
+			f.deleteOnExit();
+			FileOutputStream fos = new FileOutputStream(f);
+			
+			while (is.available()!=0) {
+				fos.write(is.read());
+			}
+			
+			fos.flush();
+			fos.close();
+			is.close();
+		} else
+			System.err.println("Trying to load library from "+source);
 		
 		try {
-			System.load(f.getAbsolutePath());
+			if (fixedPath)
+				System.load(source);
+			else
+				System.load(f.getAbsolutePath());
 		} catch (UnsatisfiedLinkError e) {
 			e.printStackTrace();
-			throw new PlatformNotSupportedException(os, arch);
+			if (fixedPath) {
+				e.printStackTrace();
+				System.err.println("The library file you provided could not be loaded!");
+			} else
+				throw new PlatformNotSupportedException(os, arch);
 		}
 	
 		
 	}
+	
+	public static void loadLibrary(String libname) throws PlatformNotSupportedException,IOException {
+		loadLibrary(libname,false);
+	}
+
 
 }

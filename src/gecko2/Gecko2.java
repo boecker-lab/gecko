@@ -28,7 +28,10 @@ public class Gecko2 {
 	    }
 	    
 		try {
-			LibraryUtils.loadLibrary("libgecko2");
+			if (args.length==1)
+				LibraryUtils.loadLibrary(args[0],true);
+			else
+				LibraryUtils.loadLibrary("libgecko2");
 		} catch (PlatformNotSupportedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,5 +1,7 @@
 package gecko2.algorithm;
 
+import java.io.Serializable;
+
 
 /**
  * This class models an occurrence of a {@link GeneCluster} (which is uniquely
@@ -8,8 +10,12 @@ package gecko2.algorithm;
  * @author Leon Kuchenbecker <lkuchenb@inf.fu-berlin.de>
  *
  */
-public class GeneClusterOccurrence {
+public class GeneClusterOccurrence implements Serializable {
 	
+	/**
+	 * Random generated serialization UID
+	 */
+	private static final long serialVersionUID = 657846431928908396L;
 	private int id;									// A unique ID for every occurrence (unique within every cluster)
 	private Subsequence[][] subsequences;			// The list of subsequences
 	private double pValue;							// The pValue of this occurrence

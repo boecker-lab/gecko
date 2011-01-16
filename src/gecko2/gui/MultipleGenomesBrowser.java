@@ -231,20 +231,22 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 		
 		@Override
 		public Dimension getMaximumSize() {
-			return getPreferredSize();
+			return getMinimumSize();
 		}
 		
 		@Override
 		public Dimension getMinimumSize() {
-			return getPreferredSize();
+			if (sizeReference!=null) {
+				Dimension d = super.getMinimumSize();
+				return new Dimension((int) d.getWidth(),sizeReference.getHeight());
+			} else
+				return new Dimension(0,0);
+			
 		}
 		
 		@Override
 		public Dimension getPreferredSize() {
-			if (sizeReference!=null) {
-				return new Dimension(80,sizeReference.getHeight());
-			} else
-				return new Dimension(0,0);
+			return getMinimumSize();
 		}
 
 		@Override
@@ -252,7 +254,6 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 			if (e.getSource()==next) {
 				int[] subselections = lastLocationEvent.getsubselection();
 				subselections[genome] = subselections[genome] + 1;
-				Arrays.toString(subselections);
 				fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this, 
 						lastLocationEvent.getSelection(), 
 						lastLocationEvent.getgOcc(), 

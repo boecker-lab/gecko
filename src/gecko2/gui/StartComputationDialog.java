@@ -14,6 +14,7 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -34,6 +35,10 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.ToolTipManager;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.PlainDocument;
 
 
 public class StartComputationDialog extends JDialog {
@@ -205,9 +210,29 @@ public class StartComputationDialog extends JDialog {
 		};
 		modeCombo.addActionListener(modeActionListener);
 	
-		refClusterField.setToolTipText("<html><B>Hint</B>:<br>Instead of entering a sequence of genes by<br>" +
+		refClusterField.setToolTipText("<html>Enter a sequence of gene IDs here, separated by<br>" +
+				"spaces.<br><br>" +
+				"<B>Hint</B>:<br>Instead of entering a sequence of genes by<br>" +
 				"hand you can also select a gene cluster from<br>" +
 				"the result list and copy it!</html>");
+		
+		Document refClusterFieldDocument = new PlainDocument(){
+			
+			/**
+			 * Random generated serialization UID
+			 */
+			private static final long serialVersionUID = -1398119324023579537L;
+
+			@Override
+			public void insertString(int offs, String str, AttributeSet a)
+					throws BadLocationException {
+				if (!str.matches("^[ \\d]*$")) return;
+				super.insertString(offs, str, a);
+			}
+			
+		};
+		
+		refClusterField.setDocument(refClusterFieldDocument);
 	
 		
 		ActionListener refGenomeComboListener = new ActionListener() {
