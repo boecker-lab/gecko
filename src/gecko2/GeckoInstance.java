@@ -254,6 +254,9 @@ public class GeckoInstance {
 				map.put(gene, new Gene[subsequences.length]);
 		}
 		for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
+			if (subsequences[seqnum].length<=subselection[seqnum] || 
+					subselection[seqnum]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+				continue;
 			Subsequence subseq = subsequences[seqnum][subselection[seqnum]];
 			Chromosome chromosome = genomes[seqnum].getChromosomes().get(subseq.getChromosome());
 			for (int i=subseq.getStart()-1; i<subseq.getStop(); i++) {

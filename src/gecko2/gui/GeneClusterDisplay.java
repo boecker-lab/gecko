@@ -81,6 +81,10 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			ArrayList<MouseListener> mlisteners = new ArrayList<MouseListener>();
 
 			for (int i=0;i<gOcc.getSubsequences().length;i++) {
+				if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
+					mlisteners.add(i,null);
+					continue;
+				}
 				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 				if (s.isValid())
 					mlisteners.add(i, instance.getGenomes()[i].getChromosomes().get(s.getChromosome()).getChromosomeMouseListener());
@@ -108,6 +112,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			
 			masterPanel.add(Box.createVerticalStrut(5));
 			for (int i=0; i<gOcc.getSubsequences().length; i++) {
+				if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+					continue;
 				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 				if (!s.isValid()) continue;
 				JPanel cpanel = new JPanel();
@@ -187,6 +193,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			cpanel.setBackground(masterPanel.getBackground());
 
 			for (int i=0; i<gOcc.getSubsequences().length; i++) {
+				if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) 
+					continue;
 				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 				if (s.getStart()>s.getStop()) continue;
 				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i)));
