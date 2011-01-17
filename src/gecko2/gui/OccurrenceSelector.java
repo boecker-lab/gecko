@@ -67,7 +67,7 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		cm.getColumn(2).setPreferredWidth(20);
 //		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
-//		table.setDefaultRenderer(Double.class, new GeneClusterSelector.DoubleCellRenderer());
+		table.setDefaultRenderer(Double.class, new GeneClusterSelector.DoubleCellRenderer());
 		TableRowSorter<AbstractTableModel> rowSorter = new TableRowSorter<AbstractTableModel>(model);
 		table.setRowSorter(rowSorter);
 		
