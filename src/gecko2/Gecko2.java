@@ -33,11 +33,9 @@ public class Gecko2 {
 			else
 				LibraryUtils.loadLibrary("libgecko2");
 		} catch (PlatformNotSupportedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.exit(1);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.exit(1);
 		}

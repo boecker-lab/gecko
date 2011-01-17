@@ -477,7 +477,6 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 				SwingUtilities.invokeAndWait(new Runnable() {
 					
 					public void run() {
-						// TODO Auto-generated method stub
 						int position=0;
 						position += (chromosome+1) * (gecko.getGeneElementHight()+4); 				// The width of the starter marks
 						position += chromosome * (gecko.getGeneElementHight()+4);					// The width of the end marks
