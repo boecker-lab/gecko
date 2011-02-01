@@ -23,9 +23,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -47,7 +49,7 @@ public class GeckoInstance {
 	private int highlightedCluster;
 	private boolean debug = false;
 	private boolean animationEnabled = true;
-	private File lastSavedFile = null, lastOpenedFile = null;
+	private File lastSavedFile = null, lastOpenedFile = null, lastExportedFile = null;
 	private Parameter lastParameter;
 	
 	private int geneElementHight;
@@ -84,6 +86,10 @@ public class GeckoInstance {
 	public final static int MAX_GENEELEMENT_HIGHT = 40;
 	public final static int MIN_GENEELEMENT_HIGHT = 9;
 	public final static int DISPLAY_GENEELEMENT_HIGHT = 20;
+	
+	public File getLastExportedFile() {
+		return lastExportedFile;
+	}
 	
 	public Parameter getLastParameter() {
 		return lastParameter;
@@ -693,6 +699,58 @@ public class GeckoInstance {
 			}
 		}
 		  
+	}
+	
+	public boolean exportResultsToFile(File f) {
+		lastExportedFile = f;
+		FileWriter fw = null;
+		try {
+			fw = new FileWriter(f);
+			for (GeneCluster c : getClusters()) {
+				for (GeneClusterOccurrence occ : c.getAllOccurrences()) {
+					/*
+					 * Write the columns <ClusterId> <OccurrenceID> <Score> <totalDist>
+					 */
+					fw.write(Integer.toString(c.getId())+
+							'\t'+
+							occ.getId()+
+							'\t'+
+							occ.getBestScore()+
+							"\t"+
+							occ.getTotalDist()+
+							"\t");
+					/*
+					 * Write the column <GeneSet>
+					 */
+					for (int i=0; i<c.getGenes().length; i++) {
+						fw.write(Integer.toString(geneLabelMap[c.getGenes()[i]]));
+						if (i<c.getGenes().length-1) fw.write(";");
+					}
+					/*
+					 * Write the start-end lists for each genome
+					 */
+					for (int s=0;s<occ.getSubsequences().length;s++) {
+						Subsequence[] sub = occ.getSubsequences()[s];
+						if (sub!=null && sub.length!=0) 
+							for (int i=0; i<sub.length; i++) {
+								fw.write(sub[i].getStart()+"-"+sub[i].getStop());
+								if (i<sub.length-1) fw.write(";");
+							}	
+						if (s<occ.getSubsequences().length-1)
+							fw.write("\t");
+					}
+					fw.write("\n");
+				}
+			}
+			fw.flush();
+			fw.close();
+			return true;
+		} catch (IOException e) {
+			if (debug) e.printStackTrace();
+			return false;
+		}
+		
+		
 	}
 
 

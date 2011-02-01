@@ -156,6 +156,7 @@ public class Gui {
 		toolbar.add(new JToolBar.Separator());
 		menuFile.add(importGenomesAction);
 		menuFile.add(saveSessionAction);
+		menuFile.add(exportResultsAction);
 		
 		toolbar.add(clearSelectionAction);
 		toolbar.add(startComputation);
@@ -345,7 +346,8 @@ public class Gui {
 			boolean saveSession,
 			boolean zoom,
 			boolean search,
-			boolean stop) {
+			boolean stop,
+			boolean export) {
 		if (icon) statusbaricon.setIcon(waitingAnimation);
 		statusbaricon.setVisible(icon);
 		progressbar.setVisible(pbar);
@@ -364,27 +366,28 @@ public class Gui {
 		}
 		searchField.setEnabled(search);
 		stopComputationAction.setEnabled(stop);
+		exportResultsAction.setEnabled(export);
 	}
 	
 	public void changeMode(short mode) {
 		switch (mode) {
 		case MODE_COMPUTING:
-			changeMode(false, true, "Computing gene clusters...", false, false, false, false, false, false,true);
+			changeMode(false, true, "Computing gene clusters...", false, false, false, false, false, false,true,false);
 			break;
 		case MODE_SESSION_IDLE:
-			changeMode(false, false, "Ready", true, true, true, true, true, true,false);
+			changeMode(false, false, "Ready", true, true, true, true, true, true,false,true);
 			break;
 		case MODE_NO_SESSION:
-			changeMode(false, false, "Ready", true, false, false, false, false, false,false);
+			changeMode(false, false, "Ready", true, false, false, false, false, false,false,false);
 			break;
 		case MODE_READING_GENOMES:
-			changeMode(true, false, "Reading genomes...", false, false, false, false, false, false,false);
+			changeMode(true, false, "Reading genomes...", false, false, false, false, false, false,false,false);
 			break;
 		case MODE_PREPARING_COMPUTATION:
-			changeMode(true, false, "Preparing data...", false, false, false, false, false, false,true);
+			changeMode(true, false, "Preparing data...", false, false, false, false, false, false,true,false);
 			break;
 		case MODE_FINISHING_COMPUTATION:
-			changeMode(true, false, "Finishing...", false, false, false, false, false, false,false);
+			changeMode(true, false, "Finishing...", false, false, false, false, false, false,false,false);
 		}
 	}
 	
@@ -483,6 +486,50 @@ public class Gui {
 		}
 	};
 
+	private Action exportResultsAction = new AbstractAction() {
+
+		private static final long serialVersionUID = 3693048160852637628L;
+
+		public void actionPerformed(ActionEvent e) {
+			if (gecko.getClusters()==null || gecko.getClusters().length==0) {
+				JOptionPane.showMessageDialog(mainframe, "No clusters have been detected", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			JFileChooser fc = new JFileChooser();
+			for (FileFilter f : fc.getChoosableFileFilters())
+				fc.removeChoosableFileFilter(f);
+			fc.addChoosableFileFilter(new FileUtils.GenericFilter("txt"));
+			if (gecko.getLastExportedFile()!=null)
+				fc.setSelectedFile(gecko.getLastExportedFile());
+			for (;;) {
+				int state = fc.showSaveDialog(null);
+				if (state == JFileChooser.APPROVE_OPTION) {
+					File f = fc.getSelectedFile();
+					if (!fc.getFileFilter().accept(fc.getSelectedFile()))
+						f = new File(f.getAbsolutePath()+".txt");
+					PrintUtils.printDebug("Choosen file to save to: "+f);
+					if (f.exists()) {
+						if (f.isDirectory()) {
+							JOptionPane.showMessageDialog(mainframe, "You cannot choose a directory", "Error", JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						int x = JOptionPane.showConfirmDialog(mainframe, 
+								"The chosen file already exists. Overwrite?", 
+								"Overwrite existing file?", 
+								JOptionPane.YES_NO_OPTION,
+								JOptionPane.WARNING_MESSAGE);
+						if (x==JOptionPane.NO_OPTION) continue;
+					}
+					if (!gecko.exportResultsToFile(f))
+						JOptionPane.showMessageDialog(mainframe, "An error occured while writing the file!", "Error", JOptionPane.ERROR_MESSAGE);
+					break;
+				} else break;
+			}
+			mainframe.requestFocus();
+
+		}
+	};
+	
 	private Action saveSessionAction = new AbstractAction() {
 		private static final long serialVersionUID = -1530838105061978403L;
 		public void actionPerformed(ActionEvent e) {
@@ -540,13 +587,19 @@ public class Gui {
 		startComputation.putValue(Action.SMALL_ICON, createImageIcon("images/player_play.png"));
 		startComputation.putValue(Action.SMALL_ICON, createImageIcon("images/player_play_large.png"));
 		startComputation.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
 		startComputation.setEnabled(false);
+		
 		saveSessionAction.putValue(Action.NAME, "Save session...");
 		saveSessionAction.putValue(Action.SHORT_DESCRIPTION, "Save session...");
 		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave.png"));
 		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave_large.png"));
 		saveSessionAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		
+		exportResultsAction.putValue(Action.NAME, "Export results...");
+		exportResultsAction.putValue(Action.SHORT_DESCRIPTION, "Export results...");
+		exportResultsAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileexport_large.png"));
+		exportResultsAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileexport_large.png"));
+		exportResultsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		saveSessionAction.setEnabled(false);
 		clearSelectionAction.putValue(Action.SHORT_DESCRIPTION, "Clear selection");
