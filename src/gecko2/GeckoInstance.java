@@ -733,7 +733,7 @@ public class GeckoInstance {
 						Subsequence[] sub = occ.getSubsequences()[s];
 						if (sub!=null && sub.length!=0) 
 							for (int i=0; i<sub.length; i++) {
-								fw.write(sub[i].getStart()+"-"+sub[i].getStop());
+								fw.write(sub[i].getChromosome()+ ":" + sub[i].getStart()+"-"+sub[i].getStop());
 								if (i<sub.length-1) fw.write(";");
 							}	
 						if (s<occ.getSubsequences().length-1)
