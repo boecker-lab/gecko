@@ -184,13 +184,18 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 					instant));
 		} else {
 			checkBox.setVisible(true);
-			int[] subselections = new int[GeckoInstance.getInstance().getGenomes().length];
-			Arrays.fill(subselections, 0);
 			GeneClusterOccurrence gOcc;
 			if (checkBox.isSelected())
 				gOcc = gc.getAllOccurrences()[0];
 			else
 				gOcc = gc.getOccurrences()[0];
+			int[] subselections = new int[GeckoInstance.getInstance().getGenomes().length];
+			for (int i=0; i<subselections.length; i++) {
+				if (gOcc.getSubsequences()[i].length == 0)
+					subselections[i] = GeneClusterOccurrence.GENOME_NOT_INCLUDED;
+				else
+					subselections[i] = 0;
+			}
 			fireSelectionEvent(new LocationSelectionEvent(GeneClusterSelector.this,
 					gc,
 					gOcc,
