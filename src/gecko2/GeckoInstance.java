@@ -729,6 +729,7 @@ public class GeckoInstance {
 					/*
 					 * Write the start-end lists for each genome
 					 */
+					fw.write("\t");
 					for (int s=0;s<occ.getSubsequences().length;s++) {
 						Subsequence[] sub = occ.getSubsequences()[s];
 						if (sub!=null && sub.length!=0) 
