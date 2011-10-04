@@ -351,7 +351,7 @@ public class Gui {
 		if (icon) statusbaricon.setIcon(waitingAnimation);
 		statusbaricon.setVisible(icon);
 		progressbar.setVisible(pbar);
-		if (pbar) progressbar.grabFocus();
+		//if (pbar) progressbar.grabFocus();
 		statusbartext.setText(text);
 		importGenomesAction.setEnabled(importGenomes);
 		startComputation.setEnabled(startComp);
