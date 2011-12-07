@@ -81,12 +81,12 @@ public class StartComputationDialog extends JDialog {
 		});
 
 		
-		final String[] modes = {"median", "center", "reference"};
+		final String[] modes = {"reference", "median", "center"};
 		final JComboBox modeCombo = new JComboBox(modes);
 
 		modeCombo.setPreferredSize(new Dimension(190,30));
 
-		this.opMode = 'm';
+		this.opMode = 'r';
 		modeCombo.setSelectedIndex(0);
 		
 		final String[] refModes = {"all against all", "fixed genome", "manual cluster"};
@@ -99,16 +99,16 @@ public class StartComputationDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				switch (modeCombo.getSelectedIndex()) {
 				case 0:
+					opMode = 'r';
+					PrintUtils.printDebug("Using REFERENCE mode!");	
+					break;
+				case 1:
 					opMode = 'm';
 					PrintUtils.printDebug("Using MEDIAN mode!");
 					break;
-				case 1:
+				default:
 					opMode = 'c';
 					PrintUtils.printDebug("Using CENTER mode!");
-					break;
-				default:
-					opMode = 'r';
-					PrintUtils.printDebug("Using REFERENCE mode!");				
 				}
 			}
 		});
@@ -195,12 +195,12 @@ public class StartComputationDialog extends JDialog {
 		
 		panel.add(gridpanel);
 		
-		refCombo.setEnabled(false);
+		refCombo.setEnabled(true);
 		ActionListener modeActionListener = new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (modeCombo.getSelectedIndex()==2) { 
+				if (modeCombo.getSelectedIndex()==0) { 
 					refCombo.setEnabled(true);
 				} else { 
 					refCombo.setEnabled(false);

@@ -1,5 +1,6 @@
 package gecko2.gui;
 
+import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
 import gecko2.util.SortUtils;
 
@@ -7,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -51,8 +53,8 @@ public class GenomeSelector extends JDialog {
 	private JTable table;
 	private AbstractAction importAction,groupAction,unGroupAction;
 	
-	public GenomeSelector(ArrayList<GenomeOccurence> occs, final Gui g) {
-		super(g.getMainframe(),"Select genomes to import...");
+	public GenomeSelector(ArrayList<GenomeOccurence> occs, Frame parent) {
+		super(parent,"Select genomes to import...");
 		super.setModal(true);
 		this.occs = occs;
 
@@ -121,7 +123,9 @@ public class GenomeSelector extends JDialog {
 				if (!importAction.isEnabled()) return;
 				
 				deleteNotFlaggedEntries();
-				g.readSelectedGenomes(GenomeSelector.this, GenomeSelector.this.occs);
+				GenomeSelector.this.setVisible(false);
+				if (GenomeSelector.this.occs != null)
+					GeckoInstance.getInstance().readGenomes(GenomeSelector.this.occs);
 			}
 		};
 		importAction.setEnabled(false);
@@ -134,7 +138,7 @@ public class GenomeSelector extends JDialog {
 			private static final long serialVersionUID = 3950317889981087655L;
 
 			public void actionPerformed(ActionEvent e) {
-				g.readSelectedGenomes(GenomeSelector.this,null);					
+				GenomeSelector.this.setVisible(false);			
 			}
 		};
 		cancelAction.putValue(Action.NAME, "Cancel");
@@ -154,12 +158,12 @@ public class GenomeSelector extends JDialog {
 				final ArrayList<GenomeOccurence> occs = GenomeSelector.this.occs;
 				for (int i : table.getSelectedRows()) {
 					occs.get(i).setGroup(highID);
-					occs.get(i).setFlagged(false);
+					occs.get(i).setFlagged(true);
 				}
 				SortUtils.resortGenomeOccurences(occs);
 				recomputeBorders();
 				table.setRowSelectionInterval(0, table.getSelectedRowCount()-1);
-				scrollpane.getVerticalScrollBar().setValue(0);
+				//scrollpane.getVerticalScrollBar().setValue(0);
 				table.tableChanged(new TableModelEvent(table.getModel(), 0, occs.size()-1));
 				table.repaint();
 				checkSelectionCount();

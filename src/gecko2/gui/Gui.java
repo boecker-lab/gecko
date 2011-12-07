@@ -264,15 +264,7 @@ public class Gui {
 	}
 	
 	private void selectGenomesForImport(ArrayList<GenomeOccurence> occs) {
-		new GenomeSelector(occs, this);
-	}
-	
-	public void readSelectedGenomes(GenomeSelector g, ArrayList<GenomeOccurence> occs) {
-		g.setVisible(false);
-		if (occs == null) {
-			return;
-		}
-		this.gecko.readGenomes(occs);
+		new GenomeSelector(occs, this.getMainframe());
 	}
 	
 	public JProgressBar getProgressbar() {
