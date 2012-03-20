@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -305,7 +306,7 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 	 */
 	public void highlightCluster(int id, int chr, int start, int stop, Color highlightColor) {
 		if (id>=genomeBrowsers.size()) return;
-		ArrayList<Chromosome> chromosomes = this.genomeBrowsers.get(id).getGenome().getChromosomes();
+		List<Chromosome> chromosomes = this.genomeBrowsers.get(id).getGenome().getChromosomes();
 		int genomeLength = chromosomes.get(chr).getGenes().size();
 		// Set everything to grey if the parameter don't make sense
 		// (algorithm produces start>stop if a genome is not part of the cluster)
@@ -363,7 +364,7 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 			// If genome i is not in the cluser, skip
 			if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
 				continue;
-			ArrayList<Chromosome> genes = gecko.getGenomes()[i].getChromosomes();
+			List<Chromosome> genes = gecko.getGenomes()[i].getChromosomes();
 			Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 			for (int j=s.getStart()-1;j<s.getStop();j++) {
 				if (Math.abs(genes.get(s.getChromosome()).getGenes().get(j).getId())==geneID) {

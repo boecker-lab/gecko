@@ -1,6 +1,7 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
+import gecko2.GeckoInstance.ResultFilter;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.event.ClusterSelectionEvent;
@@ -10,6 +11,7 @@ import gecko2.event.LocationSelectionEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -31,8 +33,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -52,8 +58,11 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 
 	private static final long serialVersionUID = -4860132931042035952L;
 	private GeneClusterSelectorModel model;
-	private JCheckBox checkBox;
+	private JCheckBox showSuboptimalCheckBox;
+	private JComboBox selectionComboBox;
+	//private JCheckBox showOnlySelectedCheckBox;
 	private JTable table;
+	private JPopupMenu popUp;
 	
 	public static final short COL_ID = 0;
 	public static final short COL_NGENES = 1;
@@ -64,10 +73,32 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 	
 	public GeneClusterSelector() {
 		this.setLayout(new BorderLayout());
-		checkBox = new JCheckBox("show suboptimal hits");
-		checkBox.setVisible(false);
-		checkBox.addActionListener(actionListener);
-		this.add(checkBox, BorderLayout.PAGE_END);
+		
+		JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		showSuboptimalCheckBox = new JCheckBox("show suboptimal hits");
+		showSuboptimalCheckBox.setVisible(false);
+		showSuboptimalCheckBox.addActionListener(actionListener);
+		selectionComboBox = new JComboBox(ResultFilter.values());
+		selectionComboBox.setVisible(true);
+		selectionComboBox.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ResultFilter selection = (ResultFilter)((JComboBox)e.getSource()).getSelectedItem();
+				GeckoInstance.getInstance().filterBy(selection);
+			}
+		});
+		/*showOnlySelectedCheckBox = new JCheckBox("show only selected");
+		showOnlySelectedCheckBox.setVisible(true);
+		showOnlySelectedCheckBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GeckoInstance.getInstance().filterBySelection(((AbstractButton) e.getSource()).getModel().isSelected());
+			}
+		});*/
+		checkBoxPanel.add(selectionComboBox);
+		//checkBoxPanel.add(showOnlySelectedCheckBox);
+		checkBoxPanel.add(showSuboptimalCheckBox);
+		this.add(checkBoxPanel, BorderLayout.PAGE_END);
 		this.setPreferredSize(new Dimension(50,200));
 		table = new JTable();
 		table.setBackground(Color.WHITE);
@@ -98,6 +129,43 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		am.put("copy", tableAction);
 		table.setDefaultRenderer(Double.class, new DoubleCellRenderer());
 		table.getRowSorter().setSortKeys(Arrays.asList(new RowSorter.SortKey[] { new RowSorter.SortKey(3, SortOrder.DESCENDING) }));
+		
+		// Build popup menu
+		popUp = new JPopupMenu();
+		
+		JMenuItem menuItem = new JMenuItem("Add to selection");
+		menuItem.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(popUp.getUIClassID());
+				GeckoInstance.getInstance().addToClusterSelection((Integer)table.getValueAt(table.getSelectedRow(), 0));				
+			}
+		});
+		popUp.add(menuItem);
+		menuItem = new JMenuItem("Clear selection");
+		menuItem.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int confirmDialog = JOptionPane.showConfirmDialog(GeneClusterSelector.this, "Really clear selection?", "Clear selection", JOptionPane.YES_NO_OPTION);
+				if (confirmDialog == JOptionPane.YES_OPTION)
+					GeckoInstance.getInstance().clearClusterSelection();				
+			}
+		});
+		popUp.add(menuItem);
+
+		popUp.addSeparator();
+		
+		menuItem = new JMenuItem("Show similiar clusters");
+		menuItem.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String filterString = (String)table.getValueAt(table.getSelectedRow(), 4);
+				if (filterString.length() > 2)
+					filterString = filterString.substring(1, filterString.length()-1);
+				GeckoInstance.getInstance().setFilterString(filterString);
+			}
+		});
+		popUp.add(menuItem);
 	}
 	
 	private Action tableAction = new AbstractAction() {
@@ -178,14 +246,14 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		if (row<0) return;
 		GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
 		if (gc.getType()==GeneCluster.TYPE_CENTER || gc.getType()==GeneCluster.TYPE_MEDIAN) {
-			checkBox.setVisible(false);
+			showSuboptimalCheckBox.setVisible(false);
 			fireSelectionEvent(new ClusterSelectionEvent(GeneClusterSelector.this, 
 					gc,
 					instant));
 		} else {
-			checkBox.setVisible(true);
+			showSuboptimalCheckBox.setVisible(true);
 			GeneClusterOccurrence gOcc;
-			if (checkBox.isSelected())
+			if (showSuboptimalCheckBox.isSelected())
 				gOcc = gc.getAllOccurrences()[0];
 			else
 				gOcc = gc.getOccurrences()[0];
@@ -212,15 +280,26 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		};
 		
 		@Override
-		public void mouseClicked(MouseEvent e) {
-			if (e.getClickCount()==1) {
+		public void mousePressed(MouseEvent e) {
+			if (e.getClickCount()==2) 
+				fireSelectionEvent(true);
+			else if (e.getClickCount()==1) {
 				table.requestFocus();
 				int row = table.rowAtPoint(e.getPoint());
 				if (row>=0) table.setRowSelectionInterval(row, row);
+				if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {					
+					popUp.show(e.getComponent(), e.getX(), e.getY());
+				}
 				e.consume();
-			} else if (e.getClickCount()==2) 
-				fireSelectionEvent(true);
+			}
 		};
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {
+				popUp.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
 	};	
 		
 	public void refresh() {

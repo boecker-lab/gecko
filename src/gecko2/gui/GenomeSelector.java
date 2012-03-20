@@ -51,7 +51,7 @@ public class GenomeSelector extends JDialog {
 	private Random rand;
 	private JScrollPane scrollpane;
 	private JTable table;
-	private AbstractAction importAction,groupAction,unGroupAction;
+	private AbstractAction importAction, groupAction, unGroupAction, allOrNoneAction;
 	
 	public GenomeSelector(ArrayList<GenomeOccurence> occs, Frame parent) {
 		super(parent,"Select genomes to import...");
@@ -98,6 +98,7 @@ public class GenomeSelector extends JDialog {
 		
 		JPanel lowerpanel = new JPanel();
 		lowerpanel.setLayout(new BorderLayout(0,0));
+		JButton allOrNoneButton = new JButton("Choose All");
 		JButton okButton = new JButton();
 		JButton cancelButton = new JButton("Cancel");
 		lowerpanel.add(cancelButton, BorderLayout.WEST);
@@ -111,8 +112,29 @@ public class GenomeSelector extends JDialog {
 		centerpanel.add(groupButton);
 		centerpanel.add(unGroupButton);
 		centerpanel.add(Box.createHorizontalGlue());
+		centerpanel.add(allOrNoneButton);
 		mainpanel.add(lowerpanel,BorderLayout.SOUTH);
 		lowerpanel.add(centerpanel, BorderLayout.CENTER);
+		
+		allOrNoneAction = new AbstractAction() {
+			private boolean all = true; // toggle between all or none action.
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(all){
+					checkAll();
+					allOrNoneAction.putValue(Action.NAME, "choose None");
+					all = false;
+				} else {
+					checkNone();
+					allOrNoneAction.putValue(Action.NAME, "choose All");
+					all = true;
+				}
+				
+			}
+		};
+		allOrNoneAction.putValue(Action.NAME, "choose All");
+		allOrNoneButton.setAction(allOrNoneAction);
+		
 		importAction = new AbstractAction() {
 			
 			private static final long serialVersionUID = -4809998022093313635L;
@@ -256,14 +278,29 @@ public class GenomeSelector extends JDialog {
 			if (!this.occs.get(i).isFlagged()) this.occs.remove(i);
 	}
 	
-	private void checkSelectionCount() {
-		int count = 0;
+	private void checkAll() {
 		for (GenomeOccurence occ : occs)
-			if (occ.isFlagged()) count++;
-		if (count>1)
-			importAction.setEnabled(true);
-		else
-			importAction.setEnabled(false);
+			occ.setFlagged(true);
+		table.repaint();
+		checkSelectionCount();
+	}
+	
+	private void checkNone() {
+		for (GenomeOccurence occ : occs)
+			occ.setFlagged(false);
+		table.repaint();
+		importAction.setEnabled(false);
+	}
+	
+	private void checkSelectionCount() {
+		boolean atLeastOneChecked = false;
+		for (GenomeOccurence occ : occs) 
+			if (occ.isFlagged()) {
+				atLeastOneChecked = true;
+				break;
+			}
+		
+		importAction.setEnabled(atLeastOneChecked);
 			
 	}
 	

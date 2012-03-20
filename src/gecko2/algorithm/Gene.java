@@ -27,6 +27,13 @@ public class Gene implements Serializable {
 		this.id = id;
 		this.annotation = annotation;
 	}
+	
+	public Gene(Gene other) {
+		this.name = other.name;
+		this.id = other.id;
+		this.annotation = other.annotation;
+		this.unknown = other.unknown;
+	}
 
 	public int getId() {
 		return id;

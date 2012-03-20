@@ -189,7 +189,7 @@ public class Gui {
 		searchField.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				gecko.filterResults(searchField.getText());
+				gecko.setFilterString(searchField.getText());
 				searchField.setSelectionStart(0);
 				searchField.setSelectionEnd(searchField.getText().length());
 			}
@@ -235,7 +235,7 @@ public class Gui {
 		southpanel.add(Box.createRigidArea(new Dimension(5,0)));
 		southpanel.add(infobarPanel);
 		mainframe.add(southpanel,BorderLayout.SOUTH);
-		changeMode(MODE_NO_SESSION);
+		changeMode(Mode.NO_SESSION);
 
 		
 		// Listener stuff
@@ -310,36 +310,33 @@ public class Gui {
 	/**
 	 * The application is currently performing the gene cluster computation
 	 */
-	public static final short MODE_COMPUTING = 1;
-	
-	/**
-	 * The application is idle, a session is currently open
-	 */
-	public static final short MODE_SESSION_IDLE = 2;
-	
-	/**
-	 * The application is idle, no session is open
-	 */
-	public static final short MODE_NO_SESSION = 3;
-	
-	/**
-	 * The application is currently reading the genomes selected by the user
-	 */
-	public static final short MODE_READING_GENOMES = 4;
-	public static final short MODE_PREPARING_COMPUTATION = 5;
-	public static final short MODE_FINISHING_COMPUTATION = 6;
+	public enum Mode {COMPUTING
+		/**
+		 * The application is idle, a session is currently open
+		 */
+		,SESSION_IDLE
+		/**
+		 * The application is idle, no session is open
+		 */
+		,NO_SESSION
+		/**
+		 * The application is currently reading the genomes selected by the user
+		 */
+		,READING_GENOMES
+		,PREPARING_COMPUTATION
+		,FINISHING_COMPUTATION}
 
-	private void changeMode(boolean icon, 
-			boolean pbar, 
-			String text,
-			boolean importGenomes,
-			boolean startComp,
-			boolean clearSelect,
-			boolean saveSession,
-			boolean zoom,
-			boolean search,
-			boolean stop,
-			boolean export) {
+	private void changeMode(final boolean icon, 
+			final boolean pbar, 
+			final String text,
+			final boolean importGenomes,
+			final boolean startComp,
+			final boolean clearSelect,
+			final boolean saveSession,
+			final boolean zoom,
+			final boolean search,
+			final boolean stop,
+			final boolean export) {
 		if (icon) statusbaricon.setIcon(waitingAnimation);
 		statusbaricon.setVisible(icon);
 		progressbar.setVisible(pbar);
@@ -361,31 +358,31 @@ public class Gui {
 		exportResultsAction.setEnabled(export);
 	}
 	
-	public void changeMode(short mode) {
+	public void changeMode(Mode mode) {
 		switch (mode) {
-		case MODE_COMPUTING:
-			changeMode(false, true, "Computing gene clusters...", false, false, false, false, false, false,true,false);
+		case COMPUTING:
+			changeMode(false, true, "Computing gene clusters...", false, false, false, false, false, false, true, false);
 			break;
-		case MODE_SESSION_IDLE:
-			changeMode(false, false, "Ready", true, true, true, true, true, true,false,true);
+		case SESSION_IDLE:
+			changeMode(false, false, "Ready", true, true, true, true, true, true, false,true);
 			break;
-		case MODE_NO_SESSION:
-			changeMode(false, false, "Ready", true, false, false, false, false, false,false,false);
+		case NO_SESSION:
+			changeMode(false, false, "Ready", true, false, false, false, false, false, false, false);
 			break;
-		case MODE_READING_GENOMES:
-			changeMode(true, false, "Reading genomes...", false, false, false, false, false, false,false,false);
+		case READING_GENOMES:
+			changeMode(true, false, "Reading genomes...", false, false, false, false, false, false, false, false);
 			break;
-		case MODE_PREPARING_COMPUTATION:
-			changeMode(true, false, "Preparing data...", false, false, false, false, false, false,true,false);
+		case PREPARING_COMPUTATION:
+			changeMode(true, false, "Preparing data...", false, false, false, false, false, false, false, false);
 			break;
-		case MODE_FINISHING_COMPUTATION:
-			changeMode(true, false, "Finishing...", false, false, false, false, false, false,false,false);
+		case FINISHING_COMPUTATION:
+			changeMode(true, false, "Finishing...", false, false, false, false, false, false, false, false);
 		}
 	}
 	
 	public void handleFileError(short error) {
 		closeCurrentSession();
-		changeMode(Gui.MODE_NO_SESSION);		
+		changeMode(Mode.NO_SESSION);		
 		JOptionPane.showMessageDialog(mainframe, "The input file is not a valid COG file", "Wrong file format", JOptionPane.ERROR_MESSAGE);
 	}
 
@@ -483,42 +480,8 @@ public class Gui {
 		private static final long serialVersionUID = 3693048160852637628L;
 
 		public void actionPerformed(ActionEvent e) {
-			if (gecko.getClusters()==null || gecko.getClusters().length==0) {
-				JOptionPane.showMessageDialog(mainframe, "No clusters have been detected", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			JFileChooser fc = new JFileChooser();
-			for (FileFilter f : fc.getChoosableFileFilters())
-				fc.removeChoosableFileFilter(f);
-			fc.addChoosableFileFilter(new FileUtils.GenericFilter("txt"));
-			if (gecko.getLastExportedFile()!=null)
-				fc.setSelectedFile(gecko.getLastExportedFile());
-			for (;;) {
-				int state = fc.showSaveDialog(null);
-				if (state == JFileChooser.APPROVE_OPTION) {
-					File f = fc.getSelectedFile();
-					if (!fc.getFileFilter().accept(fc.getSelectedFile()))
-						f = new File(f.getAbsolutePath()+".txt");
-					PrintUtils.printDebug("Choosen file to save to: "+f);
-					if (f.exists()) {
-						if (f.isDirectory()) {
-							JOptionPane.showMessageDialog(mainframe, "You cannot choose a directory", "Error", JOptionPane.ERROR_MESSAGE);
-							continue;
-						}
-						int x = JOptionPane.showConfirmDialog(mainframe, 
-								"The chosen file already exists. Overwrite?", 
-								"Overwrite existing file?", 
-								JOptionPane.YES_NO_OPTION,
-								JOptionPane.WARNING_MESSAGE);
-						if (x==JOptionPane.NO_OPTION) continue;
-					}
-					if (!gecko.exportResultsToFile(f))
-						JOptionPane.showMessageDialog(mainframe, "An error occured while writing the file!", "Error", JOptionPane.ERROR_MESSAGE);
-					break;
-				} else break;
-			}
-			mainframe.requestFocus();
-
+			ResultExportDialog resultExportDialog = new ResultExportDialog(Gui.this.getMainframe());
+			resultExportDialog.setVisible(true);
 		}
 	};
 	

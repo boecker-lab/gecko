@@ -48,6 +48,10 @@ public class Subsequence implements Serializable {
 		this.pValue = pValue;
 	}
 	
+	public void setChromosome(int chromosomeNr) {
+		this.chromosome = chromosomeNr;
+	}
+	
 	public int getChromosome() {
 		return chromosome;
 	}

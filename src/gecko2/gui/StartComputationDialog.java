@@ -87,6 +87,7 @@ public class StartComputationDialog extends JDialog {
 		modeCombo.setPreferredSize(new Dimension(190,30));
 
 		this.opMode = 'r';
+		this.refType = 'd';
 		modeCombo.setSelectedIndex(0);
 		
 		final String[] refModes = {"all against all", "fixed genome", "manual cluster"};

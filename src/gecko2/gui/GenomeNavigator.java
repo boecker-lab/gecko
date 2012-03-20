@@ -22,6 +22,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -61,8 +62,8 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 			JScrollBar bar = gb.getHorizontalScrollBar();
 			
 			// Compute the length of the bar representation for each chromosome
-			ArrayList<Integer> lineLengths = new ArrayList<Integer>(gb.getGenome().getChromosomes().size());
-			ArrayList<Chromosome> chromosomes = gb.getGenome().getChromosomes();
+			List<Integer> lineLengths = new ArrayList<Integer>(gb.getGenome().getChromosomes().size());
+			List<Chromosome> chromosomes = gb.getGenome().getChromosomes();
 			for (int j=0; j<chromosomes.size(); j++)  {
 				// Compute the line length in GenomeBrowser pixels
 				int length = chromosomes.get(j).getGenes().size()*gb.getGenWidth();

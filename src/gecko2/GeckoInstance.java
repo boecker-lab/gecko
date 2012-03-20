@@ -11,6 +11,7 @@ import gecko2.event.DataEvent;
 import gecko2.event.DataListener;
 import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
+import gecko2.io.ResultWriter;
 import gecko2.util.PrintUtils;
 import gecko2.util.SortUtils;
 
@@ -23,16 +24,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
@@ -40,13 +42,23 @@ import javax.swing.ToolTipManager;
 import javax.swing.event.EventListenerList;
 
 public class GeckoInstance {
+	public enum ResultFilter {showAll, showFiltered, showSelected};
+	
+	private static GeckoInstance instance;
 	
 	private File currentInputFile; 
 	private Genome[] genomes= null;
 	private int[] geneLabelMap;
 	private HashMap<Integer, Color> colormap;
+	
 	private GeneCluster[] clusters;
+	private SortedSet<Integer> clusterSelection;
+	private ResultFilter filterSelection = ResultFilter.showAll;
+	private SortedSet<Integer> reducedList;
+	private boolean filterReducedList;
 	private int highlightedCluster;
+	private String filterString;
+	
 	private boolean debug = false;
 	private boolean animationEnabled = true;
 	private File lastSavedFile = null, lastOpenedFile = null, lastExportedFile = null;
@@ -125,15 +137,94 @@ public class GeckoInstance {
 		return scd;
 	}
 	
-	public void filterResults(String searchPattern) {
+	/**
+	 * Enable or disable result filtering by the selection
+	 * 
+	 * @param filter true to filter by the selection, false to disable filtering
+	 */
+	public void filterBy(ResultFilter filter) {
+		filterSelection = filter;
+		filterResults();
+	}
+	
+	/**
+	 * Adds the cluster with the given index to the cluster selection
+	 * 
+	 * @param clusterIndex the index of the cluster
+	 */
+	public void addToClusterSelection(int clusterIndex) {
+		if (clusterSelection == null)
+			clusterSelection = new TreeSet<Integer>();
+		clusterSelection.add(clusterIndex);
+		filterResults();
+	}
+	
+	/**
+	 * Clears all selected clusters
+	 */
+	public void clearClusterSelection() {
+		clusterSelection.clear();
+		filterResults();
+	}
+	
+	/**
+	 * Adds the cluster with the given index to the list of hidden clusters
+	 * 
+	 * @param clusterIndex the index of the cluster
+	 */
+	public void addToReducedList(int clusterIndex) {
+		if (reducedList == null)
+			reducedList = new TreeSet<Integer>();
+		reducedList.add(clusterIndex);
+		filterResults();
+	}
+	
+	/**
+	 * Adds the cluster with the given index to the list of hidden clusters
+	 * 
+	 * @param clusterIndex the index of the cluster
+	 */
+	public void addToReducedList(SortedSet<Integer> toHide) {
+		if (reducedList == null)
+			reducedList = new TreeSet<Integer>();
+		reducedList.addAll(toHide);
+		filterResults();
+	}
+	
+	/**
+	 * Sets the string used for filtering the cluster results and updates the results
+	 * 
+	 * @param filterString the new filter string, must not be null
+	 */
+	public void setFilterString(String filterString) {
+		if (filterString == null)
+			throw new NullPointerException("filterString must not be null");
+		this.filterString = filterString;
+		filterResults();
+	}
+	
+	/**
+	 * Filter the results with the last filter string
+	 */
+	private void filterResults() {
 		if (clusters==null) return;
-		String[] searchPatterns = searchPattern.split(" ");
-		for (int i=0; i<searchPatterns.length; i++) 
-			searchPatterns[i] = Pattern.quote(searchPatterns[i].toLowerCase());
-		if (searchPatterns[0].equals("")) 
-			for (GeneCluster c : clusters)
-				c.setMatch(true);
+		if (filterString == null)
+			filterString = "";
+		if (clusterSelection == null)
+			clusterSelection = new TreeSet<Integer>();
+		if (reducedList == null)
+			reducedList = GeneCluster.generateReducedClusterList(clusters);
+		if (filterString.equals("")) {
+			for (GeneCluster c : clusters) {
+				c.setMatch(false);
+				c.setMatch(applyFilter(c.getId()));
+			}
+		}
 		else {
+			String[] searchPatterns = filterString.split(" ");
+			for (int i=0; i<searchPatterns.length; i++) 
+				searchPatterns[i] = Pattern.quote(searchPatterns[i].toLowerCase());
+
 			for (GeneCluster c : clusters) {
 				c.setMatch(false);
 				
@@ -144,7 +235,7 @@ public class GeckoInstance {
 				String geneString = Arrays.toString(genes);
 				for (String pattern : searchPatterns) {
 					if (geneString.matches(".*[\\[ ,]"+pattern+"[ ,\\]].*")) {
-						c.setMatch(true);
+						c.setMatch(applyFilter(c.getId()));
 						break;
 					}
 				}
@@ -160,7 +251,7 @@ public class GeckoInstance {
 								for (Gene g : genomes[genome].getSubsequence(s)) {
 									for (String pattern: searchPatterns)
 										if (g.getSummary().toLowerCase().matches(".*"+pattern+".*")) {
-											c.setMatch(true);
+											c.setMatch(applyFilter(c.getId()));
 											break;
 										}
 									if (c.isMatch()) break;
@@ -174,8 +265,55 @@ public class GeckoInstance {
 				}
 			}
 		}
-		gui.getGcSelector().refresh();
+		gui.getGcSelector().refresh();	
+	}
+	
+	/**
+	 * Tests, if the cluster with the given index is in given filter set
+	 * @param clusterIndex the index of the cluster
+	 * @param filter the used filtering
+	 * @return true if the cluster is displayed in the given filter set
+	 */
+	private boolean applyFilter(int clusterIndex, ResultFilter filter) {
+		switch (filter) {
+		case showSelected:
+			if (clusterSelection.contains(clusterIndex))
+				return true;
+			break;
+		case showFiltered:
+			if (reducedList.contains(clusterIndex))
+				return true;
+			break;
+		default:
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Tests, if the cluster with the given index is in the current filter set
+	 * @param clusterIndex the index of the cluster
+	 * @return true if the cluster is displayed in the current filter set
+	 */
+	private boolean applyFilter(int clusterIndex) {
+		return applyFilter(clusterIndex, filterSelection);
+	}
+	
+	/**
+	 * Returns the list of gene clusters under the given filter condition. 
+	 * @param filter the filter condition
+	 * @return the list of gene clusters
+	 */
+	private List<GeneCluster> getClusterList(ResultFilter filter) {
+		ArrayList<GeneCluster> result = new ArrayList<GeneCluster>(clusters.length);
 		
+		for (int i=0; i<clusters.length; i++) {
+			if (applyFilter(i, filter))
+				result.add(clusters[i]);
+		}
+		
+		result.trimToSize();
+		return result;		
 	}
 	
 	
@@ -199,8 +337,6 @@ public class GeckoInstance {
 	public boolean canZoomOut() {
 		return (geneElementHight>=MIN_GENEELEMENT_HIGHT);
 	}
-	
-	
 	
 	public void setDebug(boolean debug) {
 		this.debug = debug;
@@ -274,10 +410,7 @@ public class GeckoInstance {
 			}
 		}
 		return map;
-	}
-	
-	
-	
+	}	
 
 	public HashMap<Integer, Color> getColormap() {
 		return colormap;
@@ -286,8 +419,6 @@ public class GeckoInstance {
 	public int[] getGenLabelMap() {
 		return geneLabelMap;
 	}
-	
-	private static GeckoInstance instance;
 	
 	public File getCurrentInputFile() {
 		return currentInputFile;
@@ -314,7 +445,7 @@ public class GeckoInstance {
 		this.lastParameter = p;
 		p.setAlphabetSize(geneLabelMap.length-1);
 		p.setCodingTable(geneLabelMap);
-		gui.changeMode(Gui.MODE_PREPARING_COMPUTATION);
+		gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
 		new ComputationThread(p);
 	}
 	
@@ -322,8 +453,11 @@ public class GeckoInstance {
 		if (this.clusters==null) {
 			this.clusters = new GeneCluster[0];
 		}
+		this.reducedList = GeneCluster.generateReducedClusterList(this.clusters);
+		this.clusterSelection = null;
+		this.filterString = null;
 		gui.getGcSelector().refresh();
-		gui.changeMode(Gui.MODE_SESSION_IDLE);
+		gui.changeMode(Gui.Mode.SESSION_IDLE);
 	}
 	
 	private class ComputationThread implements Runnable {
@@ -461,7 +595,7 @@ public class GeckoInstance {
 						} else g=groupedGenomes.get(occ.getGroup());
 					}
 					Chromosome c = new Chromosome();
-					g.getChromosomes().add(c);
+					g.addChromosome(c);
 					c.setName(occ.getDesc());
 					ArrayList<Gene> genes = new ArrayList<Gene>();
 					// Forward file pointer to genomes first gene
@@ -512,7 +646,7 @@ public class GeckoInstance {
 					
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
-						GeckoInstance.this.gui.changeMode(Gui.MODE_SESSION_IDLE);
+						GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
 						GeckoInstance.this.gui.updateViewscreen();
 						GeckoInstance.this.fireDataChanged();
 					}
@@ -551,7 +685,7 @@ public class GeckoInstance {
 	}
 	
 	public void readGenomes(ArrayList<GenomeOccurence> occs)  {
-		GeckoInstance.this.gui.changeMode(Gui.MODE_READING_GENOMES);
+		GeckoInstance.this.gui.changeMode(Gui.Mode.READING_GENOMES);
 		new GenomeReadingThread(occs);
 	}	
 	
@@ -581,10 +715,10 @@ public class GeckoInstance {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				if (v<gui.getProgressbar().getMaximum()) {
-					gui.changeMode(Gui.MODE_COMPUTING);
+					gui.changeMode(Gui.Mode.COMPUTING);
 					gui.getProgressbar().setValue(v);
 				} else {
-					gui.changeMode(Gui.MODE_FINISHING_COMPUTATION);
+					gui.changeMode(Gui.Mode.FINISHING_COMPUTATION);
 				}
 			}
 		});
@@ -600,7 +734,7 @@ public class GeckoInstance {
 	 */
 	public void loadSessionFromFile(File f)  {
 		lastOpenedFile = f;
-		gui.changeMode(Gui.MODE_READING_GENOMES);
+		gui.changeMode(Gui.Mode.READING_GENOMES);
 		new SessionLoadingThread(f);
 	}
 	
@@ -632,7 +766,7 @@ public class GeckoInstance {
 						gui.updateViewscreen();
 						gui.updategcSelector();
 						GeckoInstance.this.fireDataChanged();
-						gui.changeMode(Gui.MODE_SESSION_IDLE);		
+						gui.changeMode(Gui.Mode.SESSION_IDLE);
 
 					}
 				});
@@ -665,7 +799,7 @@ public class GeckoInstance {
 		geneLabelMap = null;
 		colormap = null;
 		clusters = null;
-		gui.changeMode(Gui.MODE_SESSION_IDLE);		
+		gui.changeMode(Gui.Mode.SESSION_IDLE);		
 	}
 		
 	/**
@@ -701,60 +835,12 @@ public class GeckoInstance {
 		  
 	}
 	
-	public boolean exportResultsToFile(File f) {
+	public boolean exportResultsToFile(File f, ResultFilter filter) {
 		lastExportedFile = f;
-		FileWriter fw = null;
-		try {
-			fw = new FileWriter(f);
-			for (GeneCluster c : getClusters()) {
-				for (GeneClusterOccurrence occ : c.getAllOccurrences()) {
-					/*
-					 * Write the columns <ClusterId> <OccurrenceID> <Score> <totalDist>
-					 */
-					fw.write(Integer.toString(c.getId())+
-							'\t'+
-							occ.getId()+
-							'\t'+
-							occ.getBestScore()+
-							"\t"+
-							occ.getTotalDist()+
-							"\t");
-					/*
-					 * Write the column <GeneSet>
-					 */
-					for (int i=0; i<c.getGenes().length; i++) {
-						fw.write(Integer.toString(geneLabelMap[c.getGenes()[i]]));
-						if (i<c.getGenes().length-1) fw.write(";");
-					}
-					/*
-					 * Write the start-end lists for each genome
-					 */
-					fw.write("\t");
-					for (int s=0;s<occ.getSubsequences().length;s++) {
-						Subsequence[] sub = occ.getSubsequences()[s];
-						if (sub!=null && sub.length!=0) 
-							for (int i=0; i<sub.length; i++) {
-								fw.write(sub[i].getChromosome()+ ":" + sub[i].getStart()+"-"+sub[i].getStop());
-								if (i<sub.length-1) fw.write(";");
-							}	
-						if (s<occ.getSubsequences().length-1)
-							fw.write("\t");
-					}
-					fw.write("\n");
-				}
-			}
-			fw.flush();
-			fw.close();
-			return true;
-		} catch (IOException e) {
-			if (debug) e.printStackTrace();
-			return false;
-		}
-		
-		
+		filterResults();
+		List<String> genomeNames = new ArrayList<String>(genomes.length);
+		for (Genome genome : genomes)
+			genomeNames.add(genome.getChromosomes().get(0).getName());
+		return ResultWriter.exportResultsToFileNEW2(f, getClusterList(filter), geneLabelMap, genomeNames);
 	}
-
-
-	
-	
 }

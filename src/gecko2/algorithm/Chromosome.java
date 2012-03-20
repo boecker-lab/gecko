@@ -7,29 +7,30 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class Chromosome implements Serializable {
-
+	
 	private static final long serialVersionUID = -1724388125243376854L;
 	private MouseListener chromosomeMouseListener;
-
+	
+	private String name;
+	private List<Gene> genes;
+	
 	// Debug
 	public static Chromosome createSampleGenome(String name, int minid, int maxid) {
-		ArrayList<Gene> genes = new ArrayList<Gene>();
+		List<Gene> genes = new ArrayList<Gene>();
 		for (int i=minid; i<=maxid; i++)
 			genes.add(new Gene("Gene "+i,i));
 		return new Chromosome(name,genes);			
 	}
 	
-	private String name;
-	private ArrayList<Gene> genes;
-	
 	public Chromosome() {
 		this (null, null);
 	}
 	
-	public Chromosome(String name, ArrayList<Gene> genes) {
+	public Chromosome(String name, List<Gene> genes) {
 		this.name = name;
 		this.genes = genes;
 		this.chromosomeMouseListener = new ChromosomeMouseListener();
@@ -39,7 +40,7 @@ public class Chromosome implements Serializable {
 		return chromosomeMouseListener;
 	}
 
-	public void setGenes(ArrayList<Gene> genes) {
+	public void setGenes(List<Gene> genes) {
 		this.genes = genes;
 	}
 	
@@ -51,7 +52,7 @@ public class Chromosome implements Serializable {
 		return name;
 	}
 
-	public ArrayList<Gene> getGenes() {
+	public List<Gene> getGenes() {
 		return genes;
 	}
 	
