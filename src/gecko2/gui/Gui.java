@@ -52,6 +52,7 @@ public class Gui {
 	private JMenu menuFile, menuView;
 	
 	private MultipleGenomesBrowser mgb;
+	private GenomeNavigator navigator;
 	private GeneClusterSelector gcSelector;
 	private GeneClusterDisplay gcDisplay;
 
@@ -62,7 +63,7 @@ public class Gui {
 	private JLabel infobar;
 	private ImageIcon waitingAnimation;
 	private final JTextField searchField;
-	private GenomeNavigator navigator;
+
 		
 	public JFrame getMainframe() {
 		return mainframe;
@@ -127,16 +128,11 @@ public class Gui {
 		mgb = new MultipleGenomesBrowser();
 		
 		
-		// Lowest component in the upper half of the window
-		JPanel upperPanel = new JPanel();
-		upperPanel.setLayout(new BorderLayout());
-		
+		// Lowest component in the upper half of the window		
 		
 		JScrollPane upscoll = new JScrollPane();
 		upscoll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		upscoll.setViewportView(mgb);
-		
-		upperPanel.add(upscoll, BorderLayout.CENTER);
 		
 		navigator = new GenomeNavigator();
 		gecko.addDataListener(navigator);
@@ -144,8 +140,10 @@ public class Gui {
 		mgb.addBrowserContentListener(navigator);
 		occurrenceSelector.addSelectionListener(mgb);
 		
+		JScrollPane navigatorScroll = new JScrollPane(navigator);
 		
-		upperPanel.add(navigator, BorderLayout.SOUTH);
+		
+		JSplitPane upperPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upscoll, navigatorScroll);
 		
 		//Toolbar
 		JToolBar toolbar = new JToolBar();
