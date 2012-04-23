@@ -127,6 +127,7 @@ public class GeneCluster implements Serializable {
 		builder.refSeq(this.getRefSeqIndex());
 		
 		int[] subseqs = new int[occ.getSubsequences().length];
+		int[] nrOccurrences = new int[occ.getSubsequences().length];
 		List<String> chromosomes = new ArrayList<String>(occ.getSubsequences().length);
 		List<Gene[]> tempIntervals = new ArrayList<Gene[]>(occ.getSubsequences().length);
 		for (int  i=0; i<occ.getSubsequences().length; i++) {
@@ -142,13 +143,14 @@ public class GeneCluster implements Serializable {
 					interval[index] = chrom.getGenes().get(j-1);
 					index++;
 				}
-				tempIntervals.add(interval);
-					
+				tempIntervals.add(interval);		
+				nrOccurrences[i] = occ.getSubsequences()[i].length;	
 			} else {
 				subseqs[i] = -1;
 				builder.setDistance(-1, i);
 				chromosomes.add(null);
 				tempIntervals.add(null);
+				nrOccurrences[i] = 0;
 			}
 		}
 		builder.chromosomes(chromosomes);
@@ -186,6 +188,8 @@ public class GeneCluster implements Serializable {
 			}
 			geneAnnotations.add(annot);
 		}
+		
+		builder.nrOfOccurrences(nrOccurrences);
 		
 		return builder.build();
 	}

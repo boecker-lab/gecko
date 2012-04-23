@@ -32,8 +32,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -45,6 +49,8 @@ public class GeckoInstance {
 	public enum ResultFilter {showAll, showFiltered, showSelected};
 	
 	private static GeckoInstance instance;
+	
+	private boolean libgeckoLoaded;
 	
 	private File currentInputFile; 
 	private Genome[] genomes= null;
@@ -131,6 +137,14 @@ public class GeckoInstance {
 		return animationEnabled;
 	}
 	
+	public boolean isLibgeckoLoaded() {
+		return libgeckoLoaded;
+	}
+
+	public void setLibgeckoLoaded(boolean libgeckoLoaded) {
+		this.libgeckoLoaded = libgeckoLoaded;
+	}
+
 	public synchronized StartComputationDialog getStartComputationDialog() {
 		if (scd==null)
 			scd = new StartComputationDialog(genomes.length);
@@ -470,6 +484,7 @@ public class GeckoInstance {
 		}
 		
 		public void run() {
+			//printGenomeStatistics();
 			// We do this very ugly with a 3D integer array to make things easier
 			// during the JNI<->JAVA phase
 			int genomes[][][] = new int[GeckoInstance.this.genomes.length][][];
@@ -489,6 +504,52 @@ public class GeckoInstance {
 				}
 			});
 		}
+		
+		private void printGenomeStatistics() {
+			for (Genome g : GeckoInstance.this.genomes){
+				int totalLength = 0;
+				int[] alphabet = new int[p.getAlphabetSize() + 1];
+				for (Chromosome chr : g.getChromosomes()) {
+					totalLength += chr.getGenes().size();
+					for (Gene gene : chr.getGenes())
+						alphabet[Math.abs(gene.getId())]++;
+				}
+				SortedMap<Integer,Integer> familySizes = new TreeMap<Integer, Integer>();
+				for (int i=1; i<alphabet.length; i++){
+					Integer fS = familySizes.get(alphabet[i]);
+					if (fS != null)
+						familySizes.put(alphabet[i], ++fS);
+					else
+						familySizes.put(alphabet[i], 1);				
+				}
+
+				Integer nonOccFamilies = familySizes.get(0);
+				System.out.println(String.format("%s: %d genes, %d gene families", g.getChromosomes().get(0).getName(), totalLength, (nonOccFamilies == null) ? alphabet.length-1 : alphabet.length - 1 - nonOccFamilies));
+				for (Entry<Integer, Integer> entry : familySizes.entrySet()){
+					System.out.println(String.format("%d:\t%d", entry.getKey(), entry.getValue()));
+				}
+				System.out.println();
+			}
+			
+			int[] alphabet = new int[p.getAlphabetSize() + 1];
+			for (Genome g : GeckoInstance.this.genomes)
+				for (Chromosome chr : g.getChromosomes())
+					for (Gene gene : chr.getGenes())
+						alphabet[Math.abs(gene.getId())]++;
+			SortedMap<Integer,Integer> familySizes = new TreeMap<Integer, Integer>();
+			for (int i=1; i<alphabet.length; i++){
+				Integer fS = familySizes.get(alphabet[i]);
+				if (fS != null)
+					familySizes.put(alphabet[i], ++fS);
+				else
+					familySizes.put(alphabet[i], 1);				
+			}
+
+			System.out.println("Complete:");
+			for (Entry<Integer, Integer> entry : familySizes.entrySet()){
+				System.out.println(String.format("%d:\t%d", entry.getKey(), entry.getValue()));
+			}
+		}
 
 	}
 	
@@ -503,8 +564,8 @@ public class GeckoInstance {
 			String line;
 			ArrayList<GenomeOccurence> genomeOccurennces = new ArrayList<GenomeOccurence>();
 			GenomeOccurence add = new GenomeOccurence();
-			HashMap<String, Integer> groups = new HashMap<String, Integer>();
-			HashMap<Integer, Integer> groupSize = new HashMap<Integer, Integer>();
+			Map<String, Integer> groups = new HashMap<String, Integer>();
+			Map<Integer, Integer> groupSize = new HashMap<Integer, Integer>();
 			int curline = 0;
 			if ((line = reader.readLine()) != null) {
 				add.setDesc(line);
@@ -763,6 +824,7 @@ public class GeckoInstance {
 				
 				EventQueue.invokeLater(new Runnable() {	
 					public void run() {
+						reducedList = null;
 						gui.updateViewscreen();
 						gui.updategcSelector();
 						GeckoInstance.this.fireDataChanged();

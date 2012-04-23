@@ -12,7 +12,8 @@ public class GeneClusterOutput {
 	private final Map<Integer, Gene[]> geneAnnotations;
 	private final List<List<Integer>> intervals;
 	private final List<String> chromosomes;
-	
+	private final int[] nrOfOccurrences;
+
 	public static class Builder {
 		private final int nrOfSequences;
 		
@@ -22,6 +23,8 @@ public class GeneClusterOutput {
 		private Map<Integer, Gene[]> geneAnnotations;
 		private List<List<Integer>> intervals;
 		private List<String> chromosomes;
+
+		private int[] nrOfOccurrences;
 		
 		public Builder (int nrOfSequences) {
 			this.nrOfSequences = nrOfSequences;
@@ -58,6 +61,11 @@ public class GeneClusterOutput {
 			this.chromosomes = chrom;
 			return this;
 		}
+
+		public Builder nrOfOccurrences(int[] nrOfOccurrences) {
+			this.nrOfOccurrences = nrOfOccurrences;
+			return this;
+		}
 		
 		public GeneClusterOutput build() {
 			return new GeneClusterOutput(this);
@@ -71,6 +79,7 @@ public class GeneClusterOutput {
 		geneAnnotations = builder.geneAnnotations;
 		intervals = builder.intervals;
 		chromosomes = builder.chromosomes;
+		nrOfOccurrences = Arrays.copyOf(builder.nrOfOccurrences, builder.nrOfOccurrences.length);
 	}
 
 	public List<String> getChromosomes() {
@@ -106,5 +115,9 @@ public class GeneClusterOutput {
 				result.add(gene);
 		}
 		return result;
+	}
+	
+	public int[] getNrOfOccurrences() {
+		return nrOfOccurrences;
 	}
 }

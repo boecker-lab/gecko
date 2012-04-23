@@ -341,7 +341,8 @@ public class Gui {
 		//if (pbar) progressbar.grabFocus();
 		statusbartext.setText(text);
 		importGenomesAction.setEnabled(importGenomes);
-		startComputation.setEnabled(startComp);
+		if (gecko.isLibgeckoLoaded())
+			startComputation.setEnabled(startComp);
 		clearSelectionAction.setEnabled(clearSelect);
 		saveSessionAction.setEnabled(saveSession);
 		if (zoom) {

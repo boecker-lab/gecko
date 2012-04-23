@@ -27,21 +27,25 @@ public class Gecko2 {
 	    	;
 	    }
 	    
+		boolean libgeckoLoaded = false;
 		try {
 			if (args.length==1)
 				LibraryUtils.loadLibrary(args[0],true);
 			else
 				LibraryUtils.loadLibrary("libgecko2");
+			
+			libgeckoLoaded = true;
 		} catch (PlatformNotSupportedException e) {
 			e.printStackTrace();
-			System.exit(1);
+			System.err.println("Running in visualization only mode!");
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.exit(1);
+			System.err.println("Running in visualization only mode!");
 		}
 		System.err.println(":o)");
 	    		
-		GeckoInstance.getInstance(); 
+		GeckoInstance instance = GeckoInstance.getInstance();
+		instance.setLibgeckoLoaded(libgeckoLoaded);
 		Gui.startUp();
 
 	}

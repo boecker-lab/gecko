@@ -1,0 +1,2327 @@
+Detected 119 gene clusters.
+General statistics:
+Genes per cluster 	 #clusters
+4 	 89
+5 	 24
+6 	 6
+
+Interval Lengths 	 #intervals
+2 	 96
+3 	 68
+4 	 149
+5 	 37
+6 	 13
+7 	 4
+
+Lengths in Lichtheimia corymbifera scaffold00166 	 #intervals
+4 	 87
+5 	 23
+6 	 7
+7 	 2
+
+Lengths in Mucor circinelloides scaffold_02 	 #intervals
+2 	 37
+3 	 20
+4 	 21
+5 	 4
+6 	 2
+7 	 1
+
+Lengths in Phycomyces blakesleeanus scaffold_56 	 #intervals
+2 	 23
+3 	 32
+4 	 30
+5 	 7
+6 	 4
+7 	 1
+
+Lengths in Rhizopus oryzae supercont3.18 of Rhizopus oryzae 	 #intervals
+2 	 36
+3 	 16
+4 	 11
+5 	 3
+
+new cluster: pValue = 1.052679e-29, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00006	<358  188>  <398  215>  <188  358>  <3636  
+2:	Mucor circinelloides scaffold_04	<358  188>  <398  215>  <188  358>  <3636  
+3:	Phycomyces blakesleeanus scaffold_23	<358  188>  <215  398>  <188  358>  
+4:	Rhizopus oryzae supercont3.6 of Rhizopus oryzae	<215  398>  <188  358>  
+Distances: 	1: 0	2: 0	3: 1	4: 1
+358:	1: lcory_9605 - g43
+	2: mcirc_7896 - fgenesh1_pg.04_#_721
+	3: pblak_2404 - estExt_Genewise1Plus.C_230119
+	4: roryz_4556 - RO3G_08124
+398:	1: lcory_9607 - g45
+	2: mcirc_7898 - estExt_Genemark1.C_040821
+	3: pblak_2407 - estExt_fgenesh1_pg.C_230098
+	4: roryz_4554 - RO3G_08122
+188:	1: lcory_9606 - g44
+	2: mcirc_7897 - fgenesh1_kg.04_#_195_#_12_8_CCIA_CCIB_EXTA
+	3: pblak_2405 - Phybl1.fgeneshPB_kg.17__11__4337685:1
+	4: roryz_4555 - RO3G_08123
+215:	1: lcory_9608 - g46
+	2: mcirc_7899 - fgenesh1_kg.04_#_198_#_976_1_CCIA_CCIB_EXTA
+	3: pblak_2406 - Phybl1.estExt_Genewise1Plus.C_170092
+	4: roryz_4553 - RO3G_08121
+3636:	1: lcory_9611 - g49
+	2: mcirc_7902 - fgenesh1_pg.04_#_727
+	3: ---
+	4: ---
+
+new cluster: pValue = 4.910363e-22, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00011	426>  <1559  <347  1324>  
+2:	Mucor circinelloides scaffold_07	426>  <1559  <347  1324>  
+3:	Phycomyces blakesleeanus scaffold_25	426>  <1559  <347  1324>  
+4:	Rhizopus oryzae supercont3.1 of Rhizopus oryzae	<1324  347>  
+Distances: 	1: 0	2: 0	3: 0	4: 2
+426:	1: lcory_2043 - g203
+	2: mcirc_6602 - fgenesh1_pg.07_#_448
+	3: pblak_0801 - Phybl1.fgeneshPB_pg.25__127
+	4: ---
+1324:	1: lcory_2046 - g206
+	2: mcirc_6605 - fgenesh1_kg.07_#_133_#_984_1_CCIA_CCIB_EXTA
+	3: pblak_0804 - estExt_fgenesh1_pg.C_250175
+	4: roryz12673 - RO3G_00273
+1559:	1: lcory_2044 - g204
+	2: mcirc_6603 - Genemark1.9366_g
+	3: pblak_0802 - fgenesh1_kg.25_#_43_#_1672_1_CBNA_CBNB_CBNC_CBNF
+	4: ---
+347:	1: lcory_2045 - g205
+	2: mcirc_6604 - e_gw1.07.125.1
+	3: pblak_0803 - estExt_Genemark1.C_250179
+	4: roryz12674 - RO3G_00274
+
+new cluster: pValue = 3.423827e-20, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00077	<2381  <879  753>  <2606  
+2:	Mucor circinelloides scaffold_02	879>  2381>  <340  753>  <2606  
+3:	Phycomyces blakesleeanus scaffold_16	2606>  <753  879>  2381>  
+4:	Rhizopus oryzae supercont3.11 of Rhizopus oryzae	753>  <2606  
+Distances: 	1: 0	2: 1	3: 0	4: 2
+2606:	1: lcory_8326 - g392
+	2: mcirc_0213 - Mucci1.estExt_Genewise1Plus.C_21809
+	3: pblak14451 - estExt_Genewise1Plus.C_160146
+	4: roryz_1617 - RO3G_13075
+2381:	1: lcory_8323 - g389
+	2: mcirc_0210 - fgenesh1_pg.02_#_186
+	3: pblak14454 - fgenesh1_pg.16_#_134
+	4: ---
+753:	1: lcory_8325 - g391
+	2: mcirc_0212 - fgenesh1_kg.02_#_43_#_1036_2_CCIA_CCIB_EXTA
+	3: pblak14452 - estExt_Genewise1Plus.C_160151
+	4: roryz_1616 - RO3G_13074
+879:	1: lcory_8324 - g390
+	2: mcirc_0209 - estExt_fgenesh1_pg.C_020182
+	3: pblak14453 - Genemark1.9933_g
+	4: ---
+
+new cluster: pValue = 2.057728e-18, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00019	<369  <1262  2968>  <316  
+2:	Mucor circinelloides scaffold_04	316>  <2968  4202>  1262>  <369  
+3:	Phycomyces blakesleeanus scaffold_12	316>  1262>  <369  
+4:	Rhizopus oryzae supercont3.3 of Rhizopus oryzae	316>  1262>  <369  
+Distances: 	1: 0	2: 1	3: 1	4: 1
+369:	1: lcory_2274 - g41
+	2: mcirc_7153 - Mucci1.e_gw1.4.309.1
+	3: pblak12945 - fgenesh1_pm.12_#_68
+	4: roryz11406 - RO3G_04523
+2968:	1: lcory_2276 - g43
+	2: mcirc_7150 - estExt_Genemark1.C_040046
+	3: ---
+	4: ---
+1262:	1: lcory_2275 - g42
+	2: mcirc_7152 - fgenesh1_pg.04_#_32
+	3: pblak12944 - fgenesh1_pg.12_#_284
+	4: roryz11405 - RO3G_04522
+316:	1: lcory_2277 - g44
+	2: mcirc_7149 - fgenesh1_kg.04_#_6_#_1378_1_CCIA_CCIB_EXTA
+	3: pblak12943 - Phybl1.estExt_fgeneshPB_pg.C_110125
+	4: roryz11404 - RO3G_04521
+
+new cluster: pValue = 8.069958e-18, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00110	<3937  749>  3174>  92>  510>  <5388  
+2:	Mucor circinelloides scaffold_07	5388>  <510  <92  <3174  
+3:	Phycomyces blakesleeanus scaffold_30	<3937  3174>  92>  510>  
+Distances: 	1: 0	2: 2	3: 2
+510:	1: lcory_2401 - g195
+	2: mcirc_6439 - fgenesh1_kg.07_#_96_#_1515_1_CCIA_CCIB_EXTA
+	3: pblak15608 - estExt_Genewise1Plus.C_300143
+749:	1: lcory_2398 - g192
+	2: ---
+	3: ---
+5388:	1: lcory_2402 - g196
+	2: mcirc_6438 - Genemark1.9197_g
+	3: ---
+3174:	1: lcory_2399 - g193
+	2: mcirc_6441 - Genemark1.9199_g
+	3: pblak15606 - e_gw1.30.191.1
+3937:	1: lcory_2397 - g191
+	2: ---
+	3: pblak15605 - Genemark1.13807_g
+92:	1: lcory_2400 - g194
+	2: mcirc_6440 - fgenesh1_pm.07_#_113
+	3: pblak15607 - gw1.30.133.1
+
+new cluster: pValue = 1.987237e-17, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00039	<834  <8  <8  <8  2862>  1509>  
+2:	Mucor circinelloides scaffold_07	<2862  834>  1509>  
+3:	Phycomyces blakesleeanus scaffold_12	<1509  <834  2862>  
+4:	Rhizopus oryzae supercont3.5 of Rhizopus oryzae	<2862  834>  
+Distances: 	1: 0	2: 1	3: 1	4: 2
+1509:	1: lcory_4047 - g342
+	2: mcirc_6577 - fgenesh1_kg.07_#_128_#_1591_1_CCIA_CCIB_EXTA
+	3: pblak12893 - e_gw1.12.163.1
+	4: ---
+834:	1: lcory_4042 - g337
+	2: mcirc_6576 - estExt_Genewise1Plus.C_070691
+	3: pblak12894 - Phybl1.gw1.11.224.1
+	4: roryz_8084 - RO3G_06950
+8:	1: lcory_4043 - g338
+	2: ---
+	3: ---
+	4: ---
+2862:	1: lcory_4046 - g341
+	2: mcirc_6575 - Mucci1.fgeneshMC_pg.6_#_455
+	3: pblak12895 - Phybl1.estExt_fgeneshPB_pg.C_110173
+	4: roryz_8083 - RO3G_06949
+
+new cluster: pValue = 5.554862e-15, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00021	<279  <3172  1258>  <417  
+2:	Mucor circinelloides scaffold_07	<279  <3172  0>  <417  
+3:	Phycomyces blakesleeanus scaffold_20	<279  <3172  1258>  <417  
+4:	Rhizopus oryzae supercont3.4 of Rhizopus oryzae	417>  <1258  
+Distances: 	1: 0	2: 2	3: 0	4: 2
+279:	1: lcory_2792 - g41
+	2: mcirc_6796 - fgenesh1_pg.07_#_620
+	3: pblak_1607 - Phybl1.fgeneshPB_pg.2__1041
+	4: ---
+417:	1: lcory_2795 - g44
+	2: mcirc_6799 - fgenesh1_kg.07_#_185_#_3357_1_CCIA_CCIB_EXTA
+	3: pblak_1610 - fgenesh1_kg.20_#_73_#_0_0_CBNB2902.g1_CBNA_CBNB_C BNC_CBNF
+	4: roryz_7199 - RO3G_06064
+3172:	1: lcory_2793 - g42
+	2: mcirc_6797 - Genemark1.9574_g
+	3: pblak_1608 - Phybl1.fgeneshPB_pg.2__1042
+	4: ---
+1258:	1: lcory_2794 - g43
+	2: ---
+	3: pblak_1609 - Phybl1.gw1.2.789.1
+	4: roryz_7200 - RO3G_06065
+
+new cluster: pValue = 6.462786e-15, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00002	<3580  498>  <8  3579>  
+2:	Mucor circinelloides scaffold_06	498>  3579>  
+3:	Phycomyces blakesleeanus scaffold_1	<3579  <498  3580>  
+4:	Rhizopus oryzae supercont3.1 of Rhizopus oryzae	<3580  498>  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+3580:	1: lcory10799 - g63
+	2: ---
+	3: pblak_3762 - Genemark1.262_g
+	4: roryz13295 - RO3G_00895
+8:	1: lcory10801 - g65
+	2: ---
+	3: ---
+	4: ---
+498:	1: lcory10800 - g64
+	2: mcirc_5963 - fgenesh1_kg.06_#_192_#_1570_1_CCIA_CCIB_EXTA
+	3: pblak_3761 - Phybl1.fgeneshPB_pg.4__239
+	4: roryz13296 - RO3G_00896
+3579:	1: lcory10802 - g66
+	2: mcirc_5964 - Mucci1.fgeneshMC_pg.6_#_159
+	3: pblak_3760 - Genemark1.260_g
+	4: ---
+
+new cluster: pValue = 1.429068e-14, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00094	<3085  3194>  <61  1283>  
+2:	Mucor circinelloides scaffold_02	3194>  1283>  
+3:	Phycomyces blakesleeanus scaffold_16	<1283  61>  <3194  3085>  
+4:	Rhizopus oryzae supercont3.2 of Rhizopus oryzae	<1283  <3194  
+Distances: 	1: 0	2: 2	3: 0	4: 2
+3194:	1: lcory_0160 - g118
+	2: mcirc_0512 - fgenesh1_kg.02_#_130_#_2613_1_CCIA_CCIB_EXTA
+	3: pblak14509 - estExt_Genemark1.C_160189
+	4: roryz10596 - RO3G_03712
+3085:	1: lcory_0159 - g117
+	2: ---
+	3: pblak14510 - estExt_Genemark1.C_160190
+	4: ---
+1283:	1: lcory_0162 - g120
+	2: mcirc_0513 - estExt_Genemark1.C_020520
+	3: pblak14507 - estExt_Genewise1.C_160178
+	4: roryz10595 - RO3G_03711
+61:	1: lcory_0161 - g119
+	2: ---
+	3: pblak14508 - estExt_Genewise1Plus.C_160178
+	4: ---
+
+new cluster: pValue = 3.843434e-14, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00037	<306  <713  0>  <129  
+2:	Mucor circinelloides scaffold_03	129>  713>  
+3:	Phycomyces blakesleeanus scaffold_26	<306  <713  <129  
+4:	Rhizopus oryzae supercont3.20 of Rhizopus oryzae	129>  713>  306>  
+Distances: 	1: 0	2: 2	3: 1	4: 1
+713:	1: lcory_4507 - g122
+	2: mcirc_3199 - fgenesh1_kg.03_#_429_#_82_1_CCIA_CCIB_EXTA
+	3: pblak_1045 - Phybl1.estExt_fgeneshPB_pg.C_260128
+	4: roryz16594 - RO3G_16437
+306:	1: lcory_4506 - g121
+	2: ---
+	3: pblak_1044 - estExt_fgenesh1_pg.C_260124
+	4: roryz16595 - RO3G_16438
+129:	1: lcory_4509 - g124
+	2: mcirc_3198 - estExt_Genemark1.C_031596
+	3: pblak_1046 - Phybl1.estExt_fgeneshPB_pg.C_260129
+	4: roryz16593 - RO3G_16436
+
+new cluster: pValue = 1.086338e-13, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00008	3564>  2407>  1107>  2406>  
+2:	Mucor circinelloides scaffold_02	<1107  <2407  
+3:	Phycomyces blakesleeanus scaffold_11	<2406  <2407  <3564  
+4:	Rhizopus oryzae supercont3.4 of Rhizopus oryzae	3564>  2407>  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+2406:	1: lcory11194 - g94
+	2: ---
+	3: pblak11535 - Phybl1.estExt_fgeneshPB_pg.C_130255
+	4: ---
+2407:	1: lcory11192 - g92
+	2: mcirc_1511 - Genemark1.3540_g
+	3: pblak11536 - Genemark1.7956_g
+	4: roryz_7233 - RO3G_06098
+3564:	1: lcory11191 - g91
+	2: ---
+	3: pblak11537 - Genemark1.7957_g
+	4: roryz_7232 - RO3G_06097
+1107:	1: lcory11193 - g93
+	2: mcirc_1510 - Genemark1.3539_g
+	3: ---
+	4: ---
+
+new cluster: pValue = 2.306717e-13, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00028	<220  <443  2870>  <221  
+2:	Mucor circinelloides scaffold_02	2870>  <221  
+3:	Phycomyces blakesleeanus scaffold_8	221>  <2870  220>  
+4:	Rhizopus oryzae supercont3.6 of Rhizopus oryzae	<443  2870>  <221  
+Distances: 	1: 0	2: 2	3: 1	4: 1
+220:	1: lcory_3797 - g359
+	2: ---
+	3: pblak10852 - estExt_Genewise1Plus.C_80406
+	4: ---
+221:	1: lcory_3800 - g362
+	2: mcirc_0079 - Genemark1.2070_g
+	3: pblak10850 - Genemark1.6568_g
+	4: roryz_4943 - RO3G_08511
+2870:	1: lcory_3799 - g361
+	2: mcirc_0078 - Mucci1.fgeneshMC_pg.2_#_1463
+	3: pblak10851 - Genemark1.6569_g
+	4: roryz_4942 - RO3G_08510
+443:	1: lcory_3798 - g360
+	2: ---
+	3: ---
+	4: roryz_4941 - RO3G_08509
+
+new cluster: pValue = 2.894118e-13, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00019	1547>  <785  <3947  3946>  
+2:	Mucor circinelloides scaffold_02	<3946  3947>  1547>  
+3:	Phycomyces blakesleeanus scaffold_6	<3946  3947>  0>  1547>  
+4:	Rhizopus oryzae supercont3.14 of Rhizopus oryzae	1547>  785>  
+Distances: 	1: 0	2: 1	3: 2	4: 2
+3946:	1: lcory_2268 - g35
+	2: mcirc_0034 - Genemark1.2025_g
+	3: pblak_9161 - Phybl1.estExt_fgeneshPB_pg.C_20010
+	4: ---
+3947:	1: lcory_2267 - g34
+	2: mcirc_0035 - Mucci1.e_gw1.2.1083.1
+	3: pblak_9162 - estExt_Genemark1.C_60010
+	4: ---
+785:	1: lcory_2266 - g33
+	2: ---
+	3: ---
+	4: roryz_3026 - RO3G_14487
+1547:	1: lcory_2265 - g32
+	2: mcirc_0036 - Mucci1.fgeneshMC_pg.2_#_1501
+	3: pblak_9164 - Phybl1.estExt_fgeneshPB_pg.C_20011
+	4: roryz_3025 - RO3G_14486
+
+new cluster: pValue = 3.113330e-13, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00041	<105  2071>  681>  <228  
+2:	Mucor circinelloides scaffold_02	<2071  105>  
+3:	Phycomyces blakesleeanus scaffold_12	<105  2071>  <2036  681>  <228  
+4:	Rhizopus oryzae supercont3.18 of Rhizopus oryzae	2071>  681>  <228  
+Distances: 	1: 0	2: 2	3: 1	4: 1
+2071:	1: lcory_5412 - g96
+	2: mcirc_0919 - Mucci1.fgeneshMC_pg.2_#_664
+	3: pblak13025 - estExt_Genewise1Plus.C_120394
+	4: roryz_0102 - RO3G_15977
+681:	1: lcory_5413 - g97
+	2: ---
+	3: pblak13027 - e_gw1.12.379.1
+	4: roryz_0103 - RO3G_15978
+228:	1: lcory_5414 - g98
+	2: ---
+	3: pblak13028 - Phybl1.gw1.11.194.1
+	4: roryz_0104 - RO3G_15979
+105:	1: lcory_5411 - g95
+	2: mcirc_0920 - Genemark1.2926_g
+	3: pblak13024 - Genemark1.8522_g
+	4: ---
+
+new cluster: pValue = 2.399305e-12, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00075	<793  2612>  <5220  <437  
+2:	Mucor circinelloides scaffold_09	<2612  793>  
+3:	Phycomyces blakesleeanus scaffold_4	437>  5220>  1515>  <2612  793>  
+4:	Rhizopus oryzae supercont3.11 of Rhizopus oryzae	<2612  793>  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+2612:	1: lcory_8228 - g294
+	2: mcirc10575 - estExt_Genewise1.C_090458
+	3: pblak_8053 - fgenesh1_pm.4_#_87
+	4: roryz_1535 - RO3G_12993
+5220:	1: lcory_8229 - g295
+	2: ---
+	3: pblak_8051 - Genemark1.3676_g
+	4: ---
+437:	1: lcory_8230 - g296
+	2: ---
+	3: pblak_8050 - estExt_Genewise1.C_40447
+	4: ---
+793:	1: lcory_8227 - g293
+	2: mcirc10576 - fgenesh1_kg.09_#_67_#_1925_1_CCIA_CCIB_EXTA
+	3: pblak_8054 - estExt_Genewise1Plus.C_40445
+	4: roryz_1536 - RO3G_12994
+
+new cluster: pValue = 3.647395e-12, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00014	<762  <16  <1106  3048>  
+2:	Mucor circinelloides scaffold_03	<3048  1106>  
+3:	Phycomyces blakesleeanus scaffold_17	<3048  1106>  762>  
+4:	Rhizopus oryzae supercont3.14 of Rhizopus oryzae	<1106  3048>  762>  
+Distances: 	1: 0	2: 2	3: 1	4: 1
+762:	1: lcory_0865 - g138
+	2: ---
+	3: pblak13989 - estExt_Genewise1Plus.C_170085
+	4: roryz_3046 - RO3G_14507
+16:	1: lcory_0866 - g139
+	2: ---
+	3: ---
+	4: ---
+3048:	1: lcory_0868 - g141
+	2: mcirc_2506 - Genemark1.4565_g
+	3: pblak13987 - Genemark1.10187_g
+	4: roryz_3045 - RO3G_14506
+1106:	1: lcory_0867 - g140
+	2: mcirc_2507 - Mucci1.fgeneshMC_pg.3_#_812
+	3: pblak13988 - Genemark1.10188_g
+	4: roryz_3044 - RO3G_14505
+
+new cluster: pValue = 4.140161e-12, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00064	302>  <3740  1456>  1472>  
+2:	Mucor circinelloides scaffold_09	<1472  <1456  302>  
+3:	Phycomyces blakesleeanus scaffold_10	<302  1456>  
+4:	Rhizopus oryzae supercont3.2 of Rhizopus oryzae	<302  1456>  
+Distances: 	1: 0	2: 1	3: 2	4: 2
+1456:	1: lcory_7331 - g260
+	2: mcirc10542 - e_gw1.09.79.1
+	3: pblak12015 - estExt_Genewise1Plus.C_100279
+	4: roryz_9631 - RO3G_02746
+1472:	1: lcory_7332 - g261
+	2: mcirc10541 - fgenesh1_kg.09_#_56_#_1665_1_CCIA_CCIB_EXTA
+	3: ---
+	4: ---
+3740:	1: lcory_7330 - g259
+	2: ---
+	3: ---
+	4: ---
+302:	1: lcory_7329 - g258
+	2: mcirc10543 - Mucci1.fgeneshMC_pg.9_#_261
+	3: pblak12014 - Phybl1.estExt_fgeneshPB_pm.C_100030
+	4: roryz_9630 - RO3G_02745
+
+new cluster: pValue = 4.581006e-12, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00042	<2764  1046>  250>  <1928  
+2:	Mucor circinelloides scaffold_01	1928>  1046>  
+3:	Phycomyces blakesleeanus scaffold_6	<2764  1046>  <1928  
+4:	Rhizopus oryzae supercont3.12 of Rhizopus oryzae	1046>  <1928  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+250:	1: lcory_5585 - g155
+	2: ---
+	3: ---
+	4: ---
+2764:	1: lcory_5583 - g153
+	2: ---
+	3: pblak_9793 - estExt_fgenesh1_pg.C_60612
+	4: ---
+1928:	1: lcory_5586 - g156
+	2: mcirc_5140 - fgenesh1_kg.01_#_474_#_1539_1_CCIA_CCIB_EXTA
+	3: pblak_9795 - e_gw1.6.791.1
+	4: roryz_1950 - RO3G_13409
+1046:	1: lcory_5584 - g154
+	2: mcirc_5141 - fgenesh1_pg.01_#_1779
+	3: pblak_9794 - estExt_fgenesh1_pg.C_60613
+	4: roryz_1949 - RO3G_13408
+
+new cluster: pValue = 4.807199e-12, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00001	2487>  0>  <189  <693  
+2:	Mucor circinelloides scaffold_03	2487>  <693  
+3:	Phycomyces blakesleeanus scaffold_3	693>  <189  <2487  
+4:	Rhizopus oryzae supercont3.24 of Rhizopus oryzae	2487>  <693  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+189:	1: lcory_9950 - g128
+	2: ---
+	3: pblak_5626 - fgenesh1_pm.3_#_165
+	4: ---
+693:	1: lcory_9951 - g129
+	2: mcirc_1694 - Genemark1.3735_g
+	3: pblak_5625 - estExt_fgenesh1_pg.C_30741
+	4: roryz17004 - RO3G_16927
+2487:	1: lcory_9948 - g126
+	2: mcirc_1693 - Genemark1.3733_g
+	3: pblak_5627 - Phybl1.estExt_fgeneshPB_pg.C_50119
+	4: roryz17003 - RO3G_16926
+
+new cluster: pValue = 1.391837e-11, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00014	1071>  256>  1827>  <1176  
+2:	Mucor circinelloides scaffold_06	<256  <1071  
+3:	Phycomyces blakesleeanus scaffold_3	<256  <1071  
+4:	Rhizopus oryzae supercont3.6 of Rhizopus oryzae	1176>  1071>  256>  
+Distances: 	1: 0	2: 2	3: 2	4: 1
+256:	1: lcory_0948 - g221
+	2: mcirc_5876 - Mucci1.e_gw1.6.1001.1
+	3: pblak_5466 - estExt_Genewise1Plus.C_30723
+	4: roryz_4570 - RO3G_08138
+1071:	1: lcory_0947 - g220
+	2: mcirc_5877 - fgenesh1_kg.06_#_174_#_1781_1_CCIA_CCIB_EXTA
+	3: pblak_5467 - estExt_fgenesh1_pg.C_30586
+	4: roryz_4569 - RO3G_08137
+1176:	1: lcory_0950 - g223
+	2: ---
+	3: ---
+	4: roryz_4568 - RO3G_08136
+1827:	1: lcory_0949 - g222
+	2: ---
+	3: ---
+	4: ---
+
+new cluster: pValue = 2.921712e-11, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00016	<952  <332  494>  <3390  
+2:	Mucor circinelloides scaffold_06	494>  <3390  952>  
+3:	Phycomyces blakesleeanus scaffold_7	<332  494>  
+4:	Rhizopus oryzae supercont3.12 of Rhizopus oryzae	<494  332>  
+Distances: 	1: 0	2: 1	3: 2	4: 2
+494:	1: lcory_0333 - g5
+	2: mcirc_6088 - estExt_Genewise1Plus.C_061413
+	3: pblak_8996 - estExt_fgenesh1_pg.C_70357
+	4: roryz_2331 - RO3G_13790
+952:	1: lcory_0331 - g3
+	2: mcirc_6090 - gw1.06.1214.1
+	3: ---
+	4: ---
+3390:	1: lcory_0334 - g6
+	2: mcirc_6089 - Genemark1.8825_g
+	3: ---
+	4: ---
+332:	1: lcory_0332 - g4
+	2: ---
+	3: pblak_8995 - estExt_Genewise1.C_70354
+	4: roryz_2332 - RO3G_13791
+
+new cluster: pValue = 3.439586e-11, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00017	<5454  <3189  0>  5453>  <1095  3063>  
+2:	Mucor circinelloides scaffold_04	<3063  1095>  3189>  5454>  
+Distances: 	1: 0	2: 2
+5454:	1: lcory_0560 - g35
+	2: mcirc_7512 - Genemark1.5717_g
+5453:	1: lcory_0563 - g38
+	2: ---
+3189:	1: lcory_0561 - g36
+	2: mcirc_7511 - e_gw1.04.1801.1
+1095:	1: lcory_0564 - g39
+	2: mcirc_7510 - fgenesh1_kg.04_#_94_#_2176_1_CCIA_CCIB_EXTA
+3063:	1: lcory_0565 - g40
+	2: mcirc_7509 - Genemark1.5713_g
+
+new cluster: pValue = 5.097323e-11, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00110	490>  709>  77>  <51  
+2:	Mucor circinelloides scaffold_01	709>  77>  
+3:	Phycomyces blakesleeanus scaffold_30	<77  <709  <30  <490  
+4:	Rhizopus oryzae supercont3.1 of Rhizopus oryzae	490>  709>  77>  <51  
+Distances: 	1: 0	2: 2	3: 2	4: 0
+51:	1: lcory_2394 - g188
+	2: ---
+	3: ---
+	4: roryz14291 - RO3G_01893
+490:	1: lcory_2391 - g185
+	2: ---
+	3: pblak15613 - estExt_Genewise1Plus.C_300151
+	4: roryz14288 - RO3G_01890
+77:	1: lcory_2393 - g187
+	2: mcirc_3266 - fgenesh1_kg.01_#_11_#_1582_1_CCIA_CCIB_EXTA
+	3: pblak15610 - fgenesh1_kg.30_#_33_#_1993_1_CBNA_CBNB_CBNC_CBNF
+	4: roryz14290 - RO3G_01892
+709:	1: lcory_2392 - g186
+	2: mcirc_3265 - e_gw1.01.2050.1
+	3: pblak15611 - Phybl1.gw1.7.318.1
+	4: roryz14289 - RO3G_01891
+
+new cluster: pValue = 9.989137e-11, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00017	<2004  0>  13>  <4035  3190>  
+2:	Mucor circinelloides scaffold_03	<2004  13>  3190>  
+3:	Phycomyces blakesleeanus scaffold_7	<3190  4035>  <13  
+Distances: 	1: 0	2: 2	3: 2
+4035:	1: lcory_0541 - g16
+	2: ---
+	3: pblak_8648 - Genemark1.5694_g
+2004:	1: lcory_0538 - g13
+	2: mcirc_3049 - e_gw1.03.288.1
+	3: ---
+3190:	1: lcory_0542 - g17
+	2: mcirc_3051 - e_gw1.03.32.1
+	3: pblak_8647 - gw1.7.242.1
+13:	1: lcory_0540 - g15
+	2: mcirc_3050 - e_gw1.03.1101.1
+	3: pblak_8649 - estExt_Genewise1.C_70053
+
+new cluster: pValue = 1.271534e-10, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00004	888>  493>  592>  766>  
+2:	Mucor circinelloides scaffold_06	<766  592>  
+3:	Phycomyces blakesleeanus scaffold_15	<766  592>  <888  
+4:	Rhizopus oryzae supercont3.12 of Rhizopus oryzae	<766  592>  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+493:	1: lcory_9141 - g111
+	2: ---
+	3: ---
+	4: ---
+592:	1: lcory_9142 - g112
+	2: mcirc_5253 - Mucci1.fgeneshMC_pg.8_#_490
+	3: pblak13150 - fgenesh1_pg.15_#_16
+	4: roryz_2233 - RO3G_13692
+766:	1: lcory_9143 - g113
+	2: mcirc_5252 - Mucci1.estExt_Genewise1.C_80631
+	3: pblak13149 - e_gw1.15.220.1
+	4: roryz_2232 - RO3G_13691
+888:	1: lcory_9140 - g110
+	2: ---
+	3: pblak13151 - e_gw1.15.168.1
+	4: ---
+
+new cluster: pValue = 1.831972e-10, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00029	<106  4536>  619>  <1371  185>  
+2:	Mucor circinelloides scaffold_07	<619  2466>  106>  <1371  185>  
+3:	Phycomyces blakesleeanus scaffold_9	<1371  185>  <619  
+Distances: 	1: 0	2: 2	3: 2
+4536:	1: lcory_3579 - g405
+	2: ---
+	3: ---
+185:	1: lcory_3582 - g408
+	2: mcirc_6750 - Genemark1.9526_g
+	3: pblak10247 - estExt_fgenesh1_pg.C_90323
+1371:	1: lcory_3581 - g407
+	2: mcirc_6749 - Mucci1.fgeneshMC_pg.10_#_25
+	3: pblak10246 - Phybl1.estExt_fgeneshPB_pg.C_190182
+619:	1: lcory_3580 - g406
+	2: mcirc_6746 - Mucci1.gw1.10.406.1
+	3: pblak10248 - gw1.9.294.1
+106:	1: lcory_3578 - g404
+	2: mcirc_6748 - e_gw1.07.1246.1
+	3: ---
+
+new cluster: pValue = 1.905482e-10, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00002	2239>  <2180  3583>  1666>  
+2:	Mucor circinelloides scaffold_01	<2180  3583>  1666>  
+3:	Phycomyces blakesleeanus scaffold_2	<1666  <3583  0>  <2239  
+Distances: 	1: 0	2: 1	3: 2
+2239:	1: lcory10758 - g22
+	2: ---
+	3: pblak_6397 - estExt_fgenesh1_pg.C_20589
+1666:	1: lcory10761 - g25
+	2: mcirc_3894 - Mucci1.fgeneshMC_pg.1_#_1181
+	3: pblak_6394 - Phybl1.fgeneshPB_pg.1__625
+3583:	1: lcory10760 - g24
+	2: mcirc_3893 - Mucci1.estExt_fgeneshMC_pg.C_11163
+	3: pblak_6395 - fgenesh1_pg.2_#_606
+2180:	1: lcory10759 - g23
+	2: mcirc_3892 - Genemark1.708_g
+	3: ---
+
+new cluster: pValue = 2.307750e-10, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00012	<13  <241  524>  994>  
+2:	Mucor circinelloides scaffold_01	<13  524>  994>  
+3:	Phycomyces blakesleeanus scaffold_7	<994  <524  13>  
+4:	Rhizopus oryzae supercont3.19 of Rhizopus oryzae	<13  994>  
+Distances: 	1: 0	2: 1	3: 1	4: 2
+524:	1: lcory_1261 - g103
+	2: mcirc_4343 - Genemark1.1173_g
+	3: pblak_8802 - Phybl1.fgeneshPB_pg.9__106
+	4: ---
+994:	1: lcory_1262 - g104
+	2: mcirc_4344 - estExt_fgenesh1_pm.C_010323
+	3: pblak_8801 - fgenesh1_kg.7_#_50_#_1978_1_CBNA_CBNB_CBNC_CBNF
+	4: roryz_0450 - RO3G_16325
+13:	1: lcory_1259 - g101
+	2: mcirc_4342 - Mucci1.e_gw1.1.2335.1
+	3: pblak_8803 - estExt_Genewise1.C_70180
+	4: roryz_0449 - RO3G_16324
+241:	1: lcory_1260 - g102
+	2: ---
+	3: ---
+	4: ---
+
+new cluster: pValue = 6.664666e-10, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00011	<1667  <2985  37>  1067>  
+2:	Mucor circinelloides scaffold_04	1067>  2985>  1667>  
+3:	Phycomyces blakesleeanus scaffold_14	37>  1067>  <2226  2985>  
+4:	Rhizopus oryzae supercont3.3 of Rhizopus oryzae	<1067  <37  
+Distances: 	1: 0	2: 1	3: 2	4: 2
+1067:	1: lcory_1968 - g128
+	2: mcirc_8401 - Genemark1.6631_g
+	3: pblak13549 - estExt_Genemark1.C_140015
+	4: roryz11608 - RO3G_04726
+2985:	1: lcory_1966 - g126
+	2: mcirc_8402 - fgenesh1_pg.04_#_1186
+	3: pblak13551 - fgenesh1_pg.14_#_16
+	4: ---
+1667:	1: lcory_1965 - g125
+	2: mcirc_8403 - fgenesh1_kg.04_#_341_#_579_1_CCIA_CCIB_EXTA
+	3: ---
+	4: ---
+37:	1: lcory_1967 - g127
+	2: ---
+	3: pblak13548 - Genemark1.9030_g
+	4: roryz11609 - RO3G_04727
+
+new cluster: pValue = 7.382635e-10, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00003	<404  <1626  3108>  <612  2181>  125>  
+3:	Phycomyces blakesleeanus scaffold_10	<125  <2181  612>  <3108  404>  
+Distances: 	1: 0	3: 1
+1626:	1: lcory10508 - g203
+	3: ---
+612:	1: lcory10510 - g205
+	3: pblak12166 - gw1.10.82.1
+125:	1: lcory10512 - g207
+	3: pblak12164 - Genemark1.7651_g
+2181:	1: lcory10511 - g206
+	3: pblak12165 - estExt_Genemark1.C_100411
+404:	1: lcory10507 - g202
+	3: pblak12168 - estExt_Genemark1.C_100414
+3108:	1: lcory10509 - g204
+	3: pblak12167 - estExt_Genewise1Plus.C_100400
+
+new cluster: pValue = 2.818135e-09, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00012	<3031  281>  0>  1436>  
+2:	Mucor circinelloides scaffold_04	<281  3031>  535>  1436>  
+3:	Phycomyces blakesleeanus scaffold_4	<281  3031>  
+4:	Rhizopus oryzae supercont3.10 of Rhizopus oryzae	<1436  <3031  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+281:	1: lcory_1185 - g27
+	2: mcirc_7468 - gw1.04.470.1
+	3: pblak_8203 - gw1.4.274.1
+	4: ---
+3031:	1: lcory_1184 - g26
+	2: mcirc_7469 - Genemark1.5673_g
+	3: pblak_8204 - Phybl1.estExt_fgeneshPB_pg.C_30499
+	4: roryz_0958 - RO3G_12414
+1436:	1: lcory_1187 - g29
+	2: mcirc_7471 - Genemark1.5675_g
+	3: ---
+	4: roryz_0957 - RO3G_12413
+
+new cluster: pValue = 5.745525e-09, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00004	<3657  <2554  1055>  1217>  <4365  <120  
+2:	Mucor circinelloides scaffold_02	1217>  <120  2554>  3657>  
+Distances: 	1: 0	2: 2
+3657:	1: lcory_9130 - g100
+	2: mcirc_1597 - Mucci1.fgeneshMC_pm.2_#_21
+1217:	1: lcory_9133 - g103
+	2: mcirc_1594 - Mucci1.fgeneshMC_pg.2_#_47
+2554:	1: lcory_9131 - g101
+	2: mcirc_1596 - fgenesh1_pg.02_#_1448
+1055:	1: lcory_9132 - g102
+	2: ---
+4365:	1: lcory_9134 - g104
+	2: ---
+120:	1: lcory_9135 - g105
+	2: mcirc_1595 - e_gw1.02.11.1
+
+new cluster: pValue = 6.279643e-09, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00044	2753>  <18  <363  <2752  
+2:	Mucor circinelloides scaffold_11	<363  <2752  0>  2753>  
+3:	Phycomyces blakesleeanus scaffold_16	<363  <2752  
+4:	Rhizopus oryzae supercont3.2 of Rhizopus oryzae	<363  <2752  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+18:	1: lcory_5807 - g358
+	2: ---
+	3: ---
+	4: ---
+2753:	1: lcory_5806 - g357
+	2: mcirc10846 - e_gw1.11.203.1
+	3: ---
+	4: ---
+2752:	1: lcory_5809 - g360
+	2: mcirc10844 - Genemark1.11510_g
+	3: pblak14540 - Phybl1.fgeneshPB_pg.15__69
+	4: roryz_9743 - RO3G_02858
+363:	1: lcory_5808 - g359
+	2: mcirc10843 - fgenesh1_kg.11_#_41_#_78_1_CCIA_CCIB_EXTA
+	3: pblak14539 - Phybl1.estExt_fgeneshPB_pg.C_150068
+	4: roryz_9742 - RO3G_02857
+
+new cluster: pValue = 6.287808e-09, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00030	<323  <323  0>  <2818  16>  
+2:	Mucor circinelloides scaffold_01	<16  2818>  323>  
+3:	Phycomyces blakesleeanus scaffold_12	<16  2818>  
+4:	Rhizopus oryzae supercont3.10 of Rhizopus oryzae	<2818  16>  
+Distances: 	1: 0	2: 1	3: 2	4: 2
+16:	1: lcory_4680 - g586
+	2: mcirc_4862 - Mucci1.fgeneshMC_pm.1_#_100
+	3: pblak12999 - e_gw1.12.484.1
+	4: roryz_0945 - RO3G_12401
+2818:	1: lcory_4679 - g585
+	2: mcirc_4863 - fgenesh1_pg.01_#_1519
+	3: pblak13000 - fgenesh1_pg.12_#_336
+	4: roryz_0944 - RO3G_12400
+323:	1: lcory_4676 - g582
+	2: mcirc_4864 - fgenesh1_pm.01_#_500
+	3: ---
+	4: ---
+
+new cluster: pValue = 6.661788e-09, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00012	<2210  1020>  <1941  <528  
+2:	Mucor circinelloides scaffold_02	528>  <2706  <1020  2210>  
+3:	Phycomyces blakesleeanus scaffold_2	528>  1941>  0>  2210>  
+4:	Rhizopus oryzae supercont3.11 of Rhizopus oryzae	1020>  <1941  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+1941:	1: lcory_1371 - g213
+	2: ---
+	3: pblak_6630 - Phybl1.fgeneshPB_pm.1__111
+	4: roryz_1489 - RO3G_12947
+1020:	1: lcory_1370 - g212
+	2: mcirc_1549 - fgenesh1_pg.02_#_1405
+	3: ---
+	4: roryz_1488 - RO3G_12946
+528:	1: lcory_1372 - g214
+	2: mcirc_1547 - fgenesh1_pg.02_#_1403
+	3: pblak_6629 - Phybl1.fgeneshPB_pg.1__854
+	4: ---
+2210:	1: lcory_1369 - g211
+	2: mcirc_1550 - Genemark1.3578_g
+	3: pblak_6632 - fgenesh1_kg.2_#_242_#_2655_1_CBNA_CBNB_CBNC_CBNF
+	4: ---
+
+new cluster: pValue = 7.826965e-09, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00070	2640>  <5  0>  2219>  
+2:	Mucor circinelloides scaffold_03	5>  <2640  
+3:	Phycomyces blakesleeanus scaffold_8	<2219  5>  <2640  
+4:	Rhizopus oryzae supercont3.3 of Rhizopus oryzae	<2219  <2640  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+2219:	1: lcory_7892 - g212
+	2: ---
+	3: pblak10518 - Genemark1.6255_g
+	4: roryz11432 - RO3G_04549
+2640:	1: lcory_7889 - g209
+	2: mcirc_1697 - Genemark1.3738_g
+	3: pblak10520 - Phybl1.fgeneshPB_pg.3__876
+	4: roryz11433 - RO3G_04550
+5:	1: lcory_7890 - g210
+	2: mcirc_1696 - Mucci1.estExt_Genewise1Plus.C_30063
+	3: pblak10519 - Phybl1.e_gw1.3.720.1
+	4: ---
+
+new cluster: pValue = 1.017072e-08, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00016	9>  <8  37>  <438  
+2:	Mucor circinelloides scaffold_02	<9  37>  
+3:	Phycomyces blakesleeanus scaffold_2	438>  <37  <9  
+4:	Rhizopus oryzae supercont3.8 of Rhizopus oryzae	438>  <37  <9  
+Distances: 	1: 0	2: 2	3: 1	4: 1
+37:	1: lcory_0482 - g154
+	2: mcirc_1576 - fgenesh1_kg.02_#_374_#_681_1_CCIA_CCIB_EXTA
+	3: pblak_5976 - Phybl1.estExt_Genewise1.C_10213
+	4: roryz15081 - RO3G_10687
+8:	1: lcory_0481 - g153
+	2: ---
+	3: ---
+	4: ---
+9:	1: lcory_0480 - g152
+	2: mcirc_1575 - fgenesh1_kg.02_#_373_#_2110_1_CCIA_CCIB_EXTA
+	3: pblak_5977 - fgenesh1_pm.2_#_54
+	4: roryz15082 - RO3G_10688
+438:	1: lcory_0483 - g155
+	2: ---
+	3: pblak_5975 - estExt_Genemark1.C_20212
+	4: roryz15080 - RO3G_10686
+
+new cluster: pValue = 1.538991e-08, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00035	2843>  103>  55>  <672  
+2:	Mucor circinelloides scaffold_01	2843>  672>  
+3:	Phycomyces blakesleeanus scaffold_14	<672  <103  <2843  
+4:	Rhizopus oryzae supercont3.11 of Rhizopus oryzae	103>  672>  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+103:	1: lcory_4331 - g462
+	2: ---
+	3: pblak13600 - estExt_Genewise1Plus.C_140089
+	4: roryz_1356 - RO3G_12814
+55:	1: lcory_4332 - g463
+	2: ---
+	3: ---
+	4: ---
+2843:	1: lcory_4330 - g461
+	2: mcirc_4578 - Mucci1.e_gw1.1.1530.1
+	3: pblak13601 - gw1.14.266.1
+	4: ---
+672:	1: lcory_4333 - g464
+	2: mcirc_4579 - fgenesh1_kg.01_#_332_#_48_1_CCIA_CCIB_EXTA
+	3: pblak13599 - estExt_Genewise1Plus.C_140086
+	4: roryz_1357 - RO3G_12815
+
+new cluster: pValue = 2.066752e-08, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00072	170>  <37  <2630  543>  
+2:	Mucor circinelloides scaffold_05	170>  <2630  
+3:	Phycomyces blakesleeanus scaffold_38	<543  2630>  170>  
+4:	Rhizopus oryzae supercont3.5 of Rhizopus oryzae	170>  <2630  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+170:	1: lcory_8002 - g68
+	2: mcirc_9209 - Mucci1.gw1.5.643.1
+	3: pblak11183 - Phybl1.gw1.65.28.1
+	4: roryz_8226 - RO3G_07092
+2630:	1: lcory_8004 - g70
+	2: mcirc_9210 - estExt_Genewise1Plus.C_051012
+	3: pblak11182 - Phybl1.e_gw1.65.48.1
+	4: roryz_8227 - RO3G_07093
+37:	1: lcory_8003 - g69
+	2: ---
+	3: ---
+	4: ---
+543:	1: lcory_8005 - g71
+	2: ---
+	3: pblak11181 - Phybl1.estExt_Genewise1.C_650048
+	4: ---
+
+new cluster: pValue = 2.604692e-08, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00058	<17  409>  3782>  <971  
+2:	Mucor circinelloides scaffold_07	<3782  <409  
+3:	Phycomyces blakesleeanus scaffold_4	<409  17>  
+4:	Rhizopus oryzae supercont3.8 of Rhizopus oryzae	971>  <3782  <409  
+Distances: 	1: 0	2: 2	3: 2	4: 1
+17:	1: lcory_6204 - g216
+	2: ---
+	3: pblak_8192 - estExt_fgenesh1_pg.C_40472
+	4: ---
+971:	1: lcory_6207 - g219
+	2: ---
+	3: ---
+	4: roryz15463 - RO3G_11070
+409:	1: lcory_6205 - g217
+	2: mcirc_6229 - estExt_fgenesh1_pg.C_070097
+	3: pblak_8191 - Phybl1.estExt_fgeneshPB_pg.C_30487
+	4: roryz15465 - RO3G_11072
+3782:	1: lcory_6206 - g218
+	2: mcirc_6228 - fgenesh1_kg.07_#_40_#_1845_1_CCIA_CCIB_EXTA
+	3: ---
+	4: roryz15464 - RO3G_11071
+
+new cluster: pValue = 2.774377e-08, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00034	41>  <2848  5>  3163>  
+2:	Mucor circinelloides scaffold_01	5>  41>  
+3:	Phycomyces blakesleeanus scaffold_4	<41  5>  3163>  
+4:	Rhizopus oryzae supercont3.9 of Rhizopus oryzae	41>  <5  <2848  
+Distances: 	1: 0	2: 2	3: 1	4: 1
+2848:	1: lcory_4232 - g363
+	2: ---
+	3: ---
+	4: roryz16074 - RO3G_11681
+5:	1: lcory_4233 - g364
+	2: mcirc_4457 - Genemark1.1289_g
+	3: pblak_7723 - estExt_Genewise1Plus.C_40050
+	4: roryz16073 - RO3G_11680
+3163:	1: lcory_4234 - g365
+	2: ---
+	3: pblak_7724 - e_gw1.4.812.1
+	4: ---
+41:	1: lcory_4231 - g362
+	2: mcirc_4458 - e_gw1.01.2311.1
+	3: pblak_7722 - Genemark1.3357_g
+	4: roryz16072 - RO3G_11679
+
+new cluster: pValue = 2.406235e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00005	291>  <5207  <3135  75>  
+2:	Mucor circinelloides scaffold_02	<75  3135>  
+3:	Phycomyces blakesleeanus scaffold_6	<5207  792>  <3135  75>  
+4:	Rhizopus oryzae supercont3.2 of Rhizopus oryzae	<75  3135>  <1290  <291  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+291:	1: lcory_8826 - g48
+	2: ---
+	3: ---
+	4: roryz10116 - RO3G_03231
+3135:	1: lcory_8828 - g50
+	2: mcirc_0526 - Mucci1.fgeneshMC_pg.2_#_1042
+	3: pblak_9628 - gw1.6.912.1
+	4: roryz10114 - RO3G_03229
+5207:	1: lcory_8827 - g49
+	2: ---
+	3: pblak_9626 - Phybl1.estExt_fgeneshPB_pg.C_20466
+	4: ---
+75:	1: lcory_8829 - g51
+	2: mcirc_0525 - estExt_fgenesh1_pm.C_020139
+	3: pblak_9629 - estExt_Genewise1.C_60528
+	4: roryz10113 - RO3G_03228
+
+new cluster: pValue = 3.222975e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00118	665>  <2190  <207  <309  
+2:	Mucor circinelloides scaffold_07	309>  207>  
+3:	Phycomyces blakesleeanus scaffold_12	665>  0>  <207  <309  
+4:	Rhizopus oryzae supercont3.14 of Rhizopus oryzae	309>  <665  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+207:	1: lcory_6998 - g99
+	2: mcirc_6617 - estExt_Genemark1.C_070511
+	3: pblak12769 - estExt_fgenesh1_pg.C_120107
+	4: ---
+309:	1: lcory_6999 - g100
+	2: mcirc_6616 - fgenesh1_kg.07_#_135_#_2498_1_CCIA_CCIB_EXTA
+	3: pblak12770 - Genemark1.8277_g
+	4: roryz_2951 - RO3G_14412
+665:	1: lcory_6996 - g97
+	2: ---
+	3: pblak12767 - gw1.12.106.1
+	4: roryz_2952 - RO3G_14413
+2190:	1: lcory_6997 - g98
+	2: ---
+	3: ---
+	4: ---
+
+new cluster: pValue = 3.610674e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00072	475>  2633>  3712>  5>  
+2:	Mucor circinelloides scaffold_03	5>  <475  
+3:	Phycomyces blakesleeanus scaffold_4	<5  <3712  <2633  
+4:	Rhizopus oryzae supercont3.21 of Rhizopus oryzae	3712>  <13  5>  <475  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+5:	1: lcory_7989 - g55
+	2: mcirc_1725 - Mucci1.estExt_fgeneshMC_pm.C_30029
+	3: pblak_7747 - estExt_Genemark1.C_40059
+	4: roryz16441 - RO3G_16639
+3712:	1: lcory_7988 - g54
+	2: ---
+	3: pblak_7748 - Genemark1.3384_g
+	4: roryz16439 - RO3G_16637
+475:	1: lcory_7986 - g52
+	2: mcirc_1726 - Genemark1.3765_g
+	3: ---
+	4: roryz16442 - RO3G_16640
+2633:	1: lcory_7987 - g53
+	2: ---
+	3: pblak_7749 - fgenesh1_kg.4_#_21_#_0_0_CBNF4345.g1_CBNA_CBNB_CB NC_CBNF
+	4: ---
+
+new cluster: pValue = 3.653916e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00023	<5386  5385>  <1218  <1218  5384>  <16  32>  
+2:	Mucor circinelloides scaffold_11	<5385  5386>  32>  <5384  <24  1218>  
+Distances: 	1: 0	2: 2
+16:	1: lcory_2486 - g334
+	2: ---
+5386:	1: lcory_2481 - g329
+	2: mcirc10870 - e_gw1.11.362.1
+5385:	1: lcory_2482 - g330
+	2: mcirc10869 - fgenesh1_pm.11_#_57
+32:	1: lcory_2487 - g335
+	2: mcirc10871 - Mucci1.e_gw1.12.73.1
+5384:	1: lcory_2485 - g333
+	2: mcirc10872 - e_gw1.11.407.1
+1218:	1: lcory_2483 - g331
+	2: mcirc10874 - e_gw1.11.381.1
+
+new cluster: pValue = 3.949694e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00006	<463  0>  3621>  5172>  <1740  
+3:	Phycomyces blakesleeanus scaffold_20	<463  235>  3621>  5172>  <1740  
+Distances: 	1: 0	3: 2
+463:	1: lcory_9784 - g222
+	3: pblak_1629 - estExt_Genewise1Plus.C_200269
+3621:	1: lcory_9786 - g224
+	3: pblak_1631 - gw1.20.129.1
+1740:	1: lcory_9788 - g226
+	3: pblak_1633 - fgenesh1_pg.20_#_271
+5172:	1: lcory_9787 - g225
+	3: pblak_1632 - Phybl1.estExt_fgeneshPB_pg.C_21040
+
+new cluster: pValue = 4.607297e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00005	<273  0>  <3672  3671>  <3670  
+3:	Phycomyces blakesleeanus scaffold_47	<273  <3672  <3670  
+Distances: 	1: 0	3: 2
+3672:	1: lcory_8926 - g148
+	3: pblak_2689 - Phybl1.e_gw1.56.28.1
+273:	1: lcory_8924 - g146
+	3: pblak_2688 - gw1.47.2.1
+3671:	1: lcory_8927 - g149
+	3: ---
+3670:	1: lcory_8928 - g150
+	3: pblak_2690 - fgenesh1_kg.47_#_1_#_0_0_CBNB7320.b1_CBNA_CBNB_CB NC_CBNF
+
+new cluster: pValue = 5.297419e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00039	<2860  2859>  <1369  <4396  
+3:	Phycomyces blakesleeanus scaffold_5	<2860  <2859  <4396  
+4:	Rhizopus oryzae supercont3.3 of Rhizopus oryzae	2859>  <1369  
+Distances: 	1: 0	3: 1	4: 2
+1369:	1: lcory_4051 - g346
+	3: ---
+	4: roryz12132 - RO3G_05250
+2860:	1: lcory_4049 - g344
+	3: pblak_7032 - estExt_Genewise1.C_50100
+	4: ---
+4396:	1: lcory_4052 - g347
+	3: pblak_7034 - estExt_Genewise1.C_50105
+	4: ---
+2859:	1: lcory_4050 - g345
+	3: pblak_7033 - Phybl1.fgeneshPB_pg.6__420
+	4: roryz12131 - RO3G_05249
+
+new cluster: pValue = 5.621610e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00049	5312>  2791>  0>  <894  
+3:	Phycomyces blakesleeanus scaffold_4	5312>  2791>  0>  <894  
+4:	Rhizopus oryzae supercont3.9 of Rhizopus oryzae	894>  <2791  
+Distances: 	1: 0	3: 2	4: 2
+5312:	1: lcory_5156 - g336
+	3: pblak_7795 - Phybl1.estExt_Genewise1.C_30129
+	4: ---
+2791:	1: lcory_5157 - g337
+	3: pblak_7796 - estExt_fgenesh1_pg.C_40111
+	4: roryz16050 - RO3G_11657
+894:	1: lcory_5159 - g339
+	3: pblak_7798 - estExt_Genemark1.C_40109
+	4: roryz16049 - RO3G_11656
+
+new cluster: pValue = 6.814222e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00010	<788  3002>  0>  <3222  
+2:	Mucor circinelloides scaffold_03	<788  3002>  <3222  
+3:	Phycomyces blakesleeanus scaffold_18	3002>  <3222  
+Distances: 	1: 0	2: 1	3: 2
+788:	1: lcory_1732 - g144
+	2: mcirc_1867 - Mucci1.estExt_fgeneshMC_kg.C_30042
+	3: ---
+3222:	1: lcory_1735 - g147
+	2: mcirc_1869 - e_gw1.03.2333.1
+	3: pblak15005 - estExt_fgenesh1_pg.C_180008
+3002:	1: lcory_1733 - g145
+	2: mcirc_1868 - fgenesh1_pg.03_#_191
+	3: pblak15004 - Phybl1.fgeneshPB_pg.35__119
+
+new cluster: pValue = 7.895611e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00008	73>  232>  <48  10>  
+2:	Mucor circinelloides scaffold_07	232>  <48  10>  
+3:	Phycomyces blakesleeanus scaffold_12	232>  <48  10>  
+4:	Rhizopus oryzae supercont3.11 of Rhizopus oryzae	73>  0>  232>  10>  
+Distances: 	1: 0	2: 1	3: 1	4: 2
+48:	1: lcory11373 - g273
+	2: mcirc_6197 - fgenesh1_kg.07_#_24_#_1347_1_CCIA_CCIB_EXTA
+	3: pblak12950 - Phybl1.estExt_Genewise1.C_110117
+	4: ---
+232:	1: lcory11372 - g272
+	2: mcirc_6196 - Genemark1.8943_g
+	3: pblak12949 - fgenesh1_pg.12_#_289
+	4: roryz_1361 - RO3G_12819
+10:	1: lcory11374 - g274
+	2: mcirc_6198 - Genemark1.8945_g
+	3: pblak12951 - Genemark1.8453_g
+	4: roryz_1362 - RO3G_12820
+73:	1: lcory11371 - g271
+	2: ---
+	3: ---
+	4: roryz_1359 - RO3G_12817
+
+new cluster: pValue = 9.339466e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00018	5>  <362  <5395  <5394  3951>  <53  
+2:	Mucor circinelloides scaffold_04	<5394  3951>  <53  <5  
+Distances: 	1: 0	2: 2
+5:	1: lcory_2149 - g31
+	2: mcirc_8456 - e_gw1.04.491.1
+53:	1: lcory_2154 - g36
+	2: mcirc_8455 - Mucci1.fgeneshMC_pg.4_#_1256
+3951:	1: lcory_2153 - g35
+	2: mcirc_8454 - Genemark1.6681_g
+5394:	1: lcory_2152 - g34
+	2: mcirc_8453 - Genemark1.6680_g
+5395:	1: lcory_2151 - g33
+	2: ---
+362:	1: lcory_2150 - g32
+	2: ---
+
+new cluster: pValue = 9.813157e-07, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00039	<49  <4397  <3877  59>  <13  
+2:	Mucor circinelloides scaffold_03	<13  13>  <59  3877>  
+3:	Phycomyces blakesleeanus scaffold_2	49>  13>  <59  3877>  
+Distances: 	1: 0	2: 2	3: 1
+49:	1: lcory_4032 - g327
+	2: ---
+	3: pblak_5965 - e_gw1.2.1060.1
+59:	1: lcory_4035 - g330
+	2: mcirc_1899 - fgenesh1_pm.03_#_71
+	3: pblak_5967 - estExt_fgenesh1_pm.C_20050
+3877:	1: lcory_4034 - g329
+	2: mcirc_1900 - estExt_Genemark1.C_030264
+	3: pblak_5968 - estExt_Genemark1.C_20205
+4397:	1: lcory_4033 - g328
+	2: ---
+	3: ---
+13:	1: lcory_4036 - g331
+	2: mcirc_1897 - fgenesh1_kg.03_#_60_#_973_1_CCIA_CCIB_EXTA
+	3: pblak_5966 - e_gw1.2.1413.1
+
+new cluster: pValue = 1.276168e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00012	<3019  2079>  <878  <1266  
+2:	Mucor circinelloides scaffold_06	878>  <2079  
+3:	Phycomyces blakesleeanus scaffold_12	3019>  2079>  <878  
+Distances: 	1: 0	2: 2	3: 1
+3019:	1: lcory_1394 - g236
+	2: ---
+	3: pblak13040 - estExt_fgenesh1_pm.C_120089
+1266:	1: lcory_1397 - g239
+	2: ---
+	3: ---
+878:	1: lcory_1396 - g238
+	2: mcirc_5632 - fgenesh1_pm.06_#_134
+	3: pblak13042 - fgenesh1_pg.12_#_380
+2079:	1: lcory_1395 - g237
+	2: mcirc_5633 - Genemark1.8346_g
+	3: pblak13041 - estExt_Genemark1.C_120387
+
+new cluster: pValue = 1.660091e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00041	2786>  <5307  217>  <5  
+2:	Mucor circinelloides scaffold_07	5>  <217  0>  <2786  
+3:	Phycomyces blakesleeanus scaffold_2	2786>  <5307  <5  
+4:	Rhizopus oryzae supercont3.3 of Rhizopus oryzae	217>  <5  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+217:	1: lcory_5397 - g81
+	2: mcirc_6343 - fgenesh1_kg.07_#_71_#_1879_1_CCIA_CCIB_EXTA
+	3: ---
+	4: roryz11278 - RO3G_04395
+5:	1: lcory_5398 - g82
+	2: mcirc_6342 - e_gw1.07.511.1
+	3: pblak_6873 - Phybl1.e_gw1.1.1077.1
+	4: roryz11279 - RO3G_04396
+5307:	1: lcory_5396 - g80
+	2: ---
+	3: pblak_6872 - Phybl1.fgeneshPB_pg.1__1089
+	4: ---
+2786:	1: lcory_5395 - g79
+	2: mcirc_6345 - e_gw1.07.1292.1
+	3: pblak_6871 - estExt_Genewise1Plus.C_21374
+	4: ---
+
+new cluster: pValue = 2.041026e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00074	<2620  <778  3705>  <867  
+2:	Mucor circinelloides scaffold_08	<2620  3705>  
+3:	Phycomyces blakesleeanus scaffold_9	<867  <3520  <3705  778>  2620>  
+Distances: 	1: 0	2: 2	3: 1
+3705:	1: lcory_8165 - g231
+	2: mcirc_9763 - Genemark1.10115_g
+	3: pblak_9960 - estExt_fgenesh1_pg.C_90056
+867:	1: lcory_8166 - g232
+	2: ---
+	3: pblak_9958 - estExt_fgenesh1_pm.C_90005
+2620:	1: lcory_8163 - g229
+	2: mcirc_9762 - Mucci1.e_gw1.7.734.1
+	3: pblak_9962 - estExt_Genewise1Plus.C_90042
+778:	1: lcory_8164 - g230
+	2: ---
+	3: pblak_9961 - estExt_fgenesh1_pm.C_90006
+
+new cluster: pValue = 2.044770e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00032	<439  0>  2815>  <2195  
+2:	Mucor circinelloides scaffold_07	2815>  <2195  
+3:	Phycomyces blakesleeanus scaffold_1	<439  <2478  2815>  <2195  
+Distances: 	1: 0	2: 2	3: 2
+2815:	1: lcory_4792 - g81
+	2: mcirc_6248 - Genemark1.9000_g
+	3: pblak_3590 - fgenesh1_pg.1_#_75
+2195:	1: lcory_4793 - g82
+	2: mcirc_6249 - gw1.07.1390.1
+	3: pblak_3591 - gw1.1.1072.1
+439:	1: lcory_4790 - g79
+	2: ---
+	3: pblak_3588 - estExt_Genemark1.C_10089
+
+new cluster: pValue = 2.045524e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00011	<5  <3379  659>  225>  
+2:	Mucor circinelloides scaffold_03	<225  <659  
+3:	Phycomyces blakesleeanus scaffold_2	<5  659>  225>  
+4:	Rhizopus oryzae supercont3.7 of Rhizopus oryzae	3379>  5>  
+Distances: 	1: 0	2: 2	3: 1	4: 2
+5:	1: lcory_2039 - g199
+	2: ---
+	3: pblak_6269 - fgenesh1_pm.2_#_97
+	4: roryz_6118 - RO3G_09693
+3379:	1: lcory_2040 - g200
+	2: ---
+	3: ---
+	4: roryz_6117 - RO3G_09692
+225:	1: lcory_2042 - g202
+	2: mcirc_2177 - fgenesh1_kg.03_#_148_#_423_1_CCIA_CCIB_EXTA
+	3: pblak_6271 - estExt_fgenesh1_pg.C_20469
+	4: ---
+659:	1: lcory_2041 - g201
+	2: mcirc_2178 - fgenesh1_kg.03_#_149_#_1940_1_CCIA_CCIB_EXTA
+	3: pblak_6270 - Genemark1.1815_g
+	4: ---
+
+new cluster: pValue = 2.099795e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00017	<4025  1520>  <727  1583>  <3059  
+3:	Phycomyces blakesleeanus scaffold_12	3059>  <1583  <609  727>  <1520  4025>  
+Distances: 	1: 0	3: 1
+1583:	1: lcory_0682 - g157
+	3: pblak12861 - Phybl1.fgeneshPB_pg.11__210
+1520:	1: lcory_0680 - g155
+	3: pblak12864 - e_gw1.12.109.1
+3059:	1: lcory_0683 - g158
+	3: pblak12860 - fgenesh1_pm.12_#_47
+4025:	1: lcory_0679 - g154
+	3: pblak12865 - Genemark1.8373_g
+727:	1: lcory_0681 - g156
+	3: pblak12863 - Genemark1.8371_g
+
+new cluster: pValue = 2.104763e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00014	4019>  <67  5447>  0>  <1973  
+2:	Mucor circinelloides scaffold_09	4019>  <67  1973>  
+Distances: 	1: 0	2: 2
+1973:	1: lcory_0810 - g83
+	2: mcirc10515 - fgenesh1_kg.09_#_50_#_1827_1_CCIA_CCIB_EXTA
+67:	1: lcory_0807 - g80
+	2: mcirc10514 - Mucci1.estExt_fgeneshMC_kg.C_90050
+4019:	1: lcory_0806 - g79
+	2: mcirc10513 - fgenesh1_kg.09_#_47_#_784_2_CCIA_CCIB_EXTA
+5447:	1: lcory_0808 - g81
+	2: ---
+
+new cluster: pValue = 3.172477e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00012	<109  1668>  0>  0>  <219  
+4:	Rhizopus oryzae supercont3.11 of Rhizopus oryzae	219>  <1668  109>  
+Distances: 	1: 0	4: 2
+1668:	1: lcory_1356 - g198
+	4: roryz_1225 - RO3G_12683
+219:	1: lcory_1359 - g201
+	4: roryz_1224 - RO3G_12682
+109:	1: lcory_1355 - g197
+	4: roryz_1226 - RO3G_12684
+
+new cluster: pValue = 5.637160e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00023	<160  <1476  4406>  3173>  
+2:	Mucor circinelloides scaffold_04	<1476  4406>  3173>  
+3:	Phycomyces blakesleeanus scaffold_12	<160  194>  4406>  3173>  
+Distances: 	1: 0	2: 1	3: 2
+1476:	1: lcory_2489 - g337
+	2: mcirc_7380 - Mucci1.e_gw1.4.313.1
+	3: ---
+4406:	1: lcory_2490 - g338
+	2: mcirc_7381 - Genemark1.5582_g
+	3: pblak12991 - fgenesh1_pg.12_#_328
+3173:	1: lcory_2491 - g339
+	2: mcirc_7382 - e_gw1.04.20.1
+	3: pblak12992 - Phybl1.e_gw1.11.4.1
+160:	1: lcory_2488 - g336
+	2: ---
+	3: pblak12989 - estExt_fgenesh1_pm.C_120080
+
+new cluster: pValue = 6.563024e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00031	<5332  2816>  <4533  <115  
+3:	Phycomyces blakesleeanus scaffold_1	<2816  5332>  0>  <115  
+4:	Rhizopus oryzae supercont3.4 of Rhizopus oryzae	115>  2816>  
+Distances: 	1: 0	3: 2	4: 2
+5332:	1: lcory_4732 - g21
+	3: pblak_3642 - Genemark1.139_g
+	4: ---
+115:	1: lcory_4735 - g24
+	3: pblak_3644 - Genemark1.141_g
+	4: roryz_6915 - RO3G_05780
+2816:	1: lcory_4733 - g22
+	3: pblak_3641 - Genemark1.138_g
+	4: roryz_6916 - RO3G_05781
+4533:	1: lcory_4734 - g23
+	3: ---
+	4: ---
+
+new cluster: pValue = 6.678363e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00057	<413  0>  1356>  359>  
+2:	Mucor circinelloides scaffold_03	<413  1356>  359>  
+4:	Rhizopus oryzae supercont3.1 of Rhizopus oryzae	<359  <1356  
+Distances: 	1: 0	2: 1	4: 2
+1356:	1: lcory_6772 - g83
+	2: mcirc_2242 - estExt_Genemark1.C_030605
+	4: roryz13950 - RO3G_01550
+359:	1: lcory_6773 - g84
+	2: mcirc_2243 - e_gw1.03.698.1
+	4: roryz13949 - RO3G_01549
+413:	1: lcory_6770 - g81
+	2: mcirc_2241 - e_gw1.03.1840.1
+	4: ---
+
+new cluster: pValue = 8.772440e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00004	10>  <143  <1692  <2549  
+2:	Mucor circinelloides scaffold_03	2549>  1692>  10>  
+4:	Rhizopus oryzae supercont3.2 of Rhizopus oryzae	2549>  1692>  <10  
+Distances: 	1: 0	2: 1	4: 1
+143:	1: lcory_9179 - g149
+	2: ---
+	4: ---
+1692:	1: lcory_9180 - g150
+	2: mcirc_2694 - Mucci1.estExt_Genewise1Plus.C_31329
+	4: roryz_9382 - RO3G_02497
+2549:	1: lcory_9181 - g151
+	2: mcirc_2693 - gw1.03.2167.1
+	4: roryz_9381 - RO3G_02496
+10:	1: lcory_9178 - g148
+	2: mcirc_2695 - estExt_fgenesh1_pm.C_030303
+	4: roryz_9383 - RO3G_02498
+
+new cluster: pValue = 9.920195e-06, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00007	<13  0>  <782  <2523  3645>  
+2:	Mucor circinelloides scaffold_07	<3645  2523>  782>  <13  
+Distances: 	1: 0	2: 1
+3645:	1: lcory_9450 - g165
+	2: mcirc_6482 - e_gw1.07.25.1
+2523:	1: lcory_9449 - g164
+	2: mcirc_6483 - Genemark1.9241_g
+782:	1: lcory_9448 - g163
+	2: mcirc_6484 - e_gw1.07.251.1
+13:	1: lcory_9446 - g161
+	2: mcirc_6485 - e_gw1.07.1376.1
+
+new cluster: pValue = 1.112257e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00001	70>  <217  <3612  380>  
+2:	Mucor circinelloides scaffold_04	217>  <70  
+3:	Phycomyces blakesleeanus scaffold_1	217>  <70  <822  <3612  <2063  380>  
+4:	Rhizopus oryzae supercont3.7 of Rhizopus oryzae	70>  <217  <822  380>  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+3612:	1: lcory10029 - g207
+	2: ---
+	3: pblak_4568 - estExt_Genemark1.C_11054
+	4: ---
+70:	1: lcory10027 - g205
+	2: mcirc_7689 - e_gw1.04.1258.1
+	3: pblak_4566 - gw1.1.855.1
+	4: roryz_6577 - RO3G_10152
+217:	1: lcory10028 - g206
+	2: mcirc_7688 - estExt_Genewise1.C_040839
+	3: pblak_4565 - estExt_Genewise1.C_11103
+	4: roryz_6578 - RO3G_10153
+380:	1: lcory10030 - g208
+	2: ---
+	3: pblak_4570 - fgenesh1_pg.1_#_1018
+	4: roryz_6580 - RO3G_10155
+
+new cluster: pValue = 1.607903e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00049	312>  <1247  0>  <207  <309  
+3:	Phycomyces blakesleeanus scaffold_7	1247>  <312  <309  
+Distances: 	1: 0	3: 2
+207:	1: lcory_5087 - g267
+	3: ---
+309:	1: lcory_5088 - g268
+	3: pblak_8901 - fgenesh1_pg.7_#_280
+312:	1: lcory_5084 - g264
+	3: pblak_8900 - estExt_Genewise1Plus.C_70310
+1247:	1: lcory_5085 - g265
+	3: pblak_8899 - Phybl1.estExt_fgeneshPB_pg.C_90193
+
+new cluster: pValue = 1.655744e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00035	302>  <773  3863>  <415  
+2:	Mucor circinelloides scaffold_07	<415  773>  <302  
+3:	Phycomyces blakesleeanus scaffold_7	302>  <773  
+Distances: 	1: 0	2: 1	3: 2
+773:	1: lcory_4336 - g467
+	2: mcirc_6676 - Mucci1.fgeneshMC_pg.6_#_362
+	3: pblak_8940 - estExt_fgenesh1_pg.C_70308
+415:	1: lcory_4338 - g469
+	2: mcirc_6675 - fgenesh1_kg.07_#_149_#_0_0_EXTA643.b0_CCIA_CCIB_E XTA
+	3: ---
+3863:	1: lcory_4337 - g468
+	2: ---
+	3: ---
+302:	1: lcory_4335 - g466
+	2: mcirc_6677 - fgenesh1_kg.07_#_150_#_1480_1_CCIA_CCIB_EXTA
+	3: pblak_8939 - estExt_fgenesh1_pm.C_70058
+
+new cluster: pValue = 2.367824e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00004	63>  0>  <143  16>  <10  
+2:	Mucor circinelloides scaffold_03	<16  143>  <63  
+3:	Phycomyces blakesleeanus scaffold_12	10>  <16  143>  <63  <63  
+Distances: 	1: 0	2: 2	3: 1
+16:	1: lcory_9174 - g144
+	2: mcirc_2531 - estExt_Genemark1.C_030905
+	3: pblak12833 - Phybl1.e_gw1.11.165.1
+143:	1: lcory_9173 - g143
+	2: mcirc_2532 - gw1.03.565.1
+	3: pblak12834 - Phybl1.fgeneshPB_pg.11__241
+10:	1: lcory_9175 - g145
+	2: ---
+	3: pblak12832 - estExt_Genewise1Plus.C_120178
+63:	1: lcory_9171 - g141
+	2: mcirc_2533 - Genemark1.4590_g
+	3: pblak12835 - Phybl1.fgeneshPB_pg.11__240
+
+new cluster: pValue = 2.370717e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00008	1060>  0>  <102  <347  <683  
+3:	Phycomyces blakesleeanus scaffold_20	<347  1060>  683>  
+Distances: 	1: 0	3: 2
+102:	1: lcory11339 - g239
+	3: ---
+683:	1: lcory11341 - g241
+	3: pblak_1456 - fgenesh1_pg.20_#_100
+347:	1: lcory11340 - g240
+	3: pblak_1454 - estExt_Genewise1Plus.C_200113
+1060:	1: lcory11337 - g237
+	3: pblak_1455 - e_gw1.20.79.1
+
+new cluster: pValue = 2.555353e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00038	247>  <1554  385>  <674  <3881  
+3:	Phycomyces blakesleeanus scaffold_2	<674  <3881  <247  
+Distances: 	1: 0	3: 2
+3881:	1: lcory_3963 - g258
+	3: pblak_6341 - estExt_Genewise1.C_20673
+247:	1: lcory_3959 - g254
+	3: pblak_6342 - Phybl1.fgeneshPB_pg.1__576
+385:	1: lcory_3961 - g256
+	3: ---
+674:	1: lcory_3962 - g257
+	3: pblak_6340 - estExt_Genewise1.C_20670
+1554:	1: lcory_3960 - g255
+	3: ---
+
+new cluster: pValue = 2.626629e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00065	24>  0>  <361  <13  
+2:	Mucor circinelloides scaffold_07	13>  24>  
+3:	Phycomyces blakesleeanus scaffold_23	<13  <24  
+4:	Rhizopus oryzae supercont3.7 of Rhizopus oryzae	13>  361>  <24  
+Distances: 	1: 0	2: 2	3: 2	4: 1
+24:	1: lcory_7255 - g346
+	2: mcirc_6654 - Genemark1.9425_g
+	3: pblak_2490 - fgenesh1_pg.23_#_179
+	4: roryz_5847 - RO3G_09422
+13:	1: lcory_7258 - g349
+	2: mcirc_6653 - fgenesh1_kg.07_#_147_#_175_1_CCIA_CCIB_EXTA
+	3: pblak_2489 - estExt_fgenesh1_pg.C_230171
+	4: roryz_5845 - RO3G_09420
+361:	1: lcory_7257 - g348
+	2: ---
+	3: ---
+	4: roryz_5846 - RO3G_09421
+
+new cluster: pValue = 5.060351e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00227	<3887  0>  <213  190>  
+2:	Mucor circinelloides scaffold_09	<3887  0>  <213  190>  
+3:	Phycomyces blakesleeanus scaffold_3	<213  190>  
+Distances: 	1: 0	2: 2	3: 2
+3887:	1: lcory_3839 - g407
+	2: mcirc10385 - e_gw1.09.24.1
+	3: ---
+190:	1: lcory_3842 - g410
+	2: mcirc10388 - fgenesh1_pg.09_#_105
+	3: pblak_4842 - Genemark1.2463_g
+213:	1: lcory_3841 - g409
+	2: mcirc10387 - fgenesh1_kg.09_#_24_#_1761_1_CCIA_CCIB_EXTA
+	3: pblak_4841 - Genemark1.2462_g
+
+new cluster: pValue = 5.470194e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00025	300>  0>  <726  0>  <13  
+2:	Mucor circinelloides scaffold_05	<300  13>  726>  
+Distances: 	1: 0	2: 2
+300:	1: lcory_3321 - g612
+	2: mcirc_9199 - fgenesh1_kg.05_#_170_#_0_0_EXTA410.b0_CCIA_CCIB_E XTA
+13:	1: lcory_3325 - g616
+	2: mcirc_9200 - fgenesh1_kg.05_#_171_#_405_1_CCIA_CCIB_EXTA
+726:	1: lcory_3323 - g614
+	2: mcirc_9201 - Genemark1.7454_g
+
+new cluster: pValue = 5.670619e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00029	<1058  <25  <418  728>  
+2:	Mucor circinelloides scaffold_01	418>  25>  
+3:	Phycomyces blakesleeanus scaffold_6	25>  1058>  
+4:	Rhizopus oryzae supercont3.11 of Rhizopus oryzae	<728  <4110  25>  1058>  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+728:	1: lcory_3628 - g454
+	2: ---
+	3: ---
+	4: roryz_1586 - RO3G_13044
+1058:	1: lcory_3625 - g451
+	2: ---
+	3: pblak_9705 - estExt_Genewise1.C_60620
+	4: roryz_1589 - RO3G_13047
+25:	1: lcory_3626 - g452
+	2: mcirc_4388 - gw1.01.62.1
+	3: pblak_9704 - fgenesh1_pm.6_#_118
+	4: roryz_1588 - RO3G_13046
+418:	1: lcory_3627 - g453
+	2: mcirc_4387 - Mucci1.fgeneshMC_pg.1_#_716
+	3: ---
+	4: ---
+
+new cluster: pValue = 6.276494e-05, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00052	<819  16>  <3773  <1251  3772>  
+3:	Phycomyces blakesleeanus scaffold_38	3772>  <16  819>  
+Distances: 	1: 0	3: 2
+16:	1: lcory_6435 - g126
+	3: pblak11171 - estExt_Genewise1Plus.C_380032
+1251:	1: lcory_6437 - g128
+	3: ---
+819:	1: lcory_6434 - g125
+	3: pblak11172 - estExt_fgenesh1_pm.C_380007
+3772:	1: lcory_6438 - g129
+	3: pblak11170 - Phybl1.fgeneshPB_pg.65__19
+3773:	1: lcory_6436 - g127
+	3: ---
+
+new cluster: pValue = 1.126533e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00054	<1457  <128  0>  0>  9>  
+3:	Phycomyces blakesleeanus scaffold_22	<9  128>  1457>  
+Distances: 	1: 0	3: 2
+1457:	1: lcory_6873 - g245
+	3: pblak_1995 - Genemark1.11729_g
+9:	1: lcory_6877 - g249
+	3: pblak_1993 - Phybl1.estExt_Genewise1Plus.C_160263
+128:	1: lcory_6874 - g246
+	3: pblak_1994 - Phybl1.estExt_Genewise1Plus.C_160262
+
+new cluster: pValue = 1.192007e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00017	421>  <3061  <16  <4  
+2:	Mucor circinelloides scaffold_03	<4  0>  3061>  <421  <16  
+3:	Phycomyces blakesleeanus scaffold_3	<3061  <16  
+4:	Rhizopus oryzae supercont3.56 of Rhizopus oryzae	16>  <4  
+Distances: 	1: 0	2: 1	3: 2	4: 2
+16:	1: lcory_0654 - g129
+	2: mcirc_2689 - Genemark1.4751_g
+	3: pblak_5020 - estExt_fgenesh1_pg.C_30182
+	4: roryz_0484 - RO3G_17403
+4:	1: lcory_0655 - g130
+	2: mcirc_2685 - fgenesh1_pg.03_#_951
+	3: ---
+	4: roryz_0485 - RO3G_17404
+421:	1: lcory_0652 - g127
+	2: mcirc_2688 - Mucci1.fgeneshMC_pg.3_#_990
+	3: ---
+	4: ---
+3061:	1: lcory_0653 - g128
+	2: mcirc_2687 - estExt_fgenesh1_pg.C_030938
+	3: pblak_5019 - gw1.3.758.1
+	4: ---
+
+new cluster: pValue = 1.350495e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00028	<409  0>  2073>  <122  
+2:	Mucor circinelloides scaffold_07	2073>  <122  
+4:	Rhizopus oryzae supercont3.2 of Rhizopus oryzae	<409  1301>  122>  <2073  
+Distances: 	1: 0	2: 2	4: 2
+409:	1: lcory_3763 - g325
+	2: ---
+	4: roryz10386 - RO3G_03502
+2073:	1: lcory_3765 - g327
+	2: mcirc_6667 - Mucci1.estExt_fgeneshMC_pg.C_60364
+	4: roryz10389 - RO3G_03505
+122:	1: lcory_3766 - g328
+	2: mcirc_6668 - fgenesh1_pg.07_#_505
+	4: roryz10388 - RO3G_03504
+
+new cluster: pValue = 1.614551e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00017	1530>  <10  <158  0>  10>  4029>  
+3:	Phycomyces blakesleeanus scaffold_3	1530>  <10  194>  <158  <4029  
+Distances: 	1: 0	3: 2
+158:	1: lcory_0643 - g118
+	3: pblak_5223 - estExt_Genewise1.C_30450
+4029:	1: lcory_0646 - g121
+	3: pblak_5224 - fgenesh1_kg.3_#_110_#_1770_1_CBNA_CBNB_CBNC_CBNF
+10:	1: lcory_0642 - g117
+	3: pblak_5221 - gw1.3.220.1
+1530:	1: lcory_0641 - g116
+	3: pblak_5220 - estExt_Genewise1Plus.C_30436
+
+new cluster: pValue = 1.767370e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00010	136>  <24  1539>  3967>  <298  
+3:	Phycomyces blakesleeanus scaffold_1	<136  939>  <24  0>  298>  <3967  <1539  
+Distances: 	1: 0	3: 2
+136:	1: lcory_1696 - g108
+	3: pblak_3733 - Genemark1.233_g
+3967:	1: lcory_1699 - g111
+	3: pblak_3738 - estExt_Genemark1.C_10238
+24:	1: lcory_1697 - g109
+	3: pblak_3735 - fgenesh1_pg.1_#_217
+298:	1: lcory_1700 - g112
+	3: pblak_3737 - e_gw1.1.560.1
+1539:	1: lcory_1698 - g110
+	3: pblak_3739 - Phybl1.fgeneshPB_pg.4__217
+
+new cluster: pValue = 1.786358e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00045	532>  <2755  <2260  <10  
+2:	Mucor circinelloides scaffold_03	2260>  2755>  
+3:	Phycomyces blakesleeanus scaffold_39	<2755  <2260  
+4:	Rhizopus oryzae supercont3.18 of Rhizopus oryzae	532>  <2755  <3204  10>  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+532:	1: lcory_5720 - g495
+	2: ---
+	3: ---
+	4: roryz_0185 - RO3G_16060
+2260:	1: lcory_5722 - g497
+	2: mcirc_2885 - fgenesh1_kg.03_#_338_#_1686_1_CCIA_CCIB_EXTA
+	3: pblak11128 - Genemark1.15081_g
+	4: ---
+10:	1: lcory_5723 - g498
+	2: ---
+	3: ---
+	4: roryz_0188 - RO3G_16063
+2755:	1: lcory_5721 - g496
+	2: mcirc_2886 - Genemark1.4960_g
+	3: pblak11127 - fgenesh1_pg.39_#_89
+	4: roryz_0186 - RO3G_16061
+
+new cluster: pValue = 1.881794e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00010	3000>  0>  5>  207>  1128>  
+3:	Phycomyces blakesleeanus scaffold_24	3000>  5>  207>  1128>  
+Distances: 	1: 0	3: 1
+207:	1: lcory_1759 - g171
+	3: pblak_0536 - Phybl1.fgeneshPB_pg.7__64
+3000:	1: lcory_1756 - g168
+	3: pblak_0534 - Phybl1.estExt_Genewise1.C_70057
+5:	1: lcory_1758 - g170
+	3: pblak_0535 - gw1.24.95.1
+1128:	1: lcory_1760 - g172
+	3: pblak_0537 - fgenesh1_pg.24_#_205
+
+new cluster: pValue = 1.887811e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00039	216>  0>  1201>  <151  
+2:	Mucor circinelloides scaffold_03	151>  <1201  
+3:	Phycomyces blakesleeanus scaffold_2	151>  <1201  48>  <216  
+Distances: 	1: 0	2: 2	3: 2
+1201:	1: lcory_4133 - g428
+	2: mcirc_1719 - e_gw1.03.1952.1
+	3: pblak_6639 - estExt_fgenesh1_pg.C_20812
+216:	1: lcory_4131 - g426
+	2: ---
+	3: pblak_6641 - estExt_Genewise1.C_21084
+151:	1: lcory_4134 - g429
+	2: mcirc_1718 - fgenesh1_kg.03_#_16_#_738_1_CCIA_CCIB_EXTA
+	3: pblak_6638 - estExt_fgenesh1_pg.C_20811
+
+new cluster: pValue = 2.160054e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00064	1610>  <364  59>  0>  <48  
+4:	Rhizopus oryzae supercont3.8 of Rhizopus oryzae	48>  1610>  <364  
+Distances: 	1: 0	4: 2
+1610:	1: lcory_7265 - g194
+	4: roryz15305 - RO3G_10912
+48:	1: lcory_7269 - g198
+	4: roryz15304 - RO3G_10911
+364:	1: lcory_7266 - g195
+	4: roryz15306 - RO3G_10913
+59:	1: lcory_7267 - g196
+	4: ---
+
+new cluster: pValue = 2.279388e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00227	1057>  <1249  3166>  <44  
+2:	Mucor circinelloides scaffold_02	1057>  <1249  
+3:	Phycomyces blakesleeanus scaffold_40	1057>  <1249  3166>  <44  
+Distances: 	1: 0	2: 2	3: 0
+3166:	1: lcory_3832 - g400
+	2: ---
+	3: pblak_3374 - e_gw1.40.108.1
+1249:	1: lcory_3831 - g399
+	2: mcirc_0174 - Mucci1.fgeneshMC_pm.2_#_607
+	3: pblak_3373 - Phybl1.e_gw1.67.25.1
+1057:	1: lcory_3830 - g398
+	2: mcirc_0173 - gw1.02.1676.1
+	3: pblak_3372 - Phybl1.estExt_fgeneshPB_pg.C_670029
+44:	1: lcory_3833 - g401
+	2: ---
+	3: pblak_3375 - e_gw1.40.131.1
+
+new cluster: pValue = 2.373036e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00046	<56  867>  3790>  1003>  <32  
+4:	Rhizopus oryzae supercont3.17 of Rhizopus oryzae	<56  867>  <32  
+Distances: 	1: 0	4: 2
+1003:	1: lcory_6005 - g38
+	4: ---
+32:	1: lcory_6006 - g39
+	4: roryz_4160 - RO3G_15623
+867:	1: lcory_6003 - g36
+	4: roryz_4159 - RO3G_15622
+56:	1: lcory_6002 - g35
+	4: roryz_4158 - RO3G_15621
+3790:	1: lcory_6004 - g37
+	4: ---
+
+new cluster: pValue = 5.824179e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00039	<844  0>  <5  <2864  
+2:	Mucor circinelloides scaffold_09	<5  <2864  
+3:	Phycomyces blakesleeanus scaffold_2	844>  <2257  <5  <2864  
+4:	Rhizopus oryzae supercont3.5 of Rhizopus oryzae	<5  <2864  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+5:	1: lcory_4020 - g315
+	2: mcirc10449 - gw1.09.432.1
+	3: pblak_5960 - gw1.2.980.1
+	4: roryz_9082 - RO3G_07948
+2864:	1: lcory_4021 - g316
+	2: mcirc10450 - fgenesh1_pg.09_#_171
+	3: pblak_5961 - Genemark1.1510_g
+	4: roryz_9083 - RO3G_07949
+844:	1: lcory_4018 - g313
+	2: ---
+	3: pblak_5958 - Phybl1.fgeneshPB_pg.1__195
+	4: ---
+
+new cluster: pValue = 6.121091e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00039	22>  <25  <14  1246>  <1134  
+3:	Phycomyces blakesleeanus scaffold_2	1134>  <1246  22>  <14  
+Distances: 	1: 0	3: 1
+1134:	1: lcory_4130 - g425
+	3: pblak_6798 - estExt_Genewise1Plus.C_21261
+22:	1: lcory_4126 - g421
+	3: pblak_6800 - Phybl1.e_gw1.1.921.1
+25:	1: lcory_4127 - g422
+	3: ---
+1246:	1: lcory_4129 - g424
+	3: pblak_6799 - fgenesh1_pg.2_#_997
+14:	1: lcory_4128 - g423
+	3: pblak_6801 - fgenesh1_pg.2_#_999
+
+new cluster: pValue = 8.905380e-04, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00096	<3091  1744>  0>  <4054  
+3:	Phycomyces blakesleeanus scaffold_2	<3091  1744>  1430>  <4054  
+Distances: 	1: 0	3: 2
+1744:	1: lcory_0090 - g159
+	3: pblak_6747 - Phybl1.fgeneshPB_pg.1__969
+4054:	1: lcory_0092 - g161
+	3: pblak_6749 - Genemark1.2270_g
+3091:	1: lcory_0089 - g158
+	3: pblak_6746 - estExt_Genewise1Plus.C_21212
+
+new cluster: pValue = 1.089518e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00044	<16  <117  2754>  361>  
+2:	Mucor circinelloides scaffold_02	<361  <2754  
+3:	Phycomyces blakesleeanus scaffold_23	<361  <2754  
+4:	Rhizopus oryzae supercont3.24 of Rhizopus oryzae	<16  <3212  2754>  361>  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+16:	1: lcory_5788 - g339
+	2: ---
+	3: ---
+	4: roryz17050 - RO3G_16973
+117:	1: lcory_5789 - g340
+	2: ---
+	3: ---
+	4: ---
+2754:	1: lcory_5790 - g341
+	2: mcirc_1425 - fgenesh1_kg.02_#_343_#_1550_1_CCIA_CCIB_EXTA
+	3: pblak_2571 - Genemark1.12280_g
+	4: roryz17052 - RO3G_16975
+361:	1: lcory_5791 - g342
+	2: mcirc_1424 - fgenesh1_pm.02_#_417
+	3: pblak_2570 - Phybl1.e_gw1.17.257.1
+	4: roryz17053 - RO3G_16976
+
+new cluster: pValue = 1.945114e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00008	<2397  1069>  742>  17>  
+3:	Phycomyces blakesleeanus scaffold_40	<17  0>  <1069  2397>  
+4:	Rhizopus oryzae supercont3.4 of Rhizopus oryzae	1069>  17>  
+Distances: 	1: 0	3: 2	4: 2
+17:	1: lcory11279 - g179
+	3: pblak_3312 - e_gw1.40.14.1
+	4: roryz_7144 - RO3G_06009
+1069:	1: lcory11277 - g177
+	3: pblak_3314 - estExt_Genewise1.C_400033
+	4: roryz_7143 - RO3G_06008
+2397:	1: lcory11276 - g176
+	3: pblak_3315 - estExt_Genemark1.C_400032
+	4: ---
+742:	1: lcory11278 - g178
+	3: ---
+	4: ---
+
+new cluster: pValue = 2.255588e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00011	<2990  <1327  <2214  5407>  
+2:	Mucor circinelloides scaffold_02	<2990  <2214  4010>  5407>  
+Distances: 	1: 0	2: 2
+2990:	1: lcory_1868 - g28
+	2: mcirc_1583 - Genemark1.3614_g
+5407:	1: lcory_1871 - g31
+	2: mcirc_1586 - Genemark1.3617_g
+1327:	1: lcory_1869 - g29
+	2: ---
+2214:	1: lcory_1870 - g30
+	2: mcirc_1584 - Genemark1.3615_g
+
+new cluster: pValue = 2.376929e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00011	61>  <5  36>  <480  
+2:	Mucor circinelloides scaffold_01	480>  <36  61>  
+3:	Phycomyces blakesleeanus scaffold_5	480>  <36  
+4:	Rhizopus oryzae supercont3.4 of Rhizopus oryzae	480>  <36  
+Distances: 	1: 0	2: 1	3: 2	4: 2
+5:	1: lcory_1925 - g85
+	2: ---
+	3: ---
+	4: ---
+36:	1: lcory_1926 - g86
+	2: mcirc_4846 - gw1.01.2215.1
+	3: pblak_7444 - estExt_fgenesh1_pg.C_50476
+	4: roryz_6845 - RO3G_05710
+480:	1: lcory_1927 - g87
+	2: mcirc_4845 - fgenesh1_kg.01_#_406_#_95_1_CCIA_CCIB_EXTA
+	3: pblak_7443 - estExt_Genewise1Plus.C_50507
+	4: roryz_6844 - RO3G_05709
+61:	1: lcory_1924 - g84
+	2: mcirc_4847 - fgenesh1_kg.01_#_407_#_992_1_CCIA_CCIB_EXTA
+	3: ---
+	4: ---
+
+new cluster: pValue = 2.540815e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00018	323>  <1072  0>  5>  
+2:	Mucor circinelloides scaffold_05	<5  0>  <1072  <323  
+3:	Phycomyces blakesleeanus scaffold_16	<5  1072>  
+4:	Rhizopus oryzae supercont3.9 of Rhizopus oryzae	1072>  5>  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+323:	1: lcory_2158 - g40
+	2: mcirc_9349 - e_gw1.05.992.1
+	3: ---
+	4: ---
+5:	1: lcory_2161 - g43
+	2: mcirc_9346 - gw1.05.416.1
+	3: pblak14624 - Phybl1.fgeneshPB_pg.36__126
+	4: roryz15854 - RO3G_11461
+1072:	1: lcory_2159 - g41
+	2: mcirc_9348 - Genemark1.7611_g
+	3: pblak14625 - Phybl1.fgeneshPB_pm.36__20
+	4: roryz15853 - RO3G_11460
+
+new cluster: pValue = 3.180722e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00091	<762  4044>  <449  9>  <13  
+2:	Mucor circinelloides scaffold_06	<13  <9  <762  
+Distances: 	1: 0	2: 2
+762:	1: lcory_0309 - g13
+	2: mcirc_5183 - Genemark1.7872_g
+9:	1: lcory_0312 - g16
+	2: mcirc_5182 - Genemark1.7871_g
+13:	1: lcory_0313 - g17
+	2: mcirc_5181 - fgenesh1_kg.06_#_11_#_409_1_CCIA_CCIB_EXTA
+449:	1: lcory_0311 - g15
+	2: ---
+4044:	1: lcory_0310 - g14
+	2: ---
+
+new cluster: pValue = 3.664864e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00044	<16  <5284  732>  <2049  
+2:	Mucor circinelloides scaffold_01	<16  <5284  0>  <715  732>  <2049  
+3:	Phycomyces blakesleeanus scaffold_26	2049>  <732  
+Distances: 	1: 0	2: 2	3: 2
+16:	1: lcory_5857 - g408
+	2: mcirc_3507 - fgenesh1_pm.01_#_85
+	3: ---
+2049:	1: lcory_5860 - g411
+	2: mcirc_3512 - fgenesh1_kg.01_#_61_#_1479_1_CCIA_CCIB_EXTA
+	3: pblak_0954 - fgenesh1_pg.26_#_43
+732:	1: lcory_5859 - g410
+	2: mcirc_3511 - Genemark1.315_g
+	3: pblak_0955 - estExt_Genemark1.C_260039
+5284:	1: lcory_5858 - g409
+	2: mcirc_3508 - Genemark1.312_g
+	3: ---
+
+new cluster: pValue = 4.141568e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00019	2974>  683>  1744>  <2973  
+3:	Phycomyces blakesleeanus scaffold_19	2973>  <1744  <5  <2974  
+Distances: 	1: 0	3: 2
+2974:	1: lcory_2242 - g9
+	3: pblak14936 - gw1.19.406.1
+1744:	1: lcory_2244 - g11
+	3: pblak14934 - Genemark1.11065_g
+2973:	1: lcory_2245 - g12
+	3: pblak14933 - estExt_Genewise1Plus.C_190290
+683:	1: lcory_2243 - g10
+	3: ---
+
+new cluster: pValue = 4.379637e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00006	<317  0>  <987  <3624  
+2:	Mucor circinelloides scaffold_02	3624>  <317  <3426  <987  
+Distances: 	1: 0	2: 2
+987:	1: lcory_9753 - g191
+	2: mcirc_1073 - Genemark1.3089_g
+3624:	1: lcory_9754 - g192
+	2: mcirc_1070 - Genemark1.3086_g
+317:	1: lcory_9751 - g189
+	2: mcirc_1071 - fgenesh1_pg.02_#_975
+
+new cluster: pValue = 4.466107e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00041	1048>  <3156  0>  523>  
+3:	Phycomyces blakesleeanus scaffold_20	1048>  400>  <3156  523>  
+Distances: 	1: 0	3: 2
+1048:	1: lcory_5340 - g24
+	3: pblak_1499 - estExt_Genemark1.C_200140
+3156:	1: lcory_5341 - g25
+	3: pblak_1501 - Phybl1.fgeneshPB_pg.34__34
+523:	1: lcory_5343 - g27
+	3: pblak_1502 - Genemark1.11266_g
+
+new cluster: pValue = 4.861247e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00008	<1081  5130>  <418  783>  
+4:	Rhizopus oryzae supercont3.2 of Rhizopus oryzae	<1081  0>  <783  418>  <5130  
+Distances: 	1: 0	4: 1
+1081:	1: lcory11140 - g40
+	4: roryz10262 - RO3G_03377
+5130:	1: lcory11141 - g41
+	4: roryz10266 - RO3G_03381
+783:	1: lcory11143 - g43
+	4: roryz10264 - RO3G_03379
+418:	1: lcory11142 - g42
+	4: roryz10265 - RO3G_03380
+
+new cluster: pValue = 6.661034e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00002	<17  2437>  <127  184>  
+2:	Mucor circinelloides scaffold_04	127>  <17  
+4:	Rhizopus oryzae supercont3.5 of Rhizopus oryzae	17>  <184  127>  
+Distances: 	1: 0	2: 2	4: 1
+17:	1: lcory10774 - g38
+	2: mcirc_8376 - Mucci1.e_gw1.4.323.1
+	4: roryz_8908 - RO3G_07774
+184:	1: lcory10777 - g41
+	2: ---
+	4: roryz_8909 - RO3G_07775
+127:	1: lcory10776 - g40
+	2: mcirc_8375 - fgenesh1_kg.04_#_332_#_572_1_CCIA_CCIB_EXTA
+	4: roryz_8910 - RO3G_07776
+2437:	1: lcory10775 - g39
+	2: ---
+	4: ---
+
+new cluster: pValue = 8.987249e-03, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00036	<82  3858>  0>  <2835  
+2:	Mucor circinelloides scaffold_01	2835>  3858>  <5617  82>  
+Distances: 	1: 0	2: 2
+2835:	1: lcory_4408 - g23
+	2: mcirc_3327 - fgenesh1_kg.01_#_24_#_1788_1_CCIA_CCIB_EXTA
+82:	1: lcory_4405 - g20
+	2: mcirc_3330 - fgenesh1_pg.01_#_105
+3858:	1: lcory_4406 - g21
+	2: mcirc_3328 - Genemark1.126_g
+
+new cluster: pValue = 1.615042e-02, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00051	9>  1416>  <174  3766>  
+2:	Mucor circinelloides scaffold_03	<3766  <254  174>  9>  
+3:	Phycomyces blakesleeanus scaffold_16	<3766  174>  
+Distances: 	1: 0	2: 2	3: 2
+3766:	1: lcory_6640 - g28
+	2: mcirc_2578 - e_gw1.03.2363.1
+	3: pblak14320 - estExt_Genewise1Plus.C_160017
+174:	1: lcory_6639 - g27
+	2: mcirc_2580 - e_gw1.03.1905.1
+	3: pblak14321 - e_gw1.16.221.1
+9:	1: lcory_6637 - g25
+	2: mcirc_2581 - e_gw1.03.298.1
+	3: ---
+1416:	1: lcory_6638 - g26
+	2: ---
+	3: ---
+
+new cluster: pValue = 1.652868e-02, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00091	<17  <91  0>  <3192  
+2:	Mucor circinelloides scaffold_01	<17  <91  <1686  <3192  
+3:	Phycomyces blakesleeanus scaffold_15	3192>  91>  
+Distances: 	1: 0	2: 2	3: 2
+17:	1: lcory_0299 - g3
+	2: mcirc_4459 - gw1.01.2599.1
+	3: ---
+3192:	1: lcory_0302 - g6
+	2: mcirc_4462 - fgenesh1_pg.01_#_1153
+	3: pblak13278 - Phybl1.fgeneshPB_pg.31__124
+91:	1: lcory_0300 - g4
+	2: mcirc_4460 - e_gw1.01.2185.1
+	3: pblak13279 - e_gw1.15.255.1
+
+new cluster: pValue = 1.692201e-02, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00044	1079>  <1937  200>  <10  
+3:	Phycomyces blakesleeanus scaffold_3	200>  <10  
+4:	Rhizopus oryzae supercont3.11 of Rhizopus oryzae	<1937  200>  <10  
+Distances: 	1: 0	3: 2	4: 1
+200:	1: lcory_5767 - g318
+	3: pblak_5208 - Phybl1.estExt_Genewise1.C_50405
+	4: roryz_1717 - RO3G_13175
+1937:	1: lcory_5766 - g317
+	3: ---
+	4: roryz_1716 - RO3G_13174
+10:	1: lcory_5768 - g319
+	3: pblak_5209 - e_gw1.3.730.1
+	4: roryz_1718 - RO3G_13176
+1079:	1: lcory_5765 - g316
+	3: ---
+	4: ---
+
+new cluster: pValue = 2.342090e-02, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00090	1497>  73>  <1279  <746  
+3:	Phycomyces blakesleeanus scaffold_2	746>  <1279  <73  
+Distances: 	1: 0	3: 1
+746:	1: lcory_0254 - g275
+	3: pblak_6599 - Phybl1.gw1.1.312.1
+1279:	1: lcory_0253 - g274
+	3: pblak_6600 - fgenesh1_pg.2_#_803
+73:	1: lcory_0252 - g273
+	3: pblak_6601 - e_gw1.2.162.1
+1497:	1: lcory_0251 - g272
+	3: ---
+
+new cluster: pValue = 3.048893e-02, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00002	<5  <542  <134  <1077  
+2:	Mucor circinelloides scaffold_07	5>  134>  
+3:	Phycomyces blakesleeanus scaffold_23	1077>  134>  <5756  <5  
+4:	Rhizopus oryzae supercont3.12 of Rhizopus oryzae	<134  5>  
+Distances: 	1: 0	2: 2	3: 2	4: 2
+5:	1: lcory10806 - g70
+	2: mcirc_6808 - fgenesh1_kg.07_#_191_#_2113_1_CCIA_CCIB_EXTA
+	3: pblak_2391 - fgenesh1_pm.23_#_16
+	4: roryz_2154 - RO3G_13613
+542:	1: lcory10807 - g71
+	2: ---
+	3: ---
+	4: ---
+1077:	1: lcory10809 - g73
+	2: ---
+	3: pblak_2388 - fgenesh1_pm.23_#_15
+	4: ---
+134:	1: lcory10808 - g72
+	2: mcirc_6809 - estExt_Genemark1.C_070713
+	3: pblak_2389 - Phybl1.fgeneshPB_pg.17__103
+	4: roryz_2153 - RO3G_13612
+
+new cluster: pValue = 3.349260e-02, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00004	543>  0>  <51  <1366  
+2:	Mucor circinelloides scaffold_02	1366>  51>  5730>  <543  
+Distances: 	1: 0	2: 2
+51:	1: lcory_9138 - g108
+	2: mcirc_1538 - Genemark1.3566_g
+1366:	1: lcory_9139 - g109
+	2: mcirc_1537 - fgenesh1_pg.02_#_1394
+543:	1: lcory_9136 - g106
+	2: mcirc_1540 - estExt_Genewise1Plus.C_022183
+
+new cluster: pValue = 3.650694e-02, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00061	687>  5239>  <69  <575  
+3:	Phycomyces blakesleeanus scaffold_2	<575  <5239  0>  687>  
+Distances: 	1: 0	3: 2
+687:	1: lcory_7515 - g61
+	3: pblak_6687 - e_gw1.2.376.1
+69:	1: lcory_7517 - g63
+	3: ---
+575:	1: lcory_7518 - g64
+	3: pblak_6684 - e_gw1.2.537.1
+5239:	1: lcory_7516 - g62
+	3: pblak_6685 - Genemark1.2204_g
+
+new cluster: pValue = 4.848442e-02, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00003	<69  5147>  <277  435>  
+2:	Mucor circinelloides scaffold_01	<5147  69>  <1745  <435  
+Distances: 	1: 0	2: 2
+69:	1: lcory10624 - g319
+	2: mcirc_3444 - Genemark1.247_g
+5147:	1: lcory10625 - g320
+	2: mcirc_3443 - Genemark1.246_g
+277:	1: lcory10626 - g321
+	2: ---
+435:	1: lcory10627 - g322
+	2: mcirc_3446 - estExt_Genemark1.C_010249
+
+new cluster: pValue = 5.172880e-02, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00066	<151  2364>  <62  <2680  
+3:	Phycomyces blakesleeanus scaffold_2	<2364  151>  0>  <62  2884>  <2680  
+Distances: 	1: 0	3: 2
+2680:	1: lcory_7168 - g67
+	3: pblak_6424 - estExt_Genemark1.C_20653
+62:	1: lcory_7167 - g66
+	3: pblak_6422 - estExt_Genewise1.C_20782
+2364:	1: lcory_7166 - g65
+	3: pblak_6419 - estExt_Genemark1.C_20647
+151:	1: lcory_7165 - g64
+	3: pblak_6420 - fgenesh1_pg.2_#_635
+
+new cluster: pValue = 1.288898e-01, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00047	<2742  10>  1340>  <1462  
+3:	Phycomyces blakesleeanus scaffold_2	<1462  981>  <10  2742>  
+Distances: 	1: 0	3: 2
+1340:	1: lcory_5897 - g114
+	3: ---
+1462:	1: lcory_5898 - g115
+	3: pblak_6910 - estExt_Genemark1.C_21107
+2742:	1: lcory_5895 - g112
+	3: pblak_6913 - fgenesh1_pg.2_#_1085
+10:	1: lcory_5896 - g113
+	3: pblak_6912 - Phybl1.fgeneshPB_pg.1__1121
+
+new cluster: pValue = 1.902119e-01, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00164	4>  21>  <2155  <2  
+3:	Phycomyces blakesleeanus scaffold_25	21>  <4  
+4:	Rhizopus oryzae supercont3.10 of Rhizopus oryzae	<4  <21  2>  <2  <2  
+Distances: 	1: 0	3: 2	4: 1
+2:	1: lcory11430 - g56
+	3: ---
+	4: roryz_0613 - RO3G_12069
+4:	1: lcory11427 - g53
+	3: pblak_0741 - fgenesh1_kg.25_#_26_#_0_0_CBNA472.b1_CBNA_CBNB_CB NC_CBNF
+	4: roryz_0611 - RO3G_12067
+21:	1: lcory11428 - g54
+	3: pblak_0740 - Genemark1.12714_g
+	4: roryz_0612 - RO3G_12068
+2155:	1: lcory11429 - g55
+	3: ---
+	4: ---
+
+new cluster: pValue = 2.308946e-01, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00034	1323>  <745  653>  <10  
+4:	Rhizopus oryzae supercont3.6 of Rhizopus oryzae	<10  <789  745>  <1323  
+Distances: 	1: 0	4: 2
+653:	1: lcory_4208 - g339
+	4: ---
+745:	1: lcory_4207 - g338
+	4: roryz_4441 - RO3G_08009
+1323:	1: lcory_4206 - g337
+	4: roryz_4442 - RO3G_08010
+10:	1: lcory_4209 - g340
+	4: roryz_4439 - RO3G_08007
+
+new cluster: pValue = 6.877784e-01, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00041	<338  <41  10>  <2788  
+3:	Phycomyces blakesleeanus scaffold_7	41>  <1475  338>  2788>  
+Distances: 	1: 0	3: 2
+338:	1: lcory_5354 - g38
+	3: pblak_8639 - fgenesh1_pm.7_#_9
+10:	1: lcory_5356 - g40
+	3: ---
+41:	1: lcory_5355 - g39
+	3: pblak_8637 - e_gw1.7.350.1
+2788:	1: lcory_5357 - g41
+	3: pblak_8640 - Genemark1.5686_g
+
+new cluster: pValue = 8.121263e-01, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00001	402>  92>  22>  9>  
+3:	Phycomyces blakesleeanus scaffold_21	402>  <9  <22  
+Distances: 	1: 0	3: 1
+22:	1: lcory_9912 - g90
+	3: pblak_1875 - estExt_Genewise1.C_210190
+402:	1: lcory_9910 - g88
+	3: pblak_1873 - estExt_fgenesh1_pm.C_210039
+9:	1: lcory_9913 - g91
+	3: pblak_1874 - gw1.21.16.1
+92:	1: lcory_9911 - g89
+	3: ---
+
+new cluster: pValue = 8.965826e-01, refSeq = 1
+in chromosomes:
+1:	Lichtheimia corymbifera scaffold00155	<11  0>  4>  2280>  
+3:	Phycomyces blakesleeanus scaffold_15	<11  <4  
+4:	Rhizopus oryzae supercont3.2 of Rhizopus oryzae	<2  <4  <2  2280>  11>  
+Distances: 	1: 0	3: 2	4: 2
+4:	1: lcory_0019 - g18
+	3: pblak13323 - Phybl1.fgeneshPB_pg.31__81
+	4: roryz_9599 - RO3G_02714
+2280:	1: lcory_0020 - g19
+	3: ---
+	4: roryz_9601 - RO3G_02716
+11:	1: lcory_0017 - g16
+	3: pblak13322 - fgenesh1_kg.15_#_35_#_2528_1_CBNA_CBNB_CBNC_CBNF
+	4: roryz_9602 - RO3G_02717
+
