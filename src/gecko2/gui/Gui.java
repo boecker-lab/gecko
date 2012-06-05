@@ -12,6 +12,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,6 +24,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -62,6 +65,7 @@ public class Gui {
 	
 	private JLabel infobar;
 	private ImageIcon waitingAnimation;
+	private JCheckBox mgbViewSwitcher = new JCheckBox();
 	private final JTextField searchField;
 
 		
@@ -107,9 +111,11 @@ public class Gui {
 		this.gcSelector.addSelectionListener(occurrenceSelector);
 				
 		// SplitPane arrangements
+		// splits the gui in the vertical half
 		horiSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);	
 		horiSplit.setResizeWeight(0.5);
 		
+		// splits the gui in horizontal half
 		vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		vertSplit.setResizeWeight(0.5);
 		this.gecko.setClusters(null);
@@ -129,8 +135,8 @@ public class Gui {
 		
 		
 		// Lowest component in the upper half of the window		
-		
-		JScrollPane upscoll = new JScrollPane();
+	
+		final JScrollPane upscoll = new JScrollPane();
 		upscoll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		upscoll.setViewportView(mgb);
 		
@@ -142,8 +148,10 @@ public class Gui {
 		
 		JScrollPane navigatorScroll = new JScrollPane(navigator);
 		
-		
-		JSplitPane upperPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upscoll, navigatorScroll);
+		// Panel under 
+		final JSplitPane upperPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upscoll, navigatorScroll);
+		// setResizeWight to give both components the same size
+		upperPanel.setResizeWeight(0.5);
 		
 		//Toolbar
 		JToolBar toolbar = new JToolBar();
@@ -170,6 +178,33 @@ public class Gui {
 		testButton.setSelected(gecko.isAnimationEnabled());
 		toolbar.add(new JToolBar.Separator());
 		toolbar.add(testButton);
+		
+		mgbViewSwitcher.setText("Hide unclustered genomes");
+		mgbViewSwitcher.addItemListener(new ItemListener()
+		{
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) 
+			{	
+				int status = arg0.getStateChange();
+	            JCheckBox mgbViewSwitcher2 = (JCheckBox) arg0.getItemSelectable();
+		    
+	            if(mgbViewSwitcher2 == Gui.this.mgbViewSwitcher)
+	            {
+	            	if (status == ItemEvent.DESELECTED)
+	            	{
+	            		mgb.genomeBrowserFilter(false);
+	            	}
+	            	else 
+	            	{	
+	            		mgb.genomeBrowserFilter(true);
+	            	}
+	            }
+			}
+			
+		});
+		
+		toolbar.add(mgbViewSwitcher);
 		toolbar.add(Box.createHorizontalGlue());
 		
 		toolbar.add(new JLabel("Search "));

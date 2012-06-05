@@ -122,7 +122,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 				cpanel.setLayout(f);
 				cpanel.setBackground(masterPanel.getBackground());
 				Chromosome c = GeckoInstance.getInstance().getGenomes()[i].getChromosomes().get(s.getChromosome());
-				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i)));
+				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i), Integer.toString(i+1).length()));
 				TextLabel textLabel = new TextLabel(c.getName());
 				cpanel.add(textLabel);
 				masterPanel.add(cpanel);
@@ -197,7 +197,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 					continue;
 				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 				if (s.getStart()>s.getStop()) continue;
-				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i)));
+				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i), Integer.toString(i+1).length()));
 				TextLabel textLabel = new TextLabel(Integer.toString(s.getDist()));
 				textLabel.setFont(monoFont);
 				cpanel.add(textLabel);
@@ -250,7 +250,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 						}
 						TextLabel l = new TextLabel(genes[i].getSummary());
 						l.setFont(monoFont);
-						NumberInRectangle n = new NumberInRectangle(i+1,refPanel.getBackground(), mlisteners.get(i));
+						NumberInRectangle n = new NumberInRectangle(i+1,refPanel.getBackground(), mlisteners.get(i), Integer.toString(i+1).length());
 						refPanel.add(n);
 						refPanel.add(Box.createRigidArea(new Dimension(4, 0)));
 						refPanel.add(l);

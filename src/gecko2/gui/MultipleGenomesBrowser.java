@@ -15,6 +15,7 @@ import gecko2.event.LocationSelectionEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,7 +39,16 @@ import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
-
+/**
+ * This class implements the multiple genome browser (mgb) for the gecko2 GUI.
+ * The mbg is implemented a container for GenomeBrowser objects and provides
+ * functions for setting up the mgb.
+ * 
+ * This class contains modifications (genomeBrowserFilter, related variables and getter/setter)
+ * made by Hans-Martin Haase <hans-martin.haase@uni-jena.de>
+ * 
+ * @author original author unknown
+ */
 public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionListener {
 
 	private static final long serialVersionUID = -6769789368841494821L;
@@ -53,6 +63,110 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 	
 	GeckoInstance gecko;
 
+	/**
+	 * The variable stores the currently selected gene cluster
+	 */
+	private GeneCluster selectedCluster = null;
+	
+	/**
+	 * The variable stores the filter activity: <br>
+	 * false filter is inactive
+	 * true filter is active
+	 */
+	private boolean filterActiv = false; 
+	
+	/**
+	 * Getter for the variable selectedCluster.
+	 * 
+	 * @return a GenCluster object
+	 */
+	private GeneCluster getSelectedCluster() 
+	{
+		return selectedCluster;
+	}
+
+	/**
+	 * Setter for the variable selectedCluster.
+	 * 
+	 * @param selectedCluster a GeneCluster object
+	 */
+	private void setSelectedCluster(GeneCluster selectedCluster) 
+	{
+		this.selectedCluster = selectedCluster;
+	}
+
+	/**
+	 * Getter for the variable filterActiv.
+	 * 
+	 * @return true if the filter is active else false
+	 */
+	private boolean isFilterActiv() 
+	{
+		return filterActiv;
+	}
+
+	/**
+	 * Setter for the variable filterActiv
+	 * 
+	 * @param filterActiv boolean true for filter is active false for filter inactive
+	 */
+	private void setFilterActiv(boolean filterActiv) 
+	{
+		this.filterActiv = filterActiv;
+	}
+
+	/**
+	 * This method implements a filter for the mgb. It removes the GenomeBrowers for the genomes
+	 * which don't support the current cluster.
+	 * For this the method sets the filterActiv variable and the clusterBackup to undo the view change.
+	 * So the method activates and deactivates the filter.
+	 * 
+	 * @param action true if the filter should be activated else false to turn it off
+	 */
+	public void genomeBrowserFilter(boolean action)
+	{
+		// filter is only active if a cluster was selected
+		FlowLayout flowlayout = new FlowLayout();
+		flowlayout.setVgap(0);
+		
+		if (this.getSelectedCluster() != null)
+		{
+			if (this.isFilterActiv() == false && action == true)
+			{
+				// activation branch
+				for (int i = 0; i < this.getSelectedCluster().getOccurrences()[0].getSubsequences().length; i++)
+				{
+					if (this.getSelectedCluster().getOccurrences()[0].getSubsequences()[i].length == 0)
+					{	
+						this.centerpanel.getComponent(i).setVisible(false);
+						this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() - (4 + gecko.getGeneElementHight() + flowlayout.getVgap())));
+					}
+				}
+				
+				this.validate();
+				this.setFilterActiv(true);
+			}
+			else
+			{
+				if (this.isFilterActiv() == true && action == false)
+				{
+					// deactivate filter branch
+					for (int i = 0; i < this.getSelectedCluster().getOccurrences()[0].getSubsequences().length; i++)
+					{
+						this.centerpanel.getComponent(i).setVisible(true);
+						if (this.getSelectedCluster().getOccurrences()[0].getSubsequences()[i].length == 0)
+						{	
+							this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() + (4 + gecko.getGeneElementHight() + flowlayout.getVgap())));
+						}
+					}
+				
+					this.validate();
+					this.setFilterActiv(false);
+				}
+			}
+		}
+	}
+	
 	public float[] getScrollPositions() {
 		float[] pos = new float[genomeBrowsers.size()];
 		for (int i=0; i<genomeBrowsers.size(); i++) {
@@ -63,10 +177,15 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 		return pos;
 	}
 	
-	public void setScrollPositions(float[] positions) {
-		if (positions.length!=genomeBrowsers.size()) 
+	public void setScrollPositions(float[] positions) 
+	{
+		if (positions.length != genomeBrowsers.size())
+		{
 			throw new IndexOutOfBoundsException("The positions array size does not fit the number of GenomeBrowsers");
-		for (int i=0;i<positions.length;i++) {
+		}
+		
+		for (int i = 0; i < positions.length; i++) 
+		{
 			GenomeBrowser gb = genomeBrowsers.get(i);
 			JScrollBar s = gb.getHorizontalScrollBar();
 			s.setValue((int) (gb.getLeftSpacerWidth() + (positions[i]*(s.getMaximum()-2*gb.getLeftSpacerWidth()))));
@@ -174,7 +293,7 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 		JPanel boxPanel = new JPanel();
 		boxPanel.setBackground(gb.getBackground());
 		boxPanel.setLayout(new BoxLayout(boxPanel,BoxLayout.LINE_AXIS));
-		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(),gb.getBackground());
+		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(),gb.getBackground(), Integer.toString(this.genomeBrowsers.size()).length());
 //		n.addMouseListener(gb.getGenomebrowsermouseover());
 		boxPanel.add(n);
 		boxPanel.add(Box.createRigidArea(new Dimension(4, 0)));
@@ -677,13 +796,25 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 		// selected
 		if (e instanceof LocationSelectionEvent) {
 			lastLocationEvent = (LocationSelectionEvent) e;
+			
+			// save current filter status
+			boolean stat = this.isFilterActiv();
+			
+			// deactivate the filter
+			this.genomeBrowserFilter(false);
+			
 			if (e.getSelection()!=null)
 				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.getgOcc(), lastLocationEvent.getsubselection());
+		
+			// save the currently selected cluster for the filter function
+			this.setSelectedCluster(e.getSelection());
+			
+			// if the check box is selected we show only the genomes which contain the cluster
+			if (stat)
+			{
+				this.genomeBrowserFilter(stat);
+				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.getgOcc(), lastLocationEvent.getsubselection());
+			}	
 		}
 	}
-
-
-
-
-
 }
