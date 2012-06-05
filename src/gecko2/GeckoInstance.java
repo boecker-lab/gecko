@@ -763,26 +763,28 @@ public class GeckoInstance {
 	
 	public void initProgressBar(int maxvalue) {
 		final int maxv = maxvalue;
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				gui.getProgressbar().setMaximum(maxv);
-			}
-		});
+		if (gui != null)
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					gui.getProgressbar().setMaximum(maxv);
+				}
+			});
 
 	};
 	
 	public void setProgressStatus(int value) {
 		final int v = value;
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				if (v<gui.getProgressbar().getMaximum()) {
-					gui.changeMode(Gui.Mode.COMPUTING);
-					gui.getProgressbar().setValue(v);
-				} else {
-					gui.changeMode(Gui.Mode.FINISHING_COMPUTATION);
+		if (gui != null)
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					if (v<gui.getProgressbar().getMaximum()) {
+						gui.changeMode(Gui.Mode.COMPUTING);
+						gui.getProgressbar().setValue(v);
+					} else {
+						gui.changeMode(Gui.Mode.FINISHING_COMPUTATION);
+					}
 				}
-			}
-		});
+			});
 	}
 	
 	public Genome[] getGenomes() {

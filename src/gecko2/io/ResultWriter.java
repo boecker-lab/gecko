@@ -14,8 +14,11 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
 public class ResultWriter {
 	public static boolean exportResultsToFileNEW2(File f, List<GeneCluster> clusters, int[] geneLabelMap, List<String> genomeNames) {
@@ -31,6 +34,12 @@ public class ResultWriter {
 			writer.write(String.format("Detected %d gene clusters.\n", clusters.size()));
 			writer.write("General statistics:\n");
 			
+			int[] sumDistance = new int[genomeNames.size()];
+			int[] sumConservedGenes = new int[genomeNames.size()];
+			int[] sumLostGenes = new int[genomeNames.size()];
+			int[] sumClusterSize = new int[genomeNames.size()];
+			int[] sumIntervals = new int[genomeNames.size()];
+			
 			int[] clusterSizes = new int[50];
 			int[] intervalLength = new int[50];
 			int[][] intervalLengths = new int[genomeNames.size()][50];
@@ -39,6 +48,29 @@ public class ResultWriter {
 			List<String> clusterTabel = new ArrayList<String>(clusters.size());
 			for (int c=0; c<clusters.size(); c++){
 				GeneCluster cluster = clusters.get(c);
+				GeneClusterOutput clusterData = cluster.generateGeneClusterOutput();
+				
+				Set<Integer> refSet = new HashSet<Integer>(clusterData.getIntervals().get(clusterData.getRefSeq()));
+				
+				for (int i=0; i<genomeNames.size(); i++){
+					if (clusterData.getChromosomes().get(i) == null)
+						continue;
+					Set<Integer> notContained = new HashSet<Integer>() ;
+					int additionalGenes = clusterData.getDistances()[i];
+					for (Integer gene: clusterData.getIntervals().get(i)) {
+						if (!refSet.contains(gene)) {
+							if (!notContained.contains(gene)) {
+								additionalGenes--;
+								notContained.add(gene);
+							}
+						}
+					}
+					sumDistance[i] += clusterData.getDistances()[i];
+					sumLostGenes[i] += (clusterData.getDistances()[i] - additionalGenes);
+					sumConservedGenes[i] += cluster.getGenes().length - (clusterData.getDistances()[i]-additionalGenes);  // nr_of_genes - missing_genes
+					sumClusterSize[i] += cluster.getGenes().length;
+					sumIntervals[i]++;
+				} 
 				
 				StringBuilder builder = new StringBuilder();
 				builder.append(c).append("\t").append(cluster.getGenes().length).append("\t");
@@ -124,6 +156,12 @@ public class ResultWriter {
 			for (int i=0; i<clusterSizes.length; i++) {
 				if (clusterSizes[i] != 0)
 					writer.write(String.format("%d \t %d\n", i, clusterSizes[i]));
+			}
+			writer.write("\n");
+			
+			writer.write("Genome \t # intervals \t avg. cluster size \t avg. distance \t avg. # conserved genes\n");
+			for (int i=0; i<genomeNames.size(); i++) {
+				writer.write(String.format("%s \t %d \t %f \t %f \t %f\n", genomeNames.get(i), sumIntervals[i], ((float)sumClusterSize[i])/sumIntervals[i], ((float)sumDistance[i])/sumIntervals[i], ((float)sumConservedGenes[i])/sumIntervals[i]));
 			}
 			writer.write("\n");
 			
