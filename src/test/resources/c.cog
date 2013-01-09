@@ -1,0 +1,63 @@
+Shorty 1
+6 proteins
+0001	+	J	fusA	elongation factor EF-G	
+0002	+	J	tufA1	elongation factor EF-Tu	
+0003	+	J	rpsJ	ribosomal protein S10	
+0004	+	J	rplC	ribosomal protein L03	
+0005	+	J	rplD	ribosomal protein L04	
+0006	+	J	rplW	ribosomal protein L23
+0003	+	J	rpsJ	ribosomal protein S10
+0001	+	J	fusA	elongation factor EF-G			
+
+Shorty 2
+12 proteins
+0007	+	J	fusA	elongation factor EF-G	
+0004	+	J	tufA1	elongation factor EF-Tu	
+0003	+	J	rpsJ	ribosomal protein S10	
+0001	+	J	rplC	ribosomal protein L03	
+0008	+	J	rplD	ribosomal protein L04	
+0004	+	J	rplW	ribosomal protein L23	
+0005	+	J	rplB	ribosomal protein L02	
+0004	+	J	rpsS	ribosomal protein S19	
+0001	+	J	rplV	ribosomal protein L22	
+0006	+	J	rpsC	ribosomal protein S03	
+0009	+	J	rplP	ribosomal protein L16	
+0007	+	J	rplP	ribosomal protein L16	
+
+Shorty 3
+14 proteins
+0010	-	O	smb 	small protein B	
+0003	-	S	----	hypothetical protein	
+0005	+	O	----	hypothetical protein	
+0001	+	S	----	putative protein	
+0004	-	M	nsd 	nucleotide sugar dehydrogenase		
+0011	+	M	----	hypothetical protein	
+0011	+	M	----	hypothetical protein
+0002	+	V	abcT8	ABC transporter	
+0004	-	J	serS	seryl-tRNA synthetase	
+0003	+	M	glmS	glucosamine-fructose-6-phosphate aminotransferase	
+0006	-	E	argD	N-acetylornithine aminotransferase	
+0001	-	M	nsd 	nucleotide sugar dehydrogenase	
+0005	-	D	rodA	rod shape determining protein RodA
+0012	-	D	rodA	rod shape determining protein RodA	
+
+Shorty 4 chromosome I
+8 proteins
+0007	-	O	smb 	small protein B	
+0007	-	O	smb 	small protein B	
+0004	-	S	----	hypothetical protein	
+0004	+	O	----	hypothetical protein	
+0002	+	S	----	putative protein	
+0003	-	M	nsd 	nucleotide sugar dehydrogenase		
+0001	+	M	----	hypothetical protein	
+0012	+	V	abcT8	ABC transporter	
+
+Shorty 4 chromosome II
+7 proteins
+0009	-	O	smb 	small protein B	
+0001	-	S	----	hypothetical protein	
+0004	+	O	----	hypothetical protein	
+0008	+	S	----	putative protein	
+0005	-	M	nsd 	nucleotide sugar dehydrogenase		
+0012	+	M	----	hypothetical protein	
+0005	+	V	abcT8	ABC transporter	
