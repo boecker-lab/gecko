@@ -3,10 +3,19 @@ package gecko2;
 public class GenomeOccurence {
 	
 	private String desc;
+	private String genomeName;
+	private String chromosomeName;
 	private int start_line;
 	private int end_line;
 	private int group=0;
 	private boolean flagged=false;
+	
+	public String getGenomSelectorText(){
+		if (chromosomeName.isEmpty())
+			return String.format("<html><B>%s</B></html>", genomeName); 
+		else
+			return String.format("<html><B>%s</B> <I>%s</I></html>", genomeName, chromosomeName); 
+	}
 	
 	public String getDesc() {
 		return desc;
@@ -16,6 +25,22 @@ public class GenomeOccurence {
 		this.desc = desc;
 	}
 	
+	public String getGenomeName() {
+		return genomeName;
+	}
+
+	public void setGenomeName(String genomeName) {
+		this.genomeName = genomeName;
+	}
+
+	public String getChromosomeName() {
+		return chromosomeName;
+	}
+
+	public void setChromosomeName(String chromosomeName) {
+		this.chromosomeName = chromosomeName;
+	}
+
 	public int getStart_line() {
 		return start_line;
 	}

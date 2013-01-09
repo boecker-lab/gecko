@@ -1,5 +1,6 @@
 package gecko2;
 
+import gecko2.algorithm.BreakPointDistance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
@@ -12,29 +13,16 @@ import gecko2.event.DataListener;
 import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
 import gecko2.io.ResultWriter;
-import gecko2.util.PrintUtils;
-import gecko2.util.SortUtils;
 
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -46,15 +34,18 @@ import javax.swing.ToolTipManager;
 import javax.swing.event.EventListenerList;
 
 public class GeckoInstance {
-	public enum ResultFilter {showAll, showFiltered, showSelected};
-	
 	private static GeckoInstance instance;
+	
+	public native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
+	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
+	
+	public enum ResultFilter {showAll, showFiltered, showSelected};
 	
 	private boolean libgeckoLoaded;
 	
 	private File currentInputFile; 
 	private Genome[] genomes= null;
-	private int[] geneLabelMap;
+	private HashMap<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
 	private HashMap<Integer, Color> colormap;
 	
 	private GeneCluster[] clusters;
@@ -73,6 +64,28 @@ public class GeckoInstance {
 	private int geneElementHight;
 	private int geneElementWidth;
 	
+	private int maxIdLength;
+	
+	public void setMaxIdLength(int length)
+	{
+		this.maxIdLength = length;
+	}
+	
+	public int getMaxIdLength()
+	{
+		return this.maxIdLength;
+	}
+	
+	public void setColorMap(HashMap<Integer, Color> colormap)
+	{
+		this.colormap = colormap;
+	}
+	
+	public void setGeneLabelMap(HashMap<Integer, String[]> geneLabelMap)
+	{
+		this.geneLabelMap = geneLabelMap;
+	}
+	
 	/*
 	 * DataEvents
 	 */
@@ -87,7 +100,7 @@ public class GeckoInstance {
 		eventListener.remove(DataListener.class, l);
 	}
 	
-	protected synchronized void fireDataChanged() {
+	public synchronized void fireDataChanged() {
 		for (DataListener d : eventListener.getListeners(DataListener.class) ) {
 			d.dataChanged(new DataEvent(this));
 		}
@@ -245,7 +258,7 @@ public class GeckoInstance {
 				// Check if there is a match in the gene label
 				int[] genes = c.getGenes().clone();
 				for (int i=0; i<genes.length; i++)
-					genes[i] = geneLabelMap[genes[i]];
+					genes[i] = (Integer) geneLabelMap.keySet().toArray()[genes[i]];
 				String geneString = Arrays.toString(genes);
 				for (String pattern : searchPatterns) {
 					if (geneString.matches(".*[\\[ ,]"+pattern+"[ ,\\]].*")) {
@@ -374,8 +387,20 @@ public class GeckoInstance {
 			scd = new StartComputationDialog(genomes.length);
 		else
 			scd = null;
-		GeckoInstance.this.gui.updateViewscreen();
+		if (GeckoInstance.this.gui != null)
+			GeckoInstance.this.gui.updateViewscreen();
 		this.fireDataChanged();
+	}
+	
+	/**
+	 * This Method is just for the UnitTest the original method want's to modify
+	 * the gui but we didn't set the necessary parameter so we use this dirty thing
+	 * 
+	 * @param genomes a Genome array
+	 */
+	public void setGenomesTest(Genome[] genomes) 
+	{
+		this.genomes = genomes;
 	}
 	
 	public int getHighlightedCluster() {
@@ -406,7 +431,7 @@ public class GeckoInstance {
 		Subsequence[][] subsequences = gOcc.getSubsequences();
 		HashMap<Integer, Gene[]> map = new HashMap<Integer, Gene[]>();
 		for (int gene : genes) {
-			if (geneLabelMap[gene]!=0)
+			if (geneLabelMap.get(gene) != null)
 				map.put(gene, new Gene[subsequences.length]);
 		}
 		for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
@@ -424,13 +449,42 @@ public class GeckoInstance {
 			}
 		}
 		return map;
+	}
+	
+	public HashMap<Integer, Gene[][]> generateAnnotations(GeneCluster c, GeneClusterOccurrence gOcc) {
+		int[] genes = c.getGenes();
+		Subsequence[][] subsequences = gOcc.getSubsequences();
+		HashMap<Integer, Gene[][]> map = new HashMap<Integer, Gene[][]>();
+		for (int gene : genes) {
+			if (geneLabelMap.get(gene) != null) {
+				Gene[][] geneArray = new Gene[subsequences.length][];
+				for (int i=0; i<subsequences.length; i++)
+					geneArray[i] = new Gene[subsequences[i].length];
+				map.put(gene, geneArray);
+			}
+		}
+		for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
+			for (int i=0; i<subsequences[seqnum].length; i++) {
+				Subsequence subseq = subsequences[seqnum][i];
+				Chromosome chromosome = genomes[seqnum].getChromosomes().get(subseq.getChromosome());
+				for (int j=subseq.getStart()-1; j<subseq.getStop(); j++) {
+					Gene gene = chromosome.getGenes().get(j);
+					if (map.containsKey(Math.abs(gene.getId()))) {
+						Gene[][] g = map.get(Math.abs(gene.getId()));
+						if (g[seqnum][i]==null)
+							g[seqnum][i] = gene;
+					}
+				}
+			}
+		}
+		return map;
 	}	
 
 	public HashMap<Integer, Color> getColormap() {
 		return colormap;
 	}
 	
-	public int[] getGenLabelMap() {
+	public HashMap<Integer, String[]> getGenLabelMap() {
 		return geneLabelMap;
 	}
 	
@@ -455,12 +509,11 @@ public class GeckoInstance {
 		return instance;
 	}
 	
-	public void performClusterDetection(Parameter p) {
+	public void performClusterDetection(Parameter p, boolean mergeResults) {
 		this.lastParameter = p;
-		p.setAlphabetSize(geneLabelMap.length-1);
-		p.setCodingTable(geneLabelMap);
+		p.setAlphabetSize(geneLabelMap.size());
 		gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
-		new ComputationThread(p);
+		new ComputationThread(p, mergeResults);
 	}
 	
 	public void handleUpdatedClusterResults() {
@@ -474,17 +527,27 @@ public class GeckoInstance {
 		gui.changeMode(Gui.Mode.SESSION_IDLE);
 	}
 	
-	private class ComputationThread implements Runnable {
+	public class ComputationThread implements Runnable {
 
 		private Parameter p;
+		private final boolean mergeResults;
 		
-		public ComputationThread(Parameter p) {
+		public ComputationThread(Parameter p){
+			this(p, false);
+		}
+		
+		public ComputationThread(Parameter p, final boolean mergeResults) {
 			this.p = p;
+			this.mergeResults = mergeResults;
 			new Thread(this).start();
 		}
 		
 		public void run() {
-			//printGenomeStatistics();
+			//printGenomeStatistics(GeckoInstance.this.genomes, p.getAlphabetSize(), 1500, 250);
+			//BreakPointDistance.breakPointDistance(GeckoInstance.this.genomes, false);
+			//System.out.println("\n");
+			//BreakPointDistance.breakPointDistance(GeckoInstance.this.genomes, true);
+			
 			// We do this very ugly with a 3D integer array to make things easier
 			// during the JNI<->JAVA phase
 			int genomes[][][] = new int[GeckoInstance.this.genomes.length][][];
@@ -493,11 +556,14 @@ public class GeckoInstance {
 				for (int j=0;j<genomes[i].length;j++)
 					genomes[i][j] = GeckoInstance.this.genomes[i].getChromosomes().get(j).toIntArray(true, true);
 			}
-			Date before = new Date();
-			GeneCluster[] res = computeClusters(genomes, p, GeckoInstance.this);
+			Date before = new Date();			
+			GeneCluster[] res = computeClusters(genomes, p, GeckoInstance.this);			
 			Date after = new Date();
 			System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
-			GeckoInstance.this.clusters = res;
+			if (mergeResults)				
+				GeckoInstance.this.clusters = mergeResults(GeckoInstance.this.clusters, res);
+			else
+				GeckoInstance.this.clusters = res;
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					GeckoInstance.this.handleUpdatedClusterResults();
@@ -505,37 +571,91 @@ public class GeckoInstance {
 			});
 		}
 		
-		private void printGenomeStatistics() {
-			for (Genome g : GeckoInstance.this.genomes){
-				int totalLength = 0;
-				int[] alphabet = new int[p.getAlphabetSize() + 1];
+		/**
+		 * Print statistics of gene family sizes for all genomes
+		 * @param genomes The genomes
+		 * @param alphabetSize The size of the alphabet
+		 */
+		private void printGenomeStatistics(Genome[] genomes, int alphabetSize){
+			printGenomeStatistics(genomes, alphabetSize, -1, -1);
+		}
+		
+		/**
+		 * Print statistics of gene family sizes for all genomes with genomeSize +/- genomeSizeDelta genes.
+		 * @param genomes The genomes
+		 * @param alphabetSize The size of the alphabet
+		 * @param genomeSize  The number of genes that is needed for a genome to be reported. -1 will report statistics for all genomes.
+		 * @param genomeSizeDelta The maximum deviation form the genomeSize for a genome to be reported
+		 */
+		private void printGenomeStatistics(Genome[] genomes, int alphabetSize, int genomeSize, int genomeSizeDelta) {
+			int[][] alphabetPerGenome = new int[genomes.length][alphabetSize + 1];
+			String[][] annotations = new String[genomes.length][alphabetSize + 1];
+						
+			SortedMap<Integer,Integer> summedFamilySizes = new TreeMap<Integer, Integer>();
+			int nrReportedGenomes = 0;
+			List<Integer> genomeSizes = new ArrayList<Integer>();
+			// Generate family sizes per genome and print it
+			for (int n=0; n<genomes.length; n++){
+				Genome g = genomes[n];
+				if (genomeSize != -1 && (g.getTotalGeneNumber() < genomeSize-genomeSizeDelta || g.getTotalGeneNumber() > genomeSize + genomeSizeDelta))
+					continue;
+				else {
+					nrReportedGenomes++;
+					genomeSizes.add(g.getTotalGeneNumber());
+				}
 				for (Chromosome chr : g.getChromosomes()) {
-					totalLength += chr.getGenes().size();
-					for (Gene gene : chr.getGenes())
-						alphabet[Math.abs(gene.getId())]++;
+					for (Gene gene : chr.getGenes()) {
+						alphabetPerGenome[n][Math.abs(gene.getId())]++;
+						//if (n!=0)
+							annotations[n][Math.abs(gene.getId())] = gene.getAnnotation();
+						//else
+							//annotations[n][Math.abs(gene.getId())] = String.format("%s: %s", chr.getName().substring(24), gene.getAnnotation());
+					}
 				}
 				SortedMap<Integer,Integer> familySizes = new TreeMap<Integer, Integer>();
-				for (int i=1; i<alphabet.length; i++){
-					Integer fS = familySizes.get(alphabet[i]);
+				for (int i=1; i<alphabetPerGenome[n].length; i++){
+					// add family size for this genome
+					Integer fS = familySizes.get(alphabetPerGenome[n][i]);
 					if (fS != null)
-						familySizes.put(alphabet[i], ++fS);
+						familySizes.put(alphabetPerGenome[n][i], ++fS);
 					else
-						familySizes.put(alphabet[i], 1);				
+						familySizes.put(alphabetPerGenome[n][i], 1);
+					
+					// add summed family sizes				
+					fS = summedFamilySizes.get(alphabetPerGenome[n][i]);
+					if (fS != null)
+						summedFamilySizes.put(alphabetPerGenome[n][i], ++fS);
+					else
+						summedFamilySizes.put(alphabetPerGenome[n][i], 1);
 				}
 
 				Integer nonOccFamilies = familySizes.get(0);
-				System.out.println(String.format("%s: %d genes, %d gene families", g.getChromosomes().get(0).getName(), totalLength, (nonOccFamilies == null) ? alphabet.length-1 : alphabet.length - 1 - nonOccFamilies));
+				System.out.println(String.format("%s: %d genes, %d gene families", g.getName(), g.getTotalGeneNumber(), (nonOccFamilies == null) ? alphabetPerGenome[n].length-1 : alphabetPerGenome[n].length - 1 - nonOccFamilies));
 				for (Entry<Integer, Integer> entry : familySizes.entrySet()){
-					System.out.println(String.format("%d:\t%d", entry.getKey(), entry.getValue()));
+					System.out.println(String.format("%d\t%d", entry.getKey(), entry.getValue()));
 				}
 				System.out.println();
 			}
 			
+			for (Integer size : genomeSizes)
+				System.out.print(size + ", ");
+			System.out.println("");
+			System.out.println(String.format("Sum of %d genomes:", nrReportedGenomes));
+			for (Entry<Integer, Integer> entry : summedFamilySizes.entrySet()){
+				if (entry.getKey() != 0)
+					System.out.println(String.format("%d\t%d", entry.getKey(), entry.getValue()));
+			}
+			System.out.println();
+			
+			// generate complete family sizes and print it
 			int[] alphabet = new int[p.getAlphabetSize() + 1];
-			for (Genome g : GeckoInstance.this.genomes)
+			for (Genome g : genomes){
+				if (genomeSize != -1 && (g.getTotalGeneNumber() < genomeSize-genomeSizeDelta || g.getTotalGeneNumber() > genomeSize + genomeSizeDelta))
+					continue;
 				for (Chromosome chr : g.getChromosomes())
 					for (Gene gene : chr.getGenes())
 						alphabet[Math.abs(gene.getId())]++;
+			}
 			SortedMap<Integer,Integer> familySizes = new TreeMap<Integer, Integer>();
 			for (int i=1; i<alphabet.length; i++){
 				Integer fS = familySizes.get(alphabet[i]);
@@ -547,210 +667,88 @@ public class GeckoInstance {
 
 			System.out.println("Complete:");
 			for (Entry<Integer, Integer> entry : familySizes.entrySet()){
-				System.out.println(String.format("%d:\t%d", entry.getKey(), entry.getValue()));
+				System.out.println(String.format("%d\t%d", entry.getKey(), entry.getValue()));
 			}
+			
+			/*
+			for(int j=0; j<alphabetPerGenome.length; j++) {
+				System.out.print(String.format("%s\t", genomes[j].getName()));
+			}
+			System.out.println("");
+			for (int i=0; i<alphabet.length; i++) {
+				for(int j=0; j<alphabetPerGenome.length; j++) {
+					System.out.print(String.format("%d\t", alphabetPerGenome[j][i]));
+				}
+				System.out.println("");
+			}
+			for(int j=0; j<alphabetPerGenome.length; j++) {
+				System.out.print(String.format("%s\t", genomes[j].getName()));
+			}
+			System.out.println("");
+			*/
+			/*
+			for (int i=0; i<alphabet.length; i++) {
+				if (alphabetPerGenome[0][i] == 1) {
+					boolean print = false;
+					StringBuilder builder = new StringBuilder();
+					builder.append("\"").append(annotations[0][i]).append("\"");
+					for(int j=1; j<alphabetPerGenome.length; j++) {
+						if (alphabetPerGenome[j][i] == 1) {
+							builder.append("\t").append("\"").append(annotations[j][i]).append("\"");
+							print = true;
+						} else 
+							builder.append("\t").append("-");
+					}
+					if (print)
+						System.out.println(builder.toString());
+				}
+			}*/
+		}
+		
+		private GeneCluster[] mergeResults(GeneCluster[] oldResults, GeneCluster[] additionalResults) {
+			GeneCluster[] newResults;
+			if (oldResults == null)
+				newResults = additionalResults;
+			else if(additionalResults == null)
+				newResults = oldResults;
+			else {
+				newResults = Arrays.copyOf(oldResults, oldResults.length + additionalResults.length);
+				int newId = oldResults.length;
+				for (GeneCluster cluster : additionalResults) {
+					cluster.setId(newId);
+					newResults[newId] =  cluster;
+					newId++;
+				}	
+			}
+			return newResults;
 		}
 
 	}
 	
-	private String getGenomeName(String s) {
-		String name = s.split(", |,| chromosome| plasmid| megaplasmid")[0];
-		return name;
-	}
-	
-	public ArrayList<GenomeOccurence> importGenomes(File file) throws FileNotFoundException {
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			String line;
-			ArrayList<GenomeOccurence> genomeOccurennces = new ArrayList<GenomeOccurence>();
-			GenomeOccurence add = new GenomeOccurence();
-			Map<String, Integer> groups = new HashMap<String, Integer>();
-			Map<Integer, Integer> groupSize = new HashMap<Integer, Integer>();
-			int curline = 0;
-			if ((line = reader.readLine()) != null) {
-				add.setDesc(line);
-				groups.put(getGenomeName(line),1);
-				add.setGroup(1);
-				groupSize.put(1, 1);
-				add.setStart_line(curline);
-			}
-			boolean next = false;
-			while ((line = reader.readLine()) != null) {
-				curline++;
-				if (next) {
-					add.setEnd_line(curline-2);
-					genomeOccurennces.add(add);
-					add = new GenomeOccurence();
-					add.setDesc(line);
-					String genomeName = getGenomeName(line);
-					if (!groups.containsKey(genomeName)) {
-						groups.put(genomeName, groups.size());
-						add.setGroup(groups.size()-1);
-						groupSize.put(groups.size()-1,1);
-					} else {
-						int group = groups.get(genomeName);
-						add.setGroup(group);
-						groupSize.put(group, groupSize.get(group)+1);
-					}
-					add.setStart_line(curline);
-					next = false;
-				}
-				if (line.equals("")) next = true;
-			}
-			if (next) add.setEnd_line(curline-1); else add.setEnd_line(curline);
-			if (add.getDesc()!=null) genomeOccurennces.add(add);
-			reader.close();
-			this.currentInputFile = file;
-			// Remove singleton groups
-			for (GenomeOccurence occ : genomeOccurennces)
-				if (groupSize.get(occ.getGroup())==1)
-					occ.setGroup(0);
-			// Return result
-			return genomeOccurennces;
-		} catch (IOException e) {
-			if (e instanceof FileNotFoundException) throw (FileNotFoundException) e;
-			e.printStackTrace();
+	public GeneCluster[] computeReferenceStatistics(GeneCluster[] clusters){
+		if (!this.isLibgeckoLoaded()){
+			System.err.println("Running in visualization only mode! Cannot compute statistics!");
+			return clusters;
 		}
-		return null;
-	}
-	
-	private class GenomeReadingThread implements Runnable {
-
-		private ArrayList<GenomeOccurence> occs;
-		
-		public GenomeReadingThread(ArrayList<GenomeOccurence> occs) {
-			this.occs = occs;
-			SortUtils.resortGenomeOccurencesByStart(this.occs);
-			new Thread(this).start();
+		int genomes[][][] = new int[GeckoInstance.this.genomes.length][][];
+		for (int i=0;i<genomes.length;i++) {
+			genomes[i] = new int[GeckoInstance.this.genomes[i].getChromosomes().size()][];
+			for (int j=0;j<genomes[i].length;j++)
+				genomes[i][j] = GeckoInstance.this.genomes[i].getChromosomes().get(j).toIntArray(true, true);
 		}
-		
-		public void run() {
-			try { 
-				PrintUtils.printDebug("Reading these occurences:");
-				for (GenomeOccurence occ : occs)
-					PrintUtils.printDebug(occ.toString());
-				HashMap<Integer, Genome> groupedGenomes = new HashMap<Integer, Genome>();
-				ArrayList<Genome> ungroupedGenomes = new ArrayList<Genome>();
-				//GeckoInstance.this.genomes = new Chromosome[occs.size()];
-				String line;
-				CountedReader reader = new CountedReader(new FileReader(GeckoInstance.this.currentInputFile));
-				ArrayList<Integer> intidlist = new ArrayList<Integer>();
-				HashMap<Integer, Integer> backmap = new HashMap<Integer, Integer>();
-				Random r = new Random();
-				GeckoInstance.this.colormap = new HashMap<Integer, Color>();
-				for (int i=0; i<occs.size(); i++) {
-					GenomeOccurence occ = occs.get(i);
-					// TODO
-					Genome g;
-					if (occ.getGroup()==0) {
-						// If the group id is zero than we have a single chromosome genome,
-						// therefore we have to greate a new genome
-						g = new Genome();
-						ungroupedGenomes.add(g);
-					} else {
-						// If the group id is not zero we need to check if we already created
-						// a genome for that group id and if not create a new one
-						if (!groupedGenomes.containsKey(occ.getGroup())) {
-							g = new Genome();
-							groupedGenomes.put(occ.getGroup(), g);
-						} else g=groupedGenomes.get(occ.getGroup());
-					}
-					Chromosome c = new Chromosome();
-					g.addChromosome(c);
-					c.setName(occ.getDesc());
-					ArrayList<Gene> genes = new ArrayList<Gene>();
-					// Forward file pointer to genomes first gene
-					reader.jumpToLine(occ.getStart_line()+2);
-					while (reader.getCurrentLineNumber()<=occ.getEnd_line() && (line=reader.readLine())!=null) {
-						if (!line.equals("")) {
-							String[] explode = line.split("\t");
-							int id = Integer.parseInt(explode[0]);
-							int sign; if (explode[1].equals("-")) sign=-1; else sign = 1;
-							if (id!=0 && backmap.containsKey(id)) {
-								genes.add(new Gene(explode[3], sign*backmap.get(id), explode[4], false));
-							} else {
-								intidlist.add(id);
-								int intid = intidlist.size();
-								if (id!=0) {
-									colormap.put(intid, new Color(r.nextInt(240),r.nextInt(240),r.nextInt(240)));
-									backmap.put(id,intid);
-									genes.add(new Gene(explode[3], sign*intid, explode[4], false));
-								} else
-									genes.add(new Gene(explode[3], sign*intid, explode[4], true));
-							}
-						}
-					}
-					// Thank you for the not existing autoboxing on arrays...
-					GeckoInstance.this.geneLabelMap = new int[intidlist.size()+1];
-					for (int j=1;j<GeckoInstance.this.geneLabelMap.length; j++) {
-						GeckoInstance.this.geneLabelMap[j] = intidlist.get(j-1);
-					}
-					// TODO handle the case where EOF is reached before endline
-					c.setGenes(genes);
-					GeckoInstance.this.genomes = new Genome[groupedGenomes.size()];
-					{ 
-						int j=0;
-						for (Genome x : groupedGenomes.values()) {
-							GeckoInstance.this.genomes[j] = x;
-							j++;
-						}
-					}
-				}
-				GeckoInstance.this.genomes = new Genome[groupedGenomes.size()+ungroupedGenomes.size()];
-				{
-					int i=0;
-					for (Genome x : ungroupedGenomes)
-						GeckoInstance.this.genomes[i++] = x;
-					for (Genome x : groupedGenomes.values())
-						GeckoInstance.this.genomes[i++] = x;					
-				}
-					
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
-						GeckoInstance.this.gui.updateViewscreen();
-						GeckoInstance.this.fireDataChanged();
-					}
-				});
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEFORMAT);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEIO);
-			} catch (EOFException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEIO);
-			} catch (IOException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEIO);
-			} catch (LinePassedException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEFORMAT);
-			}
+		int maxPWDelta = 0;
+		int minClusterSize = Integer.MAX_VALUE;
+		int minQuorum = Integer.MAX_VALUE;
+		for (GeneCluster cluster : clusters){
+			maxPWDelta = Math.max(maxPWDelta, cluster.getMaxPWDist());
+			minClusterSize = Math.min(minClusterSize, cluster.getMinRefSeqLength());
+			minQuorum = Math.min(minQuorum, cluster.getSize());
 		}
-		
+		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.length));
+		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, 'r', 'd');
+		p.setAlphabetSize(geneLabelMap.size());
+		return this.computeReferenceStatistics(genomes, p, clusters, this);
 	}
-	
-	public static final short ERROR_FILEFORMAT = 1;
-	public static final short ERROR_FILEIO = 2;
-	
-	private void handleParsingError(final short errorType) {
-		this.genomes = null;
-		clusters = new GeneCluster[0];
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				gui.handleFileError(errorType);
-			}
-		});
-	}
-	
-	public void readGenomes(ArrayList<GenomeOccurence> occs)  {
-		GeckoInstance.this.gui.changeMode(Gui.Mode.READING_GENOMES);
-		new GenomeReadingThread(occs);
-	}	
-	
-	private native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
 	
 	public void displayMessage(String message) {
 		final String m = message;
@@ -791,112 +789,12 @@ public class GeckoInstance {
 		return genomes;
 	}
 	
-	/**
-	 * Reads a gecko session from a file
-	 * @param f The file to read from
-	 */
-	public void loadSessionFromFile(File f)  {
-		lastOpenedFile = f;
-		gui.changeMode(Gui.Mode.READING_GENOMES);
-		new SessionLoadingThread(f);
+	public void setReducedList(SortedSet<Integer> reducedList) {
+		this.reducedList = reducedList;
 	}
 	
-	class SessionLoadingThread implements Runnable {
-		private File f;
-		
-		public SessionLoadingThread(File f) {
-			this.f = f;
-			new Thread(this).start();
-		}
-		
-		@SuppressWarnings("unchecked")
-		public void run() {
-			FileInputStream fis = null;
-			ObjectInputStream o = null;
-			try {
-				fis = new FileInputStream(f);
-				o = new ObjectInputStream(fis);
-				genomes = (Genome[]) o.readObject();
-				geneLabelMap = (int[]) o.readObject();
-				colormap = (HashMap<Integer, Color>) o.readObject();
-				clusters = (GeneCluster[]) o.readObject();
-				if (clusters!=null)
-					for (GeneCluster c : clusters)
-						c.setMatch(true);
-				
-				EventQueue.invokeLater(new Runnable() {	
-					public void run() {
-						reducedList = null;
-						gui.updateViewscreen();
-						gui.updategcSelector();
-						GeckoInstance.this.fireDataChanged();
-						gui.changeMode(Gui.Mode.SESSION_IDLE);
-
-					}
-				});
-			} catch (IOException e) {
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						JOptionPane.showMessageDialog(gui.getMainframe(), 
-								"An error occured while reading the file!",
-								"Error", 
-								JOptionPane.ERROR_MESSAGE);
-					}
-				});
-				handleFailedSessionLoad();
-			} catch (ClassNotFoundException e) {
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						JOptionPane.showMessageDialog(gui.getMainframe(),
-								"The input file is not in the right format!",
-								"Wrong format",
-								JOptionPane.ERROR_MESSAGE);
-					}
-				});
-				handleFailedSessionLoad();
-			}
-		}
-	}
-	
-	private void handleFailedSessionLoad() {
-		genomes = null;
-		geneLabelMap = null;
-		colormap = null;
-		clusters = null;
-		gui.changeMode(Gui.Mode.SESSION_IDLE);		
-	}
-		
-	/**
-	 * Saves the current gecko session to a given file
-	 * @param f The file to write to
-	 */
-	public boolean saveSessionToFile(File f) {
-		lastSavedFile = f;
-		FileOutputStream fos = null;
-		try {
-			fos = new FileOutputStream(f);
-			ObjectOutputStream o = new ObjectOutputStream( fos );
-			o.writeObject(genomes);
-			o.writeObject(geneLabelMap);
-			o.writeObject(colormap);
-			o.writeObject(clusters);
-			fos.close();
-			return true;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (fos!=null) fos.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
-		}
-		  
+	public void setLastOpendFile(File lastOpenedFile) {
+		this.lastOpenedFile = lastOpenedFile;
 	}
 	
 	public boolean exportResultsToFile(File f, ResultFilter filter) {
@@ -904,7 +802,7 @@ public class GeckoInstance {
 		filterResults();
 		List<String> genomeNames = new ArrayList<String>(genomes.length);
 		for (Genome genome : genomes)
-			genomeNames.add(genome.getChromosomes().get(0).getName());
+			genomeNames.add(genome.getName());
 		return ResultWriter.exportResultsToFileNEW2(f, getClusterList(filter), geneLabelMap, genomeNames);
 	}
 }

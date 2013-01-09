@@ -33,9 +33,11 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
@@ -62,7 +64,7 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 	private ArrayList<GBNavigator> gbNavigators;
 	
 	GeckoInstance gecko;
-
+	
 	/**
 	 * The variable stores the currently selected gene cluster
 	 */
@@ -80,7 +82,7 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 	 * 
 	 * @return a GenCluster object
 	 */
-	private GeneCluster getSelectedCluster() 
+	public GeneCluster getSelectedCluster() 
 	{
 		return selectedCluster;
 	}
@@ -285,25 +287,77 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 		};
 	};
 	
-	public void addGenome(Genome g) {
+	/**
+	 * This method creates the combo box on each genome browser.
+	 * It sets the name, selection and implements an ActionListener
+	 * which handles the different selection events.
+	 * 
+	 * @param genomeBrowsersSize size of the ArrayList genomeBrowsers.
+	 * this is the id of the genome.
+	 * @return a JComboBox for the use in a GenomeBrowser
+	 */
+	private JComboBox createComboBox(int genomeBrowsersSize, int height) {
+		
+		String[] selection = {"None", "Include", "Exclude"};
+		JComboBox box = new JComboBox(selection);
+		box.setPreferredSize(new Dimension(100, height));
+		box.setMaximumSize(box.getPreferredSize());
+		box.setName(Integer.toString(genomeBrowsersSize - 1));
+		
+		box.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				JComboBox cb = (JComboBox) arg0.getSource();
+		        String selectedItem = (String) cb.getSelectedItem();
+		        
+		        if (selectedItem.equals("None")) {
+		        	
+		        	gecko.getGui().getGcSelector().resetGenome(Integer.parseInt(cb.getName()));
+		        }
+		        
+		        if (selectedItem.equals("Include")) {
+		        	
+		        	gecko.getGui().getGcSelector().showOnlyClusWthSelecGenome(Integer.parseInt(cb.getName()));
+		        }
+		        
+		        if (selectedItem.equals("Exclude")) {
+		        	
+		        	gecko.getGui().getGcSelector().dontShowClusWthSelecGenome(Integer.parseInt(cb.getName()));
+		        }
+			}
+		});
+			
+		return box;
+	}
+	
+	
+	public void addGenome(Genome g)	{
+		
 		GenomeBrowser gb = new GenomeBrowser(g);
 		gb.addMouseWheelListener(mouseWheelListener);
 		gb.addComponentListener(genomeBrowserComponentListener);
 		this.genomeBrowsers.add(gb);
 		JPanel boxPanel = new JPanel();
+		
 		boxPanel.setBackground(gb.getBackground());
-		boxPanel.setLayout(new BoxLayout(boxPanel,BoxLayout.LINE_AXIS));
-		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(),gb.getBackground(), Integer.toString(this.genomeBrowsers.size()).length());
+		boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
+		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(), gb.getBackground(), Integer.toString(this.genomeBrowsers.size()).length());
 //		n.addMouseListener(gb.getGenomebrowsermouseover());
+		JComboBox box = createComboBox(genomeBrowsers.size(), gb.getGBHeight());
+		boxPanel.add(box);
+		boxPanel.add(new JToolBar.Separator());
 		boxPanel.add(n);
 		boxPanel.add(Box.createRigidArea(new Dimension(4, 0)));
 		boxPanel.add(gb);
-		GBNavigator nav = new GBNavigator(boxPanel,genomeBrowsers.size()-1);
+		GBNavigator nav = new GBNavigator(boxPanel, genomeBrowsers.size() - 1);
 		this.gbNavigators.add(nav);
 		this.centerpanel.add(boxPanel);
 		rightPanel.add(nav);
-		this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight()+gb.getGBHeight()));
+		this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(), (int) this.getPreferredSize().getHeight() + gb.getGBHeight()));
 		this.repaint();
+
 		this.revalidate();
 	}
 	
@@ -429,6 +483,7 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 		int genomeLength = chromosomes.get(chr).getGenes().size();
 		// Set everything to grey if the parameter don't make sense
 		// (algorithm produces start>stop if a genome is not part of the cluster)
+		
 		if (start<0 || stop>=genomeLength || start>stop) {
 			for (int i=0;i<chromosomes.size();i++)
 				this.setGenomeRangeToGrey(id, i, 0, chromosomes.get(i).getGenes().size()-1, true);
@@ -740,14 +795,19 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 			if (subselection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) continue;
 			Subsequence s = gOcc.getSubsequences()[i][subselection[i]];
 //			if (s==null) continue; // must actually not be the case
-			if (getBrowser(i).isFlipped())
-				scrollToPosition(i, s.getChromosome(), (int) Math.floor((s.getStart()-1+s.getStop()-1)/2));
-			else
+			if (getBrowser(i).isFlipped()) {
+				scrollToPosition(i, s.getChromosome(), (int) Math.floor((s.getStart() - 1 + s.getStop() - 1) / 2));
+			}
+			else {
 				scrollToPosition(i, s.getChromosome(), (int) Math.ceil((s.getStart()-1+s.getStop()-1)/2));
-			if (i==gc.getRefSeqIndex())				
-				highlightCluster(i, s.getChromosome(), s.getStart()-1, s.getStop()-1, GeneElement.COLOR_HIGHLIGHT_REFCLUST);
-			else
-				highlightCluster(i, s.getChromosome(), s.getStart()-1, s.getStop()-1, GeneElement.COLOR_HIGHLIGHT_DEFAULT);			
+			}
+			
+			if (i == gc.getRefSeqIndex()) {
+				highlightCluster(i, s.getChromosome(), s.getStart() - 1, s.getStop() - 1, GeneElement.COLOR_HIGHLIGHT_REFCLUST);
+			}
+			else {
+				highlightCluster(i, s.getChromosome(), s.getStart() - 1, s.getStop() - 1, GeneElement.COLOR_HIGHLIGHT_DEFAULT);
+			}
 		}		
 	}
 	
@@ -800,21 +860,18 @@ public class MultipleGenomesBrowser extends JPanel implements ClusterSelectionLi
 			// save current filter status
 			boolean stat = this.isFilterActiv();
 			
-			// deactivate the filter
+			// deactivate the filter if active
 			this.genomeBrowserFilter(false);
-			
-			if (e.getSelection()!=null)
-				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.getgOcc(), lastLocationEvent.getsubselection());
 		
 			// save the currently selected cluster for the filter function
 			this.setSelectedCluster(e.getSelection());
 			
 			// if the check box is selected we show only the genomes which contain the cluster
 			if (stat)
-			{
 				this.genomeBrowserFilter(stat);
+			
+			if (e.getSelection()!=null)
 				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.getgOcc(), lastLocationEvent.getsubselection());
-			}	
 		}
 	}
 }

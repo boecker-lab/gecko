@@ -1,7 +1,7 @@
 package gecko2.gui;
 
-import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
+import gecko2.io.CogFileReader;
 import gecko2.util.SortUtils;
 
 import java.awt.BorderLayout;
@@ -146,8 +146,12 @@ public class GenomeSelector extends JDialog {
 				
 				deleteNotFlaggedEntries();
 				GenomeSelector.this.setVisible(false);
-				if (GenomeSelector.this.occs != null)
-					GeckoInstance.getInstance().readGenomes(GenomeSelector.this.occs);
+				if (GenomeSelector.this.occs != null){
+					CogFileReader reader = new CogFileReader();
+				
+					reader.readGenomes(GenomeSelector.this.occs);
+					
+				}
 			}
 		};
 		importAction.setEnabled(false);
@@ -425,7 +429,7 @@ public class GenomeSelector extends JDialog {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 				case 0:
-					return occs.get(rowIndex).getDesc();
+					return occs.get(rowIndex).getGenomSelectorText();
 				case 1:
 					return new Character('\0');
 				default:

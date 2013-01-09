@@ -1,6 +1,7 @@
 package gecko2.algorithm;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 
 /**
@@ -18,11 +19,15 @@ public class GeneClusterOccurrence implements Serializable {
 	private static final long serialVersionUID = 657846431928908396L;
 	private int id;									// A unique ID for every occurrence (unique within every cluster)
 	private Subsequence[][] subsequences;			// The list of subsequences
-	private double pValue;							// The pValue of this occurrence
+	private BigDecimal pValue;							// The pValue of this occurrence
 	private int dist;								// The distance of this occurrence
 	private int support;							// The number of genomes that support this occurrence
 	
 	public static final int GENOME_NOT_INCLUDED = -1;
+	
+	public GeneClusterOccurrence(int id, Subsequence[][] subsequences, double pValueBase, int pValueExp, int totalDist, int support) {
+		this(id, subsequences, (new BigDecimal(pValueBase)).scaleByPowerOfTen(pValueExp), totalDist, support);
+	}
 	
 	/**
 	 * Create a new {@link GeneClusterOccurrence} object.
@@ -32,7 +37,7 @@ public class GeneClusterOccurrence implements Serializable {
 	 * @param pValue The pValue of this occurrence
 	 * @param totalDist The distance of this occurrence
 	 */
-	public GeneClusterOccurrence(int id, Subsequence[][] subsequences, double pValue, int totalDist, int support) {
+	public GeneClusterOccurrence(int id, Subsequence[][] subsequences, BigDecimal pValue, int totalDist, int support) {
 		super();
 		this.id = id;
 		this.subsequences = subsequences;
@@ -54,7 +59,20 @@ public class GeneClusterOccurrence implements Serializable {
 	 * @return the best score of this occurrence
 	 */
 	public double getBestScore() {
-		return -Math.log(pValue);
+		return -getBigDecimalLog(pValue);
+	}
+	
+	private static double getBigDecimalLog(BigDecimal value){
+		String s = value.toString();
+		String[] split = s.split("E");
+		double base = Double.parseDouble(split[0]);
+		double log = 0.0;
+		if (split.length == 2){
+			log = Double.parseDouble(split[1]);
+			
+		}
+		log += Math.log10(base);
+		return log;
 	}
 	
 	/**
@@ -77,7 +95,7 @@ public class GeneClusterOccurrence implements Serializable {
 	 * Returns the best pValue
 	 * @return The best pValue
 	 */
-	public double getBestpValue() {
+	public BigDecimal getBestpValue() {
 		return pValue;
 	}
 	

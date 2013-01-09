@@ -5,6 +5,7 @@ import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
+import gecko2.algorithm.Genome;
 import gecko2.algorithm.Subsequence;
 import gecko2.event.ClusterSelectionEvent;
 import gecko2.event.ClusterSelectionListener;
@@ -109,22 +110,38 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			involvedChrTitle.add(invChrTitle);
 			involvedChrTitle.add(Box.createHorizontalGlue());
 			masterPanel.add(involvedChrTitle);
-			
 			masterPanel.add(Box.createVerticalStrut(5));
-			for (int i=0; i<gOcc.getSubsequences().length; i++) {
-				if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+			
+			for (int i = 0; i < gOcc.getSubsequences().length; i++) {
+				
+				if (subselections[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
 					continue;
+				
 				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
-				if (!s.isValid()) continue;
+				
+				if (!s.isValid()) 
+					continue;
+				
 				JPanel cpanel = new JPanel();
 				FlowLayout f = new FlowLayout(FlowLayout.LEFT);
 				f.setVgap(1);
 				cpanel.setLayout(f);
 				cpanel.setBackground(masterPanel.getBackground());
+				
 				Chromosome c = GeckoInstance.getInstance().getGenomes()[i].getChromosomes().get(s.getChromosome());
-				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i), Integer.toString(i+1).length()));
-				TextLabel textLabel = new TextLabel(c.getName());
-				cpanel.add(textLabel);
+				Genome g = GeckoInstance.getInstance().getGenomes()[i];
+				cpanel.add(new NumberInRectangle(i + 1, getBackground(), mlisteners.get(i), Integer.toString(i + 1).length()));
+				
+				if (g.getName() == null)
+					cpanel.add(new TextLabel(c.getName()));
+				else if (c.getName() == null)
+					cpanel.add(new TextLabel(g.getName()));
+				else if (g.getName().equals(c.getName()))
+					cpanel.add(new TextLabel(c.getName()));
+				else 
+					cpanel.add(new TextLabel(g.getName() + " " + c.getName()));
+
+				
 				masterPanel.add(cpanel);
 			}
 			masterPanel.add(Box.createVerticalStrut(5));
@@ -225,7 +242,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			masterPanel.add(title2);
 			masterPanel.add(Box.createVerticalStrut(10));
 			for (int genid : annotations.keySet()) {
-				GeneElement e = new GeneElement(new Gene(null,genid),true);
+				GeneElement e = new GeneElement(new Gene(null, genid), false);
 				Gene[] genes = annotations.get(genid);
 				e.setToolTipText(null);
 				e.setOrientation(GeneElement.ORIENTATION_NONE);

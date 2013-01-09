@@ -5,7 +5,6 @@ public class Parameter {
 	private int delta;
 	private int minClusterSize;
 	private int alphabetSize;
-	private int[] codingTable;
 	private int q;
 	private short qtype;
 	private char refType;
@@ -47,14 +46,6 @@ public class Parameter {
 		return operationMode;
 	}
 	
-	public void setCodingTable(int[] codingTable) {
-		this.codingTable = codingTable;
-	}
-	
-	public int[] getCodingTable() {
-		return codingTable;
-	}
-	
 	public void setDelta(int delta) {
 		this.delta = delta;
 	}
@@ -94,6 +85,4 @@ public class Parameter {
 	public void setQtype(short qtype) {
 		this.qtype = qtype;
 	}
-
-	
 }

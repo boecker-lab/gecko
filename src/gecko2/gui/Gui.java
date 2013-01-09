@@ -2,7 +2,12 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
+import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
+import gecko2.io.ClusterAnnotationReader;
+import gecko2.io.CogFileReader;
+import gecko2.io.GckFileReader;
+import gecko2.io.SessionWriter;
 import gecko2.util.FileUtils;
 import gecko2.util.PrintUtils;
 
@@ -18,6 +23,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,7 +46,6 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
-
 
 public class Gui {
 	
@@ -84,16 +89,17 @@ public class Gui {
 		initActions(); 
 		
 		this.statusbaricon = new JLabel();
+		statusbaricon.setEnabled(true);
 		this.statusbartext = new JLabel();
 		this.progressbar = new JProgressBar();
-		progressbar.setMaximumSize(new Dimension(100,30));
+		progressbar.setMaximumSize(new Dimension(100, 30));
 		progressbar.setValue(12);
-		this.waitingAnimation = new ImageIcon("images/loading.gif");
+		this.waitingAnimation = createImageIcon("images/ghost.png");
 		
 		this.gcDisplay = new GeneClusterDisplay();
 		
 		this.gcSelector = new GeneClusterSelector();
-		Dimension startDimension = new Dimension(800,600);
+		Dimension startDimension = new Dimension(1024, 768);
 		
 		// Basic frame settings
 		
@@ -159,10 +165,12 @@ public class Gui {
 		toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
 		toolbar.add(importGenomesAction);
 		toolbar.add(saveSessionAction);
+		
 		toolbar.add(new JToolBar.Separator());
 		menuFile.add(importGenomesAction);
 		menuFile.add(saveSessionAction);
 		menuFile.add(exportResultsAction);
+		menuFile.add(loadClusterAnnotationsAction);
 		
 		toolbar.add(clearSelectionAction);
 		toolbar.add(startComputation);
@@ -174,12 +182,16 @@ public class Gui {
 		menuView.add(zoomIn);
 		menuView.add(zoomOut);
 				
-		JToggleButton testButton = new JToggleButton("Animation");
-		testButton.setSelected(gecko.isAnimationEnabled());
+		JToggleButton animationButton = new JToggleButton("Animation");
+		animationButton.setSelected(gecko.isAnimationEnabled());
 		toolbar.add(new JToolBar.Separator());
-		toolbar.add(testButton);
+		toolbar.add(animationButton);
+		
+		toolbar.add(new JToolBar.Separator());
 		
 		mgbViewSwitcher.setText("Hide unclustered genomes");
+		mgbViewSwitcher.setToolTipText("Hides all genomes which are not in the currently selected cluster.");
+		
 		mgbViewSwitcher.addItemListener(new ItemListener()
 		{
 
@@ -206,15 +218,15 @@ public class Gui {
 		
 		toolbar.add(mgbViewSwitcher);
 		toolbar.add(Box.createHorizontalGlue());
-		
 		toolbar.add(new JLabel("Search "));
-		testButton.addActionListener(new ActionListener() {
+		
+		animationButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 				GeckoInstance.getInstance().setAnimationEnabled(((JToggleButton) e.getSource()).isSelected());
 			}
 		});
-		
+	
 		JPanel p = new JPanel(new BorderLayout());
 		
 		searchField = new JTextField("");
@@ -227,20 +239,20 @@ public class Gui {
 				searchField.setSelectionEnd(searchField.getText().length());
 			}
 		});
+		
 		p.setMaximumSize(new Dimension(150, (int) toolbar.getPreferredSize().getHeight()));
 		p.add(searchField, BorderLayout.CENTER);
 		toolbar.add(p);
-		
-		
 		
 		// END TEST
 		
 		// Add components to Frame
 		JPanel northpanel = new JPanel();
-		northpanel.setLayout(new GridLayout(1,1));
+		northpanel.setLayout(new GridLayout(1, 1));
 		mainframe.setJMenuBar(menubar);
 		northpanel.add(toolbar);
-		mainframe.add(northpanel,BorderLayout.NORTH);
+		mainframe.add(northpanel, BorderLayout.NORTH);
+		
 		horiSplit.setTopComponent(upperPanel);
 		horiSplit.setBottomComponent(vertSplit);
 		mainframe.add(horiSplit, BorderLayout.CENTER);
@@ -250,22 +262,22 @@ public class Gui {
 		JPanel statusbar = new JPanel();
 		BoxLayout box = new BoxLayout(statusbar,BoxLayout.X_AXIS);
 		statusbar.setLayout(box);
-		statusbar.add(Box.createRigidArea(new Dimension(5,0)));
+		statusbar.add(Box.createRigidArea(new Dimension(5, 0)));
 		statusbar.add(statusbaricon);
 		statusbar.add(progressbar);
-		statusbar.add(Box.createRigidArea(new Dimension(5,0)));
+		statusbar.add(Box.createRigidArea(new Dimension(5, 0)));
 		statusbar.add(statusbartext);
 		southpanel.add(statusbar);
 		
 		JPanel infobarPanel = new JPanel();
 		infobarPanel.setLayout(new BoxLayout(infobarPanel, BoxLayout.LINE_AXIS));
-		
 		infobar = new JLabel();
 		
 		infobarPanel.add(Box.createGlue());
 		infobarPanel.add(infobar);
-		infobarPanel.add(Box.createRigidArea(new Dimension(10,0)));
-		southpanel.add(Box.createRigidArea(new Dimension(5,0)));
+		infobarPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+		
+		southpanel.add(Box.createRigidArea(new Dimension(5, 0)));
 		southpanel.add(infobarPanel);
 		mainframe.add(southpanel,BorderLayout.SOUTH);
 		changeMode(Mode.NO_SESSION);
@@ -358,59 +370,63 @@ public class Gui {
 		,READING_GENOMES
 		,PREPARING_COMPUTATION
 		,FINISHING_COMPUTATION}
-
-	private void changeMode(final boolean icon, 
-			final boolean pbar, 
-			final String text,
+	
+	private void changeMode(final String text,
+			final boolean icon,
+			final boolean stopAndProgress,
 			final boolean importGenomes,
-			final boolean startComp,
-			final boolean clearSelect,
-			final boolean saveSession,
-			final boolean zoom,
-			final boolean search,
-			final boolean stop,
-			final boolean export) {
-		if (icon) statusbaricon.setIcon(waitingAnimation);
+			final boolean clusterBrowserActive){
+		if (icon)
+		{
+			this.waitingAnimation = createImageIcon("images/loading.gif");
+			statusbaricon.setIcon(waitingAnimation);
+		}
 		statusbaricon.setVisible(icon);
-		progressbar.setVisible(pbar);
-		//if (pbar) progressbar.grabFocus();
 		statusbartext.setText(text);
+		
+		progressbar.setVisible(stopAndProgress);
+		progressbar.setVisible(stopAndProgress);
+		stopComputationAction.setEnabled(stopAndProgress);
+				
 		importGenomesAction.setEnabled(importGenomes);
+		
 		if (gecko.isLibgeckoLoaded())
-			startComputation.setEnabled(startComp);
-		clearSelectionAction.setEnabled(clearSelect);
-		saveSessionAction.setEnabled(saveSession);
-		if (zoom) {
+			startComputation.setEnabled(clusterBrowserActive);
+		clearSelectionAction.setEnabled(clusterBrowserActive);
+		saveSessionAction.setEnabled(clusterBrowserActive);
+		if (clusterBrowserActive) {
 			zoomIn.setEnabled(gecko.canZoomIn());
 			zoomOut.setEnabled(gecko.canZoomOut());
 		} else {
 			zoomIn.setEnabled(false);
 			zoomOut.setEnabled(false);
 		}
-		searchField.setEnabled(search);
-		stopComputationAction.setEnabled(stop);
-		exportResultsAction.setEnabled(export);
+		mgbViewSwitcher.setEnabled(clusterBrowserActive);
+		searchField.setEnabled(clusterBrowserActive);
+		exportResultsAction.setEnabled(clusterBrowserActive);
+		loadClusterAnnotationsAction.setEnabled(clusterBrowserActive);
 	}
 	
 	public void changeMode(Mode mode) {
 		switch (mode) {
-		case COMPUTING:
-			changeMode(false, true, "Computing gene clusters...", false, false, false, false, false, false, true, false);
-			break;
-		case SESSION_IDLE:
-			changeMode(false, false, "Ready", true, true, true, true, true, true, false,true);
-			break;
-		case NO_SESSION:
-			changeMode(false, false, "Ready", true, false, false, false, false, false, false, false);
-			break;
-		case READING_GENOMES:
-			changeMode(true, false, "Reading genomes...", false, false, false, false, false, false, false, false);
-			break;
-		case PREPARING_COMPUTATION:
-			changeMode(true, false, "Preparing data...", false, false, false, false, false, false, false, false);
-			break;
-		case FINISHING_COMPUTATION:
-			changeMode(true, false, "Finishing...", false, false, false, false, false, false, false, false);
+			case COMPUTING:
+				changeMode("Computing gene clusters...", false, true, false, false);
+				break;
+			case SESSION_IDLE:
+				changeMode("Ready", false, false, true, true);
+				break;
+			case NO_SESSION:
+				changeMode("Ready", false, false, true, false);
+				break;
+			case READING_GENOMES:
+				changeMode("Reading genomes...", true, false, false, false);
+				break;
+			case PREPARING_COMPUTATION:
+				changeMode("Preparing data...", true, false, false, false);
+				break;
+			case FINISHING_COMPUTATION:
+				changeMode("Finishing...", true, false, false, false);
+				break;
 		}
 	}
 	
@@ -452,17 +468,26 @@ public class Gui {
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("cog;gck"));
 			if (gecko.getLastOpenedFile()!=null)
 				fc.setSelectedFile(gecko.getLastOpenedFile());
+
 			int state = fc.showOpenDialog( null );
 			if (state == JFileChooser.APPROVE_OPTION) {
 				try {
 					// Close the current session
 					closeCurrentSession();
 					// Check what type of file we are opening
+					
 					if (FileUtils.getExtension(fc.getSelectedFile()).equals("cog")) {
-						ArrayList<GenomeOccurence> list = Gui.this.gecko.importGenomes(fc.getSelectedFile());
+						Gui.this.gecko.setCurrentInputFile(fc.getSelectedFile());
+						CogFileReader reader = new CogFileReader();
+						ArrayList<GenomeOccurence> list = reader.importGenomes(fc.getSelectedFile());
 						selectGenomesForImport(list);
-					} else if (FileUtils.getExtension(fc.getSelectedFile()).equals("gck")) {
-						gecko.loadSessionFromFile(fc.getSelectedFile());
+					} else {
+						if (FileUtils.getExtension(fc.getSelectedFile()).equals("gck")) {
+							GckFileReader reader = new GckFileReader();
+							
+							reader.loadSessionFromFile(fc.getSelectedFile());
+							gecko.setGeneLabelMap(reader.getGeneLabelMap());
+						}
 					}
 				} catch (FileNotFoundException ex) {
 					JOptionPane.showMessageDialog(mainframe,"File not found", "Error", JOptionPane.ERROR_MESSAGE);
@@ -488,6 +513,9 @@ public class Gui {
 			StartComputationDialog d = gecko.getStartComputationDialog();
 			d.setLocationRelativeTo(Gui.this.mainframe);
 			d.setVisible(true);
+			
+			// Set the check box enabled
+			Gui.this.mgbViewSwitcher.setEnabled(true);
 		}
 	};
 	
@@ -523,37 +551,88 @@ public class Gui {
 		private static final long serialVersionUID = -1530838105061978403L;
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser fc = new JFileChooser();
+			
 			for (FileFilter f : fc.getChoosableFileFilters())
 				fc.removeChoosableFileFilter(f);
+			
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("gck"));
 			if (gecko.getLastSavedFile()!=null)
 				fc.setSelectedFile(gecko.getLastSavedFile());
+				
 			for (;;) {
 				int state = fc.showSaveDialog(null);
 				if (state == JFileChooser.APPROVE_OPTION) {
 					File f = fc.getSelectedFile();
-					if (!fc.getFileFilter().accept(fc.getSelectedFile()))
-						f = new File(f.getAbsolutePath()+".gck");
-					PrintUtils.printDebug("Choosen file to save to: "+f);
+					
+					if (! fc.getFileFilter().accept(fc.getSelectedFile()))
+						f = new File(f.getAbsolutePath() + ".gck");
+					
+					PrintUtils.printDebug("Choosen file to save to: " + f);
+					
 					if (f.exists()) {
 						if (f.isDirectory()) {
 							JOptionPane.showMessageDialog(mainframe, "You cannot choose a directory", "Error", JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
+						
 						int x = JOptionPane.showConfirmDialog(mainframe, 
 								"The chosen file already exists. Overwrite?", 
 								"Overwrite existing file?", 
 								JOptionPane.YES_NO_OPTION,
 								JOptionPane.WARNING_MESSAGE);
-						if (x==JOptionPane.NO_OPTION) continue;
+						
+						if (x == JOptionPane.NO_OPTION) 
+							continue;
 					}
-					if (!gecko.saveSessionToFile(f))
+					
+					if (! SessionWriter.saveSessionToFile(f))
 						JOptionPane.showMessageDialog(mainframe, "An error occured while writing the file!", "Error", JOptionPane.ERROR_MESSAGE);
+					
 					break;
 				} else break;
 			}
 			mainframe.requestFocus();
+		}
+	};
+	
+	private Action loadClusterAnnotationsAction = new AbstractAction() 
+	{
+		
+		private static final long serialVersionUID = 1148103871109191664L;
 
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fc = new JFileChooser();
+			
+			for (;;) {	
+				int state = fc.showOpenDialog(null);
+				
+				if (state == JFileChooser.APPROVE_OPTION) {
+					File f = fc.getSelectedFile();
+					
+					if (f.exists()) {	
+						if (f.isDirectory()) {
+							JOptionPane.showMessageDialog(mainframe, "You cannot choose a directory", "Error", JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						
+						GeckoInstance geckoInstance = GeckoInstance.getInstance();
+						List<GeneCluster> newCluster = ClusterAnnotationReader.readClusterAnnotations(f, geckoInstance.getGenomes());
+						
+						if (newCluster == null)
+							JOptionPane.showMessageDialog(mainframe, "An error occured while reading the annotations!", "Error", JOptionPane.ERROR_MESSAGE);
+						else {
+							GeneCluster[] clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster.toArray(new GeneCluster[newCluster.size()]));
+							geckoInstance.setClusters(GeneCluster.mergeResults(geckoInstance.getClusters(), clusterWithPValue));
+						}									
+						break;
+					}
+				}
+				else 
+				{
+					break;
+				}
+			}
 		}
 	};
 
@@ -583,6 +662,7 @@ public class Gui {
 		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave.png"));
 		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave_large.png"));
 		saveSessionAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		saveSessionAction.setEnabled(false);
 		
 		exportResultsAction.putValue(Action.NAME, "Export results...");
 		exportResultsAction.putValue(Action.SHORT_DESCRIPTION, "Export results...");
@@ -591,6 +671,11 @@ public class Gui {
 		exportResultsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		saveSessionAction.setEnabled(false);
+		
+		loadClusterAnnotationsAction.putValue(Action.NAME, "Load cluster annotations...");
+		loadClusterAnnotationsAction.putValue(Action.NAME, "Load clusters...");
+		loadClusterAnnotationsAction.setEnabled(false);
+		
 		clearSelectionAction.putValue(Action.SHORT_DESCRIPTION, "Clear selection");
 		clearSelectionAction.putValue(Action.SMALL_ICON, createImageIcon("images/cancel.png"));
 		clearSelectionAction.putValue(Action.SMALL_ICON, createImageIcon("images/cancel_large.png"));
@@ -605,5 +690,4 @@ public class Gui {
 		zoomOut.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag-_large.png"));
 		zoomOut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_MINUS,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ) );		
 	}
-
 }

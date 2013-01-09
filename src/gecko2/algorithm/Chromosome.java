@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -15,24 +16,21 @@ public class Chromosome implements Serializable {
 	private static final long serialVersionUID = -1724388125243376854L;
 	private MouseListener chromosomeMouseListener;
 	
+	private Genome parent;
 	private String name;
 	private List<Gene> genes;
 	
-	// Debug
-	public static Chromosome createSampleGenome(String name, int minid, int maxid) {
-		List<Gene> genes = new ArrayList<Gene>();
-		for (int i=minid; i<=maxid; i++)
-			genes.add(new Gene("Gene "+i,i));
-		return new Chromosome(name,genes);			
+	public Chromosome(String name, Genome parent) {
+		this.name = name;
+		this.genes = null;
+		this.parent = parent;
+		this.chromosomeMouseListener = new ChromosomeMouseListener();
 	}
 	
-	public Chromosome() {
-		this (null, null);
-	}
-	
-	public Chromosome(String name, List<Gene> genes) {
+	public Chromosome(String name, List<Gene> genes, Genome parent) {
 		this.name = name;
 		this.genes = genes;
+		this.parent = parent;
 		this.chromosomeMouseListener = new ChromosomeMouseListener();
 	}
 	
@@ -80,8 +78,38 @@ public class Chromosome implements Serializable {
 		return array;
 	}
 	
+	public int[] toRandomIntArray(boolean addZeros, boolean abs) {
+		int array[];
+		List<Gene> tmp = new ArrayList<Gene>(genes);
+		Collections.shuffle(tmp);
+		if (!addZeros) {
+			array = new int[genes.size()];
+			if (abs)
+				for (int i=0;i<array.length;i++) 
+					array[i] = Math.abs(tmp.get(i).getId());
+			else
+				for (int i=0;i<array.length;i++) 
+					array[i] = tmp.get(i).getId();
+		} else {
+			array = new int[tmp.size()+2];
+			array[0] = 0;
+			if (abs)
+				for (int i=1;i<array.length-1;i++) 
+					array[i] = Math.abs(tmp.get(i-1).getId());
+			else
+				for (int i=1;i<array.length-1;i++) 
+					array[i] = tmp.get(i-1).getId();
+			array[array.length-1]=0;
+		}
+		return array;
+	}
+	
 	public int[] toIntArray() {
 		return this.toIntArray(false, false);
+	}
+	
+	private Genome getParent() {
+		return parent;
 	}
 	
 	private class ChromosomeMouseListener extends MouseAdapter implements Serializable {
@@ -90,7 +118,22 @@ public class Chromosome implements Serializable {
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			GeckoInstance.getInstance().getGui().setInfobarText(Chromosome.this.name);
+			
+			String infotext = new String();
+					
+			if (Chromosome.this.getChromosomeMouseListener().equals(Chromosome.this.chromosomeMouseListener)) {
+						
+				if (Chromosome.this.getParent().getName() == null)
+					infotext = Chromosome.this.getName();
+				else if (Chromosome.this.getName() == null)
+					infotext = Chromosome.this.getParent().getName();
+				else if (Chromosome.this.getParent().getName().equals(Chromosome.this.getName()))
+					infotext = Chromosome.this.getName();
+				else 
+					infotext = Chromosome.this.getParent().getName() + " " + Chromosome.this.getName();
+			}
+			
+			GeckoInstance.getInstance().getGui().setInfobarText(infotext);
 		}
 		
 		@Override
@@ -101,7 +144,4 @@ public class Chromosome implements Serializable {
 
 		
 	}
-
-
-
 }

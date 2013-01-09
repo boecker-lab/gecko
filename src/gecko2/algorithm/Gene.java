@@ -14,9 +14,6 @@ public class Gene implements Serializable {
 		return unknown;
 	}
 	
-	public Gene() {
-	}
-	
 	public Gene(String name, int id) {
 		this(name, id, null,false);
 	}

@@ -6,6 +6,7 @@ import gecko2.util.PrintUtils;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 
 import javax.swing.JPanel;
@@ -54,8 +55,8 @@ public class GeneElement extends JPanel implements Adjustable {
 	
 	public GeneElement(Gene g, boolean fixedSize) {
 		this.fixedSize = fixedSize;
-		this.adjustSize();
 		this.gene = g;
+		this.adjustSize();
 		this.setBackground(Color.WHITE);
 		updateElement();
 	}
@@ -71,7 +72,8 @@ public class GeneElement extends JPanel implements Adjustable {
 		if (fixedSize)
 			return (int) Math.round(GeckoInstance.DISPLAY_GENEELEMENT_HIGHT*1.75);
 		else
-			return gecko.getGeneElementWidth();
+			return 8 * gecko.getMaxIdLength() + 3; 
+					//gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0].length() + 3;
 	}
 
 	/**
@@ -124,55 +126,79 @@ public class GeneElement extends JPanel implements Adjustable {
 
 		
 	@Override 
-	protected void paintComponent(Graphics g) {
+	protected void paintComponent(Graphics g) 
+	{
 		super.paintComponent(g);
+		
 		int ELEMHIGHT = computeHeight();
 		int ELEMENTWIDTH = computeWidth();
 		Color c;
+		
 		if (this.highlightColor != null) {
 //			c = new Color(120,120,254);
 			g.setColor(this.highlightColor);
 			g.fillRect(0, 0, (int) getPreferredSize().getWidth(), getPreferredHeight());
 		}
+		
 		if (this.unknown)
 			c = Color.GRAY;
-	 	else if (this.grey) {
-			int gv = (int) Math.floor((this.geneColor.getBlue()+this.geneColor.getRed()+this.geneColor.getGreen())/3);
-			c = new Color(gv,gv,gv);
-	 	} else
-			c = this.geneColor;
+	 	else  {
+	 		if (this.grey) {
+	 			int gv = (int) Math.floor((this.geneColor.getBlue() + this.geneColor.getRed() + this.geneColor.getGreen()) / 3);
+	 			c = new Color(gv, gv, gv);
+	 		} 
+	 		else {
+	 			c = this.geneColor;
+	 		}
+	 	}
+		
 		g.setColor(c);
 		int fontoffset = 0;
 		if (this.orientation == ORIENTATION_FORWARD) {
 			g.fillRect(3, Y_OFFSET+0, ELEMENTWIDTH, ELEMHIGHT);
-			int xPoints[] = {3+ELEMENTWIDTH,
-					3+ELEMENTWIDTH+((int) Math.ceil(ELEMHIGHT/2.0)),
-					3+ELEMENTWIDTH};
-			int yPoints[] = {Y_OFFSET+0,Y_OFFSET+ELEMHIGHT/2,Y_OFFSET+ELEMHIGHT};
-			g.fillPolygon(xPoints,yPoints, 3);
-		} else if (orientation == ORIENTATION_BACKWARDS) {
-			int triangleHeight = (int) Math.ceil(ELEMHIGHT/2.0);
-			g.fillRect(3+triangleHeight, Y_OFFSET+0, ELEMENTWIDTH, ELEMHIGHT);
-			int xPoints[] = {3+triangleHeight,3,3+triangleHeight};
-			int yPoints[] = {Y_OFFSET+0,(int) Math.ceil(Y_OFFSET+ELEMHIGHT/2.0),Y_OFFSET+ELEMHIGHT};
-			g.fillPolygon(xPoints,yPoints, 3);
-			fontoffset = triangleHeight;
-		} else {
-			g.fillRect(8, Y_OFFSET+0, ELEMENTWIDTH, ELEMHIGHT);
-			fontoffset = 5;
+			int xPoints[] = {3 + ELEMENTWIDTH,
+					3 + ELEMENTWIDTH + ((int) Math.ceil(ELEMHIGHT / 2.0)),
+					3 + ELEMENTWIDTH};
+			int yPoints[] = {Y_OFFSET + 0, Y_OFFSET + ELEMHIGHT / 2, Y_OFFSET + ELEMHIGHT};
+			g.fillPolygon(xPoints, yPoints, 3);
+		} 
+		else {
+			if (orientation == ORIENTATION_BACKWARDS) {
+				int triangleHeight = (int) Math.ceil(ELEMHIGHT / 2.0);
+				g.fillRect(3 + triangleHeight, Y_OFFSET + 0, ELEMENTWIDTH, ELEMHIGHT);
+				int xPoints[] = {3 + triangleHeight, 3, 3 + triangleHeight};
+				int yPoints[] = {Y_OFFSET + 0, (int) Math.ceil(Y_OFFSET + ELEMHIGHT / 2.0), Y_OFFSET + ELEMHIGHT};
+				g.fillPolygon(xPoints, yPoints, 3);
+				fontoffset = triangleHeight;
+			} 
+			else {
+				g.fillRect(8, Y_OFFSET+0, ELEMENTWIDTH, ELEMHIGHT);
+				fontoffset = 5;
+			}
 		}
+		
 		if (!this.unknown) {
 			if (geneColor == null) {
 				PrintUtils.printDebug("COLOR ERROR");
 				geneColor = Color.blue;
 			} 
+			
 			if (geneColor.getRed() + geneColor.getGreen() + geneColor.getBlue() > 450) {
 				g.setColor(Color.BLACK);
 			} else {
 				g.setColor(Color.WHITE);
 			}
-			g.setFont(g.getFont().deriveFont((float) ELEMHIGHT-((float) ELEMHIGHT/2.4F)));
-			g.drawString(Integer.toString(gecko.getGenLabelMap()[Math.abs(gene.getId())]), 5+fontoffset, ELEMHIGHT/2+Y_OFFSET+(int) Math.round(g.getFont().getSize()/2));
+			g.setFont(new Font("Monospaced", Font.PLAIN, Math.round((float) ELEMHIGHT - ((float) ELEMHIGHT / 2.4F))));
+			
+			/* Draw only the first index of the mapped String array */
+			if (gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0].length() < gecko.getMaxIdLength())
+			{
+				g.drawString(gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0] , ((8 * gecko.getMaxIdLength() + 3) / 2) - ((8 * gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0].length()) / 2) + 5, ELEMHIGHT / 2 + Y_OFFSET + (int) Math.round(g.getFont().getSize() / 2));
+			}
+			else
+			{
+				g.drawString(gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0] , 5 + fontoffset, ELEMHIGHT / 2 + Y_OFFSET + (int) Math.round(g.getFont().getSize() / 2));
+			}
 		}
 	}
 	

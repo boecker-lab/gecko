@@ -24,6 +24,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -46,6 +47,7 @@ public class StartComputationDialog extends JDialog {
 	private int quorum;
 	private char opMode,refType;
 	private JComboBox refCombo;
+	private JCheckBox mergeResults;
 	private JLabel refLabel;
 	private GeckoInstance gecko = GeckoInstance.getInstance();
 
@@ -114,6 +116,8 @@ public class StartComputationDialog extends JDialog {
 			}
 		});
 		
+		mergeResults = new JCheckBox("Merge Results");
+		mergeResults.setSelected(false);
 		
 		JPanel p1a = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		((FlowLayout) p1a.getLayout()).setVgap(12);
@@ -157,7 +161,6 @@ public class StartComputationDialog extends JDialog {
 		p5b.add(refCombo);
 		gridpanel.add(p5b);
 		
-		JLabel refValueLabel = new JLabel();
 		final JTextField refClusterField = new JTextField() {
 			
 			/**
@@ -177,7 +180,7 @@ public class StartComputationDialog extends JDialog {
 		Genome[] genomes = GeckoInstance.getInstance().getGenomes();
 		String[] revGenomes = new String[genomes.length];
 		for (int i=0;i<revGenomes.length;i++) {
-			revGenomes[i] = genomes[i].getChromosomes().get(0).getName();
+			revGenomes[i] = genomes[i].getName();
 			if (genomes[i].getChromosomes().size()>1)
 				revGenomes[i] = revGenomes[i]+" [and more...]";
 		}
@@ -189,7 +192,7 @@ public class StartComputationDialog extends JDialog {
 		
 		JPanel p6a = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		((FlowLayout) p6a.getLayout()).setVgap(12);
-		p6a.add(refValueLabel);
+		p6a.add(mergeResults);
 		gridpanel.add(p6a);
 		final JPanel p6b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		gridpanel.add(p6b);
@@ -197,14 +200,17 @@ public class StartComputationDialog extends JDialog {
 		panel.add(gridpanel);
 		
 		refCombo.setEnabled(true);
+		mergeResults.setEnabled(true);
 		ActionListener modeActionListener = new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (modeCombo.getSelectedIndex()==0) { 
 					refCombo.setEnabled(true);
+					mergeResults.setEnabled(true);
 				} else { 
 					refCombo.setEnabled(false);
+					mergeResults.setEnabled(false);
 				}
 			}
 		};
@@ -293,14 +299,14 @@ public class StartComputationDialog extends JDialog {
 					Genome[] genomes = new Genome[oldGenomes.length+1];
 					Genome cluster = new Genome();
 					ArrayList<Gene> genes = new ArrayList<Gene>();
-					Map<Integer, Integer> revIDMap = SortUtils.invertIntArray(gecko.getGenLabelMap());
+					Map<String[], Integer> revIDMap = SortUtils.invertIntArray(gecko.getGenLabelMap());
 					for (String id : refClusterField.getText().split(" "))
 						if (id!=null && (!(id.equals("")))) {
 							Integer iid = revIDMap.get(Integer.parseInt(id));
 							if (iid!=null)
 								genes.add(new Gene("", iid));
 						}
-					cluster.getChromosomes().add(new Chromosome("Reference cluster", genes));
+					cluster.getChromosomes().add(new Chromosome("Reference cluster", genes, cluster));
 					genomes[0] = cluster;
 					for (int i=0;i<oldGenomes.length;i++) {
 						genomes[i+1] = oldGenomes[i];
@@ -308,11 +314,15 @@ public class StartComputationDialog extends JDialog {
 					gecko.getGui().closeCurrentSession();
 					gecko.setGenomes(genomes);
 				}
+				boolean mergeResultsEnabled = false;
+				if (opMode == 'r' && mergeResults.isSelected())
+					mergeResultsEnabled = true;
 				GeckoInstance.getInstance().performClusterDetection(new Parameter((Integer) dSpinner.getValue(), 
 						(Integer) sSpinner.getValue(),
 						quorum,Parameter.QUORUM_NO_COST, 
 						opMode,
-						refType));
+						refType),
+						mergeResultsEnabled);
 			}
 			
 		};
