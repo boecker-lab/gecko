@@ -1,6 +1,8 @@
 package gecko2.algorithm;
 
 import gecko2.GeckoInstance;
+import gecko2.algo.DeltaLocation;
+import gecko2.algo.ReferenceCluster;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -38,6 +40,92 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	private char type;
 	// The index of the subsequence containing the reference genecluster
 	private int refSeqIndex;
+	
+	public GeneCluster(int id, 
+			GeneClusterOccurrence[] bestOccurrences, 
+			GeneClusterOccurrence[] allOccurrences, 
+			int[] genes, 
+			double bestPValueBase,
+			int bestPValueExp,
+			double bestPValueCorrectedBase,
+			int bestPValueCorrectedExp,
+			int minTotalDist, 
+			int refSeqIndex,
+			char type) 
+	{
+		this(id, bestOccurrences, allOccurrences, genes, (new BigDecimal(bestPValueBase)).scaleByPowerOfTen(bestPValueExp), (new BigDecimal(bestPValueCorrectedBase)).scaleByPowerOfTen(bestPValueCorrectedExp), minTotalDist, refSeqIndex, type);		
+	}
+		
+	public GeneCluster(int id, 
+			GeneClusterOccurrence[] bestOccurrences, 
+			GeneClusterOccurrence[] allOccurrences, 
+			int[] genes, 
+			BigDecimal bestPValue, 
+			BigDecimal bestPValueCorrected,
+			int minTotalDist, 
+			int refSeqIndex,
+			char type) 
+	{
+		match=true;
+		//TODO check if this right
+		size=0;
+		if (allOccurrences!=null && allOccurrences.length!=0)
+			for (Subsequence[] subSeqs : allOccurrences[0].getSubsequences())
+				if (subSeqs.length>0) size++;
+		
+		this.bestPValue = bestPValue;
+		this.bestPValueCorrected = bestPValueCorrected;
+		this.bestOccurrences = bestOccurrences;
+		this.allOccurrences = allOccurrences;
+		this.refSeqIndex = refSeqIndex;
+		this.minTotalDist = minTotalDist;
+		this.type = type;
+
+		this.genes = genes;
+		this.id = id;
+	}
+	
+	public GeneCluster(int id, ReferenceCluster refCluster){
+		this.id = id;
+		this.match = true;
+		this.bestPValue = refCluster.getBestCombined_pValue();
+		this.bestPValueCorrected = refCluster.getBestCombined_pValueCorrected();
+		this.refSeqIndex = refCluster.getGenomeNr();
+		this.type = TYPE_REFERENCE;
+		this.genes = new int[refCluster.getGeneContent().size()];
+		for (int i=0; i<refCluster.getGeneContent().size(); i++)
+			genes[i] = refCluster.getGeneContent().get(i);
+		
+		this.size = 0;
+		this.minTotalDist = 0;
+		int[] minDistances = refCluster.getMinimumDistances();
+		for (Integer dist : minDistances){
+			if (dist >= 0){
+				this.size++;
+				this.minTotalDist += dist;
+			}
+		}
+
+		Subsequence[][] bestSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
+		Subsequence[][] allSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
+		for (int i=0; i<refCluster.getAllDeltaLocations().size(); i++){
+			List<Subsequence> allSub = new ArrayList<Subsequence>(refCluster.getDeltaLocations(i).size());
+			List<Subsequence> bestSub = new ArrayList<Subsequence>(refCluster.getDeltaLocations(i).size());
+			for (DeltaLocation dLoc : refCluster.getDeltaLocations(i)){
+				Subsequence subseq = new Subsequence(dLoc.getL(), dLoc.getR(), dLoc.getChrNr(), dLoc.getDistance(), new BigDecimal(dLoc.getpValue()));
+				if (dLoc.getDistance() <= minDistances[i]){
+					bestSub.add(subseq);
+				}
+				allSub.add(subseq);
+			}
+			bestSubseqs[i]=bestSub.toArray(new Subsequence[bestSub.size()]);
+			allSubseqs[i]=allSub.toArray(new Subsequence[allSub.size()]);
+		}
+		this.bestOccurrences = new GeneClusterOccurrence[1];
+		this.bestOccurrences[0] = new GeneClusterOccurrence(0, bestSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
+		this.allOccurrences = new GeneClusterOccurrence[1];
+		this.allOccurrences[0] = new GeneClusterOccurrence(0, allSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
+	}
 	
 	public char getType() {
 		return type;
@@ -184,50 +272,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		return avgDist;
 	}
 	
-	public GeneCluster(int id, 
-			GeneClusterOccurrence[] bestOccurrences, 
-			GeneClusterOccurrence[] allOccurrences, 
-			int[] genes, 
-			double bestPValueBase,
-			int bestPValueExp,
-			double bestPValueCorrectedBase,
-			int bestPValueCorrectedExp,
-			int minTotalDist, 
-			int refSeqIndex,
-			char type) 
-	{
-		this(id, bestOccurrences, allOccurrences, genes, (new BigDecimal(bestPValueBase)).scaleByPowerOfTen(bestPValueExp), (new BigDecimal(bestPValueCorrectedBase)).scaleByPowerOfTen(bestPValueCorrectedExp), minTotalDist, refSeqIndex, type);		
-	}
-		
-	public GeneCluster(int id, 
-			GeneClusterOccurrence[] bestOccurrences, 
-			GeneClusterOccurrence[] allOccurrences, 
-			int[] genes, 
-			BigDecimal bestPValue, 
-			BigDecimal bestPValueCorrected,
-			int minTotalDist, 
-			int refSeqIndex,
-			char type) 
-	{
-		match=true;
-		//TODO check if this right
-		size=0;
-		if (allOccurrences!=null && allOccurrences.length!=0)
-			for (Subsequence[] subSeqs : allOccurrences[0].getSubsequences())
-				if (subSeqs.length>0) size++;
-		
-		this.bestPValue = bestPValue;
-		this.bestPValueCorrected = bestPValueCorrected;
-		this.bestOccurrences = bestOccurrences;
-		this.allOccurrences = allOccurrences;
-		this.refSeqIndex = refSeqIndex;
-		this.minTotalDist = minTotalDist;
-		this.type = type;
-
-		this.genes = genes;
-		this.id = id;
-	}
-	
 	public int getId() {
 		return id;
 	}
@@ -250,7 +294,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	
 	/**
 	 * Generates a @link GeneClusterOutput object, that contains all information about the gene cluster.
-	 * @return
+	 * @return a GeneClusterOutput object
 	 */
 	public GeneClusterOutput generateGeneClusterOutput() {
 		return generateGeneClusterOutput(true);
@@ -258,7 +302,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	
 	/**
 	 * Generates a @link GeneClusterOutput object, that contains all information about the gene cluster.
-	 * @return
+	 * @return a GeneClusterOutput object
 	 */
 	public GeneClusterOutput generateGeneClusterOutput(boolean onlyBestOccs) {
 		GeneClusterOccurrence occ;

@@ -169,9 +169,10 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				fireSelectionEvent(true);
-				GeneClusterExportDialog d = new GeneClusterExportDialog(GeckoInstance.getInstance().getGui().getMainframe());
+				AbstractMultipleGenomeBrowser mgb = GeckoInstance.getInstance().getGui().getMgb();
+				if (mgb.getSelectedCluster() == null || !GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(table.getSelectedRow(), 0)].equals(mgb.getSelectedCluster()))
+					fireSelectionEvent(true);
+				GeneClusterExportDialog d = new GeneClusterExportDialog(GeckoInstance.getInstance().getGui().getMainframe(), mgb.getSelectedCluster(), mgb.getSubselection());
 				d.setVisible(true);
 			}
 		});
@@ -238,7 +239,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 				setText("");
 			} 
 			else {
-				setText(String.format("%1.3f", value));
+				setText(String.format("%1.3f", (Double)value));
 			}
 		}
 	}

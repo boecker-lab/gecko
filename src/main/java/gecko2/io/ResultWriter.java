@@ -11,15 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ResultWriter {
 	public static boolean exportResultsToFileNEW2(File f, List<GeneCluster> clusters, Map<Integer, String[]> geneLabelMap, List<String> genomeNames) {
@@ -699,7 +691,7 @@ public class ResultWriter {
 					 * Write the column <GeneSet>
 					 */
 					for (int i=0; i<c.getGenes().length; i++) {
-						fw.write(geneLabelMap.get(c.getGenes()[i]).toString());
+						fw.write(Arrays.toString(geneLabelMap.get(c.getGenes()[i])));
 						if (i<c.getGenes().length-1) fw.write(";");
 					}
 					/*

@@ -31,7 +31,7 @@ import javax.swing.SwingUtilities;
 public class GenomeNavigator extends JPanel implements DataListener,BrowserContentListener,ClusterSelectionListener {
 	
 	private static final long serialVersionUID = -3454613481139655426L;
-	private MultipleGenomesBrowser mgb;
+	private AbstractMultipleGenomeBrowser mgb;
 	private int virtualWidth=0;
 	private int barWidth = 0;
 	private float windowCoverage;
@@ -57,24 +57,19 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 		
 		int y = PADDING;
 		
-		for (int i=0; i<mgb.getGenomeBrowsers().size();i++) {
-			GenomeBrowser gb = mgb.getGenomeBrowsers().get(i);
-			JScrollBar bar = gb.getHorizontalScrollBar();
-			
+		for (int i=0; i<mgb.getNrGenomes();i++) {
 			// Compute the length of the bar representation for each chromosome
-			List<Integer> lineLengths = new ArrayList<Integer>(gb.getGenome().getChromosomes().size());
-			List<Chromosome> chromosomes = gb.getGenome().getChromosomes();
-			for (int j=0; j<chromosomes.size(); j++)  {
-				// Compute the line length in GenomeBrowser pixels
-				int length = chromosomes.get(j).getGenes().size()*gb.getGenWidth();
-				// Scale it to GenomeNavigator pixels
-				lineLengths.add((int) Math.floor(length*scale));
-				
-			}
+			List<Integer> geneCount = new ArrayList<Integer>(mgb.getGeneNumbers(i));
+			int chromosomeCount = geneCount.size();
+			
+			List<Integer> lineLengths = new ArrayList<Integer>(geneCount.size());			
+			for (int j=0; j<geneCount.size(); j++)
+				lineLengths.add((int)(geneCount.get(j)*scale));
+
 								
 			// Compute the start pixel for the first chromosome
 			int lineStart = maxBarMax-barWidth-2+(int) ChromosomeEnd.computeDimension().getWidth(); // rightmost position
-			float substract = bar.getValue();// * (bar.getMaximum()/(1.0F*maxBarMax)); // substract value (scaled to longest bar)
+			float substract = mgb.getScrollValue(i);// * (bar.getMaximum()/(1.0F*maxBarMax)); // substract value (scaled to longest bar)
 			lineStart-= (int)(Math.floor(substract));	
 			lineStart = (int) Math.floor(lineStart*scale);
 			
@@ -83,7 +78,7 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 			// Scale it to Nagivator pixels
 			chromDist *= scale;
 			
-			if (gb.isFlipped()) Collections.reverse(lineLengths);
+			if (mgb.isFlipped(i)) Collections.reverse(lineLengths);
 			
 			ArrayList<Integer> lineStarts = new ArrayList<Integer>(lineLengths.size());
 			lineStarts.add(lineStart);
@@ -98,7 +93,7 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 						4);
 				
 				g.setStroke(new BasicStroke(1));
-				if (gb.isFlipped())
+				if (mgb.isFlipped(i))
 					g.setColor(new Color(1F,1F,0.75F));
 				else
 					g.setColor(new Color(0.7F,0.7F,1.0F));
@@ -110,20 +105,20 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 			if (gOcc!=null) {
 				g.setColor(new Color(145,0,20));
 				for (Subsequence s : gOcc.getSubsequences()[i]) {
-					int chrom = s.getChromosome();
+					int chromosomeIndex = s.getChromosome();
 					int gcount;
-					if (gb.isFlipped()) {
-						chrom = gb.getGenome().getChromosomes().size() - chrom -1;
-						gcount = gb.getGenome().getChromosomes().get(s.getChromosome()).getGenes().size() - 1 - ((int) Math.ceil(((s.getStart()+s.getStop()-2)/2.0)));
+					if (mgb.isFlipped(i)) {
+						chromosomeIndex = chromosomeCount - chromosomeIndex -1;
+						gcount = geneCount.get(s.getChromosome()) - 1 - ((int) Math.ceil(((s.getStart()+s.getStop()-2)/2.0)));
 					} else 
 						gcount = ((int) ((s.getStart()+s.getStop()-2)/2.0));	
 					
-					int xpos = gcount*gb.getGenWidth();
-					if (gb.isFlipped())
+					int xpos = gcount*mgb.getGeneWidth();
+					if (mgb.isFlipped(i))
 						xpos = (int) Math.ceil(xpos*scale);
 					else
 						xpos = (int) Math.floor(xpos*scale);
-					xpos += lineStarts.get(chrom);
+					xpos += lineStarts.get(chromosomeIndex);
 
 					g.drawLine(xpos, y, xpos, y+GENOME_LINE_WIDTH);
 					g.drawLine(xpos+1, y, xpos+1, y+GENOME_LINE_WIDTH);
@@ -175,14 +170,8 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 	 * uses zoom function).
 	 */
 	private void updateVirtualWidth() {
-		maxBarMax=0;
-		for (GenomeBrowser gb : mgb.getGenomeBrowsers()) {
-			JScrollBar bar = gb.getHorizontalScrollBar();
-			barWidth = gb.getWidth();
-			
-			if (bar.getMaximum()>maxBarMax)
-				maxBarMax = bar.getMaximum();
-		}
+		maxBarMax=mgb.getScrollMaximum();
+		barWidth = mgb.getScrollWidth();
 		int maxGenomeWidth = maxBarMax - (2*(barWidth+2)); 
 		virtualWidth = 2*maxGenomeWidth + barWidth;
 		windowCoverage = barWidth/(1.0F*virtualWidth);
@@ -197,10 +186,10 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 
 	@Override
 	public void dataChanged(DataEvent e) {
-		if (mgb.getGenomeBrowsers().size()==0) {
+		if (mgb.getNrGenomes()==0) {
 			this.setPreferredSize(new Dimension(0,0));
 		} else {
-			this.setPreferredSize(new Dimension(0,mgb.getGenomeBrowsers().size()*(GENOME_DIST)+2*PADDING));
+			this.setPreferredSize(new Dimension(0,mgb.getNrGenomes()*(GENOME_DIST)+2*PADDING));
 			updateVirtualWidth();
 		}
 		this.getParent().doLayout();

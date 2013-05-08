@@ -1,9 +1,13 @@
 package gecko2.algorithm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class BreakPointDistance {
 	
@@ -13,11 +17,6 @@ public class BreakPointDistance {
 	
 	public static void breakPointDistanceRandom(Genome[] genomes, boolean signed) {
 		breakPointDistance(genomes, signed, true);
-	}
-	
-	private static void breakPointDistance(Genome[] genomes, boolean signed, boolean random) {
-		int[][] result = computeBreakPointDistance(genomes, signed, random);
-		printBreakPointDistanceArray(result, genomes);
 	}
 	
 	public static int[][] computeBreakPointDistance(Genome[] genomes, boolean signed, boolean random) {
@@ -55,27 +54,101 @@ public class BreakPointDistance {
 		return result;
 	}
 	
-	static void printBreakPointDistanceColumn(int [][] distances, Genome[] genomes) {
+	public static void groupGenomes(Genome[] genomes, double minThreshold, double maxThreshold, double stepSize, boolean signed){
+		int[][] distances = computeBreakPointDistance(genomes, signed, false);
+		
+		System.out.print("[");
+		for (int i=0; i<genomes.length; i++){
+			System.out.print(genomes[i].getName());
+			if (i!=genomes.length-1)
+				System.out.print(", ");
+		}
+		System.out.println("]");
+		
+		for (double d=minThreshold; d<maxThreshold; d+=stepSize) {
+			System.out.println("Threshold: " + d);
+			System.out.println(groupGenomes(distances, genomes, d));
+		}
+	}
+	
+	public static List<Set<Integer>> groupGenomes(Genome[] genomes, double threshold, boolean signed){
+		int[][] distances = computeBreakPointDistance(genomes, signed, false);
+		return groupGenomes(distances, genomes, threshold);
+	}
+	
+	private static void breakPointDistance(Genome[] genomes, boolean signed, boolean random) {
+		int[][] result = computeBreakPointDistance(genomes, signed, random);
+		printBreakPointDistanceArray(result, genomes);
+	}
+	
+	static void printBreakPointDistanceColumn(int[][] distances, Genome[] genomes) {
 		for (int i=0; i<genomes.length; i++) {
 			for (int j=0; j<i; j++)
 				System.out.println(String.format("%s \t %s:\t %d", genomes[i].getName(), genomes[j].getName(), distances[i][j]));
 		}
 	}	
 	
-	static void printBreakPointDistanceArray(int [][] distances, Genome[] genomes) {
+	static void printBreakPointDistanceArray(int[][] distances, Genome[] genomes) {
 		System.out.print("Name\t");
-		for (int i=0; i<genomes.length; i++)
-			System.out.print(genomes[i].getName() + "\t");
+		for (int i=0; i<genomes.length; i++){
+			System.out.print(genomes[i].getName());
+			if (i!=genomes.length-1)
+				System.out.print("\t");
+		}
 		System.out.println();
+		double[][] normDist = normalizeDistances(distances, genomes);
 		for (int i=0; i<genomes.length; i++) {
 			System.out.print(genomes[i].getName() + "\t");
-			for (int j=0; j<distances[i].length; j++){
-				System.out.print(distances[i][j]/(double)(genomes[i].getTotalGeneNumber()-1 + genomes[j].getTotalGeneNumber()-1));
-				if (j!=distances[i].length-1)
+			for (int j=0; j<normDist[i].length; j++){
+				System.out.print(normDist[i][j]);
+				if (j!=normDist[i].length-1)
 					System.out.print("\t");
 			}
 			System.out.println();
 		}
+	}
+	
+	static List<Set<Integer>> groupGenomes(int[][] d, Genome[] genomes, double threshold) {
+		double[][] distances = normalizeDistances(d, genomes);
+		
+		List<Set<Integer>> cluster = new ArrayList<Set<Integer>>();
+		int[] setIndex = new int[genomes.length];
+		for (int i=0; i<distances.length; i++){
+			boolean added = false;
+			for (int j=0; j<i; j++){
+				if (distances[i][j] <= threshold) {
+					if (!added) {
+						cluster.get(setIndex[j]).add(i);
+						setIndex[i] = setIndex[j];
+						added = true;
+					} else {
+						if (setIndex[i] == setIndex[j]) continue;
+						
+						Set<Integer> firstToMerge = cluster.get(setIndex[i]);
+						int secondSetIndex = setIndex[j];
+						Set<Integer> secondToMerge = cluster.get(secondSetIndex);
+						for (int index : secondToMerge) {
+							firstToMerge.add(index);
+							setIndex[index] = setIndex[i];
+						}
+						cluster.set(secondSetIndex, null);
+					}
+				}
+			}
+			if (!added){
+				setIndex[i] = cluster.size();
+				Set<Integer> set = new HashSet<Integer>();
+				set.add(i);
+				cluster.add(set);
+			}
+		}
+		Iterator<Set<Integer>> iter = cluster.iterator();
+		while (iter.hasNext()){
+			Set<Integer> value = iter.next();
+			if (value == null)
+				iter.remove();
+		}
+		return cluster;
 	}
 	
 	private static class BreakPointVector {
@@ -124,6 +197,14 @@ public class BreakPointDistance {
 			}
 			return breakpoints;
 		}
+	}
+	
+	private static double[][] normalizeDistances(int[][] distances, Genome[] genomes) {
+		double[][] normalizedDistances = new double[distances.length][distances.length];
+		for (int i=0; i<distances.length; i++)
+			for (int j=0; j<distances[i].length; j++)
+				normalizedDistances[i][j] = distances[i][j]/(double)(genomes[i].getTotalGeneNumber()-1 + genomes[j].getTotalGeneNumber()-1);
+		return normalizedDistances;
 	}
 	
 	private static interface IntPair {

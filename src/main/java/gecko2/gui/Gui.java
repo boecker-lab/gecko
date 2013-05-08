@@ -12,6 +12,7 @@ import gecko2.util.FileUtils;
 import gecko2.util.PrintUtils;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -22,15 +23,22 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -57,9 +65,9 @@ public class Gui {
 	private JSplitPane horiSplit;
 	private JSplitPane vertSplit;
 	
-	private JMenu menuFile, menuView;
+	private JMenu menuFile, menuView, menuAbout;
 	
-	private MultipleGenomesBrowser mgb;
+	private AbstractMultipleGenomeBrowser mgb;
 	private GenomeNavigator navigator;
 	private GeneClusterSelector gcSelector;
 	private GeneClusterDisplay gcDisplay;
@@ -80,6 +88,11 @@ public class Gui {
 	
 	public GeneClusterSelector getGcSelector() {
 		return gcSelector;
+	}
+	
+	public GeneClusterDisplay getGcDisplay() {
+		
+		return gcDisplay;
 	}
 	
 	public Gui() {
@@ -132,9 +145,11 @@ public class Gui {
 		// Menu arrangements
 		menuFile = new JMenu("File");
 		menuView = new JMenu("View");
+		menuAbout = new JMenu("Help");
 		menubar = new JMenuBar();
 		menubar.add(menuFile);
 		menubar.add(menuView);
+		menubar.add(menuAbout);
 		
 				
 		mgb = new MultipleGenomesBrowser();
@@ -171,6 +186,8 @@ public class Gui {
 		menuFile.add(saveSessionAction);
 		menuFile.add(exportResultsAction);
 		menuFile.add(loadClusterAnnotationsAction);
+		menuFile.addSeparator();
+		menuFile.add(exitAction);
 		
 		toolbar.add(clearSelectionAction);
 		toolbar.add(startComputation);
@@ -181,6 +198,9 @@ public class Gui {
 		toolbar.add(zoomOut);
 		menuView.add(zoomIn);
 		menuView.add(zoomOut);
+		
+		menuAbout.add(aboutAction);
+		menuAbout.add(showHomePage);
 				
 		JToggleButton animationButton = new JToggleButton("Animation");
 		animationButton.setSelected(gecko.isAnimationEnabled());
@@ -205,11 +225,11 @@ public class Gui {
 	            {
 	            	if (status == ItemEvent.DESELECTED)
 	            	{
-	            		mgb.genomeBrowserFilter(false);
+	            		mgb.hideNonClusteredGenomes(false);
 	            	}
 	            	else 
 	            	{	
-	            		mgb.genomeBrowserFilter(true);
+	            		mgb.hideNonClusteredGenomes(true);
 	            	}
 	            }
 			}
@@ -319,31 +339,24 @@ public class Gui {
 	public void updateViewscreen() {
 		this.mgb.clear();
 		if (gecko.getGenomes()!=null)
-			for (Genome g: this.gecko.getGenomes())
-				this.mgb.addGenome(g);
+			this.mgb.addGenomes(gecko.getGenomes());
 	}
 	
 //	public void refreshClusterList() {
 //		this.gcSelector.refresh();
 //	}
 	
-	public MultipleGenomesBrowser getMgb() {
+	public AbstractMultipleGenomeBrowser getMgb() {
 		return mgb;
 	}
 	
 	/** Simple helper methods which makes it easier to create ImageIcons from Resource
-	
-    @param String path 
-    @return Returns a imageicon if path describes an image, null otherwise 
-*/
-	private static ImageIcon createImageIcon(String path) {
-		java.net.URL imgURL =  ClassLoader.getSystemResource(path);
-		if (imgURL != null) {
-			return new ImageIcon(imgURL);
-		} else {
-			System.err.println("Couldn't find file: " + path);
-			return null;
-		}	
+	 *
+     *	@param path path to the icon
+     *  @return Returns a imageicon if path describes an image, null otherwise 
+	 */
+	public static ImageIcon createImageIcon(String path) {
+		return new ImageIcon(path);	
 	}
 
 	
@@ -475,10 +488,9 @@ public class Gui {
 					// Close the current session
 					closeCurrentSession();
 					// Check what type of file we are opening
-					
 					if (FileUtils.getExtension(fc.getSelectedFile()).equals("cog")) {
 						Gui.this.gecko.setCurrentInputFile(fc.getSelectedFile());
-						CogFileReader reader = new CogFileReader();
+						CogFileReader reader = new CogFileReader((byte) 0);
 						ArrayList<GenomeOccurence> list = reader.importGenomes(fc.getSelectedFile());
 						selectGenomesForImport(list);
 					} else {
@@ -500,9 +512,7 @@ public class Gui {
 	private Action clearSelectionAction = new AbstractAction() {
 		private static final long serialVersionUID = 6179596178200200696L;
 		public void actionPerformed(ActionEvent e) {
-			mgb.clearHighlight();
-			mgb.clearGrey();
-			mgb.unflipAll();
+			mgb.clearSelection();
 		}
 		
 	};
@@ -516,6 +526,124 @@ public class Gui {
 			
 			// Set the check box enabled
 			Gui.this.mgbViewSwitcher.setEnabled(true);
+		}
+	};
+	
+	private Action exitAction = new AbstractAction() {
+
+		/**
+		 * Random generated serial version uid
+		 */
+		private static final long serialVersionUID = 196167012152483868L;
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			System.exit(0);
+		}
+	};
+	
+	private Action aboutAction = new AbstractAction() {
+
+		/**
+		 * Random generated serial version uid
+		 */
+		private static final long serialVersionUID = -5982961195947652321L;
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			JDialog about = new JDialog();
+			about.getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+			about.getRootPane().setBackground(about.getContentPane().getBackground());
+			about.setIconImage(createImageIcon("images/gecko2_a_small.png").getImage());
+			about.setTitle("About Gecko²");
+			about.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+			about.setPreferredSize(new Dimension(350, 475));
+			about.setSize(new Dimension(350, 475));
+			about.setLayout(new BorderLayout());
+			
+			JLabel iconLabel = new JLabel();
+			iconLabel.setIcon((Icon) createImageIcon("images/gecko2_a_small.png"));
+			JPanel iconPanel = new JPanel();
+			iconPanel.add(iconLabel);
+			about.add(iconPanel, BorderLayout.NORTH);
+			
+			JPanel authorPane = new JPanel();
+			JEditorPane text = new JEditorPane();
+			text.setContentType("text/html");
+			//text.addHyperlinkListener(new HyperlinkListener());
+			text.setText(
+			"<html>" +
+				"<body>" +
+					"<center>" +
+						"Gecko²" +
+						"<br>" +
+						"Tool for searching gene clusters" +
+						"<br>" +
+						"Version ???" +
+						"<br>" +
+						"2013, Sascha Winter, Hans-Martin Haase" +
+						"<br>" +
+						"Chair of Bioinformatics, University of Jena." +
+						"<br>" +
+						"http://bio.informatik.uni-jena.de" +
+						"<br> <br>" +
+						"Uses the iText library" +
+						"<br>" +
+						"<i>http://sourceforge.net/projects/itext/</i>" + 
+						"<br><br>" +
+						"JGoodies Forms library" +
+						"<br>" +
+						"<i>www.jgoodies.com/freeware/libraries/forms/</i>" +
+						"<br<br>" +
+						"colt library" +
+						"<br>" +
+						"<i>http://acs.lbl.gov/software/colt/index.html</i>" +
+						"<br><br>" +
+						"This program is based on Gecko2 by <br>" +
+						"Katharina Jahn and Leon Kuchenbecker" +
+					"</center>" +
+				"</body>" +
+			"</html>");
+	
+			text.setEditable(false);
+			text.setBackground(about.getContentPane().getBackground());
+			authorPane.add(text, BorderLayout.CENTER);
+			about.add(authorPane);
+			about.setVisible(true);
+		}
+	};
+	
+	private Action showHomePage = new AbstractAction() {
+
+		/**
+		 * Random generated serial version uid
+		 */
+		private static final long serialVersionUID = 3693048160852637628L;
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			// fix the url for gecko just linking to the bioinformatic page
+			if (Desktop.isDesktopSupported()) {
+				
+				Desktop desktop = Desktop.getDesktop();
+				
+				try {
+					
+					desktop.browse(new URI("http://bio.informatik.uni-jena.de/"));
+				} 
+				catch (IOException e) {
+					
+					new JOptionPane("This option requires a internet connection.", JOptionPane.ERROR_MESSAGE);	
+				} 
+				catch (URISyntaxException e) {
+					
+					new JOptionPane("Wrong URI syntax.", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			
 		}
 	};
 	
@@ -688,6 +816,15 @@ public class Gui {
 		zoomOut.putValue(Action.SHORT_DESCRIPTION, "Zoom out");
 		zoomOut.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag-.png"));
 		zoomOut.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag-_large.png"));
-		zoomOut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_MINUS,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ) );		
+		zoomOut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_MINUS,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		
+		exitAction.putValue(Action.NAME, "Exit");
+		exitAction.putValue(Action.SHORT_DESCRIPTION, "Leave the program");
+		
+		showHomePage.putValue(Action.NAME, "Gecko² Website");
+		showHomePage.putValue(Action.SHORT_DESCRIPTION, "Opens the Gecko² website in the browser");
+		
+		aboutAction.putValue(Action.NAME, "About Gecko²...");
+		
 	}
 }

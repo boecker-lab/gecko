@@ -3,7 +3,6 @@ package gecko2.io;
 import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
 import gecko2.LinePassedException;
-import gecko2.algorithm.BreakPointDistance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
@@ -23,6 +22,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,6 +58,17 @@ public class CogFileReader {
 	 * Pattern list for getGenomeName and getChromosomeName
 	 */
 	private static Pattern nameSplitPattern = Pattern.compile(",|chrom(?:osome)?|(?:mega)?plasmid|scaffold|(?:super)?cont(?:ig)?|unmap(?:ped)?|chr[_ ]?\\d+|complete genome", Pattern.CASE_INSENSITIVE);
+	
+	/**
+	 * 0 gui session, 1 cli session
+	 */
+	private byte sessionType = 0;
+	
+	public CogFileReader(byte sType) {
+		
+		sessionType = sType;
+		
+	}
 	
 	/**
 	 * The method generates the genome name for the grouping of the genes.
@@ -220,12 +231,10 @@ public class CogFileReader {
 	 */
 	public void readFileContent(ArrayList<GenomeOccurence> occs) throws EOFException, IOException, LinePassedException {
 		
-		Gui gui = GeckoInstance.getInstance().getGui();
 		
-		if (gui != null) {
-			
+		Gui gui = GeckoInstance.getInstance().getGui();
+		if (gui != null)
 			gui.changeMode(Mode.READING_GENOMES);
-		}
 		
 		HashMap<Integer, Genome> groupedGenomes = new HashMap<Integer, Genome>();
 		ArrayList<Genome> ungroupedGenomes = new ArrayList<Genome>();
@@ -283,35 +292,34 @@ public class CogFileReader {
 					String[] ids = explode[0].split(",");
 					for (int j=0; j<ids.length; j++)
 						ids[j] = this.testOldIdFormat(ids[j]);
+					
 					int sign; 
-					
-					if (explode[1].equals("-"))	{
-						
+					if (explode[1].equals("-"))
 						sign = -1;
-					}
-					else {	
+					else
 						sign = 1;
-					}
 					
-					if (ids[0].length() > maxIdWidth) {
+					if (ids[0].length() > maxIdWidth)
 						maxIdWidth = ids[0].length();
-					}
 					
-					if (!ids[0].equals("0") && !ids[0].equals("") && ids[0] != null && backmap.containsKey(ids[0])) {	
-						genes.add(new Gene(explode[3], sign * backmap.get(ids[0]), explode[4], false));
+					if (!isUnhomologe(ids) && backmap.containsKey(ids[0])) {
+						if (explode.length > 5)
+							genes.add(new Gene(explode[5], explode[3], sign * backmap.get(ids[0]), explode[4], false));
+						else
+							genes.add(new Gene(explode[3], sign * backmap.get(ids[0]), explode[4], false));
 					} 
 					else {	
 						stringidlist.add(ids);
 						int intid = stringidlist.size();
 						
-						if (!ids[0].equals("0") && ids[0] != null && !ids[0].equals("")) {			
+						if (!isUnhomologe(ids)) {			
 							this.colorMap.put(intid, new Color(r.nextInt(240),r.nextInt(240),r.nextInt(240)));
 							backmap.put(ids[0], intid);
-							genes.add(new Gene(explode[3], sign * intid, explode[4], false));
 						} 
-						else {					
-							genes.add(new Gene(explode[3], sign * intid, explode[4], true));
-						}
+						if (explode.length > 5)
+							genes.add(new Gene(explode[5], explode[3], sign * intid, explode[4], isUnhomologe(ids)));
+						else
+							genes.add(new Gene(explode[3], sign * intid, explode[4], isUnhomologe(ids)));
 					}
 				}
 			}
@@ -345,6 +353,10 @@ public class CogFileReader {
 				this.genomes[i++] = x;
 			}
 		}		
+	}
+	
+	private boolean isUnhomologe(String[] ids) {
+		return (ids[0] == null || ids[0].equals("0") || ids[0].equals(""));
 	}
 	
 	
@@ -383,8 +395,14 @@ public class CogFileReader {
 						GeckoInstance.getInstance().setGenomes(CogFileReader.this.genomes);
 						GeckoInstance.getInstance().setMaxIdLength(CogFileReader.this.maxIdLength);
 						
-						GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.SESSION_IDLE);
-						GeckoInstance.getInstance().getGui().updateViewscreen();
+						System.out.println("sessiont:  " + sessionType);
+						
+						if (CogFileReader.this.sessionType == 0) {
+						
+							GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.SESSION_IDLE);
+							GeckoInstance.getInstance().getGui().updateViewscreen();
+						}
+						
 						GeckoInstance.getInstance().fireDataChanged();
 					}
 				});
@@ -427,11 +445,18 @@ public class CogFileReader {
 	private void handleParsingError(final short errorType) {
 		this.genomes = null;
 		GeckoInstance.getInstance().setClusters(new GeneCluster[0]);
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				GeckoInstance.getInstance().getGui().handleFileError(errorType);
-			}
-		});
+		
+		if (sessionType == 0) {
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					GeckoInstance.getInstance().getGui().handleFileError(errorType);
+				}
+			});
+		}
+		else {
+			
+			CLI.handleFileError(errorType);
+		}
 	}
 	
 	/**
@@ -451,7 +476,7 @@ public class CogFileReader {
 	 *   
 	 * @return the colorMap (HashMap)
 	 */
-	public HashMap<Integer, Color> getColorMap()
+	public Map<Integer, Color> getColorMap()
 	{
 		return this.colorMap;
 	}
@@ -472,11 +497,19 @@ public class CogFileReader {
 	 * 
 	 * @return the geneLabelMap (HashMap)
 	 */
-	public HashMap<Integer, String[]> getGeneLabelMap()
+	public Map<Integer, String[]> getGeneLabelMap()
 	{
 		return this.geneLabelMap;
 	}
 	
-	
+	/**
+	 * The method returns the length of the longest id
+	 * 
+	 * @return length of the longest id
+	 */
+	public int getMaxIdLength() {
+		
+		return this.maxIdLength;
+	}
 	
 }

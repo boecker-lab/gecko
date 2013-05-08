@@ -5,28 +5,39 @@ import java.io.Serializable;
 public class Gene implements Serializable {
 	
 	private static final long serialVersionUID = 7903694077854093398L;
-	private String name;
-	private int id;
-	private String annotation;
-	private boolean unknown = false;
+	private final String name;
+	private final String tag;
+	private final int id;
+	private final String annotation;
+	private final boolean unknown;
 	
 	public boolean isUnknown() {
 		return unknown;
 	}
 	
 	public Gene(String name, int id) {
-		this(name, id, null,false);
+		this(name, name, id, null,false);
 	}
 	
 	public Gene(String name, int id, String annotation, boolean unknown) {
 		this.unknown = unknown;
 		this.name = name;
+		this.tag = name;
+		this.id = id;
+		this.annotation = annotation;
+	}
+	
+	public Gene(String name, String tag, int id, String annotation, boolean unknown) {
+		this.unknown = unknown;
+		this.name = name;
+		this.tag = tag;
 		this.id = id;
 		this.annotation = annotation;
 	}
 	
 	public Gene(Gene other) {
 		this.name = other.name;
+		this.tag = other.tag;
 		this.id = other.id;
 		this.annotation = other.annotation;
 		this.unknown = other.unknown;
@@ -36,24 +47,16 @@ public class Gene implements Serializable {
 		return id;
 	}
 	
-	public void setId(int id) {
-		this.id = id;
-	}
-	
 	public String getName() {
 		return name;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public String getTag() {
+		return tag;
 	}
 
 	public String getAnnotation() {
 		return annotation;
-	}
-	
-	public void setAnnotation(String annotation) {
-		this.annotation = annotation;
 	}
 	
 	public String getSummary() {

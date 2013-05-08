@@ -9,6 +9,7 @@ import gecko2.io.CogFileReaderTest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -179,7 +180,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void testFromGenomes() throws Exception{
-		CogFileReader reader = new CogFileReader();
+		CogFileReader reader = new CogFileReader((byte) 1);
 				
 		File inputFile = new File(CogFileReaderTest.class.getResource("/c.cog").toURI());
 		GeckoInstance.getInstance().setCurrentInputFile(inputFile);
@@ -190,6 +191,54 @@ public class BreakPointDistanceTest {
 		Genome[] genomes = reader.getGenomes();
 		
 		breakpointDistanceTest(genomes, new int[][] {{0, 14, 20, 20}, {14, 0, 22, 24},{20, 22, 0, 24},{20, 24, 24, 0}}, false);
+	}
+	
+	@Test
+	public void testGrouping() throws Exception{
+		CogFileReader reader = new CogFileReader((byte) 1);
+				
+		File inputFile = new File(CogFileReaderTest.class.getResource("/c.cog").toURI());
+		GeckoInstance.getInstance().setCurrentInputFile(inputFile);
+		ArrayList<GenomeOccurence> genOcc = reader.importGenomes(inputFile);
+			
+		reader.readFileContent(genOcc);
+				
+		Genome[] genomes = reader.getGenomes();
+		
+		List<Set<Integer>> cluster = BreakPointDistance.groupGenomes(genomes, 0.7, false);
+		assertEquals(2, cluster.size());
+		
+		assertEquals(3, cluster.get(0).size());
+		assertTrue(cluster.get(0).contains(0));
+		assertTrue(cluster.get(0).contains(1));
+		assertTrue(cluster.get(0).contains(3));
+		
+		assertEquals(1, cluster.get(1).size());
+		assertTrue(cluster.get(1).contains(2));
+		
+		cluster = BreakPointDistance.groupGenomes(genomes, 0.9, false);
+		assertEquals(1, cluster.size());
+		
+		assertEquals(4, cluster.get(0).size());
+		assertTrue(cluster.get(0).contains(0));
+		assertTrue(cluster.get(0).contains(1));
+		assertTrue(cluster.get(0).contains(3));
+		assertTrue(cluster.get(0).contains(2));
+		
+		cluster = BreakPointDistance.groupGenomes(genomes, 0.1, false);
+		assertEquals(4, cluster.size());
+		
+		assertEquals(1, cluster.get(0).size());
+		assertTrue(cluster.get(0).contains(0));
+		
+		assertEquals(1, cluster.get(1).size());
+		assertTrue(cluster.get(1).contains(1));
+		
+		assertEquals(1, cluster.get(2).size());
+		assertTrue(cluster.get(2).contains(2));
+		
+		assertEquals(1, cluster.get(3).size());
+		assertTrue(cluster.get(3).contains(3));
 	}
 
 }

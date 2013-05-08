@@ -38,7 +38,20 @@ public class GeneElement extends JPanel implements Adjustable {
 	
 	private Color highlightColor;
 	
-	private final GeckoInstance gecko = GeckoInstance.getInstance();
+	private final GeckoInstance gecko;
+	
+	public GeneElement(Gene g) {
+		this(g, false);
+	}
+	
+	public GeneElement(Gene g, boolean fixedSize) {
+		this.gecko = GeckoInstance.getInstance();
+		this.fixedSize = fixedSize;
+		this.gene = g;
+		this.adjustSize();
+		this.setBackground(Color.WHITE);
+		updateElement();
+	}
 
 	
 	public boolean isUnknown() {
@@ -47,18 +60,6 @@ public class GeneElement extends JPanel implements Adjustable {
 	
 	public void setUnknown(boolean unknown) {
 		this.unknown = unknown;
-	}
-	
-	public GeneElement(Gene g) {
-		this(g, false);
-	}
-	
-	public GeneElement(Gene g, boolean fixedSize) {
-		this.fixedSize = fixedSize;
-		this.gene = g;
-		this.adjustSize();
-		this.setBackground(Color.WHITE);
-		updateElement();
 	}
 	
 	private int computeHeight() {
@@ -70,10 +71,9 @@ public class GeneElement extends JPanel implements Adjustable {
 	
 	private int computeWidth() {
 		if (fixedSize)
-			return (int) Math.round(GeckoInstance.DISPLAY_GENEELEMENT_HIGHT*1.75);
+			return (int) Math.round(gecko.getGeneElementWidth());
 		else
-			return 8 * gecko.getMaxIdLength() + 3; 
-					//gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0].length() + 3;
+			return 8 * gecko.getMaxIdLength() + 3;
 	}
 
 	/**
@@ -191,14 +191,13 @@ public class GeneElement extends JPanel implements Adjustable {
 			g.setFont(new Font("Monospaced", Font.PLAIN, Math.round((float) ELEMHIGHT - ((float) ELEMHIGHT / 2.4F))));
 			
 			/* Draw only the first index of the mapped String array */
-			if (gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0].length() < gecko.getMaxIdLength())
-			{
-				g.drawString(gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0] , ((8 * gecko.getMaxIdLength() + 3) / 2) - ((8 * gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0].length()) / 2) + 5, ELEMHIGHT / 2 + Y_OFFSET + (int) Math.round(g.getFont().getSize() / 2));
-			}
+			String geneId = gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0];
+			int fontY_Position = ELEMHIGHT / 2 + Y_OFFSET + (int) Math.round(g.getFont().getSize() / 2);
+			
+			if (geneId.length() < gecko.getMaxIdLength())
+				g.drawString(geneId , ((8 * gecko.getMaxIdLength() + 3) / 2) - ((8 * geneId.length()) / 2) + 5, fontY_Position);
 			else
-			{
-				g.drawString(gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0] , 5 + fontoffset, ELEMHIGHT / 2 + Y_OFFSET + (int) Math.round(g.getFont().getSize() / 2));
-			}
+				g.drawString(geneId , 5 + fontoffset, fontY_Position);
 		}
 	}
 	

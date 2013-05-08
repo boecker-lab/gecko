@@ -75,7 +75,7 @@ public class CogFileReaderTest {
 		
 		ArrayList<GenomeOccurence> genOcc = null;
 		
-		CogFileReader reader = new CogFileReader();
+		CogFileReader reader = new CogFileReader((byte) 1);
 		
 		try 
 		{
@@ -341,7 +341,7 @@ public class CogFileReaderTest {
 		
 		ArrayList<GenomeOccurence> genOcc = null;
 		
-		CogFileReader reader = new CogFileReader();
+		CogFileReader reader = new CogFileReader((byte) 1);
 		
 		try 
 		{

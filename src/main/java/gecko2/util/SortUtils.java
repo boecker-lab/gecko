@@ -19,8 +19,8 @@ public class SortUtils {
 		Collections.sort(occs, new GenomeOccurenceStartComparator());
 	}
 	
-	public static Map<String[], Integer> invertIntArray(HashMap<Integer, String[]> orig) {
-		HashMap<String[], Integer> result = new HashMap<String[], Integer>();
+	public static Map<String[], Integer> invertIntArray(Map<Integer, String[]> orig) {
+		Map<String[], Integer> result = new HashMap<String[], Integer>();
 		for (int i = 0; i < orig.size() ; i++)
 			result.put(orig.get(i), i);
 		return result;		

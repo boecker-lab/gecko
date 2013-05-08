@@ -54,6 +54,9 @@ public class StartComputationDialog extends JDialog {
 	public StartComputationDialog(int ngenomes) {
 		this.setModal(true);
 		this.setResizable(false);
+		this.setIconImage(Gui.createImageIcon("images/gecko2_a_small.png").getImage());
+		this.setTitle("Configure computation");
+		
 		JPanel panel = new JPanel(new FlowLayout());
 		panel.setPreferredSize(new Dimension(430,280));
 		final JPanel gridpanel = new JPanel();
@@ -319,7 +322,8 @@ public class StartComputationDialog extends JDialog {
 					mergeResultsEnabled = true;
 				GeckoInstance.getInstance().performClusterDetection(new Parameter((Integer) dSpinner.getValue(), 
 						(Integer) sSpinner.getValue(),
-						quorum,Parameter.QUORUM_NO_COST, 
+						quorum,
+						Parameter.QUORUM_NO_COST, 
 						opMode,
 						refType),
 						mergeResultsEnabled);

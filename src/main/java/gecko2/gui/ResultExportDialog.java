@@ -25,6 +25,11 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class ResultExportDialog extends JDialog {
 
+	/**
+	 * Random generated serial version uid
+	 */
+	private static final long serialVersionUID = -5557686856082270849L;
+	
 	private JTextField textField;
 
 	/**
@@ -32,6 +37,7 @@ public class ResultExportDialog extends JDialog {
 	 */
 	public ResultExportDialog(Frame parent) {
 		setTitle("Export Results");
+		this.setIconImage(Gui.createImageIcon("images/gecko2_a_small.png").getImage());
 		setBounds(100, 100, 450, 300);
 		
 		getContentPane().setLayout(new BorderLayout());
@@ -104,7 +110,7 @@ public class ResultExportDialog extends JDialog {
 	 * @return the File the results will be written to, or null if not valid 
 	 */
 	private File validateSettings() {
-		if (textField.getText().trim() == "") {
+		if (textField.getText().trim().equals("")) {
 			JOptionPane.showMessageDialog(ResultExportDialog.this, "You have to select a file!");
 			return null;
 		}

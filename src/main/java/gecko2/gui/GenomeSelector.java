@@ -58,6 +58,8 @@ public class GenomeSelector extends JDialog {
 		super.setModal(true);
 		this.occs = occs;
 
+		this.setIconImage(Gui.createImageIcon("images/gecko2_a_small.png").getImage());
+		
 		// Resort the occurence list and recompute the group borders for
 		// visualization
 		SortUtils.resortGenomeOccurences(occs);
@@ -117,6 +119,11 @@ public class GenomeSelector extends JDialog {
 		lowerpanel.add(centerpanel, BorderLayout.CENTER);
 		
 		allOrNoneAction = new AbstractAction() {
+			
+			/**
+			 * Random generated serial version UID
+			 */
+			private static final long serialVersionUID = -2643293031674665454L;
 			private boolean all = true; // toggle between all or none action.
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -147,7 +154,7 @@ public class GenomeSelector extends JDialog {
 				deleteNotFlaggedEntries();
 				GenomeSelector.this.setVisible(false);
 				if (GenomeSelector.this.occs != null){
-					CogFileReader reader = new CogFileReader();
+					CogFileReader reader = new CogFileReader((byte) 0);
 				
 					reader.readGenomes(GenomeSelector.this.occs);
 					

@@ -53,7 +53,7 @@ public class ClusterAnnotationReaderTest {
 	@Before
 	public void setUp() {
 		try {
-			CogFileReader reader = new CogFileReader();
+			CogFileReader reader = new CogFileReader((byte) 1);
 			File inputFile = new File(ClusterAnnotationReader.class.getResource("/smallTest.cog").toURI());
 			GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 
@@ -173,7 +173,7 @@ public class ClusterAnnotationReaderTest {
 		}
 		Parameter p = new Parameter(1, 4, 3, Parameter.QUORUM_NO_COST, 'r', 'd');
 		p.setAlphabetSize(13);
-		GeneCluster[] res = GeckoInstance.getInstance().computeClusters(computeGenomes, p, GeckoInstance.getInstance());
+		GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(computeGenomes, p);
 		
 		GeneCluster[] readClusters = clusters.toArray(new GeneCluster[clusters.size()]);
 		

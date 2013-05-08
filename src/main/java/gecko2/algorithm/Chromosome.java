@@ -112,6 +112,17 @@ public class Chromosome implements Serializable {
 		return parent;
 	}
 	
+	public String getFullName() {
+		if (getParent().getName() == null)
+			return getName();
+		else if (getName() == null)
+			return getParent().getName();
+		else if (getParent().getName().equals(getName()))
+			return getName();
+		else 
+			return getParent().getName() + " " + getName();
+	}
+	
 	private class ChromosomeMouseListener extends MouseAdapter implements Serializable {
 		
 		private static final long serialVersionUID = -1016912396598206487L;
@@ -122,15 +133,8 @@ public class Chromosome implements Serializable {
 			String infotext = new String();
 					
 			if (Chromosome.this.getChromosomeMouseListener().equals(Chromosome.this.chromosomeMouseListener)) {
-						
-				if (Chromosome.this.getParent().getName() == null)
-					infotext = Chromosome.this.getName();
-				else if (Chromosome.this.getName() == null)
-					infotext = Chromosome.this.getParent().getName();
-				else if (Chromosome.this.getParent().getName().equals(Chromosome.this.getName()))
-					infotext = Chromosome.this.getName();
-				else 
-					infotext = Chromosome.this.getParent().getName() + " " + Chromosome.this.getName();
+					
+				infotext = getFullName();
 			}
 			
 			GeckoInstance.getInstance().getGui().setInfobarText(infotext);
@@ -141,7 +145,5 @@ public class Chromosome implements Serializable {
 			super.mouseExited(e);
 			GeckoInstance.getInstance().getGui().setInfobarText("");
 		}
-
-		
 	}
 }

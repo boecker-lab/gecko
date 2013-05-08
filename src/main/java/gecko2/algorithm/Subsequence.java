@@ -64,5 +64,13 @@ public class Subsequence implements Serializable {
 	public boolean isValid() {
 		return (start<=stop);
 	}
+
+	@Override
+	public String toString() {
+		return "Subsequence [start=" + start + ", stop=" + stop
+				+ ", chromosome=" + chromosome + ", dist=" + dist + ", pValue="
+				+ pValue + "]";
+	}
+	
 	
 }

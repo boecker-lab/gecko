@@ -1,6 +1,6 @@
 package gecko2;
 
-import gecko2.algorithm.BreakPointDistance;
+import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
@@ -21,8 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -36,7 +39,7 @@ import javax.swing.event.EventListenerList;
 public class GeckoInstance {
 	private static GeckoInstance instance;
 	
-	public native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
+	private native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
 	
 	public enum ResultFilter {showAll, showFiltered, showSelected};
@@ -45,8 +48,8 @@ public class GeckoInstance {
 	
 	private File currentInputFile; 
 	private Genome[] genomes= null;
-	private HashMap<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
-	private HashMap<Integer, Color> colormap;
+	private Map<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
+	private Map<Integer, Color> colormap;
 	
 	private GeneCluster[] clusters;
 	private SortedSet<Integer> clusterSelection;
@@ -66,22 +69,58 @@ public class GeckoInstance {
 	
 	private int maxIdLength;
 	
+	/**
+	 * 0 gui session, 1 cli session
+	 */
+	private int sessionType = 0;
+	
+	/**
+	 * Set the session type
+	 * 
+	 * @param sType 0 if gui session else 1 for cli session
+	 */
+	public void setSessionType (int sType) {
+		
+		sessionType = sType;
+	}
+	
+	/**
+	 * Setter for the variable maxIdLength which is the length of the
+	 * longest appearing id.
+	 * 
+	 * @param length
+	 */
 	public void setMaxIdLength(int length)
 	{
 		this.maxIdLength = length;
 	}
 	
+	/**
+	 * Getter for the variable maxIdLength
+	 * 
+	 * @return the length of the longest id in the read data
+	 */
 	public int getMaxIdLength()
 	{
 		return this.maxIdLength;
 	}
 	
-	public void setColorMap(HashMap<Integer, Color> colormap)
+	/**
+	 * Setter for the colormap
+	 * 
+	 * @param colormap
+	 */
+	public void setColorMap(Map<Integer, Color> colormap)
 	{
 		this.colormap = colormap;
 	}
 	
-	public void setGeneLabelMap(HashMap<Integer, String[]> geneLabelMap)
+	/**
+	 * Setter for the geneLabelMap
+	 * 
+	 * @param geneLabelMap
+	 */
+	public void setGeneLabelMap(Map<Integer, String[]> geneLabelMap)
 	{
 		this.geneLabelMap = geneLabelMap;
 	}
@@ -209,7 +248,7 @@ public class GeckoInstance {
 	/**
 	 * Adds the cluster with the given index to the list of hidden clusters
 	 * 
-	 * @param clusterIndex the index of the cluster
+	 * @param toHide the index of the cluster to hide
 	 */
 	public void addToReducedList(SortedSet<Integer> toHide) {
 		if (reducedList == null)
@@ -383,7 +422,7 @@ public class GeckoInstance {
 	
 	public void setGenomes(Genome[] genomes) {
 		this.genomes = genomes;
-		if (genomes!=null)
+		if (genomes!=null && GeckoInstance.this.gui != null)
 			scd = new StartComputationDialog(genomes.length);
 		else
 			scd = null;
@@ -409,7 +448,11 @@ public class GeckoInstance {
 	
 	public void setClusters(GeneCluster[] clusters) {
 		this.clusters = clusters;
-		gui.getGcSelector().refresh();
+		
+		if (this.sessionType == 0) {
+			
+			gui.getGcSelector().refresh();
+		}
 	}
 	
 	public GeneCluster[] getClusters() {
@@ -480,11 +523,11 @@ public class GeckoInstance {
 		return map;
 	}	
 
-	public HashMap<Integer, Color> getColormap() {
+	public Map<Integer, Color> getColormap() {
 		return colormap;
 	}
 	
-	public HashMap<Integer, String[]> getGenLabelMap() {
+	public Map<Integer, String[]> getGenLabelMap() {
 		return geneLabelMap;
 	}
 	
@@ -507,6 +550,48 @@ public class GeckoInstance {
 			instance = new GeckoInstance();
 		}
 		return instance;
+	}
+	
+	/**
+	 * Computes the gene clusters for the given genomes with the given paramters
+	 * @param genomes the genomes
+	 * @param params the paramters
+	 * @return the gene clusters
+	 */
+	public GeneCluster[] computeClustersJava(int[][][] genomes, Parameter params) {
+		return computeClustersJava(genomes, params);
+	}
+	
+	/**
+	 * Computes the gene clusters for the given genomes with the given paramters
+	 * @param genomes the genomes
+	 * @param params the paramters
+	 * @param genomeGrouping the grouping of the genomes, only one genome per group is used for quorum and p-value
+	 * @return the gene clusters
+	 */
+	public GeneCluster[] computeClustersJava(int[][][] genomes, Parameter params, List<Set<Integer>> genomeGrouping) {
+		return ReferenceClusterAlgorithm.computeReferenceClusters(genomes, params, genomeGrouping);
+	}
+	
+	/**
+	 * Computes the gene clusters for the given genomes with the given paramters
+	 * @param genomes the genomes
+	 * @param params the paramters
+	 * @return the gene clusters
+	 */
+	public GeneCluster[] computeClustersLibgecko(int[][][] genomes, Parameter params) {
+		return computeClusters(genomes, params, GeckoInstance.this);
+	}
+	
+	/**
+	 * Computes the gene clusters for the given genomes with the given paramters
+	 * @param genomes the genomes
+	 * @param params the paramters
+	 * @return the gene clusters
+	 */
+	public GeneCluster[] computeClusters(int[][][] genomes, Parameter params) {
+		//return computeClustersJava(genomes, params);
+		return computeClustersLibgecko(genomes, params);
 	}
 	
 	public void performClusterDetection(Parameter p, boolean mergeResults) {
@@ -545,6 +630,7 @@ public class GeckoInstance {
 		public void run() {
 			//printGenomeStatistics(GeckoInstance.this.genomes, p.getAlphabetSize(), 1500, 250);
 			//BreakPointDistance.breakPointDistance(GeckoInstance.this.genomes, false);
+			//BreakPointDistance.groupGenomes(genomes, 0.1, 0.95, 0.1, false);
 			//System.out.println("\n");
 			//BreakPointDistance.breakPointDistance(GeckoInstance.this.genomes, true);
 			
@@ -556,8 +642,9 @@ public class GeckoInstance {
 				for (int j=0;j<genomes[i].length;j++)
 					genomes[i][j] = GeckoInstance.this.genomes[i].getChromosomes().get(j).toIntArray(true, true);
 			}
-			Date before = new Date();			
-			GeneCluster[] res = computeClusters(genomes, p, GeckoInstance.this);			
+			
+			Date before = new Date();
+			GeneCluster[] res = computeClusters(genomes, p);	
 			Date after = new Date();
 			System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
 			if (mergeResults)				

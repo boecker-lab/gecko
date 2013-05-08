@@ -1,6 +1,6 @@
 package gecko2.event;
 
-import gecko2.gui.MultipleGenomesBrowser;
+import gecko2.gui.AbstractMultipleGenomeBrowser;
 
 import java.util.EventObject;
 
@@ -12,7 +12,7 @@ public class BrowserContentEvent extends EventObject {
 	private short eventType;
 	private static final long serialVersionUID = 1382632021469547584L;
 
-	public BrowserContentEvent(MultipleGenomesBrowser source, short eventType) {
+	public BrowserContentEvent(AbstractMultipleGenomeBrowser source, short eventType) {
 		super(source);
 		this.eventType = eventType;
 	}
@@ -22,8 +22,8 @@ public class BrowserContentEvent extends EventObject {
 	}
 	
 	@Override
-	public MultipleGenomesBrowser getSource() {
-		return (MultipleGenomesBrowser) super.getSource();
+	public AbstractMultipleGenomeBrowser getSource() {
+		return (AbstractMultipleGenomeBrowser) super.getSource();
 	}
 }
 
