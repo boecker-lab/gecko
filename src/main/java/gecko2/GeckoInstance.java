@@ -559,7 +559,7 @@ public class GeckoInstance {
 	 * @return the gene clusters
 	 */
 	public GeneCluster[] computeClustersJava(int[][][] genomes, Parameter params) {
-		return computeClustersJava(genomes, params);
+		return computeClustersJava(genomes, params, null);
 	}
 	
 	/**
