@@ -84,6 +84,25 @@ public class GenomePainting {
 	}
 	
 	/**
+	  * Paints one gene, the gene text is automatically generated from the gene id and the gecko gene label map
+	  * @param g the Graphics
+	  * @param gene the gene
+	  * @param partOfCluster if the gene is part of the cluster and gets an orange background
+	  * @param color the color of the gene background
+	  * @param x the x coordinate
+	  * @param y the y coordinate
+	  * @param width the width of the gene box
+	  * @param height the height of the gene box
+	  * @param hgap the size of the gap next to the gene
+	  * @param vgap the vertical gap size
+	  * @return the x coordinate after the painting
+	  */
+	public static int paintGene(Graphics g, Gene gene, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
+		String geneName = GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(gene.getId()))[0];
+		return paintGene(g, gene, backgroundColor, color, geneName, x, y, width, height, hgap, vgap);
+	}
+	
+	/**
 	  * Paints one gene
 	  * @param g the Graphics
 	  * @param gene the gene
@@ -242,7 +261,7 @@ public class GenomePainting {
 	private static int paintChromosome(Graphics g, Chromosome chromsome, int x, int y, int width, int height, int hgap, int vgap){
 		x = paintChromosomeStart(g, x, y, width, height, hgap);
 		for (Gene gene : chromsome.getGenes()) {
-			x = paintGene(g, gene, Color.WHITE, getColor(gene), Integer.toString(Math.abs(gene.getId())), x, y, width, height, hgap, vgap);
+			x = paintGene(g, gene, Color.WHITE, getColor(gene), x, y, width, height, hgap, vgap);
 		}
 		x = paintChromosomeEnd(g, x, y, width, height, hgap);
 		
@@ -263,7 +282,7 @@ public class GenomePainting {
 	private static int paintChromosomeGrey(Graphics g, Chromosome chromsome, int x, int y, int width, int height, int hgap, int vgap){
 		x = paintChromosomeStart(g, x, y, width, height, hgap);
 		for (Gene gene : chromsome.getGenes()) {
-			x = paintGene(g, gene, Color.WHITE, getGreyValueColor(gene), Integer.toString(Math.abs(gene.getId())), x, y, width, height, hgap, vgap);
+			x = paintGene(g, gene, Color.WHITE, getGreyValueColor(gene), x, y, width, height, hgap, vgap);
 		}
 		x = paintChromosomeEnd(g, x, y, width, height, hgap);
 		
@@ -291,9 +310,9 @@ public class GenomePainting {
 		for (int i=0; i<chr.getGenes().size(); i++) {
 			Gene gene = chr.getGenes().get(i);
 			if (i>=start && i<=stop)
-				x = paintGene(g, gene, highlightColor, getColor(gene), Integer.toString(Math.abs(gene.getId())), x, y, width, height, hgap, vgap);
+				x = paintGene(g, gene, highlightColor, getColor(gene), x, y, width, height, hgap, vgap);
 			else
-				x = paintGene(g, gene, Color.WHITE, getGreyValueColor(gene), Integer.toString(Math.abs(gene.getId())), x, y, width, height, hgap, vgap);
+				x = paintGene(g, gene, Color.WHITE, getGreyValueColor(gene), x, y, width, height, hgap, vgap);
 		}
 		x = paintChromosomeEnd(g, x, y, width, height, hgap);
 		

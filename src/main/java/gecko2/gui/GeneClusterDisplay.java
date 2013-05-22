@@ -132,15 +132,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 				Genome g = GeckoInstance.getInstance().getGenomes()[i];
 				cpanel.add(new NumberInRectangle(i + 1, getBackground(), mlisteners.get(i), Integer.toString(i + 1).length()));
 				
-				if (g.getName() == null)
-					cpanel.add(new TextLabel(c.getName()));
-				else if (c.getName() == null)
-					cpanel.add(new TextLabel(g.getName()));
-				else if (g.getName().equals(c.getName()))
-					cpanel.add(new TextLabel(c.getName()));
-				else 
-					cpanel.add(new TextLabel(g.getName() + " " + c.getName()));
-
+				cpanel.add(new TextLabel(c.getFullName()));
 				
 				masterPanel.add(cpanel);
 			}
@@ -213,7 +205,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 				if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) 
 					continue;
 				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
-				if (s.getStart()>s.getStop()) continue;
+				if (s.getStart()>s.getStop()) 
+					continue;
 				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i), Integer.toString(i+1).length()));
 				TextLabel textLabel = new TextLabel(Integer.toString(s.getDist()));
 				textLabel.setFont(monoFont);
