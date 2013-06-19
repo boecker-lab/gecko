@@ -70,7 +70,7 @@ public class ResultWriter {
 		final boolean HIDE_NON_OCCS = false; // if true, don't print all the non occurrences
 		
 		writer.write(String.format("Detected %d gene clusters.\n", clusters.size()));
-		writer.write("General statistics:\n");
+		/*writer.write("General statistics:\n");
 		
 		List<List<Integer>> distancesPerGenome = new ArrayList<List<Integer>>(genomeNames.size());
 		List<List<Integer>> clusterSizesPerGenome = new ArrayList<List<Integer>>(genomeNames.size());
@@ -364,7 +364,7 @@ public class ResultWriter {
 				}
 				writer.write("\n");
 			}
-		}
+		}*/
 		
 		for (GeneCluster cluster : clusters) {
 			writeSingleGeneClusterData(writer, cluster);
