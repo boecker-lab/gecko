@@ -401,6 +401,16 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * @return The SortedSet, containing the indices of the clusters that are to keep
 	 */
 	public static SortedSet<Integer> generateReducedClusterList(GeneCluster[] allClusters) {
+		return generateSimilarityReducedClusterList(allClusters);
+	}
+	
+	/**
+	 * Generates a reduced list of the gene clusters, keeping of all similar clusters only the one with the lowest p-Value.
+	 * Returns a @Link SortedSet of the indices of the kept clusters.  
+	 * @param allClusters The array of gene clusters
+	 * @return The SortedSet, containing the indices of the clusters that are to keep
+	 */
+	private static SortedSet<Integer> generateSimilarityReducedClusterList(GeneCluster[] allClusters) {
 		SortedSet<Integer> reducedList = new TreeSet<Integer>();
 		
 		GeneCluster[] tmp = Arrays.copyOf(allClusters, allClusters.length);
@@ -411,8 +421,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				int index = it.next();
 				GeneCluster cluster = allClusters[index];
 				assert(cluster.getId() == index);
-				int similarity = geneCluster.similarity(cluster);
-				if (similarity != 0) { // if similar
+				if (geneCluster.isSimilar(cluster)) { // if similar
 					int compare = geneCluster.bestPValue.compareTo(cluster.bestPValue);
 					if (compare > 0)// if similar, but worse then the previously inserted cluster
 						contained = true;
@@ -432,14 +441,77 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		return reducedList;
 	}
 	
+	private static SortedSet<Integer> generateInternalDuplicationReducedClusterList(GeneCluster[] allClusters) {
+		SortedSet<Integer> reducedList = new TreeSet<Integer>();
+		List<List<GeneCluster>> clusterGroups = groupSimilarClusters(allClusters);
+		for (List<GeneCluster> clusterGroup : clusterGroups) {
+			while (clusterGroup.size() != 0) {
+				GeneCluster bestCluster = getLargestCluster(clusterGroup);
+				reducedList.add(bestCluster.getId());
+				Iterator<GeneCluster> it = clusterGroup.iterator();
+				while (it.hasNext()){
+					GeneCluster cluster = it.next();
+					if (bestCluster.isSimilar(cluster))
+						it.remove();
+				}
+			}
+		}
+		return reducedList;
+	}
+	
+	private static GeneCluster getLargestCluster(List<GeneCluster> clusterGroup){
+		GeneCluster bestCluster = null;
+		int highestNumberOfIntervals = -1;
+		for (GeneCluster cluster : clusterGroup) {
+			if (cluster.getNumberOfIntervals() > highestNumberOfIntervals) {
+				highestNumberOfIntervals = cluster.getNumberOfIntervals();
+				bestCluster = cluster;
+			}
+		}
+		return bestCluster;
+	}
+	
+	private int getNumberOfIntervals() {
+		int numberOfIntervals = 0;
+		for (GeneClusterOccurrence occ : allOccurrences) {
+			for (Subsequence[] subseqs : occ.getSubsequences())
+				numberOfIntervals += subseqs.length;
+		}
+		return numberOfIntervals;
+	}
+	
+	private static List<List<GeneCluster>> groupSimilarClusters(GeneCluster[] allClusters) {
+		List<List<GeneCluster>> resultList = new ArrayList<List<GeneCluster>>();
+		
+		for (GeneCluster cluster : allClusters){
+			List<GeneCluster> newGroup = new ArrayList<GeneCluster>();
+			newGroup.add(cluster);
+			
+			Iterator<List<GeneCluster>> listIter = resultList.iterator();
+			while (listIter.hasNext()){
+				List<GeneCluster> groupedClusters = listIter.next();
+				for (GeneCluster groupedCluster : groupedClusters) {
+					if (groupedCluster.isSimilar(cluster)){
+						newGroup.addAll(groupedClusters);
+						listIter.remove();
+						break;
+					}
+				}
+			}
+			resultList.add(newGroup);
+		}
+		
+		return resultList;
+	}
+	
 	/**
 	 * Tests, if this gene cluster is similar to the the other gene cluster
 	 * @param other the other gene cluster
-	 * @return 0 if they are not similar, 1 if it is similar
+	 * @return if they are similar
 	 */
-	private int similarity(GeneCluster other) {
+	private boolean isSimilar(GeneCluster other) {
 		for (int i=0; i < this.bestOccurrences.length; i++) {
-			int similarity = 0;
+			boolean similar = false;
 			boolean possibleSimilarOcc = true;
 			if (this.bestOccurrences[i] == null || other.bestOccurrences[i] == null)
 				continue;
@@ -455,21 +527,20 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 					for (Subsequence oSeq : otherSubsequences) {
 						if (seq.chromosome == oSeq.chromosome) {
 							if (seq.start >= oSeq.start && seq.start <= oSeq.stop)
-								similarity = 1;
+								similar = true;
 							if (seq.stop > oSeq.start && seq.stop < oSeq.stop)
-								similarity = 1;
+								similar = true;
 							if (oSeq.start >= seq.start && oSeq.start <= seq.stop)
-								similarity = 1;
+								similar = true;
 							if (oSeq.stop > seq.start && oSeq.stop < seq.stop)
-								similarity = 1;
+								similar = true;
 						}
 					}
 				}
 			}
-			if (similarity != 0 && possibleSimilarOcc) 
-				return similarity;
+			return (similar && possibleSimilarOcc);
 		}
-		return 0;
+		return false;
 	}
 	
 	public static GeneCluster[] mergeResults(GeneCluster[] oldResults, List<GeneCluster> additionalResults) {

@@ -45,7 +45,6 @@ public class GenomeSelector extends JDialog {
 	private static final long serialVersionUID = -8491964493540715101L;
 	private ArrayList<GenomeOccurence> occs;
 	private short[] borders;
-	private TableModel tableModel;
 	private HashMap<Integer, Color> colorMap;
 	private int highID =0;
 	private Random rand;
@@ -83,8 +82,7 @@ public class GenomeSelector extends JDialog {
 		table = new JTable();
 		TableCellRenderer r = new GenomeTableCellRenderer();
 		table.setDefaultRenderer(Character.class, r);
-		this.tableModel = new GenomeTableModel();
-		table.setModel(this.tableModel);
+		table.setModel(new GenomeTableModel());
 		table.addMouseListener(new GenomeTableMouseListener());
 		table.getColumnModel().getColumn(2).setMaxWidth(20);
 		table.getColumnModel().getColumn(1).setMaxWidth(20);

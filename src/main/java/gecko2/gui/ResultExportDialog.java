@@ -2,6 +2,7 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 import gecko2.GeckoInstance.ResultFilter;
+import gecko2.io.ResultWriter.ExportType;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -61,10 +62,13 @@ public class ResultExportDialog extends JDialog {
 				}
 			}
 		});
-		final JComboBox selectionComboBox = new JComboBox(ResultFilter.values());
+		final JComboBox resultFilterComboBox = new JComboBox(ResultFilter.values());
+		final JComboBox exportTypeCompoBox = new JComboBox(ExportType.values());
 		
 		contentBuilder.append(new JLabel("Choose File"), textField, btnBrowse);
-		contentBuilder.append(new JLabel("Choose Filtering"), selectionComboBox);
+		contentBuilder.append(new JLabel("Choose Filtering"), resultFilterComboBox);
+		contentBuilder.nextLine();
+		contentBuilder.append(new JLabel("Choose Export Type"), exportTypeCompoBox);
 		
 		ButtonBarBuilder2 buttonBuilder = new ButtonBarBuilder2();
 		
@@ -76,7 +80,7 @@ public class ResultExportDialog extends JDialog {
 				File file = validateSettings();
 				
 				if (file != null) {
-					if (!GeckoInstance.getInstance().exportResultsToFile(file, (ResultFilter)selectionComboBox.getSelectedItem()))
+					if (!GeckoInstance.getInstance().exportResultsToFile(file, (ResultFilter)resultFilterComboBox.getSelectedItem(), (ExportType)exportTypeCompoBox.getSelectedItem()))
 						JOptionPane.showMessageDialog(ResultExportDialog.this, "Error writing the file!", "Write error", JOptionPane.ERROR_MESSAGE);
 					ResultExportDialog.this.close();
 				}						

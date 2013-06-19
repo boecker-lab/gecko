@@ -3,7 +3,6 @@ package gecko2.gui;
 import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
 import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.Genome;
 import gecko2.io.ClusterAnnotationReader;
 import gecko2.io.CogFileReader;
 import gecko2.io.GckFileReader;
@@ -352,11 +351,17 @@ public class Gui {
 	
 	/** Simple helper methods which makes it easier to create ImageIcons from Resource
 	 *
-     *	@param path path to the icon
-     *  @return Returns a imageicon if path describes an image, null otherwise 
-	 */
+     * @param String path 
+     * @return Returns a imageicon if path describes an image, null otherwise 
+     */
 	public static ImageIcon createImageIcon(String path) {
-		return new ImageIcon(path);	
+		java.net.URL imgURL =  ClassLoader.getSystemResource(path);
+		if (imgURL != null) {
+			return new ImageIcon(imgURL);
+		} else {
+			System.err.println("Couldn't find file: " + path);
+			return null;
+		}
 	}
 
 	

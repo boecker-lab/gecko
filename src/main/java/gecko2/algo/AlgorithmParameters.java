@@ -21,6 +21,9 @@ public class AlgorithmParameters{
     
     private final static int[][] HIGHLY_CONSERVED_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {2, 1, 2}, {3, 2, 3}, {4, 2, 4}, {5, 3, 5}, {6, 3, 6}};
     private final static int[][] LOW_CONSERVED_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {2, 1, 2}, {3, 2, 3}, {3, 3, 3}, {4, 3, 4}, {5, 3, 5}, {6, 4, 6}};
+    private final static int[][] LICHTHEIMIA_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
+    private final static int[][] LICHTHEIMIA_INNER_GENOME_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}};
+    private final static int[][] STATISTIC_PAPER_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {5, 5, 5}};
 
     
 	public AlgorithmParameters(int delta, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference) {
@@ -59,6 +62,22 @@ public class AlgorithmParameters{
 	
 	public static AlgorithmParameters getLowConservedParameters(int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
 		return new AlgorithmParameters(-1, LOW_CONSERVED_DELTA_TABLE, 3, q, nrOfGenomes, alphabetSize, singleReference, refInRef);
+	}
+	
+	public static AlgorithmParameters getLichtheimiaParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
+		return new AlgorithmParameters(-1, LICHTHEIMIA_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() == 'd') ? false : true, p.searchRefInRef());
+	}
+	
+	public static AlgorithmParameters getLichtheimiaInnerGenomeParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
+		return new AlgorithmParameters(-1, LICHTHEIMIA_INNER_GENOME_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() == 'd') ? false : true, true);
+	}
+	
+	public static AlgorithmParameters getStatisticPaperGenomeParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
+		return new AlgorithmParameters(-1, STATISTIC_PAPER_DELTA_TABLE, 4, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() == 'd') ? false : true, p.searchRefInRef());
+	}
+	
+	public static AlgorithmParameters getLichtheimiaParameters(int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
+		return new AlgorithmParameters(-1, LICHTHEIMIA_DELTA_TABLE, 3, q, nrOfGenomes, alphabetSize, singleReference, refInRef);
 	}
 	
 	private AlgorithmParameters(int delta, int[][] deltaTable, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {

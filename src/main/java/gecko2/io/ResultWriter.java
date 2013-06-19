@@ -14,7 +14,9 @@ import java.io.Writer;
 import java.util.*;
 
 public class ResultWriter {
-	public static boolean exportResultsToFileNEW2(File f, List<GeneCluster> clusters, Map<Integer, String[]> geneLabelMap, List<String> genomeNames) {
+	public enum ExportType {clusterData, table, latexTable, internalDuplications};
+	
+	public static boolean exportResultsToFileNEW2(File f, List<GeneCluster> clusters, Map<Integer, String[]> geneLabelMap, List<String> genomeNames, ExportType type) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(f));
 			
@@ -24,10 +26,20 @@ public class ResultWriter {
 					return o1.getBestPValue().compareTo(o2.getBestPValue());
 				}
 			});
-			//writeGeneClusterTable(writer, clusters);
-			writeGeneClusterOutput(writer, clusters, geneLabelMap, genomeNames);
-			//writeInternalDuplicationsData(writer, clusters, geneLabelMap, genomeNames);
-			
+			switch (type) {
+				case clusterData:
+					writeGeneClusterOutput(writer, clusters, geneLabelMap, genomeNames);
+					break;
+				case table:
+					writeGeneClusterTable(writer, clusters);
+					break;
+				case latexTable:
+					writeGeneClusterLatexTable(writer, clusters);
+					break;
+				case internalDuplications:
+					writeInternalDuplicationsData(writer, clusters, geneLabelMap, genomeNames);
+					break;
+			}
 
 			writer.close();
 			return true;

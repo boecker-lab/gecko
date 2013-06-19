@@ -571,13 +571,11 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			this.refreshMachingClusters();
 			
 			if (this.include.contains(toRemove)) {
-	
-				include.remove((Integer) toRemove);
+				include.remove(toRemove);
 			}
 			
 			if (this.exclude.contains(toRemove)) {
-			
-				exclude.remove((Integer) toRemove);
+				exclude.remove(toRemove);
 			}
 			
 			Object[] includeHelper = this.include.toArray();
@@ -589,12 +587,10 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			// If the array lists are not empty we have to include/exclude the rest of
 			// the contained genomes
 			for (int i = 0; i < includeHelper.length && includeHelper.length > 0; i++) {
-				
 				this.showClustersWithSelectedGenome((Integer) includeHelper[i]);
 			}
 			
 			for (int i = 0; i < excludeHelper.length && excludeHelper.length > 0; i++) {
-				
 				this.showClustersWithoutSelectedGenome((Integer) excludeHelper[i]);
 			}
 		}
@@ -607,35 +603,27 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		 * @param genomeToAddToFilter id of the genome to keep in clusters
 		 */
 		protected void showClustersWithSelectedGenome(int genomeToAddToFilter) {
-			
 			ArrayList<GeneCluster> tmp = new ArrayList<GeneCluster>();
 			
 			if (this.exclude.contains(genomeToAddToFilter)) {
-				
 				this.removeGenomeFromSelection(genomeToAddToFilter);
 			}
 			
 			for (GeneCluster g : this.matchingClusters) {
-				
 				for (GeneClusterOccurrence k : g.getAllOccurrences()) {
-					
 					for (int i = 0; i < k.getSubsequences()[genomeToAddToFilter].length; i++) {
-						
 						// If a genome is not in the cluster start is greater then stop
 						// keep this in mind
 						if (k.getSubsequences()[genomeToAddToFilter][i].getStart() < k.getSubsequences()[genomeToAddToFilter][i].getStop()) {
-							
 							tmp.add(g);
 							break;
 						}
 					}
 				}
-				
 			}
 				
 			this.matchingClusters = tmp;
-			this.include.add(genomeToAddToFilter);
-			
+			this.include.add(genomeToAddToFilter);	
 		} 
 		
 		/**
@@ -645,29 +633,22 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		 * @param genomeToRemoveFromClusSelec id of the genome to sort out (number)
 		 */
 		protected void showClustersWithoutSelectedGenome(int genomeToRemoveFromClusSelec) {
-
 			ArrayList<GeneCluster> tmp = new ArrayList<GeneCluster>();
 			
 			if (this.include.contains(genomeToRemoveFromClusSelec)) {
-				
 				this.removeGenomeFromSelection(genomeToRemoveFromClusSelec);
 			}
 			
 			for (GeneCluster g : this.matchingClusters) {
-				
 				for (GeneClusterOccurrence k : g.getAllOccurrences()) {
-					
 					for (int i = 0; i < k.getSubsequences()[genomeToRemoveFromClusSelec].length; i++) {
-						
 						// If a genome is not in the cluster start is greater then stop
 						if (k.getSubsequences()[genomeToRemoveFromClusSelec][i].getStart() < k.getSubsequences()[genomeToRemoveFromClusSelec][i].getStop()) {
-							
 							tmp.add(g);
 							break;
 						}
 					}
 				}
-				
 			}
 			
 			this.matchingClusters.removeAll(tmp);

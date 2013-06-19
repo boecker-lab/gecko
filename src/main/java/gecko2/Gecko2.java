@@ -112,7 +112,7 @@ public class Gecko2 {
 			System.err.println(":o)");
 	    		
 			GeckoInstance instance = GeckoInstance.getInstance();
-			instance.setLibgeckoLoaded(libgeckoLoaded);
+			instance.setLibgeckoLoaded(true);
 		
 			if (gui || (!gui && args.length <= 1)) {
 				

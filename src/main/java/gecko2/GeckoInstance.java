@@ -13,6 +13,7 @@ import gecko2.event.DataListener;
 import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
 import gecko2.io.ResultWriter;
+import gecko2.io.ResultWriter.ExportType;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -590,8 +591,8 @@ public class GeckoInstance {
 	 * @return the gene clusters
 	 */
 	public GeneCluster[] computeClusters(int[][][] genomes, Parameter params) {
-		//return computeClustersJava(genomes, params);
-		return computeClustersLibgecko(genomes, params);
+		return computeClustersJava(genomes, params);
+		//return computeClustersLibgecko(genomes, params);
 	}
 	
 	public void performClusterDetection(Parameter p, boolean mergeResults) {
@@ -884,12 +885,12 @@ public class GeckoInstance {
 		this.lastOpenedFile = lastOpenedFile;
 	}
 	
-	public boolean exportResultsToFile(File f, ResultFilter filter) {
+	public boolean exportResultsToFile(File f, ResultFilter filter, ExportType type) {
 		lastExportedFile = f;
 		filterResults();
 		List<String> genomeNames = new ArrayList<String>(genomes.length);
 		for (Genome genome : genomes)
 			genomeNames.add(genome.getName());
-		return ResultWriter.exportResultsToFileNEW2(f, getClusterList(filter), geneLabelMap, genomeNames);
+		return ResultWriter.exportResultsToFileNEW2(f, getClusterList(filter), geneLabelMap, genomeNames, type);
 	}
 }

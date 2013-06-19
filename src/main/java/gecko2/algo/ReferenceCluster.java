@@ -222,8 +222,10 @@ public class ReferenceCluster {
 		
 		List<DeltaLocation> refInRefList = dLocLists.get(dLocLists.size()-1);
 		
-		if (!refInRefList.isEmpty())
+		if (!refInRefList.isEmpty()) {
 			coveredGenomes--;
+			coveredGenomeGroups--;
+		}
 		
 		Iterator<DeltaLocation> dLocIt = refInRefList.iterator();
 		while (dLocIt.hasNext()) {
@@ -244,5 +246,10 @@ public class ReferenceCluster {
 				return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return bestCombined_pValue.toString();
 	}
 }

@@ -76,7 +76,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * false filter is inactive
 	 * true filter is active
 	 */
-	private boolean filterActive = false; 
+	private boolean filterNonContainedGenomes = false; 
 	
 	public MultipleGenomesBrowser() {
 		gecko = GeckoInstance.getInstance();
@@ -121,18 +121,15 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * For this the method sets the filterActiv variable and the clusterBackup to undo the view change.
 	 * So the method activates and deactivates the filter.
 	 * 
-	 * @param hide true if the filter should be activated else false to turn it off
+	 * @param filter true if the filter should be activated else false to turn it off
 	 */
 	@Override
-	public void hideNonClusteredGenomes(boolean hide)
+	public void hideNonClusteredGenomes(boolean filter)
 	{
 		// filter is only active if a cluster was selected
-		FlowLayout flowlayout = new FlowLayout();
-		flowlayout.setVgap(0);
-		
 		if (this.getSelectedCluster() != null)
 		{
-			if (filterActive == false && hide == true)
+			if (!filterNonContainedGenomes && filter)
 			{
 				// activation branch
 				for (int i = 0; i < this.getSelectedCluster().getOccurrences()[0].getSubsequences().length; i++)
@@ -140,16 +137,15 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 					if (this.getSelectedCluster().getOccurrences()[0].getSubsequences()[i].length == 0)
 					{	
 						this.centerpanel.getComponent(i).setVisible(false);
-						this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() - (4 + gecko.getGeneElementHight() + flowlayout.getVgap())));
+						this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() - getGenomeBrowserHeight()));
 					}
 				}
 				
 				this.validate();
-				filterActive = true;
 			}
 			else
 			{
-				if (filterActive && hide == false)
+				if (filterNonContainedGenomes && !filter)
 				{
 					// deactivate filter branch
 					for (int i = 0; i < this.getSelectedCluster().getOccurrences()[0].getSubsequences().length; i++)
@@ -157,15 +153,15 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 						this.centerpanel.getComponent(i).setVisible(true);
 						if (this.getSelectedCluster().getOccurrences()[0].getSubsequences()[i].length == 0)
 						{	
-							this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() + (4 + gecko.getGeneElementHight() + flowlayout.getVgap())));
+							this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() + getGenomeBrowserHeight()));
 						}
 					}
 				
 					this.validate();
-					filterActive = false;
 				}
 			}
 		}
+		filterNonContainedGenomes = filter;
 	}
 	
 	@Override
@@ -237,7 +233,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * @return a JComboBox for the use in a GenomeBrowser
 	 */
 	private JComboBox createComboBox(int genomeBrowsersSize, int height) {
-		
 		String[] selection = {"None", "Include", "Exclude"};
 		JComboBox box = new JComboBox(selection);
 		box.setPreferredSize(new Dimension(100, height));
@@ -286,7 +281,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
 		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(), gb.getBackground(), Integer.toString(this.genomeBrowsers.size()).length());
 //		n.addMouseListener(gb.getGenomebrowsermouseover());
-		JComboBox box = createComboBox(genomeBrowsers.size(), gb.getGBHeight());
+		JComboBox box = createComboBox(genomeBrowsers.size(), getGenomeBrowserHeight());
 		boxPanel.add(box);
 		boxPanel.add(new JToolBar.Separator());
 		boxPanel.add(n);
@@ -296,7 +291,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		this.gbNavigators.add(nav);
 		this.centerpanel.add(boxPanel);
 		rightPanel.add(nav);
-		this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(), (int) this.getPreferredSize().getHeight() + gb.getGBHeight()));
+		this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(), (int) this.getPreferredSize().getHeight() + getGenomeBrowserHeight()));
 		this.repaint();
 
 		this.revalidate();
@@ -595,7 +590,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			lastLocationEvent = (LocationSelectionEvent) e;
 			
 			// save current filter status
-			boolean stat = filterActive;
+			boolean stat = filterNonContainedGenomes;
 			
 			// deactivate the filter if active
 			this.hideNonClusteredGenomes(false);

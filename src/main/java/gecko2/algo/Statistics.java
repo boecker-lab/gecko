@@ -1,10 +1,15 @@
 package gecko2.algo;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Formatter.BigDecimalLayoutForm;
 
 import org.apache.commons.math3.util.Precision;
 
@@ -93,8 +98,9 @@ class Statistics {
 			
 			cluster.setBestCombined_pValue(combine_pValuesWithQuorum(best_pValue, cluster.getCoveredGenomeGroups()));
 			
-			cluster.setBestCombined_pValueCorrected(bonferroniCorrection(cluster));
+			//cluster.setBestCombined_pValueCorrected(bonferroniCorrection(cluster));
 		}
+		fdrCorrection(refCluster);
 	}
 	
 	private BigDecimal bonferroniCorrection(ReferenceCluster cluster) {
@@ -111,6 +117,41 @@ class Statistics {
 			testedIntervals = new BigDecimal(tmpTestedIntervals);
 		}
 		return cluster.getBestCombined_pValue().multiply(testedIntervals);
+	}
+	
+	private void fdrCorrection(List<ReferenceCluster> clusters) {
+		List<ReferenceCluster> sortedList = new ArrayList<ReferenceCluster>(clusters);
+		Collections.sort(sortedList, new Comparator<ReferenceCluster>() {
+			@Override
+			public int compare(ReferenceCluster o1, ReferenceCluster o2) {
+				return o1.getBestCombined_pValue().compareTo(o2.getBestCombined_pValue());
+			}
+		});
+		
+		if (testedIntervals == null){
+			int tmpTestedIntervals = 0;
+			int genomesToTest = genomes.size();
+			if (singleReference)
+				genomesToTest = 1;
+			for (int k=0; k<genomesToTest; k++){
+				for (int intervalLength=1; intervalLength<=genomes.get(k).getLength(); intervalLength++){
+					tmpTestedIntervals += genomes.get(k).getLength() - intervalLength + 1;
+				}
+			}
+			testedIntervals = new BigDecimal(tmpTestedIntervals);
+		}
+		
+		BigDecimal lastValue = null;
+		for (int i=0; i<sortedList.size(); i++) {
+			BigDecimal index = new BigDecimal(i+1);
+			BigDecimal correction = testedIntervals.divide(index,5, BigDecimal.ROUND_HALF_UP);
+			ReferenceCluster cluster = sortedList.get(i);
+			BigDecimal correctedValue = cluster.getBestCombined_pValue().multiply(correction);
+			if (lastValue != null)
+				correctedValue = correctedValue.max(lastValue);
+			lastValue = correctedValue;
+			cluster.setBestCombined_pValueCorrected(correctedValue);
+		}
 	}
 	
 	private BigDecimal combine_pValuesWithQuorumBD(double[] pValue,

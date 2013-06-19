@@ -15,7 +15,7 @@ public class GenomePainting {
 	private final static int CHROMOSOME_END_WIDTH = 18;
 	
 	/**
-	 * Paints the header of the genome. If gNames is set, paints the name, otherwise paints the number. 
+	 * Paints the header of the genome.
 	 * @param g the Graphics
 	 * @param text the genome name or number
 	 * @param refSeq if the genome shall be highlighted as the reference sequence

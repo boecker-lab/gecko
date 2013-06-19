@@ -65,8 +65,12 @@ public class Gene implements Serializable {
 				return name;
 			} else
 				return "[no annotation available]";
-		if (name==null)
-			return "---- -"+annotation;
+		if (name==null || name.equals(""))
+			if (tag == null || tag.equals(""))
+				return "---- -"+annotation;
+			else
+				return tag+" - "+annotation;
+
 		return name+" - "+annotation;
 	}
 	
