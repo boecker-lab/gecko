@@ -480,28 +480,29 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		return numberOfIntervals;
 	}
 	
-	private static List<List<GeneCluster>> groupSimilarClusters(GeneCluster[] allClusters) {
-		List<List<GeneCluster>> resultList = new ArrayList<List<GeneCluster>>();
-		
-		for (GeneCluster cluster : allClusters){
-			List<GeneCluster> newGroup = new ArrayList<GeneCluster>();
-			newGroup.add(cluster);
-			
-			Iterator<List<GeneCluster>> listIter = resultList.iterator();
-			while (listIter.hasNext()){
-				List<GeneCluster> groupedClusters = listIter.next();
-				for (GeneCluster groupedCluster : groupedClusters) {
-					if (groupedCluster.isSimilar(cluster)){
-						newGroup.addAll(groupedClusters);
-						listIter.remove();
-						break;
-					}
-				}
-			}
-			resultList.add(newGroup);
+	@Override
+	public int compareTo(GeneCluster other) {
+		return this.bestPValue.compareTo(other.bestPValue);
+	}
+	
+	/**
+	 * Returns the tags of the gene in the reference occurrence
+	 * @return the tags of the gene in the reference occurrence
+	 */
+	public String getReferenceTags() {
+		StringBuilder builder = new StringBuilder();
+		Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
+		Genome genome = GeckoInstance.getInstance().getGenomes()[getRefSeqIndex()];
+		boolean first = true;
+		for (int index = seq.getStart(); index <= seq.getStop(); index++){
+			if (! first)
+				builder.append(", ");
+			else
+				first = false;
+			Gene gene = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index);
+			builder.append(gene.getTag());
 		}
-		
-		return resultList;
+		return builder.toString();
 	}
 	
 	/**
@@ -564,9 +565,28 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		}
 		return newResults;
 	}
-
-	@Override
-	public int compareTo(GeneCluster other) {
-		return this.bestPValue.compareTo(other.bestPValue);
+	
+	private static List<List<GeneCluster>> groupSimilarClusters(GeneCluster[] allClusters) {
+		List<List<GeneCluster>> resultList = new ArrayList<List<GeneCluster>>();
+		
+		for (GeneCluster cluster : allClusters){
+			List<GeneCluster> newGroup = new ArrayList<GeneCluster>();
+			newGroup.add(cluster);
+			
+			Iterator<List<GeneCluster>> listIter = resultList.iterator();
+			while (listIter.hasNext()){
+				List<GeneCluster> groupedClusters = listIter.next();
+				for (GeneCluster groupedCluster : groupedClusters) {
+					if (groupedCluster.isSimilar(cluster)){
+						newGroup.addAll(groupedClusters);
+						listIter.remove();
+						break;
+					}
+				}
+			}
+			resultList.add(newGroup);
+		}
+		
+		return resultList;
 	}
 }

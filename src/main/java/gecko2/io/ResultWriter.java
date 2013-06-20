@@ -53,7 +53,7 @@ public class ResultWriter {
 		//writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
 		for (int i=0; i<clusters.size(); i++) {
 			GeneCluster cluster = clusters.get(i);
-			writer.write(String.format("%d\t%d\t%d\t%d\t%d\t%.1f\t%.2f\t%.2f\t%.4g\t%.4g\t\n", i+1, cluster.getGenes().length, cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getBestPValue(), cluster.getBestPValueCorrected()));
+			writer.write(String.format("%d\t%d\t%d\t%d\t%d\t%.1f\t%.2f\t%.2f\t%.4g\t%.4g\t%s\n", i+1, cluster.getGenes().length, cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getBestPValue(), cluster.getBestPValueCorrected(), cluster.getReferenceTags()));
 		}
 	}
 	
@@ -61,7 +61,7 @@ public class ResultWriter {
 		//writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
 		for (int i=0; i<clusters.size(); i++) {
 			GeneCluster cluster = clusters.get(i);
-			writer.write(String.format("%d & %d & %d & %d & %d & %.1f & %.2f & %.2f & \\\\\n", i+1, cluster.getGenes().length, cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore()));
+			writer.write(String.format("%d & %d & %d & %d & %d & %.1f & %.2f & %.2f & %s \\\\\n", i+1, cluster.getGenes().length, cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getReferenceTags()));
 			System.out.println(String.format("%d\t%.8g\t%.8g", i+1, cluster.getBestPValue(), cluster.getBestPValueCorrected()));
 		}
 	}
