@@ -490,17 +490,32 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * @return the tags of the gene in the reference occurrence
 	 */
 	public String getReferenceTags() {
-		StringBuilder builder = new StringBuilder();
 		Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
 		Genome genome = GeckoInstance.getInstance().getGenomes()[getRefSeqIndex()];
-		boolean first = true;
+		List<String> tags = new ArrayList<String>();
 		for (int index = seq.getStart(); index <= seq.getStop(); index++){
+			String newTag = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getTag();
+			boolean merged = false;
+			for (int i=0; i<tags.size(); i++) {
+				String tag = tags.get(i);
+				if (newTag.substring(0, 2).equals(tag.substring(0,2))) {
+					String mergedTag = tag.concat(newTag.substring(3));
+					tags.set(i, mergedTag);
+					merged = true;
+					break;
+				}
+			}
+			if (! merged)
+				tags.add(newTag);
+		}
+		StringBuilder builder = new StringBuilder();
+		boolean first = true;
+		for (String tag : tags){
 			if (! first)
 				builder.append(", ");
 			else
 				first = false;
-			Gene gene = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index);
-			builder.append(gene.getTag());
+			builder.append(tag);
 		}
 		return builder.toString();
 	}
