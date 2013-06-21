@@ -498,7 +498,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 			boolean merged = false;
 			for (int i=0; i<tags.size(); i++) {
 				String tag = tags.get(i);
-				if (newTag.substring(0, 2).equals(tag.substring(0,2))) {
+				if (newTag.length() > 3 && tag.length() > 3 && newTag.substring(0, 2).equals(tag.substring(0,2))) {
 					String mergedTag = tag.concat(newTag.substring(3));
 					tags.set(i, mergedTag);
 					merged = true;
