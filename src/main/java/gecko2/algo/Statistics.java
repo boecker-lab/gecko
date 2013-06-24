@@ -400,6 +400,8 @@ class Statistics {
 			if (nonAppearingGenes > maxDelta)
 				return false;
 		}
+		if (nonAppearingGenes == geneContent.size())
+			return false;
 		return true;
 	}
 
