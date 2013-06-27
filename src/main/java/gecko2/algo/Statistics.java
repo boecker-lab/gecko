@@ -291,7 +291,10 @@ class Statistics {
 				cluster.getDeltaLocations(genomeNr).add(artificial_dLoc);					
 			}
             for (DeltaLocation dLoc : cluster.getDeltaLocations(genomeNr)) {
-                dLoc.setpValue(prob_C_has_approxOccInGenome(dLoc.getDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
+                // For individual distance bound
+            	dLoc.setpValue(prob_C_has_approxOccInGenome(dLoc.getDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
+                // For global distance bound
+                //dLoc.setpValue(prob_C_has_approxOccInGenome(cluster.getMaxDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
             }
 		}
 	}
