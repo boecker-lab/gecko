@@ -493,12 +493,12 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
 		Genome genome = GeckoInstance.getInstance().getGenomes()[getRefSeqIndex()];
 		List<String> tags = new ArrayList<String>();
-		for (int index = seq.getStart(); index <= seq.getStop(); index++){
+		for (int index = seq.getStart()-1; index < seq.getStop(); index++){
 			String newTag = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getTag();
 			boolean merged = false;
 			for (int i=0; i<tags.size(); i++) {
 				String tag = tags.get(i);
-				if (newTag.length() > 3 && tag.length() > 3 && newTag.substring(0, 2).equals(tag.substring(0,2))) {
+				if (newTag.length() > 3 && tag.length() > 3 && newTag.substring(0, 3).equals(tag.substring(0,3))) {
 					String mergedTag = tag.concat(newTag.substring(3));
 					tags.set(i, mergedTag);
 					merged = true;
