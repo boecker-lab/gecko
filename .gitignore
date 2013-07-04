@@ -1,0 +1,9 @@
+.project
+.metadata
+.classpath
+.settings/
+.idea/
+
+.externalToolBuilders/
+
+build/
