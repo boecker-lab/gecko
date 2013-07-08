@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Formatter.BigDecimalLayoutForm;
 
+import javax.swing.JApplet;
+
 import org.apache.commons.math3.util.Precision;
 
 import cern.jet.random.Binomial;
@@ -39,7 +41,7 @@ class Statistics {
 		this.genomeGroupMapping = genomeGroupMapping;
 		this.useGenomeGrouping = nrOfGenomeGroups != genomes.size();
 		
-		this.random = new MersenneTwister();
+		this.random = new MersenneTwister(new java.util.Date());
 	}
 	
 	public static void computeReferenceStatistics(GenomeList genomes, List<ReferenceCluster> refCluster, int delta, boolean singleReference) {
