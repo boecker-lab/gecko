@@ -106,7 +106,7 @@ class GenomeList {
     		throw new RuntimeException("Trying to append additional reference copy!");
     	Genome newGenome = new Genome(genomes.get(referenceGenomeNr));
     	for (Chromosome chr : newGenome) {
-            chr.initializeForCalculation(alphabetSize, param);
+            chr.initializeForCalculation(alphabetSize, param.getMaximumDelta());
         }
     	genomes.add(newGenome);
     	param.increaseNrOfGenomes();
