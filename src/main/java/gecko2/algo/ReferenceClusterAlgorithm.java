@@ -89,9 +89,12 @@ public class ReferenceClusterAlgorithm {
 	private List<ReferenceCluster> computeRefClusters(){
 		System.out.println("Computing Gene Clusters!");
 		
-		long nanoTime = System.nanoTime();
+		long startTime = System.nanoTime();
 		
-		genomes.initializeForCalculation(param);
+        if (param.getNrOfGenomes() != genomes.size())
+            throw new RuntimeException("Number of genomes in param does not equal number of genomes!");
+		
+		genomes.initializeForCalculation(param.getMaximumDelta());
 		List<ReferenceCluster> refClusterList = new ArrayList<ReferenceCluster>();
 		
 		int refGenomeCount = 1;
@@ -109,7 +112,7 @@ public class ReferenceClusterAlgorithm {
 		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping);
 		
 		long statTime = System.nanoTime();
-		System.out.println(String.format("Calculation: %fs",(calcTime - nanoTime)/1.0E09));
+		System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));
 		System.out.println(String.format("Statistics: %fs",(statTime - calcTime)/1.0E09));
 		
 		return refClusterList;

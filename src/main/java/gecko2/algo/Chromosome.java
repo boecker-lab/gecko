@@ -85,7 +85,7 @@ class Chromosome {
      * @param alphabetSize the size of the complete alphabet.
      * @param param the parameters the algorithm is started with.
      */
-    public void initializeForCalculation(int alphabetSize, AlgorithmParameters param) {
+    public void initializeForCalculation(int alphabetSize, int maxDelta) {
         this.pos = this.computePOS(alphabetSize);
 
         this.L = new int[this.genes.length][];
@@ -93,10 +93,10 @@ class Chromosome {
         this.L_prime = new int[this.genes.length][];
         this.R_prime = new int[this.genes.length][];
         for (int i = 0; i < this.genes.length; i++) {
-            L[i] = new int[param.getMaximumDelta() + 2];
-            R[i] = IntArray.newIntArray(param.getMaximumDelta() + 2, this.size() + 1);
-            L_prime[i] = new int[param.getMaximumDelta() + 2];
-            R_prime[i] = IntArray.newIntArray(param.getMaximumDelta() + 2, this.size() + 1);
+            L[i] = new int[maxDelta + 2];
+            R[i] = IntArray.newIntArray(maxDelta + 2, this.size() + 1);
+            L_prime[i] = new int[maxDelta + 2];
+            R_prime[i] = IntArray.newIntArray(maxDelta + 2, this.size() + 1);
         }
 
         this.prevOcc = this.computePrevOcc(alphabetSize);

@@ -67,5 +67,20 @@ public class Genome implements Serializable {
 		}
 		return geneNumber;
 	}
+	
+	/**
+	 * Generates an int array from the genomes
+	 * @param genomes the genomes
+	 * @return an int array, containing all the genes
+	 */
+	public static int[][][] toIntArray(Genome[] genomes) {
+		int genomeArray[][][] = new int[genomes.length][][];
+		for (int i=0;i<genomes.length;i++) {
+			genomeArray[i] = new int[genomes[i].getChromosomes().size()][];
+			for (int j=0;j<genomeArray[i].length;j++)
+				genomeArray[i][j] = genomes[i].getChromosomes().get(j).toIntArray(true, true);
+		}
+		return genomeArray;
+	}
 
 }

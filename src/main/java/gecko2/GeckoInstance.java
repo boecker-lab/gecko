@@ -48,7 +48,7 @@ public class GeckoInstance {
 	private boolean libgeckoLoaded;
 	
 	private File currentInputFile; 
-	private Genome[] genomes= null;
+	private Genome[] genomes = null;
 	private Map<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
 	private Map<Integer, Color> colormap;
 	
@@ -637,12 +637,7 @@ public class GeckoInstance {
 			
 			// We do this very ugly with a 3D integer array to make things easier
 			// during the JNI<->JAVA phase
-			int genomes[][][] = new int[GeckoInstance.this.genomes.length][][];
-			for (int i=0;i<genomes.length;i++) {
-				genomes[i] = new int[GeckoInstance.this.genomes[i].getChromosomes().size()][];
-				for (int j=0;j<genomes[i].length;j++)
-					genomes[i][j] = GeckoInstance.this.genomes[i].getChromosomes().get(j).toIntArray(true, true);
-			}
+			int genomes[][][] = Genome.toIntArray(GeckoInstance.this.genomes);
 			
 			Date before = new Date();
 			GeneCluster[] res = computeClusters(genomes, p);	

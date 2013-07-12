@@ -126,12 +126,10 @@ class GenomeList {
      * Initializes the SetOfSequences for a calculation of gene clusters.
      * @param param the parameters the algorithm is started with.
      */
-    void initializeForCalculation(AlgorithmParameters param) {
-        if (param.getNrOfGenomes() != this.size())
-            throw new RuntimeException("Number of genomes in param does not equal number of genomes!");
+    void initializeForCalculation(int maxDelta) {
         for (Genome g : genomes) {
             for (Chromosome chr : g) {
-                chr.initializeForCalculation(alphabetSize, param);
+                chr.initializeForCalculation(alphabetSize, maxDelta);
             }
         }
         rank = new Rank(alphabetSize);
