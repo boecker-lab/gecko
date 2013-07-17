@@ -7,6 +7,8 @@ import gecko2.algorithm.Parameter;
  */
 public class AlgorithmParameters{
     private final int delta;                // the parameter delta the algorithm is started with
+    private final int[][] deltaTable;
+    private final boolean useDeltaTable;
 	private final int minClusterSize;       // minimal size of each cluster
 	private int maxUncoveredGenomes;
 	private final int minCoveredGenomes;
@@ -16,7 +18,6 @@ public class AlgorithmParameters{
     private final boolean singleReference;
     private final boolean refInRef;
     
-    private final int[][] deltaTable;
     private final static int DELTA_TABLE_SIZE = 3;
     
     private final static int[][] HIGHLY_CONSERVED_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {2, 1, 2}, {3, 2, 3}, {4, 2, 4}, {5, 3, 5}, {6, 3, 6}};
@@ -87,13 +88,16 @@ public class AlgorithmParameters{
 			throw new IllegalArgumentException("Invalid delta and deltaTable values. Must use one!");
 		
 		this.delta = delta;
-		if (deltaTable == null)
+		if (deltaTable == null) {
 			this.deltaTable = null;
-		else {
+			this.useDeltaTable = false;
+		} else {
+			this.useDeltaTable = true;
+			if (!checkDeltaTable(deltaTable))
+				throw new IllegalArgumentException("Invalid delta table!");
+			
 			this.deltaTable = new int[deltaTable.length][];
 			for (int i=0; i<deltaTable.length; i++){
-				if (deltaTable[i].length != DELTA_TABLE_SIZE)
-					throw new IllegalArgumentException("Invalid delta table! Must contain arrays of length " + DELTA_TABLE_SIZE + ".");
 				this.deltaTable[i] = new int[DELTA_TABLE_SIZE];
 				System.arraycopy(deltaTable[i], 0, this.deltaTable[i], 0, DELTA_TABLE_SIZE);
 			}
@@ -111,6 +115,38 @@ public class AlgorithmParameters{
         this.singleReference = singleReference;
         this.refInRef = refInRef;
 	}
+	
+	/**
+	 * Checks if a valide delta table has been supplied
+	 * @param deltaTable the delta table
+	 * @return true if the table is valid, else false
+	 */
+	private static boolean checkDeltaTable(int[][] deltaTable){
+		int ins=0;
+		int del=0;
+		int total=0;
+		for (int i=0; i<deltaTable.length; i++) {
+			if (deltaTable[i].length != DELTA_TABLE_SIZE)
+				return false;
+			
+			// allowed distance must not decrease
+			if (deltaTable[i][0] < ins) 
+				return false;
+			ins = deltaTable[i][0];
+			
+			if (deltaTable[i][1] < del)
+				return false;
+			del = deltaTable[i][1];
+			
+			// allowed total must be larger than insertions and deletions
+			if (deltaTable[i][2] < total || deltaTable[i][2] < deltaTable[i][1] || deltaTable[i][2] < deltaTable[i][0])
+				return false;
+			total = deltaTable[i][2];
+			
+			
+		}
+		return true;
+	}
 
     public int getAlphabetSize() {
 		return alphabetSize;
@@ -125,7 +161,7 @@ public class AlgorithmParameters{
 	}
 	
 	public int getDeltaInsertions(int clusterSize){
-		if (delta >= 0)
+		if (!useDeltaTable)
 			return delta;
 				
 		if (clusterSize >= deltaTable.length)
@@ -134,8 +170,15 @@ public class AlgorithmParameters{
 			return deltaTable[clusterSize][0];
 	}
 	
+	public int getMaximumInsertions() {
+		if (!useDeltaTable)
+			return delta;
+		
+		return deltaTable[deltaTable.length-1][0];
+	}
+	
 	public int getDeltaDeletions(int clusterSize){
-		if (delta >= 0)
+		if (!useDeltaTable)
 			return delta;
 		
 		if (clusterSize >= deltaTable.length)
@@ -144,8 +187,15 @@ public class AlgorithmParameters{
 			return deltaTable[clusterSize][1];
 	}
 	
+	public int getMaximumDeletions() {
+		if (!useDeltaTable)
+			return delta;
+		
+		return deltaTable[deltaTable.length-1][1];
+	}
+	
 	public int getDeltaTotal(int clusterSize){
-		if (delta >= 0)
+		if (!useDeltaTable)
 			return delta;
 		
 		if (clusterSize >= deltaTable.length)
@@ -155,7 +205,7 @@ public class AlgorithmParameters{
 	}
 	
 	public int getMaximumDelta(){
-		if (delta >= 0)
+		if (!useDeltaTable)
 			return delta;
 				
 		return deltaTable[deltaTable.length-1][2];
@@ -163,6 +213,10 @@ public class AlgorithmParameters{
 	
 	public int[][] getDeltaTable() {
 		return deltaTable;
+	}
+	
+	public boolean useDeltaTable() {
+		return useDeltaTable;
 	}
 
     private boolean useQuorum() {

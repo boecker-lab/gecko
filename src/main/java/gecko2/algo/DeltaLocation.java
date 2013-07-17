@@ -3,25 +3,33 @@ package gecko2.algo;
 import java.util.List;
 
 public class DeltaLocation implements Comparable<DeltaLocation> {
+	private static final int MIN_HIT_COUNT = 2;
+	
 	private int genomeNr;
 	private final int chrNr;
 	private final int l;
 	private final int r;
 	private int distance;
+	private int missingChars;
+	private int additionalChars;
 	private final int size;
 	private int hitCount;
 	private double pValue;
+	private boolean valid;
 	
 	public DeltaLocation(int genomeNr, int chrNr, int l, int r,
-			int distance, int size, int hitCount) {
+			int distance, int missingChars, int additionalChars, int size, int hitCount, boolean valid) {
 		this.genomeNr = genomeNr;
 		this.chrNr = chrNr;
 		this.l = l;
 		this.r = r;
 		this.distance = distance;
+		this.missingChars = missingChars;
+		this.additionalChars = additionalChars;
 		this.size = size;
 		this.hitCount = hitCount;
-		pValue = -1.0;
+		this.pValue = -1.0;
+		this.valid = valid;
 	}
 	
 	
@@ -32,9 +40,21 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 		this.l = org.l;
 		this.r = org.r;
 		this.distance = org.distance;
+		this.missingChars = org.missingChars;
+		this.additionalChars = org.additionalChars;
 		this.size = org.size;
 		this.hitCount = org.hitCount;
 		this.pValue = org.pValue;
+		this.valid = org.valid;
+	}
+	
+	public static DeltaLocation getReferenceLocation(int referenceGenomeNr,
+			int referenceChromosomeNr, int l, int r, int patternSize) {
+		return new DeltaLocation(referenceGenomeNr, referenceChromosomeNr, l, r, 0, 0, 0, patternSize, patternSize, true);
+	}
+	
+	public static DeltaLocation getArtificialDeltaLocation(int genomeNr, int distance) {
+		return new DeltaLocation(genomeNr, -1, 0, 0, distance, 0, 0, 0, 0, false);
 	}
 
 	public int getGenomeNr() {
@@ -83,6 +103,7 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 
 	public void increaseDistance() {
 		distance++;
+		missingChars++;
 	}
 	
 	public boolean isNested(DeltaLocation other){
@@ -236,5 +257,31 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 				+ ", l=" + l + ", r=" + r + ", distance=" + distance
 				+ ", size=" + size + ", hitCount=" + hitCount + ", pValue="
 				+ pValue + "]";
+	}
+
+	/**
+	 * Sets the valid flag for the delta location. 
+	 * If not using delta table, always true.
+	 * If using delta table, true if the additional chars, 
+	 * missing chars and total distance are smaller than the 
+	 * entries in the delta table for the given cluster size
+	 * @param param the parameters
+	 * @param clusterSize the cluster size
+	 */
+	public void checkForDeltaTableValidity(AlgorithmParameters param,
+			int clusterSize) {
+		valid = param.useDeltaTable() ? 
+				missingChars <= param.getDeltaDeletions(clusterSize) &&
+				additionalChars	<= param.getDeltaInsertions(clusterSize) &&
+				distance <= param.getDeltaTotal(clusterSize) 
+				: true;
+	}
+
+	/**
+	 * Returns if the delta location is valid. You have to call @link checkForDeltaTableValidity first!
+	 * @return if the delta location is valid
+	 */
+	public boolean isValid() {
+		return valid && hitCount >= MIN_HIT_COUNT;
 	}
 }

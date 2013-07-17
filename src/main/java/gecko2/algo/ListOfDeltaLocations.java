@@ -6,7 +6,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
-	private static final int MIN_HIT_COUNT = 2;
 	private SortedSet<DeltaLocation> deltaLocations;
 	
 	ListOfDeltaLocations(){
@@ -70,7 +69,7 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 
 	public boolean minHitsCovered() {
 		for (DeltaLocation dLoc : deltaLocations){
-			if (dLoc.getHitCount() >= MIN_HIT_COUNT)
+			if (dLoc.isValid())
 				return true;
 		}
 		return false;
@@ -85,12 +84,13 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 		return deltaLocations.size();
 	}
 
-	public boolean containsCharacter(int c, GenomeList genomes) {
+	public boolean valid_dLocContainsCharacter(int c, GenomeList genomes) {
 		for (DeltaLocation dLoc : deltaLocations){
-			for (int l=dLoc.getL(); l<=dLoc.getR(); l++)
-				if (c == genomes.get(dLoc.getGenomeNr()).get(dLoc.getChrNr()).getGene(l))
-					if (dLoc.getHitCount() >= MIN_HIT_COUNT)
+			if (dLoc.isValid()){
+				for (int l=dLoc.getL(); l<=dLoc.getR(); l++)
+					if (c == genomes.get(dLoc.getGenomeNr()).get(dLoc.getChrNr()).getGene(l))
 						return true;
+			}
 		}
 		return false;
 	}
@@ -98,7 +98,7 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	public ListOfDeltaLocations getOptimalCopy() {
 		ListOfDeltaLocations newList = new ListOfDeltaLocations();
 		for (DeltaLocation dLoc : deltaLocations)
-			if (dLoc.getHitCount() >= MIN_HIT_COUNT){
+			if (dLoc.isValid()) {
 				boolean validLoc = true;
 				Iterator<DeltaLocation> newLocIter = newList.iterator();
 				while(newLocIter.hasNext()){
@@ -131,6 +131,16 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 				dLocIt.remove();
 			}
 		}
+	}
+	
+	public void checkForValidDeltaTableLocations(AlgorithmParameters param,
+			int clusterSize) {
+		if (!param.useDeltaTable())
+			return;
+		for (DeltaLocation dLoc : deltaLocations) {
+			dLoc.checkForDeltaTableValidity(param, clusterSize);
+		}
+		
 	}
 	
 	/**

@@ -22,13 +22,11 @@ public class Genome implements Serializable {
 		this.name = name;
 	}
 	
-	public void setName(String name) {
-		
+	public void setName(String name) {	
 		this.name = name;
 	}
 	
-	public String getName() {
-		
+	public String getName() {	
 		return this.name;
 	}
 	

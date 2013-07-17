@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Formatter.BigDecimalLayoutForm;
 
-import javax.swing.JApplet;
-
 import org.apache.commons.math3.util.Precision;
 
 import cern.jet.random.Binomial;
@@ -289,7 +287,7 @@ class Statistics {
 		
 		for (ReferenceCluster cluster : refCluster){
 			if (cluster.getDeltaLocations(genomeNr).isEmpty()){
-				DeltaLocation artificial_dLoc = new DeltaLocation(genomeNr, -1, 0, 0, cluster.getMaxDistance(), 0, 0);
+				DeltaLocation artificial_dLoc = DeltaLocation.getArtificialDeltaLocation(genomeNr, cluster.getMaxDistance());
 				cluster.getDeltaLocations(genomeNr).add(artificial_dLoc);					
 			}
             for (DeltaLocation dLoc : cluster.getDeltaLocations(genomeNr)) {

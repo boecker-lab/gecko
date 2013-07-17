@@ -278,6 +278,38 @@ public class ReferenceClusterDistanceMatrixTest {
 		performTest(refCluster, res);		
 	}
 	
+	/**
+	 * For the given genomes and parameters, delta table and d=5, s=8 should give equal results
+	 */
+	@Test
+	public void testComputeClustersD5S8_DeltaTable() 
+	{
+		// def array for computation
+		int genomes[][][] = {{{0, 1, 2, 3, 4, 5, 6, 7 , 8, 0}},
+				{{0, 4, 5, 6, 7, 8, 0}},
+				{{0, 7, 6, 5, 4, 0}},
+				{{0, 7, 6, 5, 4, 9, 1, 0}},
+				{{0, 4, 5, 8, 0}},
+				{{0, 4, 5, 1, 0}},
+				{{0, 7, 6, 5, 4, 10, 1, 0}}};
+		
+		// def parameters
+		Parameter p = new Parameter(5, 8, genomes.length-1, Parameter.QUORUM_NO_COST, 'r', 'g');
+		
+		int[][] deltaTable = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {5, 5, 5}};
+		Parameter p_deltaTable = new Parameter(deltaTable, 4, genomes.length-1, Parameter.QUORUM_NO_COST, 'r', 'g');
+			
+		// Test the java implementation
+		GeneCluster[] deltaTableRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p_deltaTable);
+		GeneCluster[] res = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		
+		// def result (using p values from calculated result)
+		
+		performTest(deltaTableRes, res);		
+	}
+	
+	
+	
 	@Test
 	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws URISyntaxException, IOException, DataFormatException, LinePassedException {
 		File inputFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacter.cog").toURI());

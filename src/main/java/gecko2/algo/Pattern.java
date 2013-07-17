@@ -140,7 +140,7 @@ class Pattern {
     		
     		int prev_p=0;
             for (int charPos : pos) {
-                for (int dLeft = param.getDeltaTotal(pSize) + 1; dLeft >= 1; dLeft--) {
+                for (int dLeft = param.getMaximumDelta() + 1; dLeft >= 1; dLeft--) {
                     if (chr.getL(charPos, dLeft) < prev_p)
                         continue;
 
@@ -149,7 +149,7 @@ class Pattern {
 
                     int interveningChars = dLeft - 1;
 
-                    for (int dRight = 1; dRight <= param.getDeltaTotal(pSize) + 1; dRight++) {
+                    for (int dRight = 1; dRight <= param.getMaximumDelta() + 1; dRight++) {
                         if (dRight > 1 && chr.getR(charPos, dRight) == chr.getR(charPos, dRight - 1))
                             break;
 
@@ -158,7 +158,7 @@ class Pattern {
                             	interveningChars++;
 
                         // test total distance
-                        if (interveningChars > param.getDeltaTotal(pSize))
+                        if (interveningChars > param.getMaximumDelta())
                             break;
 
                         // test maximality
@@ -178,10 +178,10 @@ class Pattern {
 
                         assert (dist >= 0);
 
-                        if (dist <= param.getDeltaTotal(pSize) && interveningChars <= param.getDeltaInsertions(pSize) && missingChars <= param.getDeltaDeletions(pSize)) {
+                        if (dist <= param.getMaximumDelta() && interveningChars <= param.getMaximumInsertions() && missingChars <= param.getMaximumDeletions()) {
                             assert (chr.getR(charPos, dRight) - 1 <= chr.size());
 
-                            DeltaLocation newDeltaLoc = new DeltaLocation(genome.getNr(), chr.getNr(), chr.getL(charPos, dLeft) + 1, chr.getR(charPos, dRight) - 1, dist, charSetSize, charSetSize - interveningChars);
+                            DeltaLocation newDeltaLoc = new DeltaLocation(genome.getNr(), chr.getNr(), chr.getL(charPos, dLeft) + 1, chr.getR(charPos, dRight) - 1, dist, missingChars, interveningChars, charSetSize, charSetSize - interveningChars, !param.useDeltaTable());
                             newList.insertDeltaLocation(newDeltaLoc);
                         }
                     }

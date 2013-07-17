@@ -159,7 +159,7 @@ public class ReferenceClusterAlgorithm {
 				r = pattern.getRightBorder();
 				
 				for (ListOfDeltaLocations dLocList : oldLists)
-					dLocList.removeNonInheritableElements(genomes, pattern.getLastChar(), param.getDeltaTotal(pattern.getSize()));
+					dLocList.removeNonInheritableElements(genomes, pattern.getLastChar(), param.getMaximumDelta());
 				
 				for (int i=0; i<genomes.size(); i++){
 					if (param.searchRefInRef() && i==genomes.size()-1){
@@ -175,7 +175,7 @@ public class ReferenceClusterAlgorithm {
 					break;
 				
 				oldLists.get(referenceGenomeNr).emptyList();
-				DeltaLocation refdLoc = new DeltaLocation(referenceGenomeNr, referenceChromosome.getNr(), l, r, 0, pattern.getSize(), pattern.getSize());
+				DeltaLocation refdLoc = DeltaLocation.getReferenceLocation(referenceGenomeNr, referenceChromosome.getNr(), l, r, pattern.getSize());
 				oldLists.get(referenceGenomeNr).insertDeltaLocation(refdLoc);
 				
 				int minHitCoveredCount = 0;
@@ -190,6 +190,7 @@ public class ReferenceClusterAlgorithm {
 						}
 						
 						oldLists.get(k).mergeLists(newList);
+						oldLists.get(k).checkForValidDeltaTableLocations(param, pattern.getSize());
 					}
 					if (oldLists.get(k).minHitsCovered()) {
 						if (!useGenomeGrouping())
@@ -197,15 +198,15 @@ public class ReferenceClusterAlgorithm {
 						else if (!containedGenomeClusters[genomeGroupMapping.get(k)]){
 							minHitCoveredCount++;
 							containedGenomeClusters[genomeGroupMapping.get(k)] = true;
-						}	
+						}
 					}
 				}
 				
-				if (minHitCoveredCount >= param.getMinCoveredGenomes() &&
-						pattern.getSize() >= param.getMinClusterSize() &&
+				if (pattern.getSize() >= param.getMinClusterSize() &&
+						minHitCoveredCount >= param.getMinCoveredGenomes() &&
 						refdLoc.isFirstRefOcc(oldLists) &&
-						occursIn_dLocs(refdLoc.leftMostEssentialChar(referenceChromosome), oldLists, referenceGenomeNr) &&
-						occursIn_dLocs(refdLoc.rightMostEssentialChar(referenceChromosome), oldLists, referenceGenomeNr)) {
+						occursInValid_dLocs(refdLoc.leftMostEssentialChar(referenceChromosome), oldLists, referenceGenomeNr) &&
+						occursInValid_dLocs(refdLoc.rightMostEssentialChar(referenceChromosome), oldLists, referenceGenomeNr)) {
 					
 					List<ListOfDeltaLocations> listCopy = new ArrayList<ListOfDeltaLocations>(genomes.size());
 					
@@ -237,11 +238,11 @@ public class ReferenceClusterAlgorithm {
 		return true;
 	}
 
-	private boolean occursIn_dLocs(int c, List<ListOfDeltaLocations> lists, int referenceGenomeNr){
+	private boolean occursInValid_dLocs(int c, List<ListOfDeltaLocations> lists, int referenceGenomeNr){
 		for (int k=0; k<lists.size(); k++){
 			if (k == referenceGenomeNr)
 				continue;
-			if (lists.get(k).containsCharacter(c, genomes))
+			if (lists.get(k).valid_dLocContainsCharacter(c, genomes))
 				return true;
 		}
 		return false;
