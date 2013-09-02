@@ -80,5 +80,12 @@ public class Genome implements Serializable {
 		}
 		return genomeArray;
 	}
+	
+	public String toString() {
+		if (getChromosomes().size()>1)
+				return getName() + " [and more...]";
+		else
+			return getName();
+	}
 
 }

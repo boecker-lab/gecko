@@ -17,6 +17,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -39,6 +41,10 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
+
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
 
 public class StartComputationDialog extends JDialog {
@@ -180,15 +186,14 @@ public class StartComputationDialog extends JDialog {
 			
 		};
 		
-		Genome[] genomes = GeckoInstance.getInstance().getGenomes();
-		String[] revGenomes = new String[genomes.length];
-		for (int i=0;i<revGenomes.length;i++) {
-			revGenomes[i] = genomes[i].getName();
-			if (genomes[i].getChromosomes().size()>1)
-				revGenomes[i] = revGenomes[i]+" [and more...]";
-		}
+		EventList<Genome> genomeEventList = new BasicEventList<Genome>();
+		genomeEventList.addAll(Arrays.asList(GeckoInstance.getInstance().getGenomes()));
 		
-		final JComboBox refGenomeCombo = new JComboBox(revGenomes);
+		final JComboBox refGenomeCombo = new JComboBox();
+		AutoCompleteSupport.install(refGenomeCombo, genomeEventList);
+		refGenomeCombo.setSelectedIndex(0);
+		
+		
 		refGenomeCombo.setPreferredSize(new Dimension(190, 30));
 		refClusterField.setPreferredSize(new Dimension(190, 30));
 		
