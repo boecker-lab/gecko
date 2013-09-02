@@ -1,8 +1,9 @@
 package gecko2.algo;
 
 import gecko2.algo.util.IntArray;
+
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -19,7 +20,6 @@ class Pattern {
     private final int[] occ;                           // occurrence array of the pattern  //TODO either a BoolArray or store the number of occurrences and not just if it occurs.
     private final int[] minDist;                       // minimal distance between the pattern and each sequence
     private final int[] maxRemDist;                    // maximum distance left for occurrences in each sequence
-    private final List<Integer> patternList;              // the stored pattern as a list of Characters
     
     /**
      * Generates the data structure to store information about a pattern.
@@ -40,7 +40,6 @@ class Pattern {
         this.occ = new int[alphabetSize+1];
         this.minDist = new int[K];
         this.maxRemDist = IntArray.newIntArray(K, param.getMaximumDelta());
-        this.patternList = new LinkedList<Integer>();            // TODO LinkedList int selber bauen?
     }
 
     /**
@@ -109,7 +108,6 @@ class Pattern {
         IntArray.increaseAll(minDist);              // increase minDist to each sequence
         minDist[refGenomeNr]--;   // but the reference sequence by 1
         IntArray.reset(maxRemDist, -1);
-        patternList.add(c);
     }
 
     /**
@@ -189,10 +187,6 @@ class Pattern {
             }
     	}
     	return newList;
-    }
-
-    List<Integer> getPatternList() {
-        return patternList;
     }
 
     @Override public String toString() {
