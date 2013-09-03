@@ -261,43 +261,59 @@ public class GeneClusterTestUtils {
 		return genomes;
 	}
 	
+	private enum GenerateTestDataType {
+		fiveProteobacterDeltaTable,
+		fiveProteobacterD3S6Q4,
+		fiveProteobacterD3S6Q2Grouping,
+		statisticsDataD5S8Q10FixedRef
+	}
+	
 	public static void main(String[] args)
 	{
+		GenerateTestDataType testType = GenerateTestDataType.fiveProteobacterDeltaTable;
 		try {
 			List<Set<Integer>> genomeGroups = null;
+			Parameter p = null;
+			File inCogFile = null;
+			File outFile = null;
 			
-			//fiveProteobacterDeltaTable.txt
-			/*int[][] deltaArray = {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}};
-			Parameter p = new Parameter(deltaArray, 4, 4, Parameter.QUORUM_NO_COST, 'r', 'd');
-			File inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").toURI());
-			File outFile = new File("src/test/resources/fiveProteobacterDeltaTable.txt");*/
-			
-			//fiveProteobacterD3S6Q4.txt
-			/*Parameter p = new Parameter(3, 6, 4, Parameter.QUORUM_NO_COST, 'r', 'd');
-			File inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").toURI());
-			File outFile = new File("src/test/resources/fiveProteobacterD3S6Q4.txt");*/
-			
-			//fiveProteobacterD3S6Q2Grouping.txt
-			/*Parameter p = new Parameter(3, 6, 2, Parameter.QUORUM_NO_COST, 'r', 'd');
-			File inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").toURI());
-			File outFile = new File("src/test/resources/fiveProteobacterD3S6Q2Grouping.txt");
-			genomeGroups = new ArrayList<Set<Integer>>(2);
-			Set<Integer> set1 = new HashSet<Integer>();
-			set1.add(0);
-			genomeGroups.add(set1);
-			Set<Integer> set2 = new HashSet<Integer>();
-			set2.add(1);
-			set2.add(2);
-			genomeGroups.add(set2);
-			Set<Integer> set3 = new HashSet<Integer>();
-			set3.add(3);
-			set3.add(4);
-			genomeGroups.add(set3);*/
-			
-			//statisticsDataD5S8Q10FixedRef.txt
-			Parameter p = new Parameter(5, 8, 10, Parameter.QUORUM_NO_COST, 'r', 'g');
-			File inCogFile = new File(GeneClusterTestUtils.class.getResource("/statisticsData.cog").toURI());
-			File outFile = new File("src/test/resources/statisticsDataD5S8Q10FixedRef.txt");
+			switch (testType) {
+				case fiveProteobacterDeltaTable:
+					int[][] deltaArray = {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}};
+					p = new Parameter(deltaArray, 4, 4, Parameter.QUORUM_NO_COST, 'r', 'd');
+					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").toURI());
+					outFile = new File("src/test/resources/fiveProteobacterDeltaTable.txt");
+					break;
+					
+				case fiveProteobacterD3S6Q4:
+					p = new Parameter(3, 6, 4, Parameter.QUORUM_NO_COST, 'r', 'd');
+					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").toURI());
+					outFile = new File("src/test/resources/fiveProteobacterD3S6Q4.txt");
+					break;
+					
+				case fiveProteobacterD3S6Q2Grouping:
+					p = new Parameter(3, 6, 2, Parameter.QUORUM_NO_COST, 'r', 'd');
+					outFile = new File("src/test/resources/fiveProteobacterD3S6Q2Grouping.txt");
+					genomeGroups = new ArrayList<Set<Integer>>(2);
+					Set<Integer> set1 = new HashSet<Integer>();
+					set1.add(0);
+					genomeGroups.add(set1);
+					Set<Integer> set2 = new HashSet<Integer>();
+					set2.add(1);
+					set2.add(2);
+					genomeGroups.add(set2);
+					Set<Integer> set3 = new HashSet<Integer>();
+					set3.add(3);
+					set3.add(4);
+					genomeGroups.add(set3);
+					break;
+					
+				case statisticsDataD5S8Q10FixedRef:
+					p = new Parameter(5, 8, 10, Parameter.QUORUM_NO_COST, 'r', 'g');
+					inCogFile = new File(GeneClusterTestUtils.class.getResource("/statisticsData.cog").toURI());
+					outFile = new File("src/test/resources/statisticsDataD5S8Q10FixedRef.txt");
+					break;
+			}
 			
 			generateRefClusterFile(inCogFile, outFile, p, genomeGroups);	
 		} catch (URISyntaxException e) {
