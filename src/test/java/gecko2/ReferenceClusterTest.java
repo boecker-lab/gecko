@@ -3,6 +3,7 @@ package gecko2;
 import static gecko2.GeneClusterTestUtils.*;
 import static org.junit.Assert.*;
 
+import gecko2.GeneClusterTestUtils.PValueComparison;
 import gecko2.LibraryUtils.PlatformNotSupportedException;
 import gecko2.algo.AlgorithmParameters;
 import gecko2.algo.ReferenceClusterAlgorithm;
@@ -92,7 +93,7 @@ public class ReferenceClusterTest
 		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 3, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -111,7 +112,7 @@ public class ReferenceClusterTest
 									0,
 									'r')};
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 				
 			
@@ -146,7 +147,7 @@ public class ReferenceClusterTest
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 3, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -180,7 +181,7 @@ public class ReferenceClusterTest
 									1,
 									'r')};
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 				
 	}
 	
@@ -217,7 +218,7 @@ public class ReferenceClusterTest
 		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 3, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -250,7 +251,7 @@ public class ReferenceClusterTest
 									0,
 									'r')};
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	/**
@@ -284,7 +285,7 @@ public class ReferenceClusterTest
 		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 3, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -305,7 +306,7 @@ public class ReferenceClusterTest
 									1,
 									'r')};
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	/**
@@ -339,7 +340,7 @@ public class ReferenceClusterTest
 		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 3, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -360,7 +361,7 @@ public class ReferenceClusterTest
 									0,
 									'r')};
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	/**
@@ -394,7 +395,7 @@ public class ReferenceClusterTest
 		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 3, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -440,7 +441,7 @@ public class ReferenceClusterTest
 									1,
 									'r')};
 				
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 		
 	
@@ -475,7 +476,7 @@ public class ReferenceClusterTest
 		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 3, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -508,7 +509,7 @@ public class ReferenceClusterTest
 									0,
 									'r')};
 				
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	
@@ -543,7 +544,7 @@ public class ReferenceClusterTest
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 3, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -603,7 +604,7 @@ public class ReferenceClusterTest
 									'r')};
 		
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	
@@ -639,7 +640,7 @@ public class ReferenceClusterTest
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 				
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 3, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -662,7 +663,7 @@ public class ReferenceClusterTest
 									0,
 									'r')};
 				
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	
@@ -698,7 +699,7 @@ public class ReferenceClusterTest
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 				
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(4, 6, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -735,7 +736,7 @@ public class ReferenceClusterTest
 									2,
 									'r')};
 				
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	
@@ -770,7 +771,7 @@ public class ReferenceClusterTest
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 				
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(4, 6, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -807,7 +808,7 @@ public class ReferenceClusterTest
 									2,
 									'r')};
 				
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	
@@ -842,7 +843,7 @@ public class ReferenceClusterTest
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 				
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(4, 6, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -863,7 +864,7 @@ public class ReferenceClusterTest
 									1,
 									'r')};
 				
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	
@@ -898,7 +899,7 @@ public class ReferenceClusterTest
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 				
 		// def result (using p values from calculated result)
 		Subsequence sub2 = new Subsequence(2, 4, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
@@ -919,7 +920,7 @@ public class ReferenceClusterTest
 									1,
 									'r')};
 				
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	
@@ -953,7 +954,7 @@ public class ReferenceClusterTest
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 				
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(4, 7, 0, 1, res[1].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -990,7 +991,7 @@ public class ReferenceClusterTest
 									1,
 									'r')};
 
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	/**
@@ -1023,7 +1024,7 @@ public class ReferenceClusterTest
 		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-		performTest(res, javaRes);
+		performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		
 		// def result (using p values from calculated result)
 		Subsequence sub1 = new Subsequence(1, 2, 0, 0, res[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
@@ -1042,7 +1043,7 @@ public class ReferenceClusterTest
 									0,
 									'r')};
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	/**
@@ -1104,7 +1105,7 @@ public class ReferenceClusterTest
 									0,
 									'r')};
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	/**
@@ -1152,7 +1153,7 @@ public class ReferenceClusterTest
 				0,
 				'r')};
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	/**
@@ -1201,7 +1202,7 @@ public class ReferenceClusterTest
 				0,
 				'r')};
 		
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	@Test
@@ -1255,7 +1256,7 @@ public class ReferenceClusterTest
 		// result of computation 
 		GeneCluster[] noQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, noQuorumParameters);
 		
-		performTest(maxQuorumResult, noQuorumResult);
+		performTest(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
 	}
 	
 	@Test
@@ -1279,7 +1280,7 @@ public class ReferenceClusterTest
 		// result of computation 
 		GeneCluster[] noQuorumResult = GeckoInstance.getInstance().computeClustersLibgecko(genomes, noQuorumParameters);
 		
-		performTest(maxQuorumResult, noQuorumResult);
+		performTest(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
 	}
 	
 	/**
@@ -1356,7 +1357,7 @@ public class ReferenceClusterTest
 						0,
 						'r')};
 				
-		performTest(refCluster, res);
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
 }
 

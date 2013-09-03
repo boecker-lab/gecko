@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.zip.DataFormatException;
 
+import gecko2.GeneClusterTestUtils.PValueComparison;
 import gecko2.algo.AlgorithmParameters;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.GeneCluster;
@@ -66,7 +67,7 @@ public class ReferenceClusterDistanceMatrixTest {
 									1,
 									'r')};
 		
-		performTest(refCluster, res);	
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);	
 	}
 	
 	@Test
@@ -106,7 +107,7 @@ public class ReferenceClusterDistanceMatrixTest {
 		int[] genes2 = {1, 2, 5, 4, 3};
 		
 		GeneCluster[] refCluster = {new GeneCluster(0, bestOccurrences, allOccurrences, genes1, 
-									res[0].getBestPValue(), 
+									res[0].getBestPValue(),
 									res[0].getBestPValueCorrected(),
 									1, 
 									0,
@@ -118,7 +119,7 @@ public class ReferenceClusterDistanceMatrixTest {
 									0,
 									'r')};
 		
-		performTest(refCluster, res);		
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
 	
 	@Test
@@ -170,7 +171,7 @@ public class ReferenceClusterDistanceMatrixTest {
 											0,
 											'r')};
 		
-		performTest(refCluster, res);		
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
 	
 	@Test
@@ -205,7 +206,7 @@ public class ReferenceClusterDistanceMatrixTest {
 									0,
 									'r')};
 		
-		performTest(refCluster, res);		
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
 	
 	@Test
@@ -240,7 +241,7 @@ public class ReferenceClusterDistanceMatrixTest {
 									0,
 									'r')};
 		
-		performTest(refCluster, res);		
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
 	
 	@Test
@@ -275,7 +276,7 @@ public class ReferenceClusterDistanceMatrixTest {
 									0,
 									'r')};
 		
-		performTest(refCluster, res);		
+		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
 	
 	/**
@@ -305,7 +306,7 @@ public class ReferenceClusterDistanceMatrixTest {
 		
 		// def result (using p values from calculated result)
 		
-		performTest(deltaTableRes, res);		
+		performTest(deltaTableRes, res, PValueComparison.COMPARE_NONE);		
 	}
 	
 	

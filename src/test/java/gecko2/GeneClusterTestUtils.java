@@ -33,6 +33,13 @@ import java.util.zip.DataFormatException;
  *
  */
 public class GeneClusterTestUtils {
+	
+	public enum PValueComparison {
+		COMPARE_ALL,
+		COMPARE_UNCORRECTED,
+		COMPARE_NONE
+	}
+	
 	//===============================================================================//
 	//============================= Methods =========================================//
 	//===============================================================================//
@@ -80,12 +87,13 @@ public class GeneClusterTestUtils {
 	 * @param expected the expected result
 	 * @param actual the actual result
 	 */
-	private static void compareSubsequence(Subsequence expected, Subsequence actual) {
+	private static void compareSubsequence(Subsequence expected, Subsequence actual, PValueComparison pValueComp) {
 		assertEquals(expected.getStart(), actual.getStart());
 		assertEquals(expected.getStop(), actual.getStop());
 		assertEquals(expected.getChromosome(), actual.getChromosome());
 		assertEquals(expected.getDist(), actual.getDist());
-		assertEqualsBigDecimal(expected.getpValue(), actual.getpValue());
+		if (pValueComp != PValueComparison.COMPARE_NONE)
+			assertEqualsBigDecimal(expected.getpValue(), actual.getpValue());
 	}
 	
 	/**
@@ -93,9 +101,10 @@ public class GeneClusterTestUtils {
 	 * @param expected the expected result
 	 * @param actual the actual result
 	 */
-	private static void compareOccurrence(GeneClusterOccurrence expected, GeneClusterOccurrence actual) {
+	private static void compareOccurrence(GeneClusterOccurrence expected, GeneClusterOccurrence actual, PValueComparison pValueComp) {
 		assertEquals(expected.getId(), actual.getId());
-		assertEqualsBigDecimal(expected.getBestpValue(), actual.getBestpValue());
+		if (pValueComp != PValueComparison.COMPARE_NONE)
+			assertEqualsBigDecimal(expected.getBestpValue(), actual.getBestpValue());
 		assertEquals(expected.getTotalDist(), actual.getTotalDist());
 		assertEquals(expected.getSupport(), actual.getSupport());
 		
@@ -106,7 +115,7 @@ public class GeneClusterTestUtils {
 			assertEquals(expected.getSubsequences()[i].length, actual.getSubsequences()[i].length);
 			
 			for (int j=0; j<expected.getSubsequences()[i].length; j++)
-				compareSubsequence(expected.getSubsequences()[i][j], actual.getSubsequences()[i][j]);
+				compareSubsequence(expected.getSubsequences()[i][j], actual.getSubsequences()[i][j], pValueComp);
 
 		}	
 	}
@@ -117,13 +126,15 @@ public class GeneClusterTestUtils {
 	 * @param expected the expected result
 	 * @param actual the actual result
 	 */
-	private static void compareGeneClusters(GeneCluster expected, GeneCluster actual) {
+	private static void compareGeneClusters(GeneCluster expected, GeneCluster actual, PValueComparison pValueComp) {
 		assertEquals(expected.getId(), actual.getId());
 		assertArrayEquals(expected.getGenes(), actual.getGenes());
 		assertEquals(expected.getSize(), actual.getSize());
 		assertEquals(expected.isMatch(), actual.isMatch());
-		assertEqualsBigDecimal(expected.getBestPValue(), actual.getBestPValue());
-		assertEqualsBigDecimal(expected.getBestPValueCorrected(), actual.getBestPValueCorrected());
+		if (pValueComp != PValueComparison.COMPARE_NONE)
+			assertEqualsBigDecimal(expected.getBestPValue(), actual.getBestPValue());
+		if (pValueComp == PValueComparison.COMPARE_ALL)
+			assertEqualsBigDecimal(expected.getBestPValueCorrected(), actual.getBestPValueCorrected());
 		assertEquals(expected.getMinTotalDist(), actual.getMinTotalDist());
 		assertEquals(expected.getType(), actual.getType());
 		assertEquals(expected.getRefSeqIndex(), actual.getRefSeqIndex());
@@ -132,13 +143,13 @@ public class GeneClusterTestUtils {
 		
 		for(int i = 0; i < actual.getOccurrences().length; i++)
 		{
-			compareOccurrence(expected.getOccurrences()[i], actual.getOccurrences()[i]);
+			compareOccurrence(expected.getOccurrences()[i], actual.getOccurrences()[i], pValueComp);
 		}		
 		
 		assertEquals(expected.getAllOccurrences().length, actual.getAllOccurrences().length);
 		for(int i = 0; i < actual.getAllOccurrences().length; i++)
 		{
-			compareOccurrence(expected.getAllOccurrences()[i], actual.getAllOccurrences()[i]);
+			compareOccurrence(expected.getAllOccurrences()[i], actual.getAllOccurrences()[i], pValueComp);
 		}
 	}
 	
@@ -148,13 +159,13 @@ public class GeneClusterTestUtils {
 	 * @param preDefClusters pre defined GeneCluster array
 	 * @param calcClusters the GeneCluster array which is the result of the compute clusters algorithm
 	 */
-	public static void performTest(GeneCluster[] expected, GeneCluster[] actual)
+	public static void performTest(GeneCluster[] expected, GeneCluster[] actual, PValueComparison pValueComp)
 	{
 		assertEquals(expected.length, actual.length);
 		
 		for(int i = 0; i < expected.length; i++)
 		{
-			compareGeneClusters(expected[i], actual[i]);
+			compareGeneClusters(expected[i], actual[i], pValueComp);
 		}
 	}
 	
@@ -189,13 +200,13 @@ public class GeneClusterTestUtils {
 		
 		GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(genomes, p, genomeGroups);
 		
-		performTest(gcr.getCompResult(), javaRes);
+		performTest(gcr.getCompResult(), javaRes, PValueComparison.COMPARE_ALL);
 		
 		if (p.getDelta() >= 0 && genomeGroups == null){
-			GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);		
+			GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);	
 		
 			// Test the java implementation
-			performTest(res, javaRes);
+			performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		}
 	}
 			
@@ -270,7 +281,7 @@ public class GeneClusterTestUtils {
 	
 	public static void main(String[] args)
 	{
-		GenerateTestDataType testType = GenerateTestDataType.fiveProteobacterDeltaTable;
+		GenerateTestDataType testType = GenerateTestDataType.fiveProteobacterD3S6Q2Grouping;
 		try {
 			List<Set<Integer>> genomeGroups = null;
 			Parameter p = null;
@@ -293,6 +304,7 @@ public class GeneClusterTestUtils {
 					
 				case fiveProteobacterD3S6Q2Grouping:
 					p = new Parameter(3, 6, 2, Parameter.QUORUM_NO_COST, 'r', 'd');
+					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").toURI());
 					outFile = new File("src/test/resources/fiveProteobacterD3S6Q2Grouping.txt");
 					genomeGroups = new ArrayList<Set<Integer>>(2);
 					Set<Integer> set1 = new HashSet<Integer>();

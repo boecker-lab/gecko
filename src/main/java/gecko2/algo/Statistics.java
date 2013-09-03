@@ -1,7 +1,6 @@
 package gecko2.algo;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,7 +8,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Formatter.BigDecimalLayoutForm;
 
 import org.apache.commons.math3.util.Precision;
 
