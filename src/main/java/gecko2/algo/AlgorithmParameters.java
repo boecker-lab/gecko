@@ -26,6 +26,7 @@ public class AlgorithmParameters{
     private final static int[][] LICHTHEIMIA_INNER_GENOME_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}};
     private final static int[][] STATISTIC_PAPER_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {5, 5, 5}};
 
+    private final static int[][] TEST__FIVE_PROTEOBACTER_DELTA_TABLE = new int[][]{{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}};
     
 	public AlgorithmParameters(int delta, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference) {
 		this(delta, minClusterSize, q, nrOfGenomes, alphabetSize, singleReference, false);
@@ -79,6 +80,10 @@ public class AlgorithmParameters{
 	
 	public static AlgorithmParameters getLichtheimiaParameters(int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
 		return new AlgorithmParameters(-1, LICHTHEIMIA_DELTA_TABLE, 3, q, nrOfGenomes, alphabetSize, singleReference, refInRef);
+	}
+	
+	public static AlgorithmParameters getFiveProteobacterDeltaTableTestParameters(int alphabetSize, int nrOfGenomes) {
+		return new AlgorithmParameters(-1, TEST__FIVE_PROTEOBACTER_DELTA_TABLE, 4, 4, nrOfGenomes, alphabetSize, false, false);
 	}
 	
 	private AlgorithmParameters(int delta, int[][] deltaTable, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
