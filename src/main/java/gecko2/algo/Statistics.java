@@ -39,7 +39,7 @@ class Statistics {
 		this.genomeGroupMapping = genomeGroupMapping;
 		this.useGenomeGrouping = nrOfGenomeGroups != genomes.size();
 		
-		this.random = new MersenneTwister(new java.util.Date());
+		this.random = new MersenneTwister();
 	}
 	
 	public static void computeReferenceStatistics(GenomeList genomes, List<ReferenceCluster> refCluster, int delta, boolean singleReference) {
