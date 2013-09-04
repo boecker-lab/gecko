@@ -122,7 +122,7 @@ public class GckFileReader
 	 * Implementation of the Runnable for the SessionLoadingThread
 	 */
 	class SessionLoadingThread implements Runnable {
-		private File f;
+		private final File f;
 		
 		/**
 		 * The constructor sets the file where to  store the data and starts the thread.
@@ -136,12 +136,10 @@ public class GckFileReader
 			
 		@SuppressWarnings("unchecked")
 		public void run() {
-			FileInputStream fis = null;
 			ObjectInputStream o = null;
 			
 			try	{
-				fis = new FileInputStream(f);
-				o = new ObjectInputStream(fis);
+				o = new ObjectInputStream(new FileInputStream(f));
 				genomes = (Genome[]) o.readObject();
 				geneLabelMap = (HashMap<Integer, String[]>) o.readObject();
 				colorMap = (HashMap<Integer, Color>) o.readObject();
@@ -161,8 +159,7 @@ public class GckFileReader
 						GeckoInstance.getInstance().setColorMap(colorMap);
 						GeckoInstance.getInstance().setGenomes(genomes);
 						GeckoInstance.getInstance().setMaxIdLength(maxIdLength);
-						
-						GeckoInstance.getInstance().setReducedList(null);
+
 						GeckoInstance.getInstance().fireDataChanged();
 						
 						// update the gui
@@ -225,6 +222,15 @@ public class GckFileReader
 				
 				handleFailedSessionLoad();
 			}
+            finally {
+                if (o!=null) {
+                    try {
+                        o.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 		}
 	}
 		

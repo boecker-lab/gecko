@@ -200,7 +200,7 @@ public class GeneClusterResult
 	            // BestOccurences
 	            for (int i = 0; i < cluster.getOccurrences().length; i++) {
 	            	// add informations which are provided by a simple data type
-	            	toFile.append("BO[" + i +"]\t").append("id=").append(cluster.getOccurrences()[i].getId());
+	            	toFile.append("BO[").append(i).append("]\t").append("id=").append(cluster.getOccurrences()[i].getId());
 	            	toFile.append("\tpValue=").append(cluster.getOccurrences()[i].getBestpValue().stripTrailingZeros());
 	            	toFile.append("\tdist=").append(cluster.getOccurrences()[i].getTotalDist());
 	            	toFile.append("\tsupport=").append(cluster.getOccurrences()[i].getSupport()).append("\n");
@@ -224,7 +224,7 @@ public class GeneClusterResult
 	            // AllOccurences
 	            for (int i = 0; i < cluster.getAllOccurrences().length; i++) {
 	            	// add informations which are provided by a simple data type
-	            	toFile.append("AO[" + i +"]\t").append("id=").append(cluster.getAllOccurrences()[i].getId());
+	            	toFile.append("AO[").append(i).append("]\t").append("id=").append(cluster.getAllOccurrences()[i].getId());
 	            	toFile.append("\tpValue=").append(cluster.getAllOccurrences()[i].getBestpValue().stripTrailingZeros());
 	            	toFile.append("\tdist=").append(cluster.getAllOccurrences()[i].getTotalDist());
 	            	toFile.append("\tsupport=").append(cluster.getAllOccurrences()[i].getSupport()).append("\n");
@@ -274,7 +274,6 @@ public class GeneClusterResult
 	 */
 	public static GeneClusterResult readResultFile(File resultFile) throws DataFormatException, IOException
 	{
-		List<GeneClusterOccurrence> allOcc = new ArrayList<GeneClusterOccurrence>();
         List<GeneClusterOccurrence> bestOcc = new ArrayList<GeneClusterOccurrence>();
         int gcIndex = 0;
 		
@@ -363,7 +362,7 @@ public class GeneClusterResult
 	        if (!s[6].contains("FN=")) {
 	            throw new DataFormatException("Header line corrupt! Missing FN=<fileName>");
 	        }
-	        Parameter p = null;
+	        Parameter p;
 	        if (distance >= 0)
 	        	p = new Parameter(distance, minClusterSize, quorum, quorumType, operationMode, referenceType);
 	        else
@@ -388,31 +387,31 @@ public class GeneClusterResult
 	            }
 	            
 	            if (!s[1].contains("dist=")) {
-	                 throw new DataFormatException("Line corrupt! Missing dist in: " + s);
+	                 throw new DataFormatException("Line corrupt! Missing dist in: " + Arrays.toString(s));
 	            }
 	            
 	            int dist = Integer.parseInt(s[1].substring(5));
 	            
 	            if (!s[2].contains("refSeq=")) {
-	                throw new DataFormatException("Line corrupt! Missing refSeq in: " + s);
+	                throw new DataFormatException("Line corrupt! Missing refSeq in: " + Arrays.toString(s));
 	            }
 	            
 	            int refSeq = Integer.parseInt(s[2].substring(7));
 	            
 	            if (!s[3].contains("pValue=")) {
-	                throw new DataFormatException("Line corrupt! Missing pValue in: " + s);
+	                throw new DataFormatException("Line corrupt! Missing pValue in: " + Arrays.toString(s));
 	            }
 	            
 	            BigDecimal pValue = new BigDecimal(s[3].substring(7));
 	            
 	            if (!s[4].contains("CpValue=")) {
-	                throw new DataFormatException("Line corrupt! Missing pValue in: " + s);
+	                throw new DataFormatException("Line corrupt! Missing pValue in: " + Arrays.toString(s));
 	            }
 	            
 	            BigDecimal c_pValue = new BigDecimal(s[4].substring(8));
 	            
 	            if (!s[5].contains("type=")) {
-	                throw new DataFormatException("Line corrupt! Missing type in: " + s);
+	                throw new DataFormatException("Line corrupt! Missing type in: " + Arrays.toString(s));
 	            }
 	            
 	            char type = s[5].charAt(5);
@@ -424,29 +423,29 @@ public class GeneClusterResult
 	            	s = line1.split("\t");
 	            	
 	            	if (!s[0].contains("BO[")) {
-	                	throw new DataFormatException("Line corrupt! Missing index in: " + s);
+	                	throw new DataFormatException("Line corrupt! Missing index in: " + Arrays.toString(s));
 	            	}
 	            
 	            	if (!s[1].contains("id=")) {
-	                     throw new DataFormatException("Line corrupt! Missing id in: " + s);
+	                     throw new DataFormatException("Line corrupt! Missing id in: " + Arrays.toString(s));
 	                }
 	                
 	                int id = Integer.parseInt(s[1].substring(3));
 	                
 	                if (!s[2].contains("pValue=")) {
-	                     throw new DataFormatException("Line corrupt! Missing pValue in: " + s);
+	                     throw new DataFormatException("Line corrupt! Missing pValue in: " + Arrays.toString(s));
 	                }
 	                
 	                BigDecimal pValue2 = new BigDecimal(s[2].substring(7));
 	                
 	                if (!s[3].contains("dist=")) {
-	                     throw new DataFormatException("Line corrupt! Missing dist in: " + s);
+	                     throw new DataFormatException("Line corrupt! Missing dist in: " + Arrays.toString(s));
 	                }
 	                
 	                int dist2 = Integer.parseInt(s[3].substring(5));
 	                
 	                if (!s[4].contains("support=")) {
-	                     throw new DataFormatException("Line corrupt! Missing support in: " + s);
+	                     throw new DataFormatException("Line corrupt! Missing support in: " + Arrays.toString(s));
 	                }
 	                
 	                int support = Integer.parseInt(s[4].substring(8));
@@ -500,37 +499,37 @@ public class GeneClusterResult
 	            	GeneClusterOccurrence bestOccurrence = new GeneClusterOccurrence(id, subs, pValue2, dist2, support);
 	            	bestOcc.add(bestOccurrence);
 	            }
-	            
-	            allOcc = new ArrayList<GeneClusterOccurrence>();
+
+                List<GeneClusterOccurrence> allOcc = new ArrayList<GeneClusterOccurrence>();
 	           
 	            // now AllOccurrences
 	            while(!s[0].matches("\\[.*,.*\\]") && line1 != null ) {
 	            	s = line1.split("\t");
 	            	
 	            	if (!s[0].contains("AO[")) {
-	                	throw new DataFormatException("Line corrupt! Missing index in: " + s);
+	                	throw new DataFormatException("Line corrupt! Missing index in: " + Arrays.toString(s));
 	            	}
 	            
 	            	if (!s[1].contains("id=")) {
-	                     throw new DataFormatException("Line corrupt! Missing id in: " + s);
+	                     throw new DataFormatException("Line corrupt! Missing id in: " + Arrays.toString(s));
 	                }
 	                
 	                int id = Integer.parseInt(s[1].substring(3));
 	                
 	                if (!s[2].contains("pValue=")) {
-	                     throw new DataFormatException("Line corrupt! Missing pValue in: " + s);
+	                     throw new DataFormatException("Line corrupt! Missing pValue in: " + Arrays.toString(s));
 	                }
 	                
 	                BigDecimal pValue2 = new BigDecimal(s[2].substring(7));
 	                
 	                if (!s[3].contains("dist=")) {
-	                     throw new DataFormatException("Line corrupt! Missing dist in: " + s);
+	                     throw new DataFormatException("Line corrupt! Missing dist in: " + Arrays.toString(s));
 	                }
 	                
 	                int dist2 = Integer.parseInt(s[3].substring(5));
 	                
 	                if (!s[4].contains("support=")) {
-	                     throw new DataFormatException("Line corrupt! Missing support in: " + s);
+	                     throw new DataFormatException("Line corrupt! Missing support in: " + Arrays.toString(s));
 	                }
 	                
 	                int support = Integer.parseInt(s[4].substring(8));

@@ -83,7 +83,7 @@ class Chromosome {
 	/**
      * Initializes the Chromosome for the calculation of gene clusters.
      * @param alphabetSize the size of the complete alphabet.
-     * @param param the parameters the algorithm is started with.
+     * @param maxDelta the maximum allowed distance
      */
     public void initializeForCalculation(int alphabetSize, int maxDelta) {
         this.pos = this.computePOS(alphabetSize);
@@ -197,10 +197,10 @@ class Chromosome {
     
     /**
      * Computes the difference between NUM[l1][r1] and NUM[l2][r2]
-     * @param l1
-     * @param r1
-     * @param l2
-     * @param r2
+     * @param l1 left border of interval 1
+     * @param r1 right border of interval 1
+     * @param l2 left border of interval 2
+     * @param r2 right border of interval 2
      * @return difference between NUM[l1][r1] and NUM[l2][r2]
      */
     public int getNUMDiff(int l1, int r1, int l2, int r2) {
@@ -278,67 +278,6 @@ class Chromosome {
      */
     public int getPrevOCC(int index) {
         return prevOcc[index];
-    }
-
-    /**
-     * Computes the minimal distance between the pattern (all necessary information stored in the matrices L and R) and all super-Intervals in this Chromosome.
-     * @param pos the position of the character that was last added to the pattern
-     * @param delta the maximal distance
-     * @param patternSize the size of the pattern
-     * @param prevPos the position of the character that was added second to last
-     * @return the minimal distance between the pattern and all super-Intervals in this chromosome
-     */
-    public int computeDistance(int pos, int delta, int patternSize, int prevPos) {
-        int distance = patternSize;
-        int[] last_dRight = new int[delta+2];
-
-        // Iterate over dCount, the number of different characters that interrupt the interval.
-        // Stop if  1) dCount > delta, so it cannot be delta location
-        //          2) delta location with fewer errors then dCount found.
-        for (int dCount=0; dCount<=Math.min(delta, distance-1); dCount++) {
-            // Iterate over the amount of mismatches left of p.
-            // Stop if too many mismatches or left border of sequence reached.
-            for (int dLeft=1; dLeft<=dCount+1 && L[pos][dLeft-1]!=0; dLeft++) {
-                if (L[pos][dLeft] < prevPos) { // An interval that reaches the previous position has been computed at that position
-                    return distance;
-                }
-
-                if (last_dRight[dLeft] < 0) {     // Stop if prefix of the interval is not left maximal
-                    break;
-                }
-                // Search for the correct dRight to the current dLeft with dCount = (dLeft-1)+(dRight-1)-intersection.
-                int dRight = last_dRight[dLeft]+1;
-                
-                // Expand the interval until the next mismatch is not already part of it.
-                while (getNUM(L[pos][dLeft]+1, R[pos][dRight]) == getNUM(L[pos][dLeft]+1, R[pos][dRight]-1)) {
-                    if (R[pos][dRight-1] == this.size()+1)  // If right end of sequence reached
-                        break;
-                    dRight++;
-                }
-
-                last_dRight[dLeft] = dRight;     // Store the dRight for the current dLeft of an interval with dCount mismatches.
-
-                // It the super-interval is no longer left maximal, it will be found later with a higher dLeft.
-                // An interval with higher dCount, that starts witch L[pos][dLeft] cannot be left maximal.
-                if (getNUM(L[pos][dLeft], R[pos][dRight]-1) == getNUM(L[pos][dLeft]+1, R[pos][dRight]-1)) {
-                    last_dRight[dLeft] = -1;
-                    continue;
-                }
-
-                // Calculate distance for the super-interval with dCount mismatches.
-                if (R[pos][dRight-1] != this.size()+1) {    // Only if right end of the sequence is not yet reached.
-                    int lBorder = L[pos][dLeft]+1;
-                    int rBorder = R[pos][dRight]-1;
-                    distance = Math.min(distance, (patternSize-getNUM(lBorder, rBorder)+2*dCount));
-
-                    if (distance <= dCount){    // The distance with dCount or more mismatches cannot be better than dCount,
-                        return distance;        // so the search can be stopped and the distance returned.
-                    }
-                }
-            }
-        }
-
-        return distance;
     }
 
     /**

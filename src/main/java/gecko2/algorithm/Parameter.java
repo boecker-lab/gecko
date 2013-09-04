@@ -77,7 +77,7 @@ public class Parameter {
 	
 	public char getRefType() {
 		return refType;
-	};
+	}
 		
 	public void setOperationMode(char opmode) {
 		this.operationMode = opmode;

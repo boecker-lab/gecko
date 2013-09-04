@@ -20,7 +20,7 @@ public class ImageWriter {
 	 * This static method creates a .png image from a BufferedImage and saves it in the 
 	 * given location. 
 	 * 
-	 * @param exportPics the image to export
+	 * @param exportPic the image to export
 	 * @param storeLocation the location where to store the image
 	 */
 	public static void createPNGPic(BufferedImage exportPic, String storeLocation) {
@@ -38,7 +38,7 @@ public class ImageWriter {
 	 * This static method creates a .jpg image from a BufferedImage and saves it in the 
 	 * given location. 
 	 * 
-	 * @param exportPics the images to export
+	 * @param exportPic the images to export
 	 * @param storeLocation the location where to store the image
 	 */
 	public static void createJPGPic(BufferedImage exportPic, String storeLocation) {

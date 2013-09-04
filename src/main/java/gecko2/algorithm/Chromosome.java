@@ -14,9 +14,9 @@ import java.util.List;
 public class Chromosome implements Serializable {
 	
 	private static final long serialVersionUID = -1724388125243376854L;
-	private MouseListener chromosomeMouseListener;
+	private final MouseListener chromosomeMouseListener;
 	
-	private Genome parent;
+	private final Genome parent;
 	private String name;
 	private List<Gene> genes;
 	
@@ -130,7 +130,7 @@ public class Chromosome implements Serializable {
 		@Override
 		public void mouseEntered(MouseEvent e) {
 			
-			String infotext = new String();
+			String infotext = "";
 					
 			if (Chromosome.this.getChromosomeMouseListener().equals(Chromosome.this.chromosomeMouseListener)) {
 					

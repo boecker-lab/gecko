@@ -4,10 +4,9 @@ import gecko2.algorithm.Genome;
 
 import java.awt.Color;
 
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public abstract class AbstractGenomeBrowser extends JScrollPane implements Adjustable{
+abstract class AbstractGenomeBrowser extends JScrollPane implements Adjustable{
 	public abstract int getScrollValue();
 	public abstract int getMaximumValue();
 	public abstract void adjustScrollPosition(int value);

@@ -23,7 +23,8 @@ public class LibraryUtils {
 	public static class PlatformNotSupportedException extends Exception {
 
 		private static final long serialVersionUID = 1L;
-		private String os,arch;
+		private final String os;
+        private final String arch;
 		
 		public String getArch() {
 			return arch;
@@ -50,7 +51,7 @@ public class LibraryUtils {
 	
 	 /**
 	  * Try to load the specified library from the jar file.
-	  * @param source
+	  * @param source the source directory
 	  * @throws PlatformNotSupportedException
 	  */
 	public static void loadLibrary(String source, boolean fixedPath) throws PlatformNotSupportedException,IOException {

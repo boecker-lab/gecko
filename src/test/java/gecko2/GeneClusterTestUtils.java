@@ -11,9 +11,7 @@ import gecko2.algorithm.Subsequence;
 import gecko2.io.CogFileReader;
 import gecko2.io.GeneClusterResult;
 
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -156,8 +154,9 @@ public class GeneClusterTestUtils {
 	/**
 	 * The method tests whether the two input array are equal.
 	 * 
-	 * @param preDefClusters pre defined GeneCluster array
-	 * @param calcClusters the GeneCluster array which is the result of the compute clusters algorithm
+	 * @param expected expected GeneCluster array
+	 * @param actual actual GeneCluster array
+     * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
 	 */
 	public static void performTest(GeneCluster[] expected, GeneCluster[] actual, PValueComparison pValueComp)
 	{
@@ -218,7 +217,7 @@ public class GeneClusterTestUtils {
 	 * @param p Parameter set
 	 * @param outputFile the output file
 	 */
-	public static void generateRefClusterFile(File inputCogFile, File outputFile, Parameter p, List<Set<Integer>> genomeGrouping) throws FileNotFoundException, IOException, LinePassedException {
+	public static void generateRefClusterFile(File inputCogFile, File outputFile, Parameter p, List<Set<Integer>> genomeGrouping) throws IOException, LinePassedException {
 		if (outputFile.exists()) {
 			System.err.println("Error: File " + outputFile.getAbsolutePath() + " exists already. Delete it manually if you want to continue!");
 			System.exit(1);
@@ -240,7 +239,7 @@ public class GeneClusterTestUtils {
 		GeneClusterResult gcResult = new GeneClusterResult(result, p, inputCogFile.getName());
 
 		System.out.println(outputFile.getAbsolutePath());
-		outputFile.createNewFile();
+		assertTrue(outputFile.createNewFile());
 		
 		gcResult.writeToFile(outputFile);
 	}
@@ -250,11 +249,10 @@ public class GeneClusterTestUtils {
 	 * @param reader the file reader
 	 * @param inputFile the input file
 	 * @return the int[][][] of genomes
-	 * @throws EOFException
 	 * @throws IOException
 	 * @throws LinePassedException
 	 */
-	private static int[][][] readGenomes(CogFileReader reader, File inputFile) throws EOFException, IOException, LinePassedException {
+	private static int[][][] readGenomes(CogFileReader reader, File inputFile) throws IOException, LinePassedException {
 		GeckoInstance.getInstance();
 		GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 		ArrayList<GenomeOccurence> genOcc = reader.importGenomes(inputFile);

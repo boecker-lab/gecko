@@ -1,7 +1,6 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Subsequence;
 import gecko2.event.BrowserContentEvent;
@@ -25,24 +24,28 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
 public class GenomeNavigator extends JPanel implements DataListener,BrowserContentListener,ClusterSelectionListener {
 	
 	private static final long serialVersionUID = -3454613481139655426L;
-	private AbstractMultipleGenomeBrowser mgb;
+	private final AbstractMultipleGenomeBrowser mgb;
 	private int virtualWidth=0;
 	private int barWidth = 0;
 	private float windowCoverage;
 	private int maxBarMax;
-	public static final int PADDING = 5;
-	public static final int GENOME_DIST = 10;
-	public static final int GENOME_LINE_WIDTH = 6;
+	private static final int PADDING = 5;
+    private static final int GENOME_DIST = 10;
+    private static final int GENOME_LINE_WIDTH = 6;
 	private GeneClusterOccurrence gOcc;
 	
 	public GenomeNavigator() {
-		this.addComponentListener(this.componentAdapter);
+		this.addComponentListener(new ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                updateVirtualWidth();
+                refresh();
+            }
+        });
 		this.mgb = GeckoInstance.getInstance().getGui().getMgb();
 	}
 	
@@ -59,12 +62,15 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 		
 		for (int i=0; i<mgb.getNrGenomes();i++) {
 			// Compute the length of the bar representation for each chromosome
-			List<Integer> geneCount = new ArrayList<Integer>(mgb.getGeneNumbers(i));
-			int chromosomeCount = geneCount.size();
+			int[] geneCount = mgb.getGeneNumbers(i);
+            // Scale it to GenomeNavigator pixels
+            for (int j=0; j<geneCount.length; j++)
+                geneCount[j] *= mgb.getGeneWidth();
+			int chromosomeCount = geneCount.length;
 			
-			List<Integer> lineLengths = new ArrayList<Integer>(geneCount.size());			
-			for (int j=0; j<geneCount.size(); j++)
-				lineLengths.add((int)(geneCount.get(j)*scale));
+			List<Integer> lineLengths = new ArrayList<Integer>(geneCount.length);
+            for (int geneCountForChromosome : geneCount)
+                lineLengths.add((int) (geneCountForChromosome * scale));
 
 								
 			// Compute the start pixel for the first chromosome
@@ -109,7 +115,7 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 					int gcount;
 					if (mgb.isFlipped(i)) {
 						chromosomeIndex = chromosomeCount - chromosomeIndex -1;
-						gcount = geneCount.get(s.getChromosome()) - 1 - ((int) Math.ceil(((s.getStart()+s.getStop()-2)/2.0)));
+						gcount = geneCount[s.getChromosome()] - 1 - ((int) Math.ceil(((s.getStart()+s.getStop()-2)/2.0)));
 					} else 
 						gcount = ((int) ((s.getStart()+s.getStop()-2)/2.0));	
 					
@@ -176,13 +182,6 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 		virtualWidth = 2*maxGenomeWidth + barWidth;
 		windowCoverage = barWidth/(1.0F*virtualWidth);
 	}
-	
-	private ComponentAdapter componentAdapter = new ComponentAdapter() {
-		public void componentResized(java.awt.event.ComponentEvent e) {
-			updateVirtualWidth();
-			refresh();
-		};
-	};
 
 	@Override
 	public void dataChanged(DataEvent e) {

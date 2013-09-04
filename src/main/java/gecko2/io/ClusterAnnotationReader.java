@@ -21,17 +21,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ClusterAnnotationReader {
-	private File f;
-	private Genome[] genomes;
-	private List<GeneCluster> currentClusters;
-	List<GeneCluster> newClusters;
-	Map<String, Integer> genomeMap;
-	Map<String, Integer> chromosomeMap;
-	Map<Integer, Integer> genomeIndexMap;
-	int clusterId;
+	private final File f;
+	private final Genome[] genomes;
+	private final List<GeneCluster> currentClusters;
+	private final List<GeneCluster> newClusters;
+	private final Map<String, Integer> genomeMap;
+	private final Map<String, Integer> chromosomeMap;
+	private final Map<Integer, Integer> genomeIndexMap;
+	private int clusterId;
 	
-	private static Pattern clusterStartPattern = Pattern.compile("new cluster: pValue = ([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?), refSeq = (\\d+)");
-	private static Pattern clusterOccurrencePattern = Pattern.compile("(\\d+)(?:\\.\\d+)?:\t([^\t]+)\t\\[(\\d+),(\\d+)\\].*");
+	private static final Pattern clusterStartPattern = Pattern.compile("new cluster: pValue = ([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?), refSeq = (\\d+)");
+	private static final Pattern clusterOccurrencePattern = Pattern.compile("(\\d+)(?:\\.\\d+)?:\t([^\t]+)\t\\[(\\d+),(\\d+)\\].*");
 	
 	
 	public static List<GeneCluster> readClusterAnnotations(File f, Genome[] genomes) {
@@ -146,7 +146,7 @@ public class ClusterAnnotationReader {
 			Integer oldInternalIndex = genomeIndexMap.get(seqIndex);
 			if (oldInternalIndex == null)
 				genomeIndexMap.put(seqIndex, genomeMap.get(genomeName));
-			else if (oldInternalIndex != genomeMap.get(genomeName)) {
+			else if (!oldInternalIndex.equals(genomeMap.get(genomeName))) {
 				System.err.println(String.format("Missmatch in mapping for internal genome indices at %s with external index %d", genomeName, seqIndex));
 				System.err.println(String.format("Expected %d, got %d!", oldInternalIndex, genomeMap.get(genomeName)));
 				return false;
@@ -235,7 +235,6 @@ public class ClusterAnnotationReader {
 			i++;
 		}
 		
-		GeneCluster newCluster = new GeneCluster(cluster.getId(), bestOccs, allOccs, genes, cluster.getBestPValue(), cluster.getBestPValueCorrected(), totalDistance, referenceIndex, cluster.getType());	
-		return newCluster;
+		return new GeneCluster(cluster.getId(), bestOccs, allOccs, genes, cluster.getBestPValue(), cluster.getBestPValueCorrected(), totalDistance, referenceIndex, cluster.getType());
 	}
 }

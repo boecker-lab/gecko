@@ -17,11 +17,11 @@ public class GeneClusterOccurrence implements Serializable {
 	 * Random generated serialization UID
 	 */
 	private static final long serialVersionUID = 657846431928908396L;
-	private int id;									// A unique ID for every occurrence (unique within every cluster)
-	private Subsequence[][] subsequences;			// The list of subsequences
-	private BigDecimal pValue;							// The pValue of this occurrence
-	private int dist;								// The distance of this occurrence
-	private int support;							// The number of genomes that support this occurrence
+	private final int id;									// A unique ID for every occurrence (unique within every cluster)
+	private final Subsequence[][] subsequences;			// The list of subsequences
+	private final BigDecimal pValue;							// The pValue of this occurrence
+	private final int dist;								// The distance of this occurrence
+	private final int support;							// The number of genomes that support this occurrence
 	
 	public static final int GENOME_NOT_INCLUDED = -1;
 	

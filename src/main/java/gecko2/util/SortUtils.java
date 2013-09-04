@@ -2,6 +2,7 @@ package gecko2.util;
 
 import gecko2.GenomeOccurence;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,7 +29,7 @@ public class SortUtils {
 	
 }
 
-class GenomeOccurenceComparator implements Comparator<GenomeOccurence> {
+class GenomeOccurenceComparator implements Comparator<GenomeOccurence>, Serializable {
 	public int compare(GenomeOccurence o1, GenomeOccurence o2) {
 		if (o1.getGroup() == o2.getGroup())
 			return o1.getDesc().compareTo(o2.getDesc());
@@ -37,7 +38,7 @@ class GenomeOccurenceComparator implements Comparator<GenomeOccurence> {
 	}
 }
 
-class GenomeOccurenceStartComparator implements Comparator<GenomeOccurence> {
+class GenomeOccurenceStartComparator implements Comparator<GenomeOccurence>, Serializable {
 	public int compare(GenomeOccurence o1, GenomeOccurence o2) {
 		if (o1.getStart_line()<o2.getStart_line())
 			return -1;

@@ -43,14 +43,15 @@ import javax.swing.table.TableModel;
 public class GenomeSelector extends JDialog {
 
 	private static final long serialVersionUID = -8491964493540715101L;
-	private ArrayList<GenomeOccurence> occs;
-	private short[] borders;
-	private HashMap<Integer, Color> colorMap;
+	private final ArrayList<GenomeOccurence> occs;
+	private final short[] borders;
 	private int highID =0;
-	private Random rand;
-	private JScrollPane scrollpane;
-	private JTable table;
-	private AbstractAction importAction, groupAction, unGroupAction, allOrNoneAction;
+	private final Random rand;
+	private final JTable table;
+	private AbstractAction importAction;
+    private final AbstractAction groupAction;
+    private final AbstractAction unGroupAction;
+    private AbstractAction allOrNoneAction;
 	
 	public GenomeSelector(ArrayList<GenomeOccurence> occs, Frame parent) {
 		super(parent,"Select genomes to import...");
@@ -66,7 +67,7 @@ public class GenomeSelector extends JDialog {
 		recomputeBorders();
 		// Create the color map for the initial singleton groups
 		rand = new Random();
-		colorMap = new HashMap<Integer, Color>();
+        HashMap<Integer, Color> colorMap = new HashMap<Integer, Color>();
 		for (GenomeOccurence occ : occs) {
 			if (!colorMap.containsKey(occ.getGroup()))
 				colorMap.put(occ.getGroup(), getRandomColor());
@@ -87,8 +88,8 @@ public class GenomeSelector extends JDialog {
 		table.getColumnModel().getColumn(2).setMaxWidth(20);
 		table.getColumnModel().getColumn(1).setMaxWidth(20);
 		table.setIntercellSpacing(new Dimension(0,0));
-		
-		scrollpane = new JScrollPane(table);
+
+        JScrollPane scrollpane = new JScrollPane(table);
 		tablePanel.add(scrollpane);
 		mainpanel.add(tablePanel,BorderLayout.CENTER);
 		
@@ -151,13 +152,10 @@ public class GenomeSelector extends JDialog {
 				
 				deleteNotFlaggedEntries();
 				GenomeSelector.this.setVisible(false);
-				if (GenomeSelector.this.occs != null){
-					CogFileReader reader = new CogFileReader((byte) 0);
-				
-					reader.readGenomes(GenomeSelector.this.occs);
-					
-				}
-			}
+                CogFileReader reader = new CogFileReader((byte) 0);
+
+                reader.readGenomes(GenomeSelector.this.occs);
+            }
 		};
 		importAction.setEnabled(false);
 		importAction.putValue(Action.NAME, "OK");
@@ -226,7 +224,7 @@ public class GenomeSelector extends JDialog {
 							last = occ;
 							count++;
 						}
-					if (count==1 && last!=null) {
+					if (count==1) {
 						last.setGroup(0);
 						last.setFlagged(false);
 					}
@@ -314,7 +312,7 @@ public class GenomeSelector extends JDialog {
 	}
 	
 	
-	class GenomeTableMouseListener extends MouseAdapter {
+	private class GenomeTableMouseListener extends MouseAdapter {
 				
 		@Override
 		public void mouseReleased(MouseEvent e) {
@@ -336,15 +334,15 @@ public class GenomeSelector extends JDialog {
 			groupAction.setEnabled(true);
 	}
 	
-	class GroupLabel extends JLabel {
+	static class GroupLabel extends JLabel {
 
 		private static final long serialVersionUID = -678973051308024076L;
 		public static final short MODE_NOGRP = 0;
 		public static final short MODE_BEGIN = 1;
 		public static final short MODE_END = 3;
 		public static final short MODE_MIDDLE = 2;
-		private short mode;
-		private Dimension surface;
+		private final short mode;
+		private final Dimension surface;
 		
 		public GroupLabel(short mode, int width, int height) {
 			this.mode = mode;
@@ -365,6 +363,7 @@ public class GenomeSelector extends JDialog {
 			case MODE_END:
 				g.fillRect(surface.width/2-1,0, 2, surface.height/2);
 				g.fillOval(surface.width/2-4, surface.height/2-4, 7,7);
+            default:
 			}
 		}
 	}
@@ -387,7 +386,7 @@ public class GenomeSelector extends JDialog {
 	class GenomeTableModel implements TableModel {
 		
 //		private boolean[] selected;
-		private int[] groups;
+		private final int[] groups;
 
 		public GenomeTableModel() {
 //			this.selected = new boolean[occs.size()];
@@ -396,12 +395,8 @@ public class GenomeSelector extends JDialog {
 		}
 		
 		// We don't change the TableModel
-		public void addTableModelListener(TableModelListener l) {
-			;
-		}
-		public void removeTableModelListener(TableModelListener l) {
-			;
-		}
+		public void addTableModelListener(TableModelListener l) {}
+		public void removeTableModelListener(TableModelListener l) {}
 
 		public Class<?> getColumnClass(int columnIndex) {
 			switch (columnIndex) {
@@ -436,16 +431,15 @@ public class GenomeSelector extends JDialog {
 				case 0:
 					return occs.get(rowIndex).getGenomSelectorText();
 				case 1:
-					return new Character('\0');
+					return '\0';
 				default:
 					return occs.get(rowIndex).isFlagged();					
 			}
 		}
 
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			if (columnIndex==0) return false;
-			return true;
-		}
+            return columnIndex != 0;
+        }
 
 		public void setValueAt(Object value, int rowIndex, int columnIndex) {
 			if (columnIndex==2)  {

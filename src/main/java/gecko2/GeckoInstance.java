@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,7 +42,7 @@ public class GeckoInstance {
 	private native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
 	
-	public enum ResultFilter {showAll, showFiltered, showSelected};
+	public enum ResultFilter {showAll, showFiltered, showSelected}
 	
 	private boolean libgeckoLoaded;
 	
@@ -56,8 +55,6 @@ public class GeckoInstance {
 	private SortedSet<Integer> clusterSelection;
 	private ResultFilter filterSelection = ResultFilter.showAll;
 	private SortedSet<Integer> reducedList;
-	private boolean filterReducedList;
-	private int highlightedCluster;
 	private String filterString;
 	
 	private boolean debug = false;
@@ -69,6 +66,8 @@ public class GeckoInstance {
 	private int geneElementWidth;
 	
 	private int maxIdLength;
+
+    private final EventListenerList eventListener = new EventListenerList();
 	
 	/**
 	 * 0 gui session, 1 cli session
@@ -89,7 +88,7 @@ public class GeckoInstance {
 	 * Setter for the variable maxIdLength which is the length of the
 	 * longest appearing id.
 	 * 
-	 * @param length
+	 * @param length longest id
 	 */
 	public void setMaxIdLength(int length)
 	{
@@ -109,7 +108,7 @@ public class GeckoInstance {
 	/**
 	 * Setter for the colormap
 	 * 
-	 * @param colormap
+	 * @param colormap the colormap
 	 */
 	public void setColorMap(Map<Integer, Color> colormap)
 	{
@@ -119,7 +118,7 @@ public class GeckoInstance {
 	/**
 	 * Setter for the geneLabelMap
 	 * 
-	 * @param geneLabelMap
+	 * @param geneLabelMap the gene label map
 	 */
 	public void setGeneLabelMap(Map<Integer, String[]> geneLabelMap)
 	{
@@ -129,8 +128,6 @@ public class GeckoInstance {
 	/*
 	 * DataEvents
 	 */
-	private EventListenerList eventListener = new EventListenerList();
-
 	
 	public void addDataListener(DataListener l) {
 		eventListener.add(DataListener.class, l);
@@ -154,8 +151,8 @@ public class GeckoInstance {
 	
 	private StartComputationDialog scd = null;
 	
-	public final static int MAX_GENEELEMENT_HIGHT = 40;
-	public final static int MIN_GENEELEMENT_HIGHT = 9;
+	private final static int MAX_GENEELEMENT_HIGHT = 40;
+	private final static int MIN_GENEELEMENT_HIGHT = 9;
 	public final static int DISPLAY_GENEELEMENT_HIGHT = 20;
 	
 	public File getLastExportedFile() {
@@ -233,10 +230,10 @@ public class GeckoInstance {
 		clusterSelection.clear();
 		filterResults();
 	}
-	
+
 	/**
 	 * Adds the cluster with the given index to the list of hidden clusters
-	 * 
+	 *
 	 * @param clusterIndex the index of the cluster
 	 */
 	public void addToReducedList(int clusterIndex) {
@@ -245,10 +242,10 @@ public class GeckoInstance {
 		reducedList.add(clusterIndex);
 		filterResults();
 	}
-	
+
 	/**
 	 * Adds the cluster with the given index to the list of hidden clusters
-	 * 
+	 *
 	 * @param toHide the index of the cluster to hide
 	 */
 	public void addToReducedList(SortedSet<Integer> toHide) {
@@ -432,26 +429,11 @@ public class GeckoInstance {
 		this.fireDataChanged();
 	}
 	
-	/**
-	 * This Method is just for the UnitTest the original method want's to modify
-	 * the gui but we didn't set the necessary parameter so we use this dirty thing
-	 * 
-	 * @param genomes a Genome array
-	 */
-	public void setGenomesTest(Genome[] genomes) 
-	{
-		this.genomes = genomes;
-	}
-	
-	public int getHighlightedCluster() {
-		return highlightedCluster;
-	}
-	
 	public void setClusters(GeneCluster[] clusters) {
 		this.clusters = clusters;
+        this.reducedList = null;
 		
 		if (this.sessionType == 0) {
-			
 			gui.getGcSelector().refresh();
 		}
 	}
@@ -602,7 +584,7 @@ public class GeckoInstance {
 		new ComputationThread(p, mergeResults);
 	}
 	
-	public void handleUpdatedClusterResults() {
+	void handleUpdatedClusterResults() {
 		if (this.clusters==null) {
 			this.clusters = new GeneCluster[0];
 		}
@@ -615,7 +597,7 @@ public class GeckoInstance {
 	
 	public class ComputationThread implements Runnable {
 
-		private Parameter p;
+		private final Parameter p;
 		private final boolean mergeResults;
 		
 		public ComputationThread(Parameter p){
@@ -851,7 +833,7 @@ public class GeckoInstance {
 				}
 			});
 
-	};
+	}
 	
 	public void setProgressStatus(int value) {
 		final int v = value;
@@ -872,10 +854,6 @@ public class GeckoInstance {
 		return genomes;
 	}
 	
-	public void setReducedList(SortedSet<Integer> reducedList) {
-		this.reducedList = reducedList;
-	}
-	
 	public void setLastOpendFile(File lastOpenedFile) {
 		this.lastOpenedFile = lastOpenedFile;
 	}
@@ -886,6 +864,6 @@ public class GeckoInstance {
 		List<String> genomeNames = new ArrayList<String>(genomes.length);
 		for (Genome genome : genomes)
 			genomeNames.add(genome.getName());
-		return ResultWriter.exportResultsToFileNEW2(f, getClusterList(filter), geneLabelMap, genomeNames, type);
+		return ResultWriter.exportResultsToFileNEW2(f, getClusterList(filter), genomeNames, type);
 	}
 }

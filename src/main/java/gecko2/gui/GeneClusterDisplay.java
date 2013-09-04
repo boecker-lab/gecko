@@ -5,7 +5,6 @@ import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.Genome;
 import gecko2.algorithm.Subsequence;
 import gecko2.event.ClusterSelectionEvent;
 import gecko2.event.ClusterSelectionListener;
@@ -29,8 +28,8 @@ import javax.swing.JScrollPane;
 public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionListener {
 
 	private static final long serialVersionUID = -2156280340296694286L;
-	private JPanel masterPanel;
-	private JPanel flowpanel;
+	private final JPanel masterPanel;
+	private final JPanel flowpanel;
 	private HashMap<Integer, Gene[]> annotations;
 	private GeneCluster cluster;
 	private GeneClusterOccurrence gOcc;
@@ -129,7 +128,6 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 				cpanel.setBackground(masterPanel.getBackground());
 				
 				Chromosome c = GeckoInstance.getInstance().getGenomes()[i].getChromosomes().get(s.getChromosome());
-				Genome g = GeckoInstance.getInstance().getGenomes()[i];
 				cpanel.add(new NumberInRectangle(i + 1, getBackground(), mlisteners.get(i), Integer.toString(i + 1).length()));
 				
 				cpanel.add(new TextLabel(c.getFullName()));
@@ -283,7 +281,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 		this.getVerticalScrollBar().setValue(0);
 	}
 	
-	private class TextLabel extends JLabel {	
+	private static class TextLabel extends JLabel {
 		/**
 		 * Random generated serialization UID
 		 */

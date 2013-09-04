@@ -52,13 +52,13 @@ public class GeneClusterPicture {
 	/**
 	 * The selected gene cluster
 	 */
-	private GeneCluster selectedCluster;
-	private int[] subselection;
+	private final GeneCluster selectedCluster;
+	private final int[] subselection;
 	
 	/**
 	 * All input genomes from gecko instance
 	 */
-	private Genome[] genomes;
+	private final Genome[] genomes;
 	
 	/**
 	 * Tells us whether to write genome names instead if just the number.
@@ -86,7 +86,7 @@ public class GeneClusterPicture {
 	/**
 	 * Stores the current data from GeckoInstance.
 	 */
-	GeckoInstance gecko;
+	private final GeckoInstance gecko;
 	
 	/**
 	 * Stores the number of the genome with the longest cluster. This is needed to calculate
@@ -102,7 +102,7 @@ public class GeneClusterPicture {
 	/**
 	 * Default height of the gene elements
 	 */
-	private int elemHeight = 16;
+	private final int elemHeight = 16;
 	
 	/**
 	 * Default width of the gene element. (Calculated by using the longest available id)
@@ -112,12 +112,12 @@ public class GeneClusterPicture {
 	/**
 	 * Vertical space between the genomes.
 	 */
-	private int vgap = 2;
+	private final int vgap = 2;
 	
 	/**
 	 * Horizontal space between the gene elements
 	 */
-	private int hgap = 2;
+	private final int hgap = 2;
 	
 	/**
 	 * Page width
@@ -149,24 +149,24 @@ public class GeneClusterPicture {
 	/**
 	 * New color mapping with the gene id.
 	 */
-	private HashMap<Integer, Color> newColorMap = new HashMap<Integer, Color>();
+	private final HashMap<Integer, Color> newColorMap = new HashMap<Integer, Color>();
 	
 	/**
 	 * Current position in the geneColor array.
 	 */
-	byte  colorPos = 0;
+	private int colorPos = 0;
 	
 	/**
 	 * The number of additional genes that is shown on each side of the longest cluster occurrence.
 	 */
-	private final int NR_ADDITIONAL_GENES = 1;
+	private static final int NR_ADDITIONAL_GENES = 1;
 	
 	/**
 	 * The constructor sets all important variables while the variables
 	 * gNames and geneCode depend on the users choice.
 	 * 
 	 * @param gnames true if the genome name shall be replace the number
-	 * @param geneCode true if the 5 letter gene code shall be replace the (integer) id code
+	 * @param nameType either id, name or locus_tag
 	 */
 	public GeneClusterPicture(boolean gnames, NameType nameType, GeneCluster selectedCluster, int[] subselection) {
 		
@@ -187,10 +187,6 @@ public class GeneClusterPicture {
 	
 	/**
 	 * This method find the genome with the longest sequence in the cluster.
-	 * 
-	 * @return a Map which maps the genome ID on a integer array with two indices.
-	 * Index zero is the length of the sequence in the cluster and index one is the number
-	 * of the chromosome which contains the sequence.
 	 */
 	private void setRefPaintGenom() {		
 		refPaintLength = 0;
@@ -222,11 +218,12 @@ public class GeneClusterPicture {
 	}
 	
 	/**
-	 * Setter for the variable geneCode. Recreates the images.
-	 * 
-	 * @param enableCode new boolean value
+	 * Set the name type, either id, name or locus_tag
+     * Recreates the image
+	 *
+	 * @param nameType the name type
 	 */
-	public void setNameType(NameType nameType) {		
+	public void setNameType(NameType nameType) {
 		if (this.nameType != nameType) {
 			this.nameType = nameType;
 			resetPageSize();
@@ -423,7 +420,7 @@ public class GeneClusterPicture {
 	 * @return returns the color for the gene element of the given gene ID
 	 */
 	private Color getColor(int colorID) {
-		Color out = null;
+		Color out;
 		
 		if (this.gecko.getGenLabelMap().get(colorID)[0].equals("0")) {
 			out = Color.GRAY;

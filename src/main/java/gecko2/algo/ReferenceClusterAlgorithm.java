@@ -31,14 +31,14 @@ public class ReferenceClusterAlgorithm {
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
 	 * @param genomes the genomes
 	 * @param param the parameters
-	 * @param genomeGroupMapping each set contains the index of all genomes that contribute to quorum and p-value only once
+	 * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
 	 * @return the gene clusters
 	 */
 	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
 		if (!param.useJavaAlgorithm()) 
 			throw new IllegalArgumentException("invalid parameters");
 		
-		GenomeList data = null;
+		GenomeList data;
 		if (param.getAlphabetSize() >= 0)
 			data = new GenomeList(genomes, param.getAlphabetSize());
 		else {
@@ -252,9 +252,9 @@ public class ReferenceClusterAlgorithm {
 
 	private int countNonOccs(int[] noOccCount, int delta) {
 		int nonOccs = 0;
-		for (int i=0; i<noOccCount.length; i++)
-			if (noOccCount[i] > delta)
-				nonOccs++;
+        for (int aNoOccCount : noOccCount)
+            if (aNoOccCount > delta)
+                nonOccs++;
 		return nonOccs;
 	}
 	

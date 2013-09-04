@@ -19,7 +19,7 @@ public class FileUtils {
     
 	public static class GenericFilter extends FileFilter {
 		
-		private String extensions;
+		private final String extensions;
 		
 		/**
 		 * Create a new Generic Filter

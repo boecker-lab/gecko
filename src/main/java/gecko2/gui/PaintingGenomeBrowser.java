@@ -22,13 +22,13 @@ import javax.swing.event.MouseInputAdapter;
 public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	private static final long serialVersionUID = -87373710905284714L;
 	
-	private JPanel canvas;
-	private Genome genome;
-	private GeckoInstance gecko;
-	private MultipleGenomesBrowser parent;
+	private final JPanel canvas;
+	private final Genome genome;
+	private final GeckoInstance gecko;
+	private final AbstractMultipleGenomeBrowser parent;
 	private int borderSpace;
-	private final int hgap = 2;
-	private final int vgap = 2;
+	private static final int hgap = 2;
+	private static final int vgap = 2;
 	
 	private String maxLengthString;
 	

@@ -1,6 +1,5 @@
 package gecko2.algo;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,8 +15,8 @@ class Genome implements Iterable<Chromosome> {
 
     /**
      * 
-     * @param nr
-     * @param chromosomes
+     * @param nr the nr of the genome
+     * @param chromosomes the list of chromosomes
      */
 	public Genome(int nr, List<Chromosome> chromosomes) {
         this.chromosomes = new ArrayList<Chromosome>(chromosomes);
@@ -90,10 +89,10 @@ class Genome implements Iterable<Chromosome> {
 	    			return false;
 			} else {
 				int[] pos = chr.getPOS(c);
-				for (int i=0; i<pos.length; i++){
-					if (pos[i] < l || pos[i] > r)
-						return false;
-				}
+                for (int position : pos) {
+                    if (position < l || position > r)
+                        return false;
+                }
 			}
 		}
 		return true;

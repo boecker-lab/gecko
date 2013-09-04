@@ -1,9 +1,6 @@
 package gecko2.gui;
 
-import java.util.List;
-
 import javax.swing.JPanel;
-import javax.swing.event.EventListenerList;
 
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
@@ -23,7 +20,7 @@ public abstract class AbstractMultipleGenomeBrowser extends JPanel implements Cl
 	
 	public abstract int getNrGenomes();
 	public abstract int getGeneWidth();
-	public abstract List<Integer> getGeneNumbers(int genomeIndex);
+	public abstract int[] getGeneNumbers(int genomeIndex);
 	public abstract boolean isFlipped(int genomeIndex);
 	public abstract void centerCurrentClusterAt(int geneID);
 	public abstract int getScrollMaximum();

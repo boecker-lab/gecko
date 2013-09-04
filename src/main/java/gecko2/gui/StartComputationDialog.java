@@ -18,7 +18,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -52,10 +51,9 @@ public class StartComputationDialog extends JDialog {
 	private static final long serialVersionUID = -5635614016950101153L;
 	private int quorum;
 	private char opMode,refType;
-	private JComboBox refCombo;
-	private JCheckBox mergeResults;
-	private JLabel refLabel;
-	private GeckoInstance gecko = GeckoInstance.getInstance();
+	private final JComboBox refCombo;
+	private final JCheckBox mergeResults;
+	private final GeckoInstance gecko = GeckoInstance.getInstance();
 
 	public StartComputationDialog(int ngenomes) {
 		this.setModal(true);
@@ -102,7 +100,7 @@ public class StartComputationDialog extends JDialog {
 		modeCombo.setSelectedIndex(0);
 		
 		final String[] refModes = {"all against all", "fixed genome", "manual cluster"};
-		refLabel = new JLabel("Reference:");
+        JLabel refLabel = new JLabel("Reference:");
 		refCombo = new JComboBox(refModes);
 		refCombo.setPreferredSize(new Dimension(190, 30));
 		
@@ -310,15 +308,13 @@ public class StartComputationDialog extends JDialog {
 					Map<String[], Integer> revIDMap = SortUtils.invertIntArray(gecko.getGenLabelMap());
 					for (String id : refClusterField.getText().split(" "))
 						if (id!=null && (!(id.equals("")))) {
-							Integer iid = revIDMap.get(Integer.parseInt(id));
+							Integer iid = revIDMap.get(Integer.parseInt(id)); //TODO contains strings, should not work!
 							if (iid!=null)
 								genes.add(new Gene("", iid));
 						}
 					cluster.getChromosomes().add(new Chromosome("Reference cluster", genes, cluster));
 					genomes[0] = cluster;
-					for (int i=0;i<oldGenomes.length;i++) {
-						genomes[i+1] = oldGenomes[i];
-					}
+                    System.arraycopy(oldGenomes, 0, genomes, 1, oldGenomes.length);
 					gecko.getGui().closeCurrentSession();
 					gecko.setGenomes(genomes);
 				}

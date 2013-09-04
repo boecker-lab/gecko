@@ -22,7 +22,7 @@ public class ColorUtils {
 
 	public static float[] RGBtoHSV (int R, int G, int B, float[] HSV) {
 		// R,G,B in [0,255]
-		float H = 0, S = 0, V = 0;
+		float H = 0, S = 0, V;
 		float cMax = 255.0f;
 		int cHi = Math.max(R,Math.max(G,B));	// highest color value
 		int cLo = Math.min(R,Math.min(G,B));	// lowest color value
@@ -60,7 +60,7 @@ public class ColorUtils {
 	
 	public static int HSVtoRGB (float h, float s, float v) {
 		// h,s,v in [0,1]
-		float rr = 0, gg = 0, bb = 0;
+		float rr, gg, bb;
 		float hh = (6 * h) % 6;                 
 		int   c1 = (int) hh;                     
 		float c2 = hh - c1;
@@ -74,14 +74,14 @@ public class ColorUtils {
 			case 3: rr=x; gg=y; bb=v; break;
 			case 4: rr=z; gg=x; bb=v; break;
 			case 5: rr=v; gg=x; bb=y; break;
+            default: throw new RuntimeException("Ooops! That was not supposed to happen!");
 		}
 		int N = 256;
 		int r = Math.min(Math.round(rr*N),N-1);
 		int g = Math.min(Math.round(gg*N),N-1);
 		int b = Math.min(Math.round(bb*N),N-1);
 		// create int-packed RGB-color:
-		int rgb = ((r&0xff)<<16) | ((g&0xff)<<8) | b&0xff; 
-		return rgb;
+		return ((r&0xff)<<16) | ((g&0xff)<<8) | b&0xff;
 	}
 	
 }

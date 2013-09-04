@@ -34,7 +34,7 @@ public class GeneElement extends JPanel implements Adjustable {
 	private boolean grey = false;
 	private boolean unknown = false;
 	private boolean fixedSize = false;
-	private Gene gene;
+	private final Gene gene;
 	
 	private Color highlightColor;
 	
@@ -71,7 +71,7 @@ public class GeneElement extends JPanel implements Adjustable {
 	
 	private int computeWidth() {
 		if (fixedSize)
-			return (int) Math.round(gecko.getGeneElementWidth());
+			return gecko.getGeneElementWidth();
 		else
 			return 8 * gecko.getMaxIdLength() + 3;
 	}
@@ -113,10 +113,8 @@ public class GeneElement extends JPanel implements Adjustable {
 	}
 	
 	public boolean isHighlighted() {
-		if (this.highlightColor!=null)
-			return true;
-		return false;
-	}
+        return this.highlightColor != null;
+    }
 		
 	public void setGrey(boolean grey) {
 		this.grey = grey;
@@ -144,7 +142,7 @@ public class GeneElement extends JPanel implements Adjustable {
 			c = Color.GRAY;
 	 	else  {
 	 		if (this.grey) {
-	 			int gv = (int) Math.floor((this.geneColor.getBlue() + this.geneColor.getRed() + this.geneColor.getGreen()) / 3);
+	 			int gv = (this.geneColor.getBlue() + this.geneColor.getRed() + this.geneColor.getGreen()) / 3;
 	 			c = new Color(gv, gv, gv);
 	 		} 
 	 		else {
@@ -155,24 +153,24 @@ public class GeneElement extends JPanel implements Adjustable {
 		g.setColor(c);
 		int fontoffset = 0;
 		if (this.orientation == ORIENTATION_FORWARD) {
-			g.fillRect(3, Y_OFFSET+0, ELEMENTWIDTH, ELEMHIGHT);
+			g.fillRect(3, Y_OFFSET, ELEMENTWIDTH, ELEMHIGHT);
 			int xPoints[] = {3 + ELEMENTWIDTH,
 					3 + ELEMENTWIDTH + ((int) Math.ceil(ELEMHIGHT / 2.0)),
 					3 + ELEMENTWIDTH};
-			int yPoints[] = {Y_OFFSET + 0, Y_OFFSET + ELEMHIGHT / 2, Y_OFFSET + ELEMHIGHT};
+			int yPoints[] = {Y_OFFSET, Y_OFFSET + ELEMHIGHT / 2, Y_OFFSET + ELEMHIGHT};
 			g.fillPolygon(xPoints, yPoints, 3);
 		} 
 		else {
 			if (orientation == ORIENTATION_BACKWARDS) {
 				int triangleHeight = (int) Math.ceil(ELEMHIGHT / 2.0);
-				g.fillRect(3 + triangleHeight, Y_OFFSET + 0, ELEMENTWIDTH, ELEMHIGHT);
+				g.fillRect(3 + triangleHeight, Y_OFFSET, ELEMENTWIDTH, ELEMHIGHT);
 				int xPoints[] = {3 + triangleHeight, 3, 3 + triangleHeight};
-				int yPoints[] = {Y_OFFSET + 0, (int) Math.ceil(Y_OFFSET + ELEMHIGHT / 2.0), Y_OFFSET + ELEMHIGHT};
+				int yPoints[] = {Y_OFFSET, (int) Math.ceil(Y_OFFSET + ELEMHIGHT / 2.0), Y_OFFSET + ELEMHIGHT};
 				g.fillPolygon(xPoints, yPoints, 3);
 				fontoffset = triangleHeight;
 			} 
 			else {
-				g.fillRect(8, Y_OFFSET+0, ELEMENTWIDTH, ELEMHIGHT);
+				g.fillRect(8, Y_OFFSET, ELEMENTWIDTH, ELEMHIGHT);
 				fontoffset = 5;
 			}
 		}
@@ -192,7 +190,7 @@ public class GeneElement extends JPanel implements Adjustable {
 			
 			/* Draw only the first index of the mapped String array */
 			String geneId = gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0];
-			int fontY_Position = ELEMHIGHT / 2 + Y_OFFSET + (int) Math.round(g.getFont().getSize() / 2);
+			int fontY_Position = ELEMHIGHT / 2 + Y_OFFSET + (g.getFont().getSize() / 2);
 			
 			if (geneId.length() < gecko.getMaxIdLength())
 				g.drawString(geneId , ((8 * gecko.getMaxIdLength() + 3) / 2) - ((8 * geneId.length()) / 2) + 5, fontY_Position);

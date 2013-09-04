@@ -12,7 +12,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -42,8 +41,8 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 	/*
 	 * Gui elements
 	 */
-	private JTable table;
-	private JCheckBox checkBox;
+	private final JTable table;
+	private final JCheckBox checkBox;
 	
 	/*
 	 * Data
@@ -52,10 +51,9 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 
 	/**
 	 * Creates a new {@link OccurrenceSelector}.
-	 * @param gd The {@link GeneClusterDisplay} that should be used to display
 	 * the details of a selected occurrence.
 	 */
-	public OccurrenceSelector(GeneClusterDisplay gd) {
+	public OccurrenceSelector() {
 		// Create the gui elements
 		this.setPreferredSize(new Dimension(50,10));
 		table = new JTable();
@@ -75,21 +73,25 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		this.setLayout(new BorderLayout());
 		this.add(scrollPane, BorderLayout.CENTER);
 		checkBox = new JCheckBox("show suboptimal hits");
-		checkBox.addActionListener(checkBoxListener);
+		checkBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.fireTableDataChanged();
+            }
+        });
 		this.add(checkBox, BorderLayout.PAGE_END);
-		table.addMouseListener(mouseListener);
+		table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount()==2 && table.getSelectedRow()>=0) {
+                    selectOccurrence(table.getSelectedRow());
+                }
+            }
+
+        });
 		table.setBackground(Color.WHITE);
 		scrollPane.getViewport().setBackground(Color.WHITE);
 		scrollPane.setBackground(Color.WHITE);
 	}
-	
-	private ActionListener checkBoxListener = new ActionListener() {
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			model.fireTableDataChanged();			
-		}
-	};
 	
 	private void selectOccurrence(int row) {
 		// Get the selected occurrence
@@ -107,16 +109,6 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 				gOcc,
 				subselections));
 	}
-	
-	private MouseListener mouseListener = new MouseAdapter() {
-		
-		public void mouseClicked(java.awt.event.MouseEvent e) {
-			if (e.getClickCount()==2 && table.getSelectedRow()>=0) {
-					selectOccurrence(table.getSelectedRow());
-			}
-		};
-		
-	};
 	
 	private GeneClusterOccurrence[] getOccurrences(GeneCluster gc) {
 		if (gc==null)
@@ -165,7 +157,7 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		}
 	}
 	
-	private AbstractTableModel model = new AbstractTableModel() {
+	private final AbstractTableModel model = new AbstractTableModel() {
 		
 		/**
 		 * Random generated serialization UID
@@ -181,7 +173,7 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		@Override
 		public String getColumnName(int column) {
 			return columnNames[column];
-		};
+		}
 		
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
@@ -209,7 +201,7 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		@Override
 		public java.lang.Class<?> getColumnClass(int columnIndex) {
 			return columns[columnIndex];
-		};
+		}
 		
 		@Override
 		public int getColumnCount() {
@@ -217,7 +209,7 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		}
 	};
 	
-	private EventListenerList eventListener = new EventListenerList();
+	private final EventListenerList eventListener = new EventListenerList();
 	
 	public void addSelectionListener(ClusterSelectionListener s) {
 		eventListener.add(ClusterSelectionListener.class, s);

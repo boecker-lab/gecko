@@ -35,7 +35,7 @@ public class GeneClusterOutput {
 		
 		private BigDecimal pValue;
 		private int refSeq;
-		private int[] distances;
+		private final int[] distances;
 		private Map<Integer, Gene[][]> geneAnnotations;
 		private List<List<List<Integer>>> intervals;
 		private List<List<int[]>> intervalBorders;

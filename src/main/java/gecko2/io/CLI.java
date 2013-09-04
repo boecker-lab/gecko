@@ -180,7 +180,7 @@ public class CLI {
 		}
 		
 		// check whether specific genomes are selected (just for cog files)
-		if (opLine[start - 1].split(":").length > 1 && cogFile == true) {
+		if (opLine[start - 1].split(":").length > 1 && cogFile) {
 			
 			selectedGenomes = new ArrayList<Integer>();
 			
@@ -315,11 +315,10 @@ public class CLI {
 	/**
 	 * The method prepares the necessary data structures for the computation.
 	 * 
-	 * @throws EOFException from cog file reader
 	 * @throws IOException from cog file reader or gck file reader
 	 * @throws LinePassedException from cog file reader
 	 */
-	private void preparation() throws EOFException, IOException, LinePassedException {
+	private void preparation() throws IOException, LinePassedException {
 		
 		// read the input file
 		GeckoInstance.getInstance().setCurrentInputFile(inFile);
@@ -334,16 +333,12 @@ public class CLI {
 			
 			// select specified genomes
 			if (selectedGenomes != null) {
-				
-				for (int i = 0; i < selectedGenomes.size(); i++) {
-					
-					genOcc.get(selectedGenomes.get(i)).setFlagged(true);
-				}
+                for (Integer selectedGenome : selectedGenomes) {
+                    genOcc.get(selectedGenome).setFlagged(true);
+                }
 			}
 			else {
-			
 				for (GenomeOccurence occ : genOcc) {
-				
 					occ.setFlagged(true);
 				}
 			}
@@ -353,8 +348,7 @@ public class CLI {
 			// create the 3 dimensional int array for the computation
 			genomes = new int[reader.getGenomes().length][][];
 		
-			for (int k = 0; k < genomes.length; k++) 
-			{
+			for (int k = 0; k < genomes.length; k++) {
 				genomes[k] = new int[reader.getGenomes()[k].getChromosomes().size()][];		
 				for (int j = 0; j < genomes[k].length; j++)
 					genomes[k][j] = reader.getGenomes()[k].getChromosomes().get(j).toIntArray(true, true);
@@ -414,16 +408,7 @@ public class CLI {
 		boolean result = false;
 		
 		if (suffix == 'c') {
-			
-			if (!fileToTest.exists() || fileToTest.getName().endsWith(".gck") || !fileToTest.getName().endsWith(".cog")) {
-				
-				//System.err.println("The given input file " + fileToTest.getAbsolutePath() + " does not exist.");
-				result = false;
-			}
-			else {
-				
-				result = true;
-			}
+            result = !(!fileToTest.exists() || fileToTest.getName().endsWith(".gck") || !fileToTest.getName().endsWith(".cog"));
 		}
 		
 		if (suffix == 'g') {
@@ -434,47 +419,32 @@ public class CLI {
 				System.exit(15);
 			}
 			
-			if (fileToTest.exists() && out == true) {
+			if (fileToTest.exists() && out) {
 				
 				System.err.println("The given output file " + fileToTest.getAbsolutePath() + " already exists.");
 				System.out.println("Do you want to overwrite the file? [Y|n]");
 				
 				BufferedReader answerIn = new BufferedReader(new InputStreamReader(System.in));
 				
-				String tester = "";
-				
+				String tester;
+
 				try {
-					
+
 					tester = answerIn.readLine();
-					
+
 				} catch (IOException e) {
-					
+
 					System.err.println("An error occurred while reading your command line input. \nSo your input file won't be overwritten.");
 					tester = "no";
 				}
 				
 				Pattern yes = Pattern.compile("yes|Yes|YES|y|Y");
 				Matcher ansMatcher = yes.matcher(tester);
-				
-				if (ansMatcher.find()) {
-					
-					result = false;
-				}
-				else {
-					
-					result = true;
-				}
+
+                result = !ansMatcher.find();
 			}
 			else {
-				
-				if (fileToTest.exists()) {
-					
-					result = true;
-				}
-				else {
-					
-					result = false;
-				}
+                result = fileToTest.exists();
 			}
 		}
 		

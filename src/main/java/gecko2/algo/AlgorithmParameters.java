@@ -45,13 +45,13 @@ public class AlgorithmParameters{
 	}
 	
 	public AlgorithmParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		this(p.getDelta(), p.getDeltaTable(), p.getMinClusterSize(), p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() == 'd') ? false : true, p.searchRefInRef());
+		this(p.getDelta(), p.getDeltaTable(), p.getMinClusterSize(), p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != 'd'), p.searchRefInRef());
 		if (!p.useJavaAlgorithm())
 			throw new IllegalArgumentException("Parameters not compatible to Java mode.");
 	}
 	
 	public static AlgorithmParameters getHighlyConservedParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, HIGHLY_CONSERVED_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() == 'd') ? false : true, p.searchRefInRef());
+		return new AlgorithmParameters(-1, HIGHLY_CONSERVED_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != 'd'), p.searchRefInRef());
 	}
 	
 	public static AlgorithmParameters getHighlyConservedParameters(int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
@@ -59,7 +59,7 @@ public class AlgorithmParameters{
 	}
 	
 	public static AlgorithmParameters getLowConservedParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, LOW_CONSERVED_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() == 'd') ? false : true, p.searchRefInRef());
+		return new AlgorithmParameters(-1, LOW_CONSERVED_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != 'd'), p.searchRefInRef());
 	}
 	
 	public static AlgorithmParameters getLowConservedParameters(int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
@@ -67,15 +67,15 @@ public class AlgorithmParameters{
 	}
 	
 	public static AlgorithmParameters getLichtheimiaParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, LICHTHEIMIA_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() == 'd') ? false : true, p.searchRefInRef());
+		return new AlgorithmParameters(-1, LICHTHEIMIA_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != 'd'), p.searchRefInRef());
 	}
 	
 	public static AlgorithmParameters getLichtheimiaInnerGenomeParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, LICHTHEIMIA_INNER_GENOME_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() == 'd') ? false : true, true);
+		return new AlgorithmParameters(-1, LICHTHEIMIA_INNER_GENOME_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != 'd'), true);
 	}
 	
 	public static AlgorithmParameters getStatisticPaperGenomeParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, STATISTIC_PAPER_DELTA_TABLE, 4, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() == 'd') ? false : true, p.searchRefInRef());
+		return new AlgorithmParameters(-1, STATISTIC_PAPER_DELTA_TABLE, 4, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != 'd'), p.searchRefInRef());
 	}
 	
 	public static AlgorithmParameters getLichtheimiaParameters(int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
@@ -98,7 +98,7 @@ public class AlgorithmParameters{
 			this.useDeltaTable = false;
 		} else {
 			this.useDeltaTable = true;
-			if (!checkDeltaTable(deltaTable))
+			if (isDeltaTableInvalid(deltaTable))
 				throw new IllegalArgumentException("Invalid delta table!");
 			
 			this.deltaTable = new int[deltaTable.length][];
@@ -126,31 +126,31 @@ public class AlgorithmParameters{
 	 * @param deltaTable the delta table
 	 * @return true if the table is valid, else false
 	 */
-	private static boolean checkDeltaTable(int[][] deltaTable){
+	private static boolean isDeltaTableInvalid(int[][] deltaTable){
 		int ins=0;
 		int del=0;
 		int total=0;
-		for (int i=0; i<deltaTable.length; i++) {
-			if (deltaTable[i].length != DELTA_TABLE_SIZE)
-				return false;
-			
-			// allowed distance must not decrease
-			if (deltaTable[i][0] < ins) 
-				return false;
-			ins = deltaTable[i][0];
-			
-			if (deltaTable[i][1] < del)
-				return false;
-			del = deltaTable[i][1];
-			
-			// allowed total must be larger than insertions and deletions
-			if (deltaTable[i][2] < total || deltaTable[i][2] < deltaTable[i][1] || deltaTable[i][2] < deltaTable[i][0])
-				return false;
-			total = deltaTable[i][2];
-			
-			
-		}
-		return true;
+        for (int[] deltaTableColumn : deltaTable) {
+            if (deltaTableColumn.length != DELTA_TABLE_SIZE)
+                return true;
+
+            // allowed distance must not decrease
+            if (deltaTableColumn[0] < ins)
+                return true;
+            ins = deltaTableColumn[0];
+
+            if (deltaTableColumn[1] < del)
+                return true;
+            del = deltaTableColumn[1];
+
+            // allowed total must be larger than insertions and deletions
+            if (deltaTableColumn[2] < total || deltaTableColumn[2] < deltaTableColumn[1] || deltaTableColumn[2] < deltaTableColumn[0])
+                return true;
+            total = deltaTableColumn[2];
+
+
+        }
+		return false;
 	}
 
     public int getAlphabetSize() {
@@ -214,10 +214,6 @@ public class AlgorithmParameters{
 			return delta;
 				
 		return deltaTable[deltaTable.length-1][2];
-	}
-	
-	public int[][] getDeltaTable() {
-		return deltaTable;
 	}
 	
 	public boolean useDeltaTable() {

@@ -10,8 +10,8 @@ public class ClusterSelectionEvent extends EventObject {
 	 * Random generated serialization UID
 	 */
 	private static final long serialVersionUID = -9184708680298812763L;
-	private GeneCluster selection;
-	private boolean instantDisplay;
+	private final GeneCluster selection;
+	private final boolean instantDisplay;
 	
 	public ClusterSelectionEvent(Object source, GeneCluster selection, boolean instantDisplay) {
 		super(source);

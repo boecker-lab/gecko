@@ -1,7 +1,6 @@
 package gecko2.algorithm;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -152,7 +151,7 @@ public class BreakPointDistance {
 	}
 	
 	private static class BreakPointVector {
-		Map<IntPair, Integer> values;
+		final Map<IntPair, Integer> values;
 		
 		public BreakPointVector(int[][] genome, boolean signed) {
 			values = new HashMap<IntPair, Integer>();

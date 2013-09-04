@@ -73,7 +73,7 @@ public class CogFileReaderTest {
 		refGenomes[0].addChromosome(new Chromosome("", genes1, refGenomes[0]));
 		refGenomes[1].addChromosome(new Chromosome("", genes2, refGenomes[1]));
 		
-		ArrayList<GenomeOccurence> genOcc = null;
+		ArrayList<GenomeOccurence> genOcc;
 		
 		CogFileReader reader = new CogFileReader((byte) 1);
 		
@@ -112,7 +112,7 @@ public class CogFileReaderTest {
 			for(int z = 0; z < reader.getGeneLabelMap().keySet().toArray().length; z++)
 			{
 				//int z;
-				assertEquals((Integer) geneLabelMap.keySet().toArray()[z], (Integer) reader.getGeneLabelMap().keySet().toArray()[z]);
+				assertEquals(geneLabelMap.keySet().toArray()[z], reader.getGeneLabelMap().keySet().toArray()[z]);
 			}
 			
 			for( int j = 1; j <= reader.getGeneLabelMap().size(); j++)
@@ -339,7 +339,7 @@ public class CogFileReaderTest {
 		refGenomes[3].addChromosome(new Chromosome("chromosome I", genes4, refGenomes[3]));
 		refGenomes[3].addChromosome(new Chromosome("chromosome II", genes42, refGenomes[3]));
 		
-		ArrayList<GenomeOccurence> genOcc = null;
+		ArrayList<GenomeOccurence> genOcc;
 		
 		CogFileReader reader = new CogFileReader((byte) 1);
 		
@@ -378,7 +378,7 @@ public class CogFileReaderTest {
 			for(int z = 0; z < reader.getGeneLabelMap().keySet().toArray().length; z++)
 			{
 				//int z;
-				assertEquals((Integer) geneLabelMap.keySet().toArray()[z], (Integer) reader.getGeneLabelMap().keySet().toArray()[z]);
+				assertEquals(geneLabelMap.keySet().toArray()[z], reader.getGeneLabelMap().keySet().toArray()[z]);
 			}
 			
 			for( int j = 1; j <= reader.getGeneLabelMap().size(); j++)

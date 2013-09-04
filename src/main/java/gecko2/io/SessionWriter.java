@@ -25,45 +25,43 @@ public class SessionWriter
 	public static boolean saveSessionToFile(File f) 
 	{
 		GeckoInstance.getInstance().setLastSavedFile(f);
-		FileOutputStream fos = null;
-		
+        ObjectOutputStream o = null;
+        boolean returnValue = true;
 		try 
 		{
-			fos = new FileOutputStream(f);
-			ObjectOutputStream o = new ObjectOutputStream( fos );
+			o = new ObjectOutputStream(new FileOutputStream(f));
 			o.writeObject(GeckoInstance.getInstance().getGenomes());
 			o.writeObject(GeckoInstance.getInstance().getGenLabelMap());
 			o.writeObject(GeckoInstance.getInstance().getColormap());
 			o.writeObject(GeckoInstance.getInstance().getClusters());
 			o.writeObject(GeckoInstance.getInstance().getMaxIdLength());
-			fos.close();
-			return true;
+			o.close();
 		} 
 		catch (FileNotFoundException e) 
 		{
 			e.printStackTrace();
-			return false;
+            returnValue = false;
 		} 
 		catch (IOException e) 
 		{
 			e.printStackTrace();
-			return false;
-		} 
-		
+            returnValue = false;
+		}
 		finally 
 		{
 			try 
 			{
-				if (fos!=null) 
+				if (o!=null)
 				{
-					fos.close();
+					o.close();
 				}
 			} 
 			catch (IOException e) 
 			{
 				e.printStackTrace();
-				return false;
+				returnValue = false;
 			}
 		}
+        return returnValue;
 	}
 }

@@ -1,12 +1,13 @@
 package gecko2.algo;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.SortedSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
-	private SortedSet<DeltaLocation> deltaLocations;
+	private Set<DeltaLocation> deltaLocations;
 	
 	ListOfDeltaLocations(){
 		deltaLocations = new TreeSet<DeltaLocation>(new DeltaLocationOrderComperator());
@@ -148,7 +149,7 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	 * @author swinter
 	 *
 	 */
-	private static class DeltaLocationOrderComperator implements Comparator<DeltaLocation> {
+	private static class DeltaLocationOrderComperator implements Comparator<DeltaLocation>, Serializable {
 		@Override
 		public int compare(DeltaLocation o1, DeltaLocation o2) {
 			if (o1.getL() < o2.getL())

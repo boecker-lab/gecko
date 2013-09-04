@@ -2,9 +2,7 @@ package gecko2.algo;
 
 import gecko2.algo.util.IntArray;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * The Pattern class implements a data structure to store the information about a pattern.
@@ -73,14 +71,6 @@ class Pattern {
      */
     public int getRefGenomeNr() {
         return refGenomeNr;
-    }
-
-    /**
-     * Returns the number of characters in the pattern.
-     * @return the number of characters in the pattern.
-     */
-    public int nrOfCharacters() {
-        return pSize;
     }
     
     public int getLastChar() {

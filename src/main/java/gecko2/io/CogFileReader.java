@@ -57,7 +57,7 @@ public class CogFileReader {
 	/**
 	 * Pattern list for getGenomeName and getChromosomeName
 	 */
-	private static Pattern nameSplitPattern = Pattern.compile(",|chrom(?:osome)?|(?:mega)?plasmid|scaffold|(?:super)?cont(?:ig)?|unmap(?:ped)?|chr[_ ]?\\d+|complete genome", Pattern.CASE_INSENSITIVE);
+	private static final Pattern nameSplitPattern = Pattern.compile(",|chrom(?:osome)?|(?:mega)?plasmid|scaffold|(?:super)?cont(?:ig)?|unmap(?:ped)?|chr[_ ]?\\d+|complete genome", Pattern.CASE_INSENSITIVE);
 	
 	/**
 	 * 0 gui session, 1 cli session
@@ -109,8 +109,7 @@ public class CogFileReader {
 		
 		try {
 			int newID = Integer.parseInt(id);
-			String newStringId = Integer.toString(newID);
-			return newStringId;
+			return Integer.toString(newID);
 		} catch (NumberFormatException e) {}
 		
 		return id;
@@ -225,11 +224,10 @@ public class CogFileReader {
 	 * Variables: colormap, genes, geneLabelMap
 	 * 
 	 * @param occs gene occurences in the genomes
-	 * @throws EOFException
 	 * @throws IOException
 	 * @throws LinePassedException
 	 */
-	public void readFileContent(ArrayList<GenomeOccurence> occs) throws EOFException, IOException, LinePassedException {
+	public void readFileContent(ArrayList<GenomeOccurence> occs) throws IOException, LinePassedException {
 		
 		
 		Gui gui = GeckoInstance.getInstance().getGui();
@@ -249,99 +247,89 @@ public class CogFileReader {
 		Random r = new Random();
 		this.colorMap = new HashMap<Integer, Color>();
 		int maxIdWidth = 0;
-		
-		for (int i = 0; i < occs.size(); i++) {
-			
-			GenomeOccurence occ = occs.get(i);
 
-			Genome g;
-			if (occ.getGroup() == 0) {
-				
-				// If the group id is zero than we have a single chromosome genome,
-				// therefore we have to greate a new genome
-				g = new Genome();
-				g.setName(occ.getGenomeName());
-				ungroupedGenomes.add(g);
-				
-			} 
-			else {
-				
-				// If the group id is not zero we need to check if we already created
-				// a genome for that group id and if not create a new one
-				if (!groupedGenomes.containsKey(occ.getGroup())) {			
-					g = new Genome();
-					g.setName(occ.getGenomeName());
-					groupedGenomes.put(occ.getGroup(), g);
-				} 
-				
-				else{		
-					g = groupedGenomes.get(occ.getGroup());
-				}
-			}
-			
-			Chromosome c = new Chromosome(occ.getChromosomeName(), g);
-			g.addChromosome(c);
-			c.setName(occ.getChromosomeName());
-			ArrayList<Gene> genes = new ArrayList<Gene>();
-			
-			// Forward file pointer to genomes first gene
-			reader.jumpToLine(occ.getStart_line() + 2);
-			while (reader.getCurrentLineNumber() <= occ.getEnd_line() && (line = reader.readLine()) != null) {			
-				if (!line.equals("")) {	
-					String[] explode = line.split("\t");
-					String[] ids = explode[0].split(",");
-					for (int j=0; j<ids.length; j++)
-						ids[j] = this.testOldIdFormat(ids[j]);
-					
-					int sign; 
-					if (explode[1].equals("-"))
-						sign = -1;
-					else
-						sign = 1;
-					
-					if (ids[0].length() > maxIdWidth)
-						maxIdWidth = ids[0].length();
-					
-					if (!isUnhomologe(ids) && backmap.containsKey(ids[0])) {
-						if (explode.length > 5)
-							genes.add(new Gene(explode[5], explode[3], sign * backmap.get(ids[0]), explode[4], false));
-						else
-							genes.add(new Gene(explode[3], sign * backmap.get(ids[0]), explode[4], false));
-					} 
-					else {	
-						stringidlist.add(ids);
-						int intid = stringidlist.size();
-						
-						if (!isUnhomologe(ids)) {			
-							this.colorMap.put(intid, new Color(r.nextInt(240),r.nextInt(240),r.nextInt(240)));
-							backmap.put(ids[0], intid);
-						} 
-						if (explode.length > 5)
-							genes.add(new Gene(explode[5], explode[3], sign * intid, explode[4], isUnhomologe(ids)));
-						else
-							genes.add(new Gene(explode[3], sign * intid, explode[4], isUnhomologe(ids)));
-					}
-				}
-			}
-			
-			this.maxIdLength = maxIdWidth;
-			
-			// Thank you for the not existing autoboxing on arrays...
-			this.geneLabelMap = new HashMap<Integer, String[]>();
-			
-			for (int j = 1; j < stringidlist.size() + 1; j++) {
-				this.geneLabelMap.put(j, stringidlist.get(j - 1));
-			}
-			
-			// TODO handle the case where EOF is reached before endline
-			c.setGenes(genes);
-			this.genomes = new Genome[groupedGenomes.size()]; 
-			int j = 0;
-			for (Genome x : groupedGenomes.values()) {	
-				this.genomes[j] = x;
-				j++;
-			}
-		}
+        for (GenomeOccurence occ : occs) {
+            Genome g;
+            if (occ.getGroup() == 0) {
+                // If the group id is zero than we have a single chromosome genome,
+                // therefore we have to greate a new genome
+                g = new Genome();
+                g.setName(occ.getGenomeName());
+                ungroupedGenomes.add(g);
+            } else {
+                // If the group id is not zero we need to check if we already created
+                // a genome for that group id and if not create a new one
+                if (!groupedGenomes.containsKey(occ.getGroup())) {
+                    g = new Genome();
+                    g.setName(occ.getGenomeName());
+                    groupedGenomes.put(occ.getGroup(), g);
+                } else {
+                    g = groupedGenomes.get(occ.getGroup());
+                }
+            }
+
+            Chromosome c = new Chromosome(occ.getChromosomeName(), g);
+            g.addChromosome(c);
+            c.setName(occ.getChromosomeName());
+            ArrayList<Gene> genes = new ArrayList<Gene>();
+
+            // Forward file pointer to genomes first gene
+            reader.jumpToLine(occ.getStart_line() + 2);
+            while (reader.getCurrentLineNumber() <= occ.getEnd_line() && (line = reader.readLine()) != null) {
+                if (!line.equals("")) {
+                    String[] explode = line.split("\t");
+                    String[] ids = explode[0].split(",");
+                    for (int j = 0; j < ids.length; j++)
+                        ids[j] = this.testOldIdFormat(ids[j]);
+
+                    int sign;
+                    if (explode[1].equals("-"))
+                        sign = -1;
+                    else
+                        sign = 1;
+
+                    if (ids[0].length() > maxIdWidth)
+                        maxIdWidth = ids[0].length();
+
+                    if (!isUnhomologe(ids) && backmap.containsKey(ids[0])) {
+                        if (explode.length > 5)
+                            genes.add(new Gene(explode[5], explode[3], sign * backmap.get(ids[0]), explode[4], false));
+                        else
+                            genes.add(new Gene(explode[3], sign * backmap.get(ids[0]), explode[4], false));
+                    } else {
+                        stringidlist.add(ids);
+                        int intid = stringidlist.size();
+
+                        if (!isUnhomologe(ids)) {
+                            this.colorMap.put(intid, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
+                            backmap.put(ids[0], intid);
+                        }
+                        if (explode.length > 5)
+                            genes.add(new Gene(explode[5], explode[3], sign * intid, explode[4], isUnhomologe(ids)));
+                        else
+                            genes.add(new Gene(explode[3], sign * intid, explode[4], isUnhomologe(ids)));
+                    }
+                }
+            }
+
+            this.maxIdLength = maxIdWidth;
+
+            // Thank you for the not existing autoboxing on arrays...
+            this.geneLabelMap = new HashMap<Integer, String[]>();
+
+            for (int j = 1; j < stringidlist.size() + 1; j++) {
+                this.geneLabelMap.put(j, stringidlist.get(j - 1));
+            }
+
+            // TODO handle the case where EOF is reached before endline
+            c.setGenes(genes);
+            this.genomes = new Genome[groupedGenomes.size()];
+            int j = 0;
+            for (Genome x : groupedGenomes.values()) {
+                this.genomes[j] = x;
+                j++;
+            }
+        }
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()]; {
 			int i = 0;
@@ -366,7 +354,7 @@ public class CogFileReader {
 	 */
 	private class GenomeReadingThread implements Runnable {
 
-		private ArrayList<GenomeOccurence> occs;
+		private final ArrayList<GenomeOccurence> occs;
 		
 		public GenomeReadingThread(ArrayList<GenomeOccurence> occs) {
 			this.occs = occs;
@@ -429,12 +417,12 @@ public class CogFileReader {
 	/**
 	 * First error type
 	 */
-	public static final short ERROR_FILEFORMAT = 1;
+	private static final short ERROR_FILEFORMAT = 1;
 	
 	/**
 	 * Second error type
 	 */
-	public static final short ERROR_FILEIO = 2;
+	private static final short ERROR_FILEIO = 2;
 	
 	
 	/**

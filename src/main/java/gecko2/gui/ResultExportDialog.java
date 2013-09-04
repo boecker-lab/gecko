@@ -31,12 +31,13 @@ public class ResultExportDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = -5557686856082270849L;
 	
-	private JTextField textField;
+	private final JTextField textField;
 
 	/**
 	 * Create the dialog.
 	 */
 	public ResultExportDialog(Frame parent) {
+        super(parent);
 		setTitle("Export Results");
 		this.setIconImage(Gui.createImageIcon("images/gecko2_a_small.png").getImage());
 		setBounds(100, 100, 450, 300);

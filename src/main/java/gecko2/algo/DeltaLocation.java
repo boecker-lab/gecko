@@ -99,6 +99,8 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 
 	public void increaseHitCount() {
 		hitCount++;
+        distance--;
+        additionalChars--;
 	}
 
 	public void increaseDistance() {
@@ -270,11 +272,9 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 	 */
 	public void checkForDeltaTableValidity(AlgorithmParameters param,
 			int clusterSize) {
-		valid = param.useDeltaTable() ? 
-				missingChars <= param.getDeltaDeletions(clusterSize) &&
-				additionalChars	<= param.getDeltaInsertions(clusterSize) &&
-				distance <= param.getDeltaTotal(clusterSize) 
-				: true;
+		valid = !param.useDeltaTable() || missingChars <= param.getDeltaDeletions(clusterSize) &&
+                additionalChars <= param.getDeltaInsertions(clusterSize) &&
+                distance <= param.getDeltaTotal(clusterSize);
 	}
 
 	/**

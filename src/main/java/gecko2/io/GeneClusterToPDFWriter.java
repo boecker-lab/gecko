@@ -12,8 +12,6 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import gecko2.GeckoInstance;
-
 
 /**
  * The class generates a picture with the gene cluster selected in the GeneClusterSelector.
@@ -25,32 +23,19 @@ import gecko2.GeckoInstance;
 public class GeneClusterToPDFWriter {
 
 	/**
-	 * This variable tells us whether the data from the GeneClusterDisplay should
-	 * be added to the picture.
-	 * <br>
-	 * Default is false.
-	 */
-	private boolean eData = false;
-	
-	/**
 	 * File pointer to the pdf file.
 	 */
 	private File targetFile = null;
 	
 	/**
-	 * Stores the current data from GeckoInstance.
-	 */
-	GeckoInstance gecko;
-	
-	/**
 	 * The variable contains the name of the user.
 	 */
-	private String author;
+	private final String author;
 	
 	/**
 	 * The images we want to have as pdf
 	 */
-	private GeneClusterPicture clusterPic;
+	private final GeneClusterPicture clusterPic;
 	
 	/**
 	 * The constructor sets the global variables gecko, selectedCluster, genomes, eData, 
@@ -58,19 +43,15 @@ public class GeneClusterToPDFWriter {
 	 * 
 	 * @param targetFile this becomes the pdf output file
 	 * @param author name of the user
-	 * @param edata true for adding cluster informations
-	 * @param pics the image content we want to export to pdf
+	 * @param picture the image content we want to export to pdf
 	 */
-	public GeneClusterToPDFWriter(File targetFile, String author, boolean edata, GeneClusterPicture picture) {
-		
-		this.eData = edata;
+	public GeneClusterToPDFWriter(File targetFile, String author, GeneClusterPicture picture) {
 		this.targetFile = targetFile;
 		this.author = author;
 		this.clusterPic = picture;
 	}
 	
 	public void setOutputFile(String outputFile) {
-		
 		this.targetFile = new File(outputFile);
 	}
 	
@@ -78,7 +59,6 @@ public class GeneClusterToPDFWriter {
 	 * The function creates a PDF file from the panel content.
 	 */
 	public void createPDF() {
-		
 		Document clusterPDF = new Document(new Rectangle(clusterPic.getPageWidth(), clusterPic.getPageHeight()));
 		
 		try {

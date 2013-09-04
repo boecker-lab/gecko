@@ -15,7 +15,6 @@ import gecko2.event.LocationSelectionEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,12 +23,9 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -37,9 +33,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
 /**
@@ -55,16 +49,15 @@ import javax.swing.event.EventListenerList;
 public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
 	private static final long serialVersionUID = -6769789368841494821L;
-	private JPanel leftpanel ;
-	private JPanel centerpanel;
+	private final JPanel centerpanel;
 
-	private JPanel rightPanel;
-	private List<AbstractGenomeBrowser> genomeBrowsers;
-	private ScrollListener wheelListener;
+	private final JPanel rightPanel;
+	private final List<AbstractGenomeBrowser> genomeBrowsers;
+	private final ScrollListener wheelListener;
 	private LocationSelectionEvent lastLocationEvent;
-	private List<GBNavigator> gbNavigators;
+	private final List<GBNavigator> gbNavigators;
 	
-	GeckoInstance gecko;
+	private final GeckoInstance gecko;
 	
 	/**
 	 * The variable stores the currently selected gene cluster
@@ -87,13 +80,13 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		this.genomeBrowsers = new ArrayList<AbstractGenomeBrowser>();
 		this.gbNavigators = new ArrayList<GBNavigator>();
 		this.setLayout(new BorderLayout());
-		this.leftpanel = new JPanel();
+        JPanel leftpanel = new JPanel();
 		this.centerpanel = new JPanel();
 		centerpanel.setBackground(Color.WHITE);
 		this.rightPanel = new JPanel();
 		rightPanel.setBackground(Color.WHITE);
 		rightPanel.setVisible(false);
-		this.leftpanel.setLayout(new BoxLayout(leftpanel,BoxLayout.Y_AXIS));
+		leftpanel.setLayout(new BoxLayout(leftpanel,BoxLayout.Y_AXIS));
 		this.centerpanel.setLayout(new BoxLayout(centerpanel,BoxLayout.Y_AXIS));
 		this.centerpanel.setPreferredSize(new Dimension(200,200));
 		this.rightPanel.setLayout(new BoxLayout(rightPanel,BoxLayout.Y_AXIS));
@@ -192,7 +185,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
 	}
 
-	private MouseWheelListener mouseWheelListener = new MouseWheelListener() {
+	private final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
 		
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
@@ -217,10 +210,10 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	/*
 	 * When a GenomeBrowser 
 	 */
-	private ComponentListener genomeBrowserComponentListener = new ComponentAdapter() {
+	private final ComponentListener genomeBrowserComponentListener = new ComponentAdapter() {
 		public void componentResized(java.awt.event.ComponentEvent e) {
 			fireBrowserContentChanged(BrowserContentEvent.ZOOM_FACTOR_CHANGED);
-		};
+		}
 	};
 	
 	/**
@@ -303,9 +296,10 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		 * Random generated serialization UID
 		 */
 		private static final long serialVersionUID = -1597716317000549154L;
-		private JButton prev=new JButton("<"),next=new JButton(">");
-		private JComponent sizeReference;
-		private int genome;
+		private final JButton prev=new JButton("<");
+        private final JButton next=new JButton(">");
+		private final JComponent sizeReference;
+		private final int genome;
 		
 		private final ComponentListener componentListener = new ComponentAdapter() {
 			@Override
@@ -313,7 +307,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 				GBNavigator.this.invalidate();
 				GBNavigator.this.getParent().doLayout();
 				GBNavigator.this.doLayout();
-			};
+			}
 		};
 		
 		public JButton getPrev() {
@@ -402,7 +396,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	}
 	
 	/**
-	 * Calls the {@link MultipleGenomesBrowser#scrollToPosition(GenomeBrowser, int, int)} 
+	 * Calls the {@link GenomeBrowser#scrollToPosition(int, int)}
 	 * function for the {@link GenomeBrowser} with the specified id
 	 * @param gbid The id of the genome browser
 	 */
@@ -426,7 +420,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		}
 		return maxBarMax;
 	}
-	
+
 	@Override
 	public void centerCurrentClusterAt(int geneID) {
 		int[] subselections 		= lastLocationEvent.getsubselection();
@@ -526,12 +520,9 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			if (subselection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) continue;
 			Subsequence s = gOcc.getSubsequences()[i][subselection[i]];
 //			if (s==null) continue; // must actually not be the case
-			if (genomeBrowsers.get(i).isFlipped()) {
-				scrollToPosition(i, s.getChromosome(), (int) Math.floor((s.getStart() - 1 + s.getStop() - 1) / 2));
-			}
-			else {
-				scrollToPosition(i, s.getChromosome(), (int) Math.ceil((s.getStart()-1+s.getStop()-1)/2));
-			}
+
+
+			scrollToPosition(i, s.getChromosome(), (s.getStart() - 1 + s.getStop() - 1) / 2);
 			
 			if (i == gc.getRefSeqIndex()) {
 				genomeBrowsers.get(i).highlightCluster(s.getChromosome(), s.getStart() - 1, s.getStop() - 1, GeneElement.COLOR_HIGHLIGHT_REFCLUST);
@@ -546,7 +537,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * BrowserContentEvents
 	 */
 	
-	private EventListenerList eventListener = new EventListenerList();
+	private final EventListenerList eventListener = new EventListenerList();
 
 	@Override
 	public void addBrowserContentListener(BrowserContentListener l) {
@@ -624,12 +615,11 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	}
 	
 	@Override
-	public List<Integer> getGeneNumbers(int genomeIndex) {
-		List<Integer> lineLengths = new ArrayList<Integer>(genomeBrowsers.get(genomeIndex).getGenome().getChromosomes().size());
-		for (Chromosome chr : genomeBrowsers.get(genomeIndex).getGenome().getChromosomes())  {
+	public int[] getGeneNumbers(int genomeIndex) {
+		int[] lineLengths = new int[genomeBrowsers.get(genomeIndex).getGenome().getChromosomes().size()];
+        for (int i=0; i<genomeBrowsers.get(genomeIndex).getGenome().getChromosomes().size(); i++) {
 			// Compute the line length in GenomeBrowser pixels
-			lineLengths.add(chr.getGenes().size()*this.getGeneWidth());
-			// Scale it to GenomeNavigator pixels
+			lineLengths[i] = genomeBrowsers.get(genomeIndex).getGenome().getChromosomes().get(i).getGenes().size();
 		}
 		return lineLengths;
 	}

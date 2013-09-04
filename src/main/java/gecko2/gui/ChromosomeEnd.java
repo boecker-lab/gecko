@@ -15,9 +15,9 @@ public class ChromosomeEnd extends JPanel implements Adjustable {
 
 	public static final short LEFT = 1;
 	public static final short RIGHT = 2;
-	private short orientation;
+	private final short orientation;
 	
-	private static GeckoInstance gecko = GeckoInstance.getInstance();
+	private static final GeckoInstance gecko = GeckoInstance.getInstance();
 	
 	public ChromosomeEnd(Color c, short orientation) {
 		this.setBackground(c);

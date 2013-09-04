@@ -19,6 +19,8 @@ import java.util.TreeSet;
  * 
  * @author Leon Kuchenbecker <lkuchenb@inf.fu-berlin.de>
  *
+ * Note: this class has a natural ordering that is inconsistent with equals.
+ *
  */
 public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	
@@ -28,18 +30,18 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
 	private static final long serialVersionUID = -5371037483783752995L;
 
-	int id;
-	int[] genes;
-	int size;
+	private int id;
+	private final int[] genes;
+	private int size;
 	private boolean match;
-	private BigDecimal bestPValue;
-	private BigDecimal bestPValueCorrected;
+	private final BigDecimal bestPValue;
+	private final BigDecimal bestPValueCorrected;
 	private int minTotalDist;
-	private GeneClusterOccurrence[] bestOccurrences;
-	private GeneClusterOccurrence[] allOccurrences;
-	private char type;
+	private final GeneClusterOccurrence[] bestOccurrences;
+	private final GeneClusterOccurrence[] allOccurrences;
+	private final char type;
 	// The index of the subsequence containing the reference genecluster
-	private int refSeqIndex;
+	private final int refSeqIndex;
 	
 	public GeneCluster(int id, 
 			GeneClusterOccurrence[] bestOccurrences, 
@@ -198,8 +200,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				return -1;
 			Subsequence[] refSeqs = occ.getSubsequences()[refSeqIndex];
 			for (Subsequence seq : refSeqs){
-				if (seq.dist == 0)
-					minLength = Math.min(minLength, (seq.stop - seq.start) + 1);
+				if (seq.getDist() == 0)
+					minLength = Math.min(minLength, (seq.getStop() - seq.getStart()) + 1);
 			}
 		}
 		if (minLength == Integer.MAX_VALUE)
@@ -216,7 +218,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		for (GeneClusterOccurrence occ : allOccurrences){
 			for (Subsequence[] refSeqs : occ.getSubsequences())
 				for (Subsequence seq : refSeqs){
-					maxPWDist = Math.max(maxPWDist, seq.dist);
+					maxPWDist = Math.max(maxPWDist, seq.getDist());
 				}
 		}
 		return maxPWDist;
@@ -234,7 +236,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 					continue;
 				Subsequence[] refSeqs = occ.getSubsequences()[i];
 				for (Subsequence seq : refSeqs){
-					minPWDist = Math.min(minPWDist, seq.dist);
+					minPWDist = Math.min(minPWDist, seq.getDist());
 				}
 			}
 		}
@@ -259,7 +261,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				if (refSeqs.length != 0){
 					minDist = minTotalDist;
 					for (Subsequence seq : refSeqs){
-						minDist = Math.min(minDist, seq.dist);
+						minDist = Math.min(minDist, seq.getDist());
 					}
 					seqs++;
 				}
@@ -282,10 +284,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		
 	public int[] getGenes() {
 		return genes;
-	}
-	
-	public void setGenes(int[] genes) {
-		this.genes = genes;
 	}
 	
 	public int getSize() {
@@ -314,8 +312,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		GeneClusterOutput.Builder builder = new GeneClusterOutput.Builder(occ.getSubsequences().length);
 		builder.pValue(this.getBestPValue());
 		builder.refSeq(this.getRefSeqIndex());
-		
-		int[] subseqs = new int[occ.getSubsequences().length];
+
 		int[] nrOccurrences = new int[occ.getSubsequences().length];
 		List<List<String>> chromosomes = new ArrayList<List<String>>(occ.getSubsequences().length);
 		List<List<Gene[]>> tempIntervals = new ArrayList<List<Gene[]>>(occ.getSubsequences().length);
@@ -331,10 +328,9 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				
 				for (Subsequence seq : occ.getSubsequences()[i]) {
 					int chrNr = seq.getChromosome();
-					subseqs[i] = 0;
 					Gene[] interval = new Gene[seq.getStop() - seq.getStart() + 1];
 					Chromosome chrom = GeckoInstance.getInstance().getGenomes()[i].getChromosomes().get(chrNr);
-					int[] border = new int[]{seq.start, seq.stop};
+					int[] border = new int[]{seq.getStart(), seq.getStop()};
 					int index = 0;
 					for (int j=seq.getStart(); j<=seq.getStop(); j++) {
 						interval[index] = chrom.getGenes().get(j-1);
@@ -348,7 +344,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				tempIntervals.add(tempInt);
 				intervalBorders.add(borders);
 			} else {
-				subseqs[i] = -1;
 				builder.setDistance(-1, i);
 				chromosomes.add(null);
 				tempIntervals.add(null);
@@ -361,8 +356,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				occ);
 		
 		Map<Integer, Gene[][]> newAnnotations = new HashMap<Integer, Gene[][]>();
-		for (Integer geneId : annotations.keySet())
-			newAnnotations.put(Math.abs(geneId), annotations.get(geneId));
+		for (Map.Entry<Integer, Gene[][]> entry : annotations.entrySet())
+			newAnnotations.put(Math.abs(entry.getKey()), entry.getValue());
 		
 		builder.annotations(newAnnotations);
 		
@@ -541,14 +536,14 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				}
 				for (Subsequence seq : subsequences) {
 					for (Subsequence oSeq : otherSubsequences) {
-						if (seq.chromosome == oSeq.chromosome) {
-							if (seq.start >= oSeq.start && seq.start <= oSeq.stop)
+						if (seq.getChromosome() == oSeq.getChromosome()) {
+							if (seq.getStart() >= oSeq.getStart() && seq.getStart() <= oSeq.getStop())
 								similar = true;
-							if (seq.stop > oSeq.start && seq.stop < oSeq.stop)
+							if (seq.getStop() > oSeq.getStart() && seq.getStop() < oSeq.getStop())
 								similar = true;
-							if (oSeq.start >= seq.start && oSeq.start <= seq.stop)
+							if (oSeq.getStart() >= seq.getStart() && oSeq.getStart() <= seq.getStop())
 								similar = true;
-							if (oSeq.stop > seq.start && oSeq.stop < seq.stop)
+							if (oSeq.getStop() > seq.getStart() && oSeq.getStop() < seq.getStop())
 								similar = true;
 						}
 					}

@@ -16,18 +16,14 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClusterAnnotationReaderTest {
-	public static File annotationFile = null;
-	public static Genome[] genomes = null;
+	private Genome[] genomes = null;
 	
 	@BeforeClass
 	public static void loadLibGecko2()
@@ -134,7 +130,7 @@ public class ClusterAnnotationReaderTest {
 					}
 				}	
 			}
-			assertTrue(String.format("No matching cluster for %s found!", actual.toString()), match);
+			assertTrue(String.format("No matching cluster for %s found!", Arrays.toString(actual)), match);
 		}
 	}
 	
@@ -160,7 +156,7 @@ public class ClusterAnnotationReaderTest {
 		readAnnotationsTest(annotationFile);
 	}
 	
-	public void readAnnotationsTest(File annotationFile){
+	private void readAnnotationsTest(File annotationFile){
 		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, genomes);
 		assertNotNull(clusters);
 		assertEquals(12, clusters.size());

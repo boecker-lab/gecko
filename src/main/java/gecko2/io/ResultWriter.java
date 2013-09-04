@@ -14,9 +14,9 @@ import java.io.Writer;
 import java.util.*;
 
 public class ResultWriter {
-	public enum ExportType {clusterData, table, latexTable, internalDuplications};
+	public enum ExportType {clusterData, table, latexTable, internalDuplications}
 	
-	public static boolean exportResultsToFileNEW2(File f, List<GeneCluster> clusters, Map<Integer, String[]> geneLabelMap, List<String> genomeNames, ExportType type) {
+	public static boolean exportResultsToFileNEW2(File f, List<GeneCluster> clusters, List<String> genomeNames, ExportType type) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(f));
 			
@@ -28,7 +28,7 @@ public class ResultWriter {
 			});
 			switch (type) {
 				case clusterData:
-					writeGeneClusterOutput(writer, clusters, geneLabelMap, genomeNames);
+					writeGeneClusterOutput(writer, clusters, genomeNames);
 					break;
 				case table:
 					writeGeneClusterTable(writer, clusters);
@@ -37,7 +37,7 @@ public class ResultWriter {
 					writeGeneClusterLatexTable(writer, clusters);
 					break;
 				case internalDuplications:
-					writeInternalDuplicationsData(writer, clusters, geneLabelMap, genomeNames);
+					writeInternalDuplicationsData(writer, clusters, genomeNames);
 					break;
 			}
 
@@ -53,7 +53,7 @@ public class ResultWriter {
 		//writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
 		for (int i=0; i<clusters.size(); i++) {
 			GeneCluster cluster = clusters.get(i);
-			writer.write(String.format("%d\t%d\t%d\t%d\t%d\t%.1f\t%.2f\t%.2f\t%.4g\t%.4g\t%s\n", i+1, cluster.getGenes().length, cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getBestPValue(), cluster.getBestPValueCorrected(), cluster.getReferenceTags()));
+			writer.write(String.format("%d\t%d\t%d\t%d\t%d\t%.1f\t%.2f\t%.2f\t%.4g\t%.4g\t%s%n", i+1, cluster.getGenes().length, cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getBestPValue(), cluster.getBestPValueCorrected(), cluster.getReferenceTags()));
 		}
 	}
 	
@@ -61,15 +61,15 @@ public class ResultWriter {
 		//writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
 		for (int i=0; i<clusters.size(); i++) {
 			GeneCluster cluster = clusters.get(i);
-			writer.write(String.format("%d & %d & %d & %d & %d & %.1f & %.2f & %.2f & %s \\\\\n", i+1, cluster.getGenes().length, cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getReferenceTags()));
+			writer.write(String.format("%d & %d & %d & %d & %d & %.1f & %.2f & %.2f & %s \\\\%n", i+1, cluster.getGenes().length, cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getReferenceTags()));
 			System.out.println(String.format("%d\t%.8g\t%.8g", i+1, cluster.getBestPValue(), cluster.getBestPValueCorrected()));
 		}
 	}
 	
-	private static void writeGeneClusterOutput(Writer writer, List<GeneCluster> clusters, Map<Integer, String[]> geneLabelMap, List<String> genomeNames) throws IOException {
+	private static void writeGeneClusterOutput(Writer writer, List<GeneCluster> clusters, List<String> genomeNames) throws IOException {
 		final boolean HIDE_NON_OCCS = false; // if true, don't print all the non occurrences
 		
-		writer.write(String.format("Detected %d gene clusters.\n", clusters.size()));
+		writer.write(String.format("Detected %d gene clusters.%n", clusters.size()));
 		/*writer.write("General statistics:\n");
 		
 		List<List<Integer>> distancesPerGenome = new ArrayList<List<Integer>>(genomeNames.size());
@@ -371,23 +371,22 @@ public class ResultWriter {
 		}
 	}
 	
-	private static void writeInternalDuplicationsData(Writer writer, List<GeneCluster> clusters, Map<Integer, String[]> geneLabelMap, List<String> genomeNames) throws IOException {
+	private static void writeInternalDuplicationsData(Writer writer, List<GeneCluster> clusters, List<String> genomeNames) throws IOException {
 		final boolean HIDE_NON_OCCS = true; // if true, don't print all the non occurrences
 		
-		writer.write(String.format("Detected %d duplications.\n", clusters.size()));
+		writer.write(String.format("Detected %d duplications.%n", clusters.size()));
 		writer.write("General statistics:\n");
 		
 		List<List<Integer>> distancesPerGenome = new ArrayList<List<Integer>>(genomeNames.size());
 		List<List<Integer>> clusterSizesPerGenome = new ArrayList<List<Integer>>(genomeNames.size());
 		List<List<Integer>> conservedGenesPerGenome = new ArrayList<List<Integer>>(genomeNames.size());
-		for (int i=0; i<genomeNames.size(); i++){
-			distancesPerGenome.add(new ArrayList<Integer>());
-			clusterSizesPerGenome.add(new ArrayList<Integer>());
-			conservedGenesPerGenome.add(new ArrayList<Integer>());
-		}		
-		List<Set<Integer>> conservedGenes = new ArrayList<Set<Integer>>(genomeNames.size());
-		for (int i=0; i<genomeNames.size(); i++)
-			conservedGenes.add(new HashSet<Integer>());
+        List<Set<Integer>> conservedGenes = new ArrayList<Set<Integer>>(genomeNames.size());
+        for (String genomeName : genomeNames) {
+            distancesPerGenome.add(new ArrayList<Integer>());
+            clusterSizesPerGenome.add(new ArrayList<Integer>());
+            conservedGenesPerGenome.add(new ArrayList<Integer>());
+            conservedGenes.add(new HashSet<Integer>());
+        }
 		int[] totalConservedGenes = new int[genomeNames.size()];
 		
 		int[] clusterSizes = new int[50];
@@ -495,17 +494,17 @@ public class ResultWriter {
 			builder.append("]\t[");
 			
 			first = true;
-			for (int i=0; i<conservedGenesPerGenome.size(); i++) {
-				int cGenes = conservedGenesPerGenome.get(i).get(conservedGenesPerGenome.get(i).size() - 1);
-				
-				if (HIDE_NON_OCCS && cGenes == -1) continue;
-				
-				if (!first)
-					builder.append(", ");
-				else
-					first = false;		
-				builder.append(cGenes != -1 ? cGenes : "-");
-			}
+            for (List<Integer> aConservedGenesPerGenome : conservedGenesPerGenome) {
+                int cGenes = aConservedGenesPerGenome.get(aConservedGenesPerGenome.size() - 1);
+
+                if (HIDE_NON_OCCS && cGenes == -1) continue;
+
+                if (!first)
+                    builder.append(", ");
+                else
+                    first = false;
+                builder.append(cGenes != -1 ? cGenes : "-");
+            }
 			builder.append("]\t[");
 			
 			first = true;
@@ -523,7 +522,7 @@ public class ResultWriter {
 		writer.write("Genes per cluster \t #clusters\n");
 		for (int i=0; i<clusterSizes.length; i++) {
 			if (clusterSizes[i] != 0)
-				writer.write(String.format("%d \t %d\n", i, clusterSizes[i]));
+				writer.write(String.format("%d \t %d%n", i, clusterSizes[i]));
 		}
 		writer.write("\n");
 		
@@ -532,12 +531,12 @@ public class ResultWriter {
 		writer.write("Interval Lengths \t #intervals \t #multiple intervals \n");
 		for (int i=0; i<intervalLength.length; i++) {
 			if (intervalLength[i] != 0 || intervalLengthMult[i] != 0) {
-				writer.write(String.format("%d \t %d \t %d \n", i, intervalLength[i], intervalLengthMult[i]));
+				writer.write(String.format("%d \t %d \t %d %n", i, intervalLength[i], intervalLengthMult[i]));
 				lenSum += intervalLength[i];
 				multLenSum += intervalLengthMult[i];
 			}
 		}
-		writer.write(String.format("Sum \t %d \t %d \n", lenSum, multLenSum));
+		writer.write(String.format("Sum \t %d \t %d %n", lenSum, multLenSum));
 		writer.write("\n");
 		
 		writer.write("Cluster\t#Genes\tOccurrences on Chromosomes\tLengths:#\t #conserved Genes\tAllOccs per Chromosome\n");
@@ -552,7 +551,7 @@ public class ResultWriter {
 	
 	private static void writeSingleGeneClusterData(Writer writer, GeneCluster cluster) throws IOException {
 		GeneClusterOutput clusterData = cluster.generateGeneClusterOutput(false);			
-		writer.write(String.format("new cluster: pValue = %e, refSeq = %d\n", clusterData.getPValue(), clusterData.getRefSeq()+1));
+		writer.write(String.format("new cluster: pValue = %e, refSeq = %d%n", clusterData.getPValue(), clusterData.getRefSeq()+1));
 		writer.write("in chromosomes:\n");
 		for (int i=0; i<clusterData.getChromosomes().size(); i++)
 			if (clusterData.getChromosomes().get(i) != null) {
@@ -593,11 +592,12 @@ public class ResultWriter {
 		writer.write("\n");
 		
 		Map<Integer, Gene[][]>geneAnnotations = clusterData.getGeneAnnotations();
-		for (Integer geneid : geneAnnotations.keySet()) {
-			Gene[][] annotation = geneAnnotations.get(geneid);
+
+        for (Map.Entry<Integer, Gene[][]> entry : geneAnnotations.entrySet()) {
+			Gene[][] annotation = entry.getValue();
 			for (int i=0; i<annotation.length; i++) {
 				if (0==i)
-					writer.write(String.format("%d:", geneid));
+					writer.write(String.format("%d:", entry.getKey()));
 				for (int j=0; j<annotation[i].length; j++){
 					
 					String chrNo;
@@ -607,16 +607,16 @@ public class ResultWriter {
 						chrNo = String.format("%d.%d", i+1, j);
 					
 					if (annotation[i][j] != null) 
-						writer.write(String.format("\t%s: %s\n", chrNo, annotation[i][j].getSummary()));
+						writer.write(String.format("\t%s: %s%n", chrNo, annotation[i][j].getSummary()));
 					else if (clusterData.getChromosomes().get(i) != null)
-						writer.write(String.format("\t%s: ---\n", chrNo));	
+						writer.write(String.format("\t%s: ---%n", chrNo));
 				}
 			}
 		}
 		writer.write("\n");
 	}
 	
-	public static boolean exportResultsToFileNEW(File f, List<GeneCluster> clusters, HashMap<Integer, String[]> geneLabelMap) {
+	public static boolean exportResultsToFileNEW(File f, List<GeneCluster> clusters) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(f));
 			
@@ -627,20 +627,20 @@ public class ResultWriter {
 				}
 			});
 			
-			writer.write(String.format("gene cluster list of size %d\n", clusters.size()));
+			writer.write(String.format("gene cluster list of size %d%n", clusters.size()));
 			
 			for (GeneCluster cluster : clusters) {
-				writer.write(String.format("K = %d\n", 0)); //TODO 0
-				writer.write(String.format("new Cluster: pValue = %e\n", cluster.getBestPValue()));
+				writer.write(String.format("K = %d%n", 0)); //TODO 0
+				writer.write(String.format("new Cluster: pValue = %e%n", cluster.getBestPValue()));
 				writer.write("gene content: " + geneContentString(cluster.getGenes()) + "\n");
-				writer.write(String.format("             type: %c, min total dist: %d, refGenomeNr: %d\n", 'r', cluster.getMinTotalDist(), cluster.getRefSeqIndex())); //TODO 'r'
-				writer.write("\n");
-				writer.write("best clusters:\n");
+				writer.write(String.format("             type: %c, min total dist: %d, refGenomeNr: %d%n", 'r', cluster.getMinTotalDist(), cluster.getRefSeqIndex())); //TODO 'r'
+				writer.write("%n");
+				writer.write("best clusters:%n");
 				for (GeneClusterOccurrence occ : cluster.getOccurrences()) {
 					writeClusterOccurrence(occ, writer);
 				}
-				writer.write("\n");
-				writer.write("all clusters:\n");
+				writer.write("%n");
+				writer.write("all clusters:%n");
 				for (GeneClusterOccurrence occ : cluster.getAllOccurrences()) {
 					writeClusterOccurrence(occ, writer);
 				}
@@ -662,14 +662,14 @@ public class ResultWriter {
 	}
 	
 	private static void writeClusterOccurrence(GeneClusterOccurrence occ, Writer writer) throws IOException {
-		writer.write(String.format("next ACI: pValue: %e, total dist: %d, support: %d, number of refOccs: %d\n",
+		writer.write(String.format("next ACI: pValue: %e, total dist: %d, support: %d, number of refOccs: %d%n",
 				occ.getBestpValue(),
 				occ.getTotalDist(),
 				occ.getSupport(),
 				0)); //TODO 0
 		for (int i=0; i<occ.getSubsequences().length; i++) {
 			for (Subsequence subsequence : occ.getSubsequences()[i]) {
-				writer.write(String.format("\t\tgenome %d, chr %d: [%d,%d] dist: %d, pValue: %e%s\n",
+				writer.write(String.format("\t\tgenome %d, chr %d: [%d,%d] dist: %d, pValue: %e%s%n",
 						i,
 						subsequence.getChromosome(),
 						subsequence.getStart(),
@@ -679,7 +679,7 @@ public class ResultWriter {
 						subsequence.getDist() == 0 ? " RefOCC" : ""));
 			}			
 		}
-		writer.write("finished\n");
+		writer.write("finished%n");
 	}
 	
 	public static boolean exportResultsToFile(File f, List<GeneCluster> clusters, HashMap<Integer, String[]> geneLabelMap) {
@@ -729,7 +729,14 @@ public class ResultWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
-		}
+		} finally {
+            if (fw != null)
+                try {
+                    fw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
 		
 		
 	}

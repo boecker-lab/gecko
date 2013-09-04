@@ -15,8 +15,8 @@ public class LocationSelectionEvent extends ClusterSelectionEvent {
 	 */
 	private static final long serialVersionUID = -7045332477999665994L;
 	
-	private int[] subselection;
-	private GeneClusterOccurrence gOcc;
+	private final int[] subselection;
+	private final GeneClusterOccurrence gOcc;
 	
 	public LocationSelectionEvent(Object source, GeneCluster gc, GeneClusterOccurrence gOcc, int[] subselection, boolean instant) {
 		super(source, gc, instant);

@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 import java.util.zip.DataFormatException;
 
 import gecko2.GeneClusterTestUtils.PValueComparison;
-import gecko2.algo.AlgorithmParameters;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
@@ -27,8 +26,6 @@ public class ReferenceClusterDistanceMatrixTest {
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 6, 5, 4, 0}}};
 			
 		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6};
-		
 		int[][] distanceMatrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
 		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.QUORUM_NO_COST, 'r', 'd');
 			
@@ -129,8 +126,6 @@ public class ReferenceClusterDistanceMatrixTest {
 		int genomes[][][] = {{{0, 1, 2, 5 , 4, 11, 3 , 10, 0}}, {{0, 1, 2, 6, 7, 8, 0}}, {{0, 3, 2, 1, 9, 4, 7, 5, 10, 0}}};
 			
 		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-		
 		int[][] distanceMatrix = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {3, 3, 3}};
 		Parameter p = new Parameter(distanceMatrix, 2, 2, Parameter.QUORUM_NO_COST, 'r', 'g');
 			
@@ -181,8 +176,6 @@ public class ReferenceClusterDistanceMatrixTest {
 		int genomes[][][] = {{{0, 1, 2, 3, 0}}, {{0, 1, 2, 4, 3, 0}}, {{0, 1, 3, 0}}};
 			
 		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4};
-		
 		int[][] distanceMatrix = {{1, 0, 1}, {1, 0, 1}, {1, 0, 1}, {1, 0, 1}};
 		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.QUORUM_NO_COST, 'r', 'g');
 			
@@ -216,8 +209,6 @@ public class ReferenceClusterDistanceMatrixTest {
 		int genomes[][][] = {{{0, 1, 2, 3, 4, 0}}, {{0, 1, 2, 5, 3, 0}}, {{0, 1, 3, 4, 0}}};
 			
 		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5};
-		
 		int[][] distanceMatrix = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 1, 1}};
 		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.QUORUM_NO_COST, 'r', 'g');
 			
@@ -251,8 +242,6 @@ public class ReferenceClusterDistanceMatrixTest {
 		int genomes[][][] = {{{0, 1, 2, 3, 0}}, {{0, 1, 4, 3, 0}}, {{0, 1, 4, 5, 3, 0}}};
 			
 		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5};
-		
 		int[][] distanceMatrix = {{1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}};
 		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.QUORUM_NO_COST, 'r', 'g');
 			

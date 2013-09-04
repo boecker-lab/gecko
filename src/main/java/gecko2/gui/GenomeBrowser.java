@@ -12,18 +12,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
@@ -32,28 +27,27 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 	
 	private final static Color BG_COLOR_FLIPPED = Color.ORANGE;
 	
-	private FlowLayout flowlayout;
+	private final FlowLayout flowlayout;
 	
 	private static final long serialVersionUID = 7086043901343368118L;
-	private Genome genome;
+	private final Genome genome;
 	private ArrayList<GeneElement> genElements[];
-	private JPanel contentPanel;
-	private GenomeBrowserMouseDrag genomebrowsermousedrag;
-	private HashMap<GeneElement, Integer[]> backmap;
-	private GeckoInstance gecko;
+	private final JPanel contentPanel;
+	private final GenomeBrowserMouseDrag genomebrowsermousedrag;
+	private final GeckoInstance gecko;
 	private GenomeScollThread last;
-	private MultipleGenomesBrowser parent;
+	private final AbstractMultipleGenomeBrowser parent;
 	
 	private boolean flipped = false;
 	
-	private JPanel leftspace, rightspace;
+	private final JPanel leftspace;
+    private final JPanel rightspace;
 	
 	private boolean init = true;
 	
 	public GenomeBrowser(Genome g, MultipleGenomesBrowser parent) {
 		this.parent = parent;
 		gecko = GeckoInstance.getInstance();
-		backmap = new HashMap<GeneElement, Integer[]>();
 		genomebrowsermousedrag = new GenomeBrowserMouseDrag();
 		this.setBorder(null);
 		this.contentPanel = new JPanel();
@@ -140,12 +134,12 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 	 * Marks a region within a genome by setting everything except that region to 
 	 * greyscale instead of the gene colors and by changing the background color
 	 * of the specified region.
-	 * @param id The id of the genome
 	 * @param chr The id of the chromosome
 	 * @param start The first gene in the region. If the value is greater than stop
 	 * or below zero the whole genome is set to greyscale.
 	 * @param stop The last gene in the region. If the value is lower than start or 
 	 * greater than the chromosome length -1 the whole genome is set to greyscale.
+     * @param highlightColor The color that is used for highlighting
 	 */
 	public void highlightCluster(int chr, int start, int stop, Color highlightColor) {
 		List<Chromosome> chromosomes = genome.getChromosomes();
@@ -216,7 +210,6 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 	
 	@SuppressWarnings("unchecked")
 	private void createGeneElements() {
-		int id = 0;
 		genElements = new ArrayList[genome.getChromosomes().size()];
 		for (int i=0;i<genome.getChromosomes().size();i++) {
 			MouseListener ml = genome.getChromosomes().get(i).getChromosomeMouseListener();
@@ -229,8 +222,6 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 				element.addMouseListener(ml);
 				if (g.isUnknown()) element.setUnknown(true);
 				this.genElements[i].add(element);
-				Integer[] back = {i,id++};
-				backmap.put(element,back);
 			}
 		}
 		arrangeGeneElements();
@@ -316,7 +307,6 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 	/**
 	 * Scrolls to a specified position within a genome. A thread is created to perform the
 	 * scrolling. The funktion returns after the Tread is created and started.
-	 * @param gb The genomebrowser
 	 * @param chromosome The chromosome id
 	 * @param position The position of the gene within the chromosome
 	 */
@@ -325,7 +315,6 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 				|| genome.getChromosomes().size()<=chromosome
 				|| genome.getChromosomes().get(chromosome).getGenes().size()<=position) 
 			return;
-		GenomeScollThread temp = last;
 		last = new GenomeScollThread(chromosome, position, last);
 	}
 	
@@ -363,10 +352,12 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 		}
 	}
 	
-private class GenomeScollThread implements Runnable {	
-		private int units,chromosome,gene;
-		private Thread myThread;
-		GenomeScollThread waitForMe;
+    private class GenomeScollThread implements Runnable {
+        private int units;
+        private final int chromosome;
+        private final int gene;
+		private final Thread myThread;
+		final GenomeScollThread waitForMe;
 		private boolean stop;
 						
 		public GenomeScollThread(int chromosome, int gene, GenomeScollThread waitForMe) {
@@ -430,7 +421,9 @@ private class GenomeScollThread implements Runnable {
 			}
 
 			// Do the scrolling
-			int steps = 1; int sign = 1; int absunits = Math.abs(this.units);
+			int steps = 1;
+            int sign = 1;
+            int absunits = Math.abs(this.units);
 			if (this.units<0) sign = -1;
 			
 			// If the animation is disabled, don't bother
@@ -454,7 +447,8 @@ private class GenomeScollThread implements Runnable {
 				int sleepTime = 10;
 				for (int i=0; i<absunits; i=i+steps) {
 					
-					if (stop) break;
+					if (stop)
+                        break;
 										
 					final int finalsign = sign;
 					final int finalsteps = steps;

@@ -6,7 +6,6 @@ import gecko2.io.ImageWriter;
 import gecko2.io.GeneClusterPicture.NameType;
 import gecko2.util.FileUtils;
 import gecko2.algorithm.GeneCluster;
-import gecko2.gui.Preview;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -20,10 +19,8 @@ import java.awt.event.ItemListener;
 import java.io.File;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -54,23 +51,18 @@ public class GeneClusterExportDialog extends JDialog {
 	/**
 	 * Text filed which contains the path to the pdf file we want to store.
 	 */
-	private JTextField storingLocation = new JTextField();
+	private final JTextField storingLocation = new JTextField();
 	
 	/**
 	 * Text field which contains the users name.
 	 */
-	private JTextField authorName = new JTextField(System.getProperty("user.name"));
-	
-	/**
-	 * Users home directory for saving the pdf file (Default location).
-	 */
-	private String HELP = System.getProperty("user.dir");
+	private final JTextField authorName = new JTextField(System.getProperty("user.name"));
 	
 	/**
 	 * Predefined file name for the pdf file.
 	 */
-	private String FILENAME = "ClusterExport";
-	
+	private final String FILENAME = "ClusterExport";
+
 	/**
 	 * Here we store whether extra data from the GeneClusterDisplay shall be
 	 * added to the PDF.
@@ -100,10 +92,7 @@ public class GeneClusterExportDialog extends JDialog {
 	/**
 	 * The preview area on the gui
 	 */
-	private Preview prev;
-	
-	private JLabel ovlapStatus1 = new JLabel();
-	private JLabel ovlapStatus2 = new JLabel();
+	private final Preview prev;
 	
 	/**
 	 * Constructor sets the elements of the dialog.
@@ -119,7 +108,10 @@ public class GeneClusterExportDialog extends JDialog {
 		this.setLayout(new BorderLayout());
 		this.setPreferredSize(new Dimension(1010, 700));
 		this.setIconImage(Gui.createImageIcon("images/gecko2_a_small.png").getImage());
+
+        JLabel ovlapStatus1 = new JLabel();
 		ovlapStatus1.setForeground(Color.RED);
+        JLabel ovlapStatus2 = new JLabel();
 		ovlapStatus2.setForeground(Color.RED);
 	
 		// two main panels
@@ -131,7 +123,7 @@ public class GeneClusterExportDialog extends JDialog {
 		// description label for the text field
 		JLabel storLocLabel = new JLabel("File name:  ");
 		this.storingLocation.setPreferredSize(new Dimension(280, storingLocation.getHeight()));
-		this.storingLocation.setText(HELP + File.separatorChar + FILENAME + ".pdf");
+		this.storingLocation.setText(System.getProperty("user.dir") + File.separatorChar + FILENAME + ".pdf");
 		
 		
 		// file chooser button including action if pressed
@@ -201,12 +193,8 @@ public class GeneClusterExportDialog extends JDialog {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {				
 				int status = arg0.getStateChange();
-				
-				if (status == ItemEvent.DESELECTED)
-            		GeneClusterExportDialog.this.eData = false;
-            	else 
-            		GeneClusterExportDialog.this.eData = true;
-				
+
+                GeneClusterExportDialog.this.eData = status != ItemEvent.DESELECTED;
 			}
 			
 		});		
@@ -237,7 +225,44 @@ public class GeneClusterExportDialog extends JDialog {
 		
 		// Button for launching the export
 		JButton exportButton = new JButton("Export");
-		exportButton.addActionListener(export);
+		exportButton.addActionListener(new AbstractAction() {
+            /**
+             * Action which is launched by pressing the export button.
+             * Causes the export of the cluster to a pdf file.
+             */
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // if the user just used the text field for editing the file name/path
+                // we have to check the file existence independent from the browse button
+                // behavior
+                String filename = checkAndFixFileExtension(GeneClusterExportDialog.this.storingLocation.getText());
+                GeneClusterExportDialog.this.storingLocation.setText(filename);
+
+                if (!checkFileExistence(new File(filename))) {
+                    // png export
+                    if (GeneClusterExportDialog.this.png) {
+                        ImageWriter.createPNGPic(GeneClusterExportDialog.this.clusterPics.createImage(), GeneClusterExportDialog.this.storingLocation.getText());
+                        GeneClusterExportDialog.this.setVisible(false);
+                    }
+
+                    // jpg export
+                    if (GeneClusterExportDialog.this.jpg) {
+                        ImageWriter.createJPGPic(GeneClusterExportDialog.this.clusterPics.createImage(), GeneClusterExportDialog.this.storingLocation.getText());
+                        GeneClusterExportDialog.this.setVisible(false);
+                    }
+
+                    // pdf export
+                    if (GeneClusterExportDialog.this.pdf) {
+                        GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(new File(GeneClusterExportDialog.this.storingLocation.getText()),
+                                GeneClusterExportDialog.this.authorName.getText(),
+                                GeneClusterExportDialog.this.clusterPics);
+                        gcw.setOutputFile(GeneClusterExportDialog.this.storingLocation.getText());
+                        gcw.createPDF();
+                        GeneClusterExportDialog.this.setVisible(false);
+                    }
+                }
+            }
+        });
 		
 		JLabel author = new JLabel("Author:  ");
 		
@@ -275,16 +300,11 @@ public class GeneClusterExportDialog extends JDialog {
 				
 				if (status == ItemEvent.SELECTED) {
 					
-					GeneClusterExportDialog.this.pdf = false;
-					GeneClusterExportDialog.this.png = true;
-					GeneClusterExportDialog.this.jpg = false;
-					
-					if (!GeneClusterExportDialog.this.jpg && GeneClusterExportDialog.this.png && !GeneClusterExportDialog.this.pdf) {
-						
-						int dot = GeneClusterExportDialog.this.storingLocation.getText().lastIndexOf(".");
-						String newFilename = GeneClusterExportDialog.this.storingLocation.getText().substring(0, dot);
-						GeneClusterExportDialog.this.storingLocation.setText(newFilename + ".png");
-					}
+					pdf = false;
+					png = true;
+					jpg = false;
+
+                    matchFileEndingToFiletype();
 				}
 			}
 		});
@@ -301,16 +321,11 @@ public class GeneClusterExportDialog extends JDialog {
 				
 				if (status == ItemEvent.SELECTED) {
 					
-					GeneClusterExportDialog.this.pdf = false;
-					GeneClusterExportDialog.this.png = false;
-					GeneClusterExportDialog.this.jpg = true;
-					
-					if (GeneClusterExportDialog.this.jpg && !GeneClusterExportDialog.this.png && !GeneClusterExportDialog.this.pdf) {
-						
-						int dot = GeneClusterExportDialog.this.storingLocation.getText().lastIndexOf(".");
-						String newFilename = GeneClusterExportDialog.this.storingLocation.getText().substring(0, dot);
-						GeneClusterExportDialog.this.storingLocation.setText(newFilename + ".jpg");
-					}
+					pdf = false;
+					png = false;
+					jpg = true;
+
+                    matchFileEndingToFiletype();
 				}
 			}
 		});
@@ -328,16 +343,11 @@ public class GeneClusterExportDialog extends JDialog {
 				
 				if (status == ItemEvent.SELECTED) {
 					
-					GeneClusterExportDialog.this.pdf = true;
-					GeneClusterExportDialog.this.png = false;
-					GeneClusterExportDialog.this.jpg = false;
-					
-					if (!GeneClusterExportDialog.this.jpg && !GeneClusterExportDialog.this.png && GeneClusterExportDialog.this.pdf) {
-						
-						int dot = GeneClusterExportDialog.this.storingLocation.getText().lastIndexOf(".");
-						String newFilename = GeneClusterExportDialog.this.storingLocation.getText().substring(0, dot);
-						GeneClusterExportDialog.this.storingLocation.setText(newFilename + ".pdf");
-					}
+					pdf = true;
+					png = false;
+					jpg = false;
+
+                    matchFileEndingToFiletype();
 				}
 			}
 		});
@@ -376,6 +386,17 @@ public class GeneClusterExportDialog extends JDialog {
 		this.pack();
 		
 	}
+
+    private void matchFileEndingToFiletype() {
+        int dot = GeneClusterExportDialog.this.storingLocation.getText().lastIndexOf(".");
+        String newFilename = GeneClusterExportDialog.this.storingLocation.getText().substring(0, dot);
+        if (pdf)
+            storingLocation.setText(newFilename + ".pdf");
+        if (png)
+            storingLocation.setText(newFilename + ".png");
+        if (jpg)
+            storingLocation.setText(newFilename + ".jpg");
+    }
 	
 	private void updateImage() {
 		GeneClusterExportDialog.this.prev.updatePreview(GeneClusterExportDialog.this.clusterPics.createImage());
@@ -383,58 +404,6 @@ public class GeneClusterExportDialog extends JDialog {
 		GeneClusterExportDialog.this.validate();
 		GeneClusterExportDialog.this.repaint();
 	}
-	
-	/**
-	 * Action which is launched by pressing the export button.
-	 * Causes the export of the cluster to a pdf file.
-	 */
-	private Action export = new AbstractAction() {
-
-		/**
-		 * Random serial version UID
-		 */
-		private static final long serialVersionUID = 8546001404773999661L;
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
-			// if the user just used the text field for editing the file name/path
-			// we have to check the file existence independent from the browse button 
-			// behavior
-			String filename = checkAndFixFileExtension(GeneClusterExportDialog.this.storingLocation.getText());
-			GeneClusterExportDialog.this.storingLocation.setText(filename);
-			
-			if (!checkFileExistence(new File(filename))) {
-			
-				// png export
-				if (GeneClusterExportDialog.this.png) {
-				
-					ImageWriter.createPNGPic(GeneClusterExportDialog.this.clusterPics.createImage(), GeneClusterExportDialog.this.storingLocation.getText());
-					GeneClusterExportDialog.this.setVisible(false);
-				}
-			
-				// jpg export
-				if (GeneClusterExportDialog.this.jpg) {
-				
-					ImageWriter.createJPGPic(GeneClusterExportDialog.this.clusterPics.createImage(), GeneClusterExportDialog.this.storingLocation.getText());
-					GeneClusterExportDialog.this.setVisible(false);
-				}
-			
-				// pdf export
-				if (GeneClusterExportDialog.this.pdf) {
-			
-					GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(new File(GeneClusterExportDialog.this.storingLocation.getText()),
-							GeneClusterExportDialog.this.authorName.getText(),
-							GeneClusterExportDialog.this.eData, 
-							GeneClusterExportDialog.this.clusterPics
-							);
-					gcw.setOutputFile(GeneClusterExportDialog.this.storingLocation.getText());
-					gcw.createPDF();
-					GeneClusterExportDialog.this.setVisible(false);
-				}
-			}
-		}
-	};
 	
 	/**
 	 * The method test whether a given file object points to a existing file.

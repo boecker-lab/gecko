@@ -124,7 +124,7 @@ class GenomeList {
     
     /**
      * Initializes the SetOfSequences for a calculation of gene clusters.
-     * @param param the parameters the algorithm is started with.
+     * @param maxDelta the maximum distance
      */
     void initializeForCalculation(int maxDelta) {
         for (Genome g : genomes) {

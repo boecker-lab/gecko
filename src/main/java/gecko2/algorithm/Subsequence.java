@@ -7,11 +7,11 @@ public class Subsequence implements Serializable {
 	
 	private static final long serialVersionUID = 2522802683054385603L;
 
-	int start;
-	int stop;
-	int chromosome;
-	int dist;
-	BigDecimal pValue;
+	private final int start;
+    private final int stop;
+    private final int chromosome;
+    private int dist;
+    private final BigDecimal pValue;
 	
 	public void setDist(int dist) {
 		this.dist = dist;
@@ -32,15 +32,7 @@ public class Subsequence implements Serializable {
 	public BigDecimal getpValue() {
 		return pValue;
 	}
-	
-	public void setStart(int start) {
-		this.start = start;
-	}
-	
-	public void setStop(int stop) {
-		this.stop = stop;
-	}
-	
+
 	public Subsequence(int start, int stop, int chromosome, int dist, double pValueBase, int pValueExp) {
 		this(start, stop, chromosome, dist, (new BigDecimal(pValueBase)).scaleByPowerOfTen(pValueExp));
 	}
@@ -51,10 +43,6 @@ public class Subsequence implements Serializable {
 		this.chromosome = chromosome;
 		this.dist = dist;
 		this.pValue = pValue;
-	}
-	
-	public void setChromosome(int chromosomeNr) {
-		this.chromosome = chromosomeNr;
 	}
 	
 	public int getChromosome() {

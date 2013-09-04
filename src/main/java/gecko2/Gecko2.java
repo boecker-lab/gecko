@@ -30,9 +30,7 @@ public class Gecko2 {
 		try {
 	    
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	    } catch (Throwable t) {
-	    	;
-	    }
+	    } catch (Throwable t) {}
 	    
 		boolean libgeckoLoaded = false;
 		
@@ -47,7 +45,7 @@ public class Gecko2 {
 		Pattern uGui = Pattern.compile("-g|--gui");
 		Matcher optChecker;
 		
-		for (int i = 0; i < args.length && help == false; i++) {
+		for (int i = 0; i < args.length && !help; i++) {
 			
 			optChecker = sHelp.matcher(args[i]);
 			
@@ -65,7 +63,7 @@ public class Gecko2 {
 		}
 		
 		// load the libraries if showing the help isn't requested
-		if (help == false) {
+		if (!help) {
 		
 			// there is no possibility to check whether a file is a text or compiled binary file
 			// so we use primarily the file extension for checking the library existence.
@@ -86,7 +84,7 @@ public class Gecko2 {
 			
 			try {
 				
-				if ((args.length > 2 || args.length == 1 || (args.length == 2 && gui == true)) && !inFileGckCog) {
+				if ((args.length > 2 || args.length == 1 || (args.length == 2 && gui)) && !inFileGckCog) {
 				
 					LibraryUtils.loadLibrary(args[0],true);
 					externalLib = true;
@@ -114,7 +112,7 @@ public class Gecko2 {
 			GeckoInstance instance = GeckoInstance.getInstance();
 			instance.setLibgeckoLoaded(true);
 		
-			if (gui || (!gui && args.length <= 1)) {
+			if (gui || args.length <= 1) {
 				
 				// start gui session
 				Gui.startUp();

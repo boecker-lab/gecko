@@ -224,8 +224,8 @@ class Statistics {
 	private BigDecimal combine_pValuesWithQuorum(double[] pValue, int Q) {
 		if (Q == pValue.length || Q == genomes.size()){
 			Probability combined = Probability.ONE;
-			for (int k=0; k<pValue.length; k++)
-				combined = combined.multiply(pValue[k]);
+            for (double aPValue : pValue)
+                combined = combined.multiply(aPValue);
 			return combined.toBigDecimal();
 		}
 		
@@ -299,7 +299,7 @@ class Statistics {
 	
 	private double prob_C_has_approxOccInGenome(int delta, int totalLength,
 			int alphabetSize, List<Integer> geneContent, PTable pPlusTable, int[] charFreqs) {
-		if (!dLocPossible(geneContent, delta, charFreqs))
+		if (noDLocPossible(geneContent, delta, charFreqs))
 			return 0.0;
 		
 		double[] localCharProb = computeLocalCharProb(geneContent, charFreqs);
@@ -311,7 +311,7 @@ class Statistics {
 		int L = Math.max(1, geneContent.size()-delta);
 		boolean notEqual = true;
 		while (notEqual && L<=totalLength){
-			double newLog = log + (totalLength-L+1)*Math.log1p(-1.0*q_L_delta(delta, L, localCharProb, probOfC, geneContent.size(), alphabetSize, pTable, pPlusTable));
+			double newLog = log + (totalLength-L+1)*Math.log1p(-1.0*q_L_delta(delta, L, probOfC, geneContent.size(), pTable, pPlusTable));
 			
 			if (L >= geneContent.size())
 				notEqual = !Precision.equalsWithRelativeTolerance(log, newLog, 0.0000001);
@@ -329,18 +329,17 @@ class Statistics {
 			return -1.0 * Math.expm1(log);
 	}
 
-	private double q_L_delta(int delta, int L, double[] localCharProb,
-			double probOfC, int sizeOfC, int alphabetSize, PTable pMinusTable,
+	private double q_L_delta(int delta, int L, double probOfC, int sizeOfC, PTable pMinusTable,
 			PTable pPlusTable) {
 		double sum = 0.0;
 		for (int d=0; d<=delta; d++)
-			sum += p_L_d(d, L, localCharProb, probOfC, sizeOfC, alphabetSize, pMinusTable, pPlusTable);
+			sum += p_L_d(d, L, probOfC, sizeOfC, pMinusTable, pPlusTable);
 		
 		return sum;
 	}
 
-	private double p_L_d(int d, int L, double[] localCharProb, double probOfC,
-			int sizeOfC, int alphabetSize, PTable pMinusTable, PTable pPlusTable) {
+	private double p_L_d(int d, int L, double probOfC,
+			int sizeOfC, PTable pMinusTable, PTable pPlusTable) {
 		double prob = 0.0;
 		Binomial binomial = null;
 		if (probOfC != 1.0)
@@ -392,19 +391,17 @@ class Statistics {
 		return localCharProb;
 	}
 
-	private boolean dLocPossible(List<Integer> geneContent, int maxDelta,
-			int[] charFreqs) {
+	private boolean noDLocPossible(List<Integer> geneContent, int maxDelta,
+                                   int[] charFreqs) {
 		int nonAppearingGenes = 0;
 		for (Integer gene : geneContent){
 			if (charFreqs[gene] == 0)
 				nonAppearingGenes++;
 			if (nonAppearingGenes > maxDelta)
-				return false;
+				return true;
 		}
-		if (nonAppearingGenes == geneContent.size())
-			return false;
-		return true;
-	}
+        return nonAppearingGenes == geneContent.size();
+    }
 
 	private int getMaxRefClusterSize() {
 		int maxSize = 0;

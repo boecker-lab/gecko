@@ -9,7 +9,7 @@ import java.io.Reader;
 
 public class CountedReader {
 	
-	private BufferedReader buff;
+	private final BufferedReader buff;
 	private int counter;
 	private boolean eof;
 	
@@ -29,11 +29,10 @@ public class CountedReader {
 	/**
 	 * Skips a given number of lines
 	 * @param l The line to skip to. The next readLine() call will return the contents of line l if it exists.
-	 * @throws IOException
-	 * @throws EOFException If the number given -1 exceeds the length of the content.
+	 * @throws IOException, EOFException If the number given -1 exceeds the length of the content.
 	 * @throws LinePassedException If the readers pointer already points at a line after the given line number
 	 */
-	public void jumpToLine(int l) throws IOException, EOFException, LinePassedException {
+	public void jumpToLine(int l) throws IOException, LinePassedException {
 		if (this.eof) throw new EOFException();
 		if (this.counter > l-1) throw new LinePassedException();
 		while (this.counter<l-1) {

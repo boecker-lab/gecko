@@ -10,12 +10,12 @@ import javax.swing.JPanel;
 public class NumberInRectangle extends JPanel {
 
 	private static final long serialVersionUID = -5779445240934635898L;
-	private int number;
+	private final int number;
 	
 	/**
 	 * Here we save the number of genomes to calculate the size and place of the rectangles.
 	 */
-	private int dim;
+	private final int dim;
 	
 	public NumberInRectangle(int number, Color bg, MouseListener ml, int dim) {
 		this.setBackground(bg);

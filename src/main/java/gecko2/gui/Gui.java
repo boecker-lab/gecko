@@ -28,56 +28,26 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
 public class Gui {
 	
-	private GeckoInstance gecko;
+	private final GeckoInstance gecko;
 
-	private JFrame mainframe;
-	private JMenuBar menubar;
+	private final JFrame mainframe;
 	
-	private JSplitPane horiSplit;
-	private JSplitPane vertSplit;
-	
-	private JMenu menuFile, menuView, menuAbout;
-	
-	private AbstractMultipleGenomeBrowser mgb;
-	private GenomeNavigator navigator;
-	private GeneClusterSelector gcSelector;
-	private GeneClusterDisplay gcDisplay;
+	private final AbstractMultipleGenomeBrowser mgb;
+	private final GeneClusterSelector gcSelector;
+	private final GeneClusterDisplay gcDisplay;
 
-	private JLabel statusbartext;
-	private JLabel statusbaricon;
-	private JProgressBar progressbar;
+	private final JLabel statusbartext;
+	private final JLabel statusbaricon;
+	private final JProgressBar progressbar;
 	
-	private JLabel infobar;
+	private final JLabel infobar;
 	private ImageIcon waitingAnimation;
-	private JCheckBox mgbViewSwitcher = new JCheckBox();
+	private final JCheckBox mgbViewSwitcher = new JCheckBox();
 	private final JTextField searchField;
 
 		
@@ -94,7 +64,7 @@ public class Gui {
 		return gcDisplay;
 	}
 	
-	public Gui() {
+	private Gui() {
 		this.gecko = GeckoInstance.getInstance();
 		this.gecko.setGui(this);
 		
@@ -116,7 +86,7 @@ public class Gui {
 		// Basic frame settings
 		
 		mainframe = new JFrame("Gecko\u00B2");
-		mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		mainframe.setPreferredSize(startDimension);
 		mainframe.setLayout(new BorderLayout());
 		
@@ -124,17 +94,17 @@ public class Gui {
 		// and OccurrenceSelector)
 		JSplitPane selectorSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		selectorSplitPane.setTopComponent(this.gcSelector);
-		OccurrenceSelector occurrenceSelector = new OccurrenceSelector(this.gcDisplay);
+		OccurrenceSelector occurrenceSelector = new OccurrenceSelector();
 		selectorSplitPane.setBottomComponent(occurrenceSelector);
 		this.gcSelector.addSelectionListener(occurrenceSelector);
 				
 		// SplitPane arrangements
 		// splits the gui in the vertical half
-		horiSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);	
+        JSplitPane horiSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		horiSplit.setResizeWeight(0.5);
 		
 		// splits the gui in horizontal half
-		vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        JSplitPane vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		vertSplit.setResizeWeight(0.5);
 		this.gecko.setClusters(null);
 		vertSplit.setTopComponent(selectorSplitPane);
@@ -142,10 +112,10 @@ public class Gui {
 		vertSplit.setBottomComponent(gcDisplay);
 
 		// Menu arrangements
-		menuFile = new JMenu("File");
-		menuView = new JMenu("View");
-		menuAbout = new JMenu("Help");
-		menubar = new JMenuBar();
+        JMenu menuFile = new JMenu("File");
+        JMenu menuView = new JMenu("View");
+        JMenu menuAbout = new JMenu("Help");
+        JMenuBar menubar = new JMenuBar();
 		menubar.add(menuFile);
 		menubar.add(menuView);
 		menubar.add(menuAbout);
@@ -159,8 +129,8 @@ public class Gui {
 		final JScrollPane upscoll = new JScrollPane();
 		upscoll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		upscoll.setViewportView(mgb);
-		
-		navigator = new GenomeNavigator();
+
+        GenomeNavigator navigator = new GenomeNavigator();
 		gecko.addDataListener(navigator);
 		
 		mgb.addBrowserContentListener(navigator);
@@ -351,7 +321,7 @@ public class Gui {
 	
 	/** Simple helper methods which makes it easier to create ImageIcons from Resource
 	 *
-     * @param String path 
+     * @param path the path
      * @return Returns a imageicon if path describes an image, null otherwise 
      */
 	public static ImageIcon createImageIcon(String path) {
@@ -469,7 +439,7 @@ public class Gui {
 	 * The following section contains the actions that the user can trigger
 	 */
 	
-	private Action stopComputationAction = new AbstractAction() {
+	private final Action stopComputationAction = new AbstractAction() {
 
 		private static final long serialVersionUID = -6567239762573695048L;
 
@@ -478,7 +448,7 @@ public class Gui {
 		}	
 	};
 	
-	private Action importGenomesAction = new AbstractAction() {
+	private final Action importGenomesAction = new AbstractAction() {
 		private static final long serialVersionUID = -7418023194238092616L;
 		
 		public void actionPerformed(ActionEvent e) {
@@ -514,7 +484,7 @@ public class Gui {
 		}	
 	};
 	
-	private Action clearSelectionAction = new AbstractAction() {
+	private final Action clearSelectionAction = new AbstractAction() {
 		private static final long serialVersionUID = 6179596178200200696L;
 		public void actionPerformed(ActionEvent e) {
 			mgb.clearSelection();
@@ -522,7 +492,7 @@ public class Gui {
 		
 	};
 	
-	private Action startComputation = new AbstractAction() {
+	private final Action startComputation = new AbstractAction() {
 		private static final long serialVersionUID = -1530838105061978403L;
 		public void actionPerformed(ActionEvent e) {
 			StartComputationDialog d = gecko.getStartComputationDialog();
@@ -534,7 +504,7 @@ public class Gui {
 		}
 	};
 	
-	private Action exitAction = new AbstractAction() {
+	private final Action exitAction = new AbstractAction() {
 
 		/**
 		 * Random generated serial version uid
@@ -548,7 +518,7 @@ public class Gui {
 		}
 	};
 	
-	private Action aboutAction = new AbstractAction() {
+	private final Action aboutAction = new AbstractAction() {
 
 		/**
 		 * Random generated serial version uid
@@ -569,7 +539,7 @@ public class Gui {
 			about.setLayout(new BorderLayout());
 			
 			JLabel iconLabel = new JLabel();
-			iconLabel.setIcon((Icon) createImageIcon("images/gecko2_a_small.png"));
+			iconLabel.setIcon(createImageIcon("images/gecko2_a_small.png"));
 			JPanel iconPanel = new JPanel();
 			iconPanel.add(iconLabel);
 			about.add(iconPanel, BorderLayout.NORTH);
@@ -620,7 +590,7 @@ public class Gui {
 		}
 	};
 	
-	private Action showHomePage = new AbstractAction() {
+	private final Action showHomePage = new AbstractAction() {
 
 		/**
 		 * Random generated serial version uid
@@ -652,7 +622,7 @@ public class Gui {
 		}
 	};
 	
-	private Action zoomIn = new AbstractAction() {
+	private final Action zoomIn = new AbstractAction() {
 		private static final long serialVersionUID = 6370914610738020426L;
 		public void actionPerformed(ActionEvent e) {
 			Gui.this.mgb.changeGeneElementHight(+2);
@@ -661,7 +631,7 @@ public class Gui {
 		}
 	};
 	
-	private Action zoomOut = new AbstractAction() {
+	private final Action zoomOut = new AbstractAction() {
 		private static final long serialVersionUID = -5867464557496189529L;
 		public void actionPerformed(ActionEvent e) {
 			Gui.this.mgb.changeGeneElementHight(-2);
@@ -670,7 +640,7 @@ public class Gui {
 		}
 	};
 
-	private Action exportResultsAction = new AbstractAction() {
+	private final Action exportResultsAction = new AbstractAction() {
 
 		private static final long serialVersionUID = 3693048160852637628L;
 
@@ -680,7 +650,7 @@ public class Gui {
 		}
 	};
 	
-	private Action saveSessionAction = new AbstractAction() {
+	private final Action saveSessionAction = new AbstractAction() {
 		private static final long serialVersionUID = -1530838105061978403L;
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser fc = new JFileChooser();
@@ -728,7 +698,7 @@ public class Gui {
 		}
 	};
 	
-	private Action loadClusterAnnotationsAction = new AbstractAction() 
+	private final Action loadClusterAnnotationsAction = new AbstractAction()
 	{
 		
 		private static final long serialVersionUID = 1148103871109191664L;

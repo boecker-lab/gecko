@@ -10,7 +10,7 @@ public class Genome implements Serializable {
 
 	private static final long serialVersionUID = 370380955909547007L;
 
-	private List<Chromosome> chromosomes;
+	private final List<Chromosome> chromosomes;
 	private String name;
 	
 	public Genome() {
@@ -55,7 +55,7 @@ public class Genome implements Serializable {
 		List<Gene> geneList = new ArrayList<Gene>(s.getStop() - (s.getStart()-1));
 		for (int i=s.getStart()-1; i<s.getStop(); i++) 
 			geneList.add(chromosomes.get(s.getChromosome()).getGenes().get(i));
-		return geneList.toArray(new Gene[0]);
+		return geneList.toArray(new Gene[geneList.size()]);
 	}
 	
 	public int getTotalGeneNumber() {
