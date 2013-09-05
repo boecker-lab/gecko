@@ -1,22 +1,19 @@
 package gecko2;
 
 import static gecko2.GeneClusterTestUtils.*;
-import static org.junit.Assert.*;
 
 import gecko2.GeneClusterTestUtils.PValueComparison;
-import gecko2.LibraryUtils.PlatformNotSupportedException;
-import gecko2.algo.AlgorithmParameters;
+import gecko2.util.LibraryUtils;
+import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Parameter;
 import gecko2.algorithm.Subsequence;
-import gecko2.io.CogFileReader;
-import gecko2.io.GeneClusterResult;
+import gecko2.exceptions.LinePassedException;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -47,7 +44,7 @@ public class ReferenceClusterTest
 		
 		try 
 		{
-			LibraryUtils.loadLibrary("libgecko2");	
+			LibraryUtils.loadLibrary("libgecko2");
 		} 
 		catch (PlatformNotSupportedException e) 
 		{

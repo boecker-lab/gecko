@@ -15,6 +15,7 @@ import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Parameter;
 import gecko2.algorithm.Subsequence;
 
+import gecko2.exceptions.LinePassedException;
 import org.junit.Test;
 
 public class ReferenceClusterDistanceMatrixTest {

@@ -8,6 +8,7 @@ import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Parameter;
 import gecko2.algorithm.Subsequence;
+import gecko2.exceptions.LinePassedException;
 import gecko2.io.CogFileReader;
 import gecko2.io.GeneClusterResult;
 

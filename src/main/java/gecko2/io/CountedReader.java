@@ -1,6 +1,6 @@
 package gecko2.io;
 
-import gecko2.LinePassedException;
+import gecko2.exceptions.LinePassedException;
 
 import java.io.BufferedReader;
 import java.io.EOFException;

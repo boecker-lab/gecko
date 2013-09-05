@@ -1,9 +1,8 @@
 package gecko2.gui;
 
-import gecko2.io.GeneClusterPicture;
 import gecko2.io.GeneClusterToPDFWriter;
 import gecko2.io.ImageWriter;
-import gecko2.io.GeneClusterPicture.NameType;
+import gecko2.gui.GeneClusterPicture.NameType;
 import gecko2.util.FileUtils;
 import gecko2.algorithm.GeneCluster;
 

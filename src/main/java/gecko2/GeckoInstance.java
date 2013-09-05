@@ -1,13 +1,7 @@
 package gecko2;
 
 import gecko2.algo.ReferenceClusterAlgorithm;
-import gecko2.algorithm.Chromosome;
-import gecko2.algorithm.Gene;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.Genome;
-import gecko2.algorithm.Parameter;
-import gecko2.algorithm.Subsequence;
+import gecko2.algorithm.*;
 import gecko2.event.DataEvent;
 import gecko2.event.DataListener;
 import gecko2.gui.Gui;
@@ -577,11 +571,11 @@ public class GeckoInstance {
 		//return computeClustersLibgecko(genomes, params);
 	}
 	
-	public void performClusterDetection(Parameter p, boolean mergeResults) {
+	public void performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
 		this.lastParameter = p;
 		p.setAlphabetSize(geneLabelMap.size());
 		gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
-		new ComputationThread(p, mergeResults);
+		new ComputationThread(p, mergeResults, genomeGroupingFactor);
 	}
 	
 	void handleUpdatedClusterResults() {
@@ -599,14 +593,16 @@ public class GeckoInstance {
 
 		private final Parameter p;
 		private final boolean mergeResults;
+        private final double groupingFactor;
 		
 		public ComputationThread(Parameter p){
-			this(p, false);
+			this(p, false, -1.0);
 		}
 		
-		public ComputationThread(Parameter p, final boolean mergeResults) {
+		public ComputationThread(Parameter p, boolean mergeResults, double groupingFactor) {
 			this.p = p;
 			this.mergeResults = mergeResults;
+            this.groupingFactor = groupingFactor;
 			new Thread(this).start();
 		}
 		
@@ -619,10 +615,14 @@ public class GeckoInstance {
 			
 			// We do this very ugly with a 3D integer array to make things easier
 			// during the JNI<->JAVA phase
-			int genomes[][][] = Genome.toIntArray(GeckoInstance.this.genomes);
+            List<Set<Integer>> genomeGroups = null;
+            if (groupingFactor <= 1.0)
+                genomeGroups = BreakPointDistance.groupGenomes(genomes, groupingFactor, false);
+
+            int genomes[][][] = Genome.toIntArray(GeckoInstance.this.genomes);
 			
 			Date before = new Date();
-			GeneCluster[] res = computeClusters(genomes, p);	
+			GeneCluster[] res = computeClustersJava(genomes, p, genomeGroups);
 			Date after = new Date();
 			System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
 			if (mergeResults)				

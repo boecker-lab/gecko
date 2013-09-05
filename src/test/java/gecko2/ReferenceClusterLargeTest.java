@@ -1,13 +1,16 @@
 package gecko2;
 
 import static gecko2.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
-import gecko2.LibraryUtils.PlatformNotSupportedException;
+
+import gecko2.util.LibraryUtils;
+import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.zip.DataFormatException;
 
+import gecko2.exceptions.LinePassedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,7 +26,7 @@ public class ReferenceClusterLargeTest {
 		
 		try 
 		{
-			LibraryUtils.loadLibrary("libgecko2");	
+			LibraryUtils.loadLibrary("libgecko2");
 		} 
 		catch (PlatformNotSupportedException e) 
 		{

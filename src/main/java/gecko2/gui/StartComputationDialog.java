@@ -62,16 +62,19 @@ public class StartComputationDialog extends JDialog {
 		this.setTitle("Configure computation");
 		
 		JPanel panel = new JPanel(new FlowLayout());
-		panel.setPreferredSize(new Dimension(430,280));
+		panel.setPreferredSize(new Dimension(430,310));
 		final JPanel gridpanel = new JPanel();
-		gridpanel.setPreferredSize(new Dimension(410,220));
-		gridpanel.setLayout(new GridLayout(6,2));
+		gridpanel.setPreferredSize(new Dimension(410,250));
+		gridpanel.setLayout(new GridLayout(7,2));
 		
 		final JSpinner dSpinner = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
 		dSpinner.setPreferredSize(new Dimension(150,30));
 		
 		final JSpinner sSpinner = new JSpinner(new SpinnerNumberModel(7, 0, Integer.MAX_VALUE, 1));
 		sSpinner.setPreferredSize(new Dimension(150,30));
+
+        final JSpinner groupSpinner = new JSpinner(new SpinnerNumberModel(1.1, 0.0, 1.1, 0.1));
+        sSpinner.setPreferredSize(new Dimension(150,30));
 		
 		final String[] qValues = new String[ngenomes-1];
 		qValues[qValues.length-1] = "all";
@@ -202,6 +205,14 @@ public class StartComputationDialog extends JDialog {
 		gridpanel.add(p6a);
 		final JPanel p6b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		gridpanel.add(p6b);
+
+        final JPanel p7a = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        ((FlowLayout) p6a.getLayout()).setVgap(12);
+        p7a.add(new JLabel("Genome Grouping Factor: "));
+        gridpanel.add(p7a);
+        final JPanel p7b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        p7b.add(groupSpinner);
+        gridpanel.add(p7b);
 		
 		panel.add(gridpanel);
 		
@@ -327,7 +338,8 @@ public class StartComputationDialog extends JDialog {
 						Parameter.QUORUM_NO_COST, 
 						opMode,
 						refType),
-						mergeResultsEnabled);
+						mergeResultsEnabled,
+                        (Double)groupSpinner.getValue());
 			}
 			
 		};

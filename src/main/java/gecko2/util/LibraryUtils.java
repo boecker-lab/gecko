@@ -1,4 +1,4 @@
-package gecko2;
+package gecko2.util;
 
 import java.io.File;
 import java.io.FileOutputStream;

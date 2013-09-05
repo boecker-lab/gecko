@@ -1,8 +1,9 @@
 package gecko2.io;
 
+import gecko2.CommandLineInterface;
 import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
-import gecko2.LinePassedException;
+import gecko2.exceptions.LinePassedException;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
@@ -443,7 +444,7 @@ public class CogFileReader {
 		}
 		else {
 			
-			CLI.handleFileError(errorType);
+			CommandLineInterface.handleFileError(errorType);
 		}
 	}
 	

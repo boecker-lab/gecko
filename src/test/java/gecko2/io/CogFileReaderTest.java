@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
-import gecko2.LinePassedException;
+import gecko2.exceptions.LinePassedException;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;

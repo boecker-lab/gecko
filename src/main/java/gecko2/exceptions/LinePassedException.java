@@ -1,4 +1,4 @@
-package gecko2;
+package gecko2.exceptions;
 
 public class LinePassedException extends Exception {
 

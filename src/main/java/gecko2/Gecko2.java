@@ -1,8 +1,8 @@
 package gecko2;
 
-import gecko2.LibraryUtils.PlatformNotSupportedException;
+import gecko2.util.LibraryUtils;
+import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import gecko2.gui.Gui;
-import gecko2.io.CLI;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -86,7 +86,7 @@ public class Gecko2 {
 				
 				if ((args.length > 2 || args.length == 1 || (args.length == 2 && gui)) && !inFileGckCog) {
 				
-					LibraryUtils.loadLibrary(args[0],true);
+					LibraryUtils.loadLibrary(args[0], true);
 					externalLib = true;
 				}
 				else {
@@ -122,19 +122,19 @@ public class Gecko2 {
 				// start cli session
 				if (!libloaderror) {
 				
-					new CLI(args, externalLib);
+					new CommandLineInterface(args, externalLib);
 				}
 				else {
 					
 					// cli is useless without the lib so we terminate the program
-					// NOTE: Return codes 1 - 7 are used in CLI.java
+					// NOTE: Return codes 1 - 7 are used in CommandLineInterface.java
 					System.exit(8);
 				}
 			}
 		}
 		else {
 			
-			CLI.showHelp();
+			CommandLineInterface.showHelp();
 		}
 	}
 }
