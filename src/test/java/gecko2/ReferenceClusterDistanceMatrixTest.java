@@ -1,22 +1,21 @@
 package gecko2;
 
-import static gecko2.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
-import static gecko2.GeneClusterTestUtils.performTest;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.zip.DataFormatException;
-
 import gecko2.GeneClusterTestUtils.PValueComparison;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Parameter;
 import gecko2.algorithm.Subsequence;
-
-import gecko2.exceptions.LinePassedException;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.zip.DataFormatException;
+
+import static gecko2.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
+import static gecko2.GeneClusterTestUtils.performTest;
 
 public class ReferenceClusterDistanceMatrixTest {
 	
@@ -302,7 +301,7 @@ public class ReferenceClusterDistanceMatrixTest {
 	
 	
 	@Test
-	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws URISyntaxException, IOException, DataFormatException, LinePassedException {
+	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
 		File inputFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacter.cog").toURI());
 		File resultFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacterDeltaTable.txt").toURI());
 		

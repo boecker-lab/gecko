@@ -1,49 +1,32 @@
 package gecko2.gui;
 
+import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
 import gecko2.io.CogFileReader;
 import gecko2.util.SortUtils;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Stack;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.*;
+import java.util.List;
 
 
 public class GenomeSelector extends JDialog {
 
 	private static final long serialVersionUID = -8491964493540715101L;
-	private final ArrayList<GenomeOccurence> occs;
+    private final CogFileReader reader;
+	private final List<GenomeOccurence> occs;
 	private final short[] borders;
 	private int highID =0;
 	private final Random rand;
@@ -53,12 +36,13 @@ public class GenomeSelector extends JDialog {
     private final AbstractAction unGroupAction;
     private AbstractAction allOrNoneAction;
 	
-	public GenomeSelector(ArrayList<GenomeOccurence> occs, Frame parent) {
+	public GenomeSelector(CogFileReader cogReader, Frame parent) {
 		super(parent,"Select genomes to import...");
 		super.setModal(true);
-		this.occs = occs;
+        this.reader = cogReader;
+        this.occs = reader.getOccs();
 
-		this.setIconImage(Gui.createImageIcon("images/gecko2_a_small.png").getImage());
+        this.setIconImage(Gui.createImageIcon("images/gecko2_a_small.png").getImage());
 		
 		// Resort the occurence list and recompute the group borders for
 		// visualization
@@ -152,9 +136,54 @@ public class GenomeSelector extends JDialog {
 				
 				deleteNotFlaggedEntries();
 				GenomeSelector.this.setVisible(false);
-                CogFileReader reader = new CogFileReader((byte) 0);
+                GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.READING_GENOMES);
 
-                reader.readGenomes(GenomeSelector.this.occs);
+                SwingWorker worker = new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() {
+                        try {
+                            reader.readFileContent();
+                        } catch (IOException e) {
+                            EventQueue.invokeLater(new Runnable() {
+                                public void run() {
+                                    JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
+                                            "An error occured while reading the file!",
+                                            "Error",
+                                            JOptionPane.ERROR_MESSAGE);
+                                }
+                            });
+                        } catch (ParseException e) {
+                            EventQueue.invokeLater(new Runnable() {
+                                public void run() {
+                                    JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
+                                            "The input file is not in the right format!",
+                                            "Wrong format",
+                                            JOptionPane.ERROR_MESSAGE);
+                                }
+                            });
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public void done() {
+                        GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
+                        GeckoInstance.getInstance().setColorMap(reader.getColorMap());
+                        GeckoInstance.getInstance().setGenomes(reader.getGenomes());
+                        GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
+
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                GeckoInstance.getInstance().getGui().updateViewscreen();
+                                GeckoInstance.getInstance().getGui().updategcSelector();
+                                GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.SESSION_IDLE);
+                            }
+                        });
+                        GeckoInstance.getInstance().fireDataChanged();
+                    }
+                };
+                worker.execute();
             }
 		};
 		importAction.setEnabled(false);
@@ -184,7 +213,6 @@ public class GenomeSelector extends JDialog {
 
 			public void actionPerformed(ActionEvent e) {
 				++highID;
-				final ArrayList<GenomeOccurence> occs = GenomeSelector.this.occs;
 				for (int i : table.getSelectedRows()) {
 					occs.get(i).setGroup(highID);
 					occs.get(i).setFlagged(true);
@@ -196,7 +224,6 @@ public class GenomeSelector extends JDialog {
 				table.tableChanged(new TableModelEvent(table.getModel(), 0, occs.size()-1));
 				table.repaint();
 				checkSelectionCount();
-				
 			}
 		};
 		groupAction.putValue(Action.NAME, "Group");
@@ -207,7 +234,6 @@ public class GenomeSelector extends JDialog {
 			private static final long serialVersionUID = -6309595381945331217L;
 
 			public void actionPerformed(ActionEvent e) {
-				final ArrayList<GenomeOccurence> occs = GenomeSelector.this.occs;
 				Stack<Integer> touchedGroups = new Stack<Integer>();
 				for (int row : table.getSelectedRows()) {
 					if (occs.get(row).getGroup()!=0) touchedGroups.push(occs.get(row).getGroup());

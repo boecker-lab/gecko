@@ -1,12 +1,12 @@
 package gecko2.gui;
 
-import javax.swing.JPanel;
-
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 import gecko2.event.BrowserContentListener;
 import gecko2.event.ClusterSelectionListener;
 import gecko2.gui.MultipleGenomesBrowser.ScrollListener;
+
+import javax.swing.*;
 
 public abstract class AbstractMultipleGenomeBrowser extends JPanel implements ClusterSelectionListener{
 	public abstract void addBrowserContentListener(BrowserContentListener l);

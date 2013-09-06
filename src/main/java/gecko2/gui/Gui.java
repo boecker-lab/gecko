@@ -1,7 +1,6 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
-import gecko2.GenomeOccurence;
 import gecko2.algorithm.GeneCluster;
 import gecko2.io.ClusterAnnotationReader;
 import gecko2.io.CogFileReader;
@@ -10,26 +9,17 @@ import gecko2.io.SessionWriter;
 import gecko2.util.FileUtils;
 import gecko2.util.PrintUtils;
 
-import java.awt.BorderLayout;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.text.ParseException;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 
 public class Gui {
 	
@@ -297,8 +287,8 @@ public class Gui {
 		new Gui();
 	}
 	
-	private void selectGenomesForImport(ArrayList<GenomeOccurence> occs) {
-		new GenomeSelector(occs, this.getMainframe());
+	private void selectAndImportGenomes(CogFileReader reader) {
+		new GenomeSelector(reader, this.getMainframe());
 	}
 	
 	public JProgressBar getProgressbar() {
@@ -417,12 +407,6 @@ public class Gui {
 				break;
 		}
 	}
-	
-	public void handleFileError(short error) {
-		closeCurrentSession();
-		changeMode(Mode.NO_SESSION);		
-		JOptionPane.showMessageDialog(mainframe, "The input file is not a valid COG file", "Wrong file format", JOptionPane.ERROR_MESSAGE);
-	}
 
 	public void closeCurrentSession() {
 		gecko.setClusters(null);
@@ -452,7 +436,7 @@ public class Gui {
 		private static final long serialVersionUID = -7418023194238092616L;
 		
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser fc = new JFileChooser();
+			final JFileChooser fc = new JFileChooser();
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("cog;gck"));
 			if (gecko.getLastOpenedFile()!=null)
 				fc.setSelectedFile(gecko.getLastOpenedFile());
@@ -465,15 +449,63 @@ public class Gui {
 					// Check what type of file we are opening
 					if (FileUtils.getExtension(fc.getSelectedFile()).equals("cog")) {
 						Gui.this.gecko.setCurrentInputFile(fc.getSelectedFile());
-						CogFileReader reader = new CogFileReader((byte) 0);
-						ArrayList<GenomeOccurence> list = reader.importGenomes(fc.getSelectedFile());
-						selectGenomesForImport(list);
+						CogFileReader reader = new CogFileReader(fc.getSelectedFile());
+						reader.importGenomesOccs();
+						selectAndImportGenomes(reader);
 					} else {
 						if (FileUtils.getExtension(fc.getSelectedFile()).equals("gck")) {
-							GckFileReader reader = new GckFileReader();
-							
-							reader.loadSessionFromFile(fc.getSelectedFile());
-							gecko.setGeneLabelMap(reader.getGeneLabelMap());
+                            Gui.this.gecko.setCurrentInputFile(fc.getSelectedFile());
+                            GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.READING_GENOMES);
+
+                            SwingWorker worker = new SwingWorker<Void, Void>() {
+                                GckFileReader reader = new GckFileReader(fc.getSelectedFile());
+                                @Override
+                                protected Void doInBackground() {
+                                    try{
+                                        reader.readData();
+                                    } catch (IOException e) {
+                                        EventQueue.invokeLater(new Runnable() {
+                                            public void run() {
+                                            JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
+                                                    "An error occured while reading the file!",
+                                                    "Error",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            }
+                                        });
+                                    } catch (ParseException e) {
+                                        EventQueue.invokeLater(new Runnable() {
+                                            public void run() {
+                                                JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
+                                                    "The input file is not in the right format!",
+                                                    "Wrong format",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            }
+                                        });
+                                    }
+                                    return null;
+                                }
+
+                                @Override
+                                public void done() {
+                                    GeckoInstance.getInstance().setClusters(reader.getGeneClusters());
+                                    GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
+                                    GeckoInstance.getInstance().setColorMap(reader.getColorMap());
+                                    GeckoInstance.getInstance().setGenomes(reader.getGenomes());
+                                    GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
+
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            updateViewscreen();
+                                            updategcSelector();
+                                            changeMode(Gui.Mode.SESSION_IDLE);
+                                        }
+                                    });
+                                    GeckoInstance.getInstance().fireDataChanged();
+                                }
+                            };
+
+                            worker.execute();
 						}
 					}
 				} catch (FileNotFoundException ex) {

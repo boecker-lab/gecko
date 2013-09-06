@@ -1,9 +1,10 @@
 package gecko2.algo;
 
-import java.util.*;
-
 import cern.jet.random.Binomial;
 import cern.jet.random.engine.RandomEngine;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class PTable {
 	private int numberOfChars;

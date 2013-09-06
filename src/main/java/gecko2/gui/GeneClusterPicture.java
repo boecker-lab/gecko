@@ -5,11 +5,8 @@ import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 import gecko2.algorithm.Subsequence;
-import gecko2.gui.GenomePainting;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 

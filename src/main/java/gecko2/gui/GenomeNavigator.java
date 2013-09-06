@@ -3,28 +3,15 @@ package gecko2.gui;
 import gecko2.GeckoInstance;
 import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Subsequence;
-import gecko2.event.BrowserContentEvent;
-import gecko2.event.BrowserContentListener;
-import gecko2.event.ClusterSelectionEvent;
-import gecko2.event.ClusterSelectionListener;
-import gecko2.event.DataEvent;
-import gecko2.event.DataListener;
-import gecko2.event.LocationSelectionEvent;
+import gecko2.event.*;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Shape;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 public class GenomeNavigator extends JPanel implements DataListener,BrowserContentListener,ClusterSelectionListener {
 	

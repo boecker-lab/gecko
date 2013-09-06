@@ -3,20 +3,16 @@ package gecko2.util;
 import gecko2.GenomeOccurence;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class SortUtils {
 	
-	public static void resortGenomeOccurences(ArrayList<GenomeOccurence> occs) {
+	public static void resortGenomeOccurences(List<GenomeOccurence> occs) {
 		Collections.sort(occs, new GenomeOccurenceComparator());
 	}
 	
-	public static void resortGenomeOccurencesByStart(ArrayList<GenomeOccurence> occs) {
+	public static void resortGenomeOccurencesByStart(List<GenomeOccurence> occs) {
 		Collections.sort(occs, new GenomeOccurenceStartComparator());
 	}
 	

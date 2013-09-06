@@ -35,7 +35,7 @@ public class CountedReader {
 	public void jumpToLine(int l) throws IOException, LinePassedException {
 		if (this.eof) throw new EOFException();
 		if (this.counter > l-1) throw new LinePassedException();
-		while (this.counter<l-1) {
+		while (this.counter < l-1) {
 			String line = this.buff.readLine();
 			if (line==null) {
 				this.eof = true;
@@ -52,4 +52,9 @@ public class CountedReader {
 	public int getCurrentLineNumber() {
 		return counter;
 	}
+
+    public void close() throws IOException {
+        if (buff != null)
+            buff.close();
+    }
 }

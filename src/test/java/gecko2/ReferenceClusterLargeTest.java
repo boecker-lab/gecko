@@ -1,18 +1,17 @@
 package gecko2;
 
-import static gecko2.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
-
 import gecko2.util.LibraryUtils;
 import gecko2.util.LibraryUtils.PlatformNotSupportedException;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.zip.DataFormatException;
 
-import gecko2.exceptions.LinePassedException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static gecko2.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
 
 public class ReferenceClusterLargeTest {
 	/**
@@ -41,7 +40,7 @@ public class ReferenceClusterLargeTest {
 	}
 	
 	@Test
-	public void statisticDataReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, LinePassedException {
+	public void statisticDataReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
 		File inputFile = new File(ReferenceClusterTest.class.getResource("/statisticsData.cog").toURI());
 		File resultFile = new File(ReferenceClusterTest.class.getResource("/statisticsDataD5S8Q10FixedRef.txt").toURI());
 		

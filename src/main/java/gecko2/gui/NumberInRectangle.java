@@ -1,11 +1,8 @@
 package gecko2.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseListener;
-
-import javax.swing.JPanel;
 
 public class NumberInRectangle extends JPanel {
 

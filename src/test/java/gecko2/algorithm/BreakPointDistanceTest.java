@@ -1,17 +1,17 @@
 package gecko2.algorithm;
-import static org.junit.Assert.*;
 
 import gecko2.GeckoInstance;
-import gecko2.GenomeOccurence;
 import gecko2.io.CogFileReader;
 import gecko2.io.CogFileReaderTest;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class BreakPointDistanceTest {
@@ -180,13 +180,12 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void testFromGenomes() throws Exception{
-		CogFileReader reader = new CogFileReader((byte) 1);
-				
 		File inputFile = new File(CogFileReaderTest.class.getResource("/c.cog").toURI());
-		GeckoInstance.getInstance().setCurrentInputFile(inputFile);
-		ArrayList<GenomeOccurence> genOcc = reader.importGenomes(inputFile);
-			
-		reader.readFileContent(genOcc);
+        CogFileReader reader = new CogFileReader(inputFile);
+        GeckoInstance.getInstance().setCurrentInputFile(inputFile);
+
+		reader.importGenomesOccs();
+		reader.readFileContent();
 				
 		Genome[] genomes = reader.getGenomes();
 		
@@ -195,13 +194,12 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void testGrouping() throws Exception{
-		CogFileReader reader = new CogFileReader((byte) 1);
-				
 		File inputFile = new File(CogFileReaderTest.class.getResource("/c.cog").toURI());
+        CogFileReader reader = new CogFileReader(inputFile);
 		GeckoInstance.getInstance().setCurrentInputFile(inputFile);
-		ArrayList<GenomeOccurence> genOcc = reader.importGenomes(inputFile);
-			
-		reader.readFileContent(genOcc);
+
+		reader.importGenomesOccs();
+		reader.readFileContent();
 				
 		Genome[] genomes = reader.getGenomes();
 		

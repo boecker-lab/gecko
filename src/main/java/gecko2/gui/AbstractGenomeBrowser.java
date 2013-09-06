@@ -2,9 +2,8 @@ package gecko2.gui;
 
 import gecko2.algorithm.Genome;
 
-import java.awt.Color;
-
-import javax.swing.JScrollPane;
+import javax.swing.*;
+import java.awt.*;
 
 abstract class AbstractGenomeBrowser extends JScrollPane implements Adjustable{
 	public abstract int getScrollValue();

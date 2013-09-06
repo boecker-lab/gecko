@@ -1,22 +1,22 @@
 package gecko2.io;
 
-import static org.junit.Assert.*;
-
 import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
-import gecko2.exceptions.LinePassedException;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
+import org.junit.Test;
 
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Test;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * JUnit test for the new class InputFileReader.
@@ -74,18 +74,24 @@ public class CogFileReaderTest {
 		refGenomes[1].addChromosome(new Chromosome("", genes2, refGenomes[1]));
 		
 		ArrayList<GenomeOccurence> genOcc;
-		
-		CogFileReader reader = new CogFileReader((byte) 1);
-		
-		try 
+
+        File inputFile = null;
+        try {
+            inputFile = new File(CogFileReaderTest.class.getResource("/c2.cog").toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        CogFileReader reader = new CogFileReader(inputFile);
+        try
 		{
-			File inputFile = new File(CogFileReaderTest.class.getResource("/c2.cog").toURI());
+            reader = new CogFileReader(inputFile);
 			GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 			
-			genOcc = reader.importGenomes(inputFile);
+			reader.importGenomesOccs();
 		
-			reader.readFileContent(genOcc);
-		} 
+			reader.readFileContent();
+		}
 		catch (EOFException e) 
 		{
 			e.printStackTrace();
@@ -94,15 +100,10 @@ public class CogFileReaderTest {
 		{
 			e.printStackTrace();
 		} 
-		catch (LinePassedException e) 
-		{
-			e.printStackTrace();
-		} 
-		catch (URISyntaxException e) 
+		catch (ParseException e)
 		{
 			e.printStackTrace();
 		}
-		
 		
 		assertEquals(reader.getGeneLabelMap().size(), geneLabelMap.size());
 		
@@ -340,17 +341,23 @@ public class CogFileReaderTest {
 		refGenomes[3].addChromosome(new Chromosome("chromosome II", genes42, refGenomes[3]));
 		
 		ArrayList<GenomeOccurence> genOcc;
-		
-		CogFileReader reader = new CogFileReader((byte) 1);
+
+        File inputFile = null;
+        try {
+            inputFile = new File(CogFileReaderTest.class.getResource("/c.cog").toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        CogFileReader reader = new CogFileReader(inputFile);
 		
 		try 
 		{
-			File inputFile = new File(CogFileReaderTest.class.getResource("/c.cog").toURI());
 			GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 			
-			genOcc = reader.importGenomes(inputFile);
+			reader.importGenomesOccs();
 		
-			reader.readFileContent(genOcc);
+			reader.readFileContent();
 		} 
 		catch (EOFException e) 
 		{
@@ -360,11 +367,7 @@ public class CogFileReaderTest {
 		{
 			e.printStackTrace();
 		} 
-		catch (LinePassedException e) 
-		{
-			e.printStackTrace();
-		} 
-		catch (URISyntaxException e) 
+		catch (ParseException e)
 		{
 			e.printStackTrace();
 		}

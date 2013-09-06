@@ -1,28 +1,28 @@
 package gecko2;
 
-import static gecko2.GeneClusterTestUtils.*;
-
 import gecko2.GeneClusterTestUtils.PValueComparison;
-import gecko2.util.LibraryUtils;
-import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Parameter;
 import gecko2.algorithm.Subsequence;
-import gecko2.exceptions.LinePassedException;
+import gecko2.util.LibraryUtils;
+import gecko2.util.LibraryUtils.PlatformNotSupportedException;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.DataFormatException;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static gecko2.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
+import static gecko2.GeneClusterTestUtils.performTest;
 
 /**
  * The class tests the computeClusters algorithm from the Gecko2 program
@@ -1203,7 +1203,7 @@ public class ReferenceClusterTest
 	}
 	
 	@Test
-	public void fiveProteobacterReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, LinePassedException {
+	public void fiveProteobacterReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
 		File inputFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacter.cog").toURI());
 		File resultFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacterD3S6Q4.txt").toURI());
 		
@@ -1211,7 +1211,7 @@ public class ReferenceClusterTest
 	}
 	
 	@Test
-	public void fiveProteobacterReferenceClusterTestWithGrouping() throws URISyntaxException, IOException, DataFormatException, LinePassedException {
+	public void fiveProteobacterReferenceClusterTestWithGrouping() throws URISyntaxException, IOException, DataFormatException, ParseException {
 		File inputFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacter.cog").toURI());
 		File resultFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacterD3S6Q2Grouping.txt").toURI());
 		

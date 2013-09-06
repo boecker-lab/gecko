@@ -1,8 +1,7 @@
 package gecko2.util;
 
-import java.io.File;
-
 import javax.swing.filechooser.FileFilter;
+import java.io.File;
 
 public class FileUtils {
 	

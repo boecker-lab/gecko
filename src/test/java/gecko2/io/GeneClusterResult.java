@@ -1,11 +1,11 @@
 package gecko2.io;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import gecko2.algorithm.GeneCluster;
+import gecko2.algorithm.GeneClusterOccurrence;
+import gecko2.algorithm.Parameter;
+import gecko2.algorithm.Subsequence;
+
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,11 +13,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
-
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.Parameter;
-import gecko2.algorithm.Subsequence;
 
 /**
  * This class models a new data type which contains the result

@@ -1,8 +1,5 @@
 package gecko2;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
@@ -17,11 +14,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.DataFormatException;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -169,19 +169,19 @@ public class GeneClusterTestUtils {
 		}
 	}
 	
-	static void automaticGeneClusterTestFromFile(File input, File expected) throws IOException, DataFormatException, LinePassedException {
+	static void automaticGeneClusterTestFromFile(File input, File expected) throws IOException, DataFormatException, ParseException {
 		automaticGeneClusterTestFromFile(input, expected, null);
 	}
 	
-	static void automaticGeneClusterTestFromFile(File input, File expected, List<Set<Integer>> genomeGroups) throws IOException, DataFormatException, LinePassedException {
+	static void automaticGeneClusterTestFromFile(File input, File expected, List<Set<Integer>> genomeGroups) throws IOException, DataFormatException, ParseException {
 		GeneClusterResult gcr = GeneClusterResult.readResultFile(expected);
 		
 		GeckoInstance.getInstance().setCurrentInputFile(input);
 		
-		CogFileReader reader = new CogFileReader((byte) 1);
-		ArrayList<GenomeOccurence> genOcc = reader.importGenomes(input);
-		
-		reader.readFileContent(genOcc);
+		CogFileReader reader = new CogFileReader(input);
+
+        reader.importGenomesOccs();
+		reader.readFileContent();
 		
 		int genomes[][][] = new int[reader.getGenomes().length][][];
 		
@@ -218,7 +218,7 @@ public class GeneClusterTestUtils {
 	 * @param p Parameter set
 	 * @param outputFile the output file
 	 */
-	public static void generateRefClusterFile(File inputCogFile, File outputFile, Parameter p, List<Set<Integer>> genomeGrouping) throws IOException, LinePassedException {
+	public static void generateRefClusterFile(File inputCogFile, File outputFile, Parameter p, List<Set<Integer>> genomeGrouping) throws IOException, ParseException {
 		if (outputFile.exists()) {
 			System.err.println("Error: File " + outputFile.getAbsolutePath() + " exists already. Delete it manually if you want to continue!");
 			System.exit(1);
@@ -228,7 +228,7 @@ public class GeneClusterTestUtils {
 		ReferenceClusterTest.loadLibGecko2();
 		
 			// generate the Genome array from the input file
-		CogFileReader reader = new CogFileReader((byte) 1);
+		CogFileReader reader = new CogFileReader(inputCogFile);
 		int genomes[][][] = readGenomes(reader, inputCogFile);
 
 		p.setAlphabetSize(reader.getGeneLabelMap().size());
@@ -253,11 +253,11 @@ public class GeneClusterTestUtils {
 	 * @throws IOException
 	 * @throws LinePassedException
 	 */
-	private static int[][][] readGenomes(CogFileReader reader, File inputFile) throws IOException, LinePassedException {
+	private static int[][][] readGenomes(CogFileReader reader, File inputFile) throws IOException, ParseException {
 		GeckoInstance.getInstance();
 		GeckoInstance.getInstance().setCurrentInputFile(inputFile);
-		ArrayList<GenomeOccurence> genOcc = reader.importGenomes(inputFile);
-		reader.readFileContent(genOcc);
+        reader.importGenomesOccs();
+		reader.readFileContent();
 
 		int genomes[][][] = new int[reader.getGenomes().length][][];
 
@@ -332,7 +332,7 @@ public class GeneClusterTestUtils {
 			System.exit(1);
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (LinePassedException e) {
+		} catch (ParseException e) {
 			e.printStackTrace();
 		}	
 

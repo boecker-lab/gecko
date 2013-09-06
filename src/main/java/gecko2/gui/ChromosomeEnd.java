@@ -2,11 +2,8 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 
 public class ChromosomeEnd extends JPanel implements Adjustable {

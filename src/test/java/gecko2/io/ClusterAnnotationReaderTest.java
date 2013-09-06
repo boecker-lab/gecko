@@ -1,26 +1,28 @@
 package gecko2.io;
 
-import static gecko2.GeneClusterTestUtils.*;
-import static org.junit.Assert.*;
 import gecko2.GeckoInstance;
-import gecko2.GenomeOccurence;
-import gecko2.util.LibraryUtils;
-import gecko2.util.LibraryUtils.PlatformNotSupportedException;
-import gecko2.exceptions.LinePassedException;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
 import gecko2.algorithm.Subsequence;
+import gecko2.util.LibraryUtils;
+import gecko2.util.LibraryUtils.PlatformNotSupportedException;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static gecko2.GeneClusterTestUtils.assertEqualsBigDecimal;
+import static org.junit.Assert.*;
 
 public class ClusterAnnotationReaderTest {
 	private Genome[] genomes = null;
@@ -49,19 +51,19 @@ public class ClusterAnnotationReaderTest {
 	@Before
 	public void setUp() {
 		try {
-			CogFileReader reader = new CogFileReader((byte) 1);
 			File inputFile = new File(ClusterAnnotationReader.class.getResource("/smallTest.cog").toURI());
+            CogFileReader reader = new CogFileReader(inputFile);
 			GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 
-			ArrayList<GenomeOccurence> genOcc = reader.importGenomes(inputFile);
+			reader.importGenomesOccs();
 
-			reader.readFileContent(genOcc);
+			reader.readFileContent();
 			genomes = reader.getGenomes();
 		} catch (EOFException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (LinePassedException e) {
+		} catch (ParseException e) {
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();

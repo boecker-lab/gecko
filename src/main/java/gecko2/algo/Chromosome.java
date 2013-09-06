@@ -2,7 +2,10 @@ package gecko2.algo;
 
 import gecko2.algo.util.IntArray;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Chromosome stores the gene sequence of one chromosome.

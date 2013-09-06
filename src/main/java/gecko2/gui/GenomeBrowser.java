@@ -6,10 +6,9 @@ import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
 import gecko2.event.BrowserContentEvent;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
@@ -17,11 +16,6 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.MouseInputAdapter;
 
 public class GenomeBrowser extends AbstractGenomeBrowser {
 	

@@ -1,30 +1,19 @@
 package gecko2.io;
 
-import gecko2.CommandLineInterface;
 import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
-import gecko2.exceptions.LinePassedException;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
-import gecko2.gui.Gui;
-import gecko2.gui.Gui.Mode;
-import gecko2.util.PrintUtils;
+import gecko2.exceptions.LinePassedException;
 import gecko2.util.SortUtils;
 
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.awt.*;
+import java.io.*;
+import java.text.ParseException;
+import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +22,7 @@ import java.util.regex.Pattern;
  * 
  * The code is originally from GeckoInstance.java and is modified.
  */
-public class CogFileReader {
+public class CogFileReader implements GeckoDataReader {
 
 	/**
 	 * Storing place for the colorMap
@@ -54,21 +43,23 @@ public class CogFileReader {
 	 * Storing place for the length of the longest id.
 	 */
 	private int maxIdLength;
+
+    private List<GenomeOccurence> occs;
 	
 	/**
 	 * Pattern list for getGenomeName and getChromosomeName
 	 */
 	private static final Pattern nameSplitPattern = Pattern.compile(",|chrom(?:osome)?|(?:mega)?plasmid|scaffold|(?:super)?cont(?:ig)?|unmap(?:ped)?|chr[_ ]?\\d+|complete genome", Pattern.CASE_INSENSITIVE);
+
+
+    /**
+     * The input File
+     */
+    private final File inputFile;
+
 	
-	/**
-	 * 0 gui session, 1 cli session
-	 */
-	private byte sessionType = 0;
-	
-	public CogFileReader(byte sType) {
-		
-		sessionType = sType;
-		
+	public CogFileReader(File inputFile) {
+		this.inputFile = inputFile;
 	}
 	
 	/**
@@ -107,27 +98,25 @@ public class CogFileReader {
 	 * @return 0 (as string) if id contains only zeros else the unmodified id
 	 */
 	private String testOldIdFormat(String id) {
-		
 		try {
 			int newID = Integer.parseInt(id);
 			return Integer.toString(newID);
 		} catch (NumberFormatException e) {}
 		
 		return id;
-	}	
+	}
 	
 	/**
 	 * This method computes the occurrences of the genes.
-	 * 
-	 * @param file File object for the .cog file
+	 *
 	 * @return a ArrayList with the occurrences of the genes
 	 * @throws FileNotFoundException
 	 */
-	public ArrayList<GenomeOccurence> importGenomes(File file) throws FileNotFoundException	{	
-		ArrayList<GenomeOccurence> genomeOccurennces = new ArrayList<GenomeOccurence>();
+	public void importGenomesOccs() throws FileNotFoundException	{
+		occs = new ArrayList<GenomeOccurence>();
 		HashMap<Integer, Integer> groupSize = new HashMap<Integer, Integer>();
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(file));
+			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
 			try {
 				String line;
 				GenomeOccurence add = new GenomeOccurence();
@@ -155,7 +144,7 @@ public class CogFileReader {
 					
 					if (next) {
 						add.setEnd_line(curline - 2);
-						genomeOccurennces.add(add);
+						occs.add(add);
 						add = new GenomeOccurence();
 						add.setDesc(line);
 						String genomeName = getGenomeName(line);
@@ -193,143 +182,143 @@ public class CogFileReader {
 				}
 				
 				if (add.getDesc() != null) {
-					genomeOccurennces.add(add);
+					occs.add(add);
 				}
 			} finally{
 				reader.close();
 			}
 			
 			// Remove singleton groups
-			for (GenomeOccurence occ : genomeOccurennces) {
+			for (GenomeOccurence occ : occs) {
 				if (groupSize.get(occ.getGroup()) == 1)	{
 					occ.setGroup(0);
 				}
 			}
-			
-			// Return result
-			return genomeOccurennces;
 		} 
 		catch (IOException e) {
 			if (e instanceof FileNotFoundException)	{
 				throw (FileNotFoundException) e;
 			}
-			
 			e.printStackTrace();
 		}
-		
-		return null;
 	}
 	
 	/**
 	 * The method reads the .cog file and set/generates the global variables.
-	 * Variables: colormap, genes, geneLabelMap
-	 * 
-	 * @param occs gene occurences in the genomes
+	 *
 	 * @throws IOException
-	 * @throws LinePassedException
+	 * @throws ParseException
 	 */
-	public void readFileContent(ArrayList<GenomeOccurence> occs) throws IOException, LinePassedException {
-		
-		
-		Gui gui = GeckoInstance.getInstance().getGui();
-		if (gui != null)
-			gui.changeMode(Mode.READING_GENOMES);
-		
+	public void readFileContent() throws IOException, ParseException{
+        SortUtils.resortGenomeOccurencesByStart(occs);
+
 		HashMap<Integer, Genome> groupedGenomes = new HashMap<Integer, Genome>();
 		ArrayList<Genome> ungroupedGenomes = new ArrayList<Genome>();
 		String line;
-		CountedReader reader = new CountedReader(new FileReader(GeckoInstance.getInstance().getCurrentInputFile()));
-		
-		ArrayList<String[]> stringidlist = new ArrayList<String[]>();
-		
-		// This is a bit dirty we look only into the first index of the array and store it in this map
-		// But it seems like containsKey can't handle arrays as key.
-		HashMap<String, Integer> backmap = new HashMap<String, Integer>();
-		Random r = new Random();
-		this.colorMap = new HashMap<Integer, Color>();
-		int maxIdWidth = 0;
+        CountedReader reader = null;
+        try {
+            reader = new CountedReader(new FileReader(GeckoInstance.getInstance().getCurrentInputFile()));
 
-        for (GenomeOccurence occ : occs) {
-            Genome g;
-            if (occ.getGroup() == 0) {
-                // If the group id is zero than we have a single chromosome genome,
-                // therefore we have to greate a new genome
-                g = new Genome();
-                g.setName(occ.getGenomeName());
-                ungroupedGenomes.add(g);
-            } else {
-                // If the group id is not zero we need to check if we already created
-                // a genome for that group id and if not create a new one
-                if (!groupedGenomes.containsKey(occ.getGroup())) {
+            ArrayList<String[]> stringidlist = new ArrayList<String[]>();
+
+            // This is a bit dirty we look only into the first index of the array and store it in this map
+            // But it seems like containsKey can't handle arrays as key.
+            HashMap<String, Integer> backmap = new HashMap<String, Integer>();
+            Random r = new Random();
+            this.colorMap = new HashMap<Integer, Color>();
+            int maxIdWidth = 0;
+
+            for (GenomeOccurence occ : occs) {
+                Genome g;
+                if (occ.getGroup() == 0) {
+                    // If the group id is zero than we have a single chromosome genome,
+                    // therefore we have to greate a new genome
                     g = new Genome();
                     g.setName(occ.getGenomeName());
-                    groupedGenomes.put(occ.getGroup(), g);
+                    ungroupedGenomes.add(g);
                 } else {
-                    g = groupedGenomes.get(occ.getGroup());
-                }
-            }
-
-            Chromosome c = new Chromosome(occ.getChromosomeName(), g);
-            g.addChromosome(c);
-            c.setName(occ.getChromosomeName());
-            ArrayList<Gene> genes = new ArrayList<Gene>();
-
-            // Forward file pointer to genomes first gene
-            reader.jumpToLine(occ.getStart_line() + 2);
-            while (reader.getCurrentLineNumber() <= occ.getEnd_line() && (line = reader.readLine()) != null) {
-                if (!line.equals("")) {
-                    String[] explode = line.split("\t");
-                    String[] ids = explode[0].split(",");
-                    for (int j = 0; j < ids.length; j++)
-                        ids[j] = this.testOldIdFormat(ids[j]);
-
-                    int sign;
-                    if (explode[1].equals("-"))
-                        sign = -1;
-                    else
-                        sign = 1;
-
-                    if (ids[0].length() > maxIdWidth)
-                        maxIdWidth = ids[0].length();
-
-                    if (!isUnhomologe(ids) && backmap.containsKey(ids[0])) {
-                        if (explode.length > 5)
-                            genes.add(new Gene(explode[5], explode[3], sign * backmap.get(ids[0]), explode[4], false));
-                        else
-                            genes.add(new Gene(explode[3], sign * backmap.get(ids[0]), explode[4], false));
+                    // If the group id is not zero we need to check if we already created
+                    // a genome for that group id and if not create a new one
+                    if (!groupedGenomes.containsKey(occ.getGroup())) {
+                        g = new Genome();
+                        g.setName(occ.getGenomeName());
+                        groupedGenomes.put(occ.getGroup(), g);
                     } else {
-                        stringidlist.add(ids);
-                        int intid = stringidlist.size();
-
-                        if (!isUnhomologe(ids)) {
-                            this.colorMap.put(intid, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
-                            backmap.put(ids[0], intid);
-                        }
-                        if (explode.length > 5)
-                            genes.add(new Gene(explode[5], explode[3], sign * intid, explode[4], isUnhomologe(ids)));
-                        else
-                            genes.add(new Gene(explode[3], sign * intid, explode[4], isUnhomologe(ids)));
+                        g = groupedGenomes.get(occ.getGroup());
                     }
                 }
+
+                Chromosome c = new Chromosome(occ.getChromosomeName(), g);
+                g.addChromosome(c);
+                c.setName(occ.getChromosomeName());
+                ArrayList<Gene> genes = new ArrayList<Gene>();
+
+                // Forward file pointer to genomes first gene
+                reader.jumpToLine(occ.getStart_line() + 2);
+                while (reader.getCurrentLineNumber() <= occ.getEnd_line() && (line = reader.readLine()) != null) {
+                    if (!line.equals("")) {
+                        String[] explode = line.split("\t");
+                        String[] ids = explode[0].split(",");
+                        for (int j = 0; j < ids.length; j++)
+                            ids[j] = this.testOldIdFormat(ids[j]);
+
+                        int sign;
+                        if (explode[1].equals("-"))
+                            sign = -1;
+                        else
+                            sign = 1;
+
+                        if (ids[0].length() > maxIdWidth)
+                            maxIdWidth = ids[0].length();
+
+                        if (!isUnhomologe(ids) && backmap.containsKey(ids[0])) {
+                            if (explode.length > 5)
+                                genes.add(new Gene(explode[5], explode[3], sign * backmap.get(ids[0]), explode[4], false));
+                            else
+                                genes.add(new Gene(explode[3], sign * backmap.get(ids[0]), explode[4], false));
+                        } else {
+                            stringidlist.add(ids);
+                            int intid = stringidlist.size();
+
+                            if (!isUnhomologe(ids)) {
+                                this.colorMap.put(intid, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
+                                backmap.put(ids[0], intid);
+                            }
+                            if (explode.length > 5)
+                                genes.add(new Gene(explode[5], explode[3], sign * intid, explode[4], isUnhomologe(ids)));
+                            else
+                                genes.add(new Gene(explode[3], sign * intid, explode[4], isUnhomologe(ids)));
+                        }
+                    }
+                }
+
+                this.maxIdLength = maxIdWidth;
+
+                // Thank you for the not existing autoboxing on arrays...
+                this.geneLabelMap = new HashMap<Integer, String[]>();
+
+                for (int j = 1; j < stringidlist.size() + 1; j++) {
+                    this.geneLabelMap.put(j, stringidlist.get(j - 1));
+                }
+
+                // TODO handle the case where EOF is reached before endline
+                c.setGenes(genes);
+                this.genomes = new Genome[groupedGenomes.size()];
+                int j = 0;
+                for (Genome x : groupedGenomes.values()) {
+                    this.genomes[j] = x;
+                    j++;
+                }
             }
-
-            this.maxIdLength = maxIdWidth;
-
-            // Thank you for the not existing autoboxing on arrays...
-            this.geneLabelMap = new HashMap<Integer, String[]>();
-
-            for (int j = 1; j < stringidlist.size() + 1; j++) {
-                this.geneLabelMap.put(j, stringidlist.get(j - 1));
-            }
-
-            // TODO handle the case where EOF is reached before endline
-            c.setGenes(genes);
-            this.genomes = new Genome[groupedGenomes.size()];
-            int j = 0;
-            for (Genome x : groupedGenomes.values()) {
-                this.genomes[j] = x;
-                j++;
-            }
+        } catch (LinePassedException e) {
+            throw new ParseException(e.getMessage(), 0);
+        }  finally {
+            if (reader != null)
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()]; {
@@ -347,117 +336,16 @@ public class CogFileReader {
 	private boolean isUnhomologe(String[] ids) {
 		return (ids[0] == null || ids[0].equals("0") || ids[0].equals(""));
 	}
-	
-	
-	/**
-	 * This class implements a thread for the reading process.
-	 * The code is exported from GeckoInstance.java and modified.
-	 */
-	private class GenomeReadingThread implements Runnable {
 
-		private final ArrayList<GenomeOccurence> occs;
-		
-		public GenomeReadingThread(ArrayList<GenomeOccurence> occs) {
-			this.occs = occs;
-		
-			SortUtils.resortGenomeOccurencesByStart(this.occs);
-			new Thread(this).start();
-		}
-		
-		public void run() {
-			try { 
-				PrintUtils.printDebug("Reading these occurences:");
-				for (GenomeOccurence occ : occs)
-					PrintUtils.printDebug(occ.toString());
-
-				CogFileReader.this.readFileContent(occs);
-				
-				
-				
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						
-						/* If someone knows why we have to add the following three lines here */
-						/* please tell it to me. I really want to know this :P */
-						GeckoInstance.getInstance().setGeneLabelMap(CogFileReader.this.geneLabelMap);
-						GeckoInstance.getInstance().setColorMap(CogFileReader.this.colorMap);
-						GeckoInstance.getInstance().setGenomes(CogFileReader.this.genomes);
-						GeckoInstance.getInstance().setMaxIdLength(CogFileReader.this.maxIdLength);
-						
-						System.out.println("sessiont:  " + sessionType);
-						
-						if (CogFileReader.this.sessionType == 0) {
-						
-							GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.SESSION_IDLE);
-							GeckoInstance.getInstance().getGui().updateViewscreen();
-						}
-						
-						GeckoInstance.getInstance().fireDataChanged();
-					}
-				});
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEFORMAT);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEIO);
-			} catch (EOFException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEIO);
-			} catch (IOException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEIO);
-			} catch (LinePassedException e) {
-				e.printStackTrace();
-				handleParsingError(ERROR_FILEFORMAT);
-			}
-		}
-		
-	}
-	
-	/**
-	 * First error type
-	 */
-	private static final short ERROR_FILEFORMAT = 1;
-	
-	/**
-	 * Second error type
-	 */
-	private static final short ERROR_FILEIO = 2;
-	
-	
-	/**
-	 * This method handles errors which are related to the input file.
-	 * 
-	 * @param errorType 
-	 */
-	private void handleParsingError(final short errorType) {
-		this.genomes = null;
-		GeckoInstance.getInstance().setClusters(new GeneCluster[0]);
-		
-		if (sessionType == 0) {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					GeckoInstance.getInstance().getGui().handleFileError(errorType);
-				}
-			});
-		}
-		else {
-			
-			CommandLineInterface.handleFileError(errorType);
-		}
-	}
-	
-	/**
-	 * This method launches a readingThread.
-	 * 
-	 * @param occs ArrayList of type GenomeOccurence
-	 */
-	public void readGenomes(ArrayList<GenomeOccurence> occs)  {
-		//GeckoInstance.this.gui.changeMode(Gui.Mode.READING_GENOMES);
-		new GenomeReadingThread(occs);	
-	}
-	
+    /**
+     * Method for handling errors while the file is read.
+     */
+    private void handleFailedSessionLoad() {
+        genomes = null;
+        geneLabelMap = null;
+        colorMap = null;
+        maxIdLength = 0;
+    }
 	
 	/**
 	 * The method is a getter for the colormap. Which contains the relation between the gene and his
@@ -500,5 +388,35 @@ public class CogFileReader {
 		
 		return this.maxIdLength;
 	}
-	
+
+    /**
+     * Always returns an empty GeneCluster[]. .cog files don't contain gene cluster data.
+     * @return the gene clusters
+     */
+    @Override
+    public GeneCluster[] getGeneClusters() {
+        return new GeneCluster[0];
+    }
+
+    /**
+     * Reads all data from the file
+     *
+     * @throws java.io.IOException      if an IO problem occurred while reading the file
+     * @throws java.text.ParseException if the file format is wrong
+     */
+    @Override
+    public void readData() throws IOException, ParseException {
+        importGenomesOccs();
+        for (GenomeOccurence occ : occs)
+            occ.setFlagged(true);
+        readFileContent();
+    }
+
+    /**
+     * Get the genome occurrences.
+     * @return
+     */
+    public List<GenomeOccurence> getOccs() {
+        return occs;
+    }
 }

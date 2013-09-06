@@ -1,36 +1,18 @@
 package gecko2.gui;
 
+import gecko2.algorithm.GeneCluster;
+import gecko2.gui.GeneClusterPicture.NameType;
 import gecko2.io.GeneClusterToPDFWriter;
 import gecko2.io.ImageWriter;
-import gecko2.gui.GeneClusterPicture.NameType;
 import gecko2.util.FileUtils;
-import gecko2.algorithm.GeneCluster;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 
 
 /**

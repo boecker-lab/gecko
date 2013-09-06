@@ -1,11 +1,10 @@
 package gecko2.io;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
 
 /**
  * This class provides static methods to export a BufferdImage into 

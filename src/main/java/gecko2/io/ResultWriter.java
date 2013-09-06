@@ -1,16 +1,8 @@
 package gecko2.io;
 
-import gecko2.algorithm.Gene;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.GeneClusterOutput;
-import gecko2.algorithm.Subsequence;
+import gecko2.algorithm.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 
 public class ResultWriter {

@@ -1,19 +1,12 @@
 package gecko2.algo;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.math3.util.Precision;
-
 import cern.jet.random.Binomial;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
+import org.apache.commons.math3.util.Precision;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 class Statistics {
 	private final GenomeList genomes;

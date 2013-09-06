@@ -1,28 +1,18 @@
 package gecko2.gui;
 
-import gecko2.GeckoInstance;
-import gecko2.GeckoInstance.ResultFilter;
-import gecko2.io.ResultWriter.ExportType;
-
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.layout.FormLayout;
+import gecko2.GeckoInstance;
+import gecko2.GeckoInstance.ResultFilter;
+import gecko2.io.ResultWriter.ExportType;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
 public class ResultExportDialog extends JDialog {
 

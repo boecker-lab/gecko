@@ -6,18 +6,12 @@ import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
 import gecko2.event.BrowserContentEvent;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.MouseInputAdapter;
 
 public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	private static final long serialVersionUID = -87373710905284714L;

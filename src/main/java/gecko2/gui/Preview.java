@@ -1,11 +1,8 @@
 package gecko2.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-
-import javax.swing.JPanel;
 
 /**
  * The class implements a simple preview for the pdf file created with the

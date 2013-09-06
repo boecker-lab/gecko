@@ -9,26 +9,14 @@ import gecko2.gui.StartComputationDialog;
 import gecko2.io.ResultWriter;
 import gecko2.io.ResultWriter.ExportType;
 
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-
-import javax.swing.JOptionPane;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
 import javax.swing.event.EventListenerList;
+import java.awt.*;
+import java.io.File;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 public class GeckoInstance {
 	private static GeckoInstance instance;

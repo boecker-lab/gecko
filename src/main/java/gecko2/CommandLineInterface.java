@@ -1,19 +1,14 @@
 package gecko2;
 
-import gecko2.GeckoInstance;
-import gecko2.GenomeOccurence;
-import gecko2.exceptions.LinePassedException;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Parameter;
+import gecko2.exceptions.LinePassedException;
 import gecko2.io.CogFileReader;
 import gecko2.io.GckFileReader;
 import gecko2.io.SessionWriter;
 
-import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +39,6 @@ import java.util.regex.Pattern;
  * @version 0.06
  */
 public class CommandLineInterface {
-
 	/**
 	 * Maximum distance of the cluster sequences.
 	 * Default value is 3.
@@ -136,7 +130,7 @@ public class CommandLineInterface {
 			System.exit(6);
 			
 		} 
-		catch (LinePassedException e) {
+		catch (ParseException e) {
 			
 			System.err.println("The readers pointer already points at a line after the given line number.");
 			e.printStackTrace();
@@ -321,7 +315,7 @@ public class CommandLineInterface {
 	 * @throws IOException from cog file reader or gck file reader
 	 * @throws LinePassedException from cog file reader
 	 */
-	private void preparation() throws IOException, LinePassedException {
+	private void preparation() throws IOException, ParseException {
 		
 		// read the input file
 		GeckoInstance.getInstance().setCurrentInputFile(inFile);
@@ -329,24 +323,23 @@ public class CommandLineInterface {
 		if (this.inFileType == 0) {
 		
 			// input file is a .cog file
-			CogFileReader reader = new CogFileReader((byte) 1);
-			ArrayList<GenomeOccurence> genOcc;
+			CogFileReader reader = new CogFileReader(inFile);
 	
-			genOcc = reader.importGenomes(inFile);
+			reader.importGenomesOccs();
 			
 			// select specified genomes
 			if (selectedGenomes != null) {
                 for (Integer selectedGenome : selectedGenomes) {
-                    genOcc.get(selectedGenome).setFlagged(true);
+                    reader.getOccs().get(selectedGenome).setFlagged(true);
                 }
 			}
 			else {
-				for (GenomeOccurence occ : genOcc) {
+				for (GenomeOccurence occ : reader.getOccs()) {
 					occ.setFlagged(true);
 				}
 			}
 			
-			reader.readFileContent(genOcc);
+			reader.readFileContent();
 		
 			// create the 3 dimensional int array for the computation
 			genomes = new int[reader.getGenomes().length][][];
@@ -371,15 +364,18 @@ public class CommandLineInterface {
 			GeckoInstance.getInstance().setColorMap(reader.getColorMap());
 			GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
 			GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
-			GeckoInstance.getInstance().setSessionType((byte) 1);
+			GeckoInstance.getInstance().setSessionType(1);
 		}
 		else {
 			// now we have a gck file as input
-			GckFileReader reader = new GckFileReader();
-			reader.setSessionType(1);
-			reader.loadSessionFromFile(inFile);
-		
-			// if no minimum number of genomes is given we use all
+			GckFileReader reader = new GckFileReader(inFile);
+            try {
+                reader.readData();
+            } catch (ParseException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            // if no minimum number of genomes is given we use all
 			if (minGenomeNum == -1) 
 				minGenomeNum = reader.getGenomes().length;
 			
@@ -452,17 +448,6 @@ public class CommandLineInterface {
 		}
 		
 		return result;
-	}
-	
-	/**
-	 * This method handles file error if some thing is wrong with the input cog file.
-	 * 
-	 * @param error Type of the error.
-	 */
-	public static void handleFileError(short error) {
-		
-		System.err.println("The input file is not a valid COG file. Wrong file format. Aborting ...");
-		System.exit(4);
 	}
 	
 	/**
