@@ -6,6 +6,7 @@ import gecko2.event.DataEvent;
 import gecko2.event.DataListener;
 import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
+import gecko2.io.GeckoDataReader;
 import gecko2.io.ResultWriter;
 import gecko2.io.ResultWriter.ExportType;
 
@@ -50,21 +51,6 @@ public class GeckoInstance {
 	private int maxIdLength;
 
     private final EventListenerList eventListener = new EventListenerList();
-	
-	/**
-	 * 0 gui session, 1 cli session
-	 */
-	private int sessionType = 0;
-	
-	/**
-	 * Set the session type
-	 * 
-	 * @param sType 0 if gui session else 1 for cli session
-	 */
-	public void setSessionType (int sType) {
-		
-		sessionType = sType;
-	}
 	
 	/**
 	 * Setter for the variable maxIdLength which is the length of the
@@ -415,10 +401,30 @@ public class GeckoInstance {
 		this.clusters = clusters;
         this.reducedList = null;
 		
-		if (this.sessionType == 0) {
+		if (gui != null) {
 			gui.getGcSelector().refresh();
 		}
 	}
+
+    public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                GeckoInstance.getInstance().setClusters(reader.getGeneClusters());
+                GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
+                GeckoInstance.getInstance().setColorMap(reader.getColorMap());
+                GeckoInstance.getInstance().setGenomes(reader.getGenomes());
+                GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
+                if (gui != null){
+                    gui.updateViewscreen();
+                    gui.updategcSelector();
+                    gui.changeMode(Gui.Mode.SESSION_IDLE);
+                }
+            }
+        });
+
+        GeckoInstance.getInstance().fireDataChanged();
+    }
 	
 	public GeneCluster[] getClusters() {
 		return clusters;
@@ -798,7 +804,7 @@ public class GeckoInstance {
 			minQuorum = Math.min(minQuorum, cluster.getSize());
 		}
 		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.length));
-		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, 'r', 'd');
+		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
 		p.setAlphabetSize(geneLabelMap.size());
 		return this.computeReferenceStatistics(genomes, p, clusters, this);
 	}

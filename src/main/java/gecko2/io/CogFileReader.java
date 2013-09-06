@@ -1,6 +1,5 @@
 package gecko2.io;
 
-import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
@@ -217,7 +216,7 @@ public class CogFileReader implements GeckoDataReader {
 		String line;
         CountedReader reader = null;
         try {
-            reader = new CountedReader(new FileReader(GeckoInstance.getInstance().getCurrentInputFile()));
+            reader = new CountedReader(new FileReader(inputFile));
 
             ArrayList<String[]> stringidlist = new ArrayList<String[]>();
 

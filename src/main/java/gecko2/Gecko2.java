@@ -1,6 +1,7 @@
 package gecko2;
 
 import gecko2.gui.Gui;
+import gecko2.io.CogFileReader;
 import gecko2.io.GckFileReader;
 import gecko2.io.GeckoDataReader;
 import gecko2.util.LibraryUtils;
@@ -12,6 +13,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.ParseException;
 
 public class Gecko2 {
 
@@ -82,17 +84,24 @@ public class Gecko2 {
             infile = new File(args[0]);
         }
 
+        GeckoDataReader reader = null;
         if (infile != null) {
             String extension = infile.getPath().substring(infile.getPath().lastIndexOf(".") + 1);
 
-            GeckoDataReader reader;
             if (extension.equals("gck")) {
                 reader = new GckFileReader(infile);
             } else if (extension.equals("cog")) {
-
+                reader = new CogFileReader(infile);
             } else {
                 printUsage(System.err, parser, new CmdLineException(parser, "Input file is not of type .gck or .cog!"));
                 return;
+            }
+            try {
+                reader.readData();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
 
@@ -100,77 +109,14 @@ public class Gecko2 {
             Gui.startUp();
         }
 
+        if (reader != null)
+            GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
 
-        /*
-		for (int i = 0; i < args.length && !help; i++) {
-			
-			optChecker = sHelp.matcher(args[i]);
-			
-			if (optChecker.find()) {
-				
-				help = true;
-			}
-			
-			optChecker = uGui.matcher(args[i]);
-			
-			if (optChecker.find()) {
-				
-				gui = true;
-			}
-		}
-		
-		// load the libraries if showing the help isn't requested
-		if (!help) {
-		
-			// there is no possibility to check whether a file is a text or compiled binary file
-			// so we use primarily the file extension for checking the library existence.
-			
-			boolean inFileGckCog = true;
-			
-			if (args.length > 0) {
-				
-				Pattern inFile = Pattern.compile("gck|cog");
-				Matcher inFileMatch = inFile.matcher(args[0]);
-				
-				if (!inFileMatch.find()) {
-					
-					inFileGckCog = false;
-				}
-			}
-			boolean libloaderror = false;
-			
 
-		
-			System.err.println(":o)");
-	    		
-			GeckoInstance instance = GeckoInstance.getInstance();
-			instance.setLibgeckoLoaded(true);
-		
-			if (gui || args.length <= 1) {
-				
-				// start gui session
-				Gui.startUp();
-			}
-			else {
-				
-				// start cli session
-				if (!libloaderror) {
-				
-					new CommandLineInterface(args, externalLib);
-				}
-				else {
-					
-					// cli is useless without the lib so we terminate the program
-					// NOTE: Return codes 1 - 7 are used in CommandLineInterface.java
-					System.exit(8);
-				}
-			}
-		}
-		else {
-			
-			CommandLineInterface.showHelp();
-		}
-		*/
+        if (args.length > 1) {
+            CommandLineExecution.runAlgorithm(options);
+        }
+
 	}
 
     private static void printUsage(PrintStream out, CmdLineParser parser, Exception e) {

@@ -169,7 +169,7 @@ public class ClusterAnnotationReaderTest {
 			for (int j=0;j<computeGenomes[i].length;j++)
 				computeGenomes[i][j] = genomes[i].getChromosomes().get(j).toIntArray(true, true);
 		}
-		Parameter p = new Parameter(1, 4, 3, Parameter.QUORUM_NO_COST, 'r', 'd');
+		Parameter p = new Parameter(1, 4, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
 		p.setAlphabetSize(13);
 		GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(computeGenomes, p);
 		

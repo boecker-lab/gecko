@@ -167,20 +167,7 @@ public class GenomeSelector extends JDialog {
 
                     @Override
                     public void done() {
-                        GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
-                        GeckoInstance.getInstance().setColorMap(reader.getColorMap());
-                        GeckoInstance.getInstance().setGenomes(reader.getGenomes());
-                        GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
-
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                GeckoInstance.getInstance().getGui().updateViewscreen();
-                                GeckoInstance.getInstance().getGui().updategcSelector();
-                                GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.SESSION_IDLE);
-                            }
-                        });
-                        GeckoInstance.getInstance().fireDataChanged();
+                        GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
                     }
                 };
                 worker.execute();

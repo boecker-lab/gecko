@@ -355,7 +355,7 @@ public class CommandLineInterface {
 				minGenomeNum = reader.getGenomes().length;
 			
 			// create the parameter set for computeClusters
-			parameter = new Parameter(maxDist, minClusSize, minGenomeNum, Parameter.QUORUM_NO_COST, opMode, refType);
+			parameter = new Parameter(maxDist, minClusSize, minGenomeNum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.getOperationModeFromChar(opMode), refType);
 			parameter.setAlphabetSize(reader.getGeneLabelMap().size());		
 			
 			// store important information in the gecko instance for the 
@@ -364,7 +364,6 @@ public class CommandLineInterface {
 			GeckoInstance.getInstance().setColorMap(reader.getColorMap());
 			GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
 			GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
-			GeckoInstance.getInstance().setSessionType(1);
 		}
 		else {
 			// now we have a gck file as input
@@ -380,7 +379,7 @@ public class CommandLineInterface {
 				minGenomeNum = reader.getGenomes().length;
 			
 			// create the parameter set for computeClusters
-			parameter = new Parameter(maxDist, minClusSize, minGenomeNum, Parameter.QUORUM_NO_COST, opMode, refType);
+			parameter = new Parameter(maxDist, minClusSize, minGenomeNum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.getOperationModeFromChar(opMode), refType);
 			parameter.setAlphabetSize(reader.getGeneLabelMap().size());		
 		
 			// store important information in the gecko instance for the 
@@ -389,7 +388,6 @@ public class CommandLineInterface {
 			GeckoInstance.getInstance().setColorMap(reader.getColorMap());
 			GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
 			GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
-			GeckoInstance.getInstance().setSessionType(1);
 		}
 	}
 	

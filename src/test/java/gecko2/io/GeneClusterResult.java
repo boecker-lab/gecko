@@ -319,21 +319,14 @@ public class GeneClusterResult
 	        if (!s[4].contains("OM=")) {
 	            throw new DataFormatException("Header line corrupt! Missing OM=<operationMode>");
 	        }
-	        
-	        char operationMode = ' ';
+
+            Parameter.OperationMode operationMode;
 	        char oM = s[4].substring(3).trim().charAt(0);
-	        char[] modes = {'m', 'c', 'r'};
-	       
-	        for (char oModes : modes) {
-	            if (oM == oModes) {
-	                operationMode = oModes;
-	                break;
-	            }
-	        }
-	        
-	        if (operationMode == ' ') {
-	            throw new DataFormatException("Header line corrupt! Could not parse <operationMode>");
-	        }
+            try{
+                operationMode = Parameter.OperationMode.getOperationModeFromChar(oM);
+            } catch (IllegalArgumentException e) {
+                throw new DataFormatException("Header line corrupt! Could not parse <operationMode>");
+            }
 	        
 	        if (!s[5].contains("RT=")) {
 	            throw new DataFormatException("Header line corrupt! Missing RT=<referenceType>");

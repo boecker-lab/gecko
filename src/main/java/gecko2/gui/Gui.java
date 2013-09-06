@@ -487,21 +487,7 @@ public class Gui {
 
                                 @Override
                                 public void done() {
-                                    GeckoInstance.getInstance().setClusters(reader.getGeneClusters());
-                                    GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
-                                    GeckoInstance.getInstance().setColorMap(reader.getColorMap());
-                                    GeckoInstance.getInstance().setGenomes(reader.getGenomes());
-                                    GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
-
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            updateViewscreen();
-                                            updategcSelector();
-                                            changeMode(Gui.Mode.SESSION_IDLE);
-                                        }
-                                    });
-                                    GeckoInstance.getInstance().fireDataChanged();
+                                    GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
                                 }
                             };
 

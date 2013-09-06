@@ -30,7 +30,8 @@ public class StartComputationDialog extends JDialog {
 
 	private static final long serialVersionUID = -5635614016950101153L;
 	private int quorum;
-	private char opMode,refType;
+	private Parameter.OperationMode opMode;
+    private char refType;
 	private final JComboBox refCombo;
 	private final JCheckBox mergeResults;
 	private final GeckoInstance gecko = GeckoInstance.getInstance();
@@ -72,13 +73,11 @@ public class StartComputationDialog extends JDialog {
 			}
 		});
 
-		
-		final String[] modes = {"reference", "median", "center"};
-		final JComboBox modeCombo = new JComboBox(modes);
+		final JComboBox modeCombo = new JComboBox(Parameter.OperationMode.values());
 
 		modeCombo.setPreferredSize(new Dimension(190,30));
 
-		this.opMode = 'r';
+		this.opMode = Parameter.OperationMode.reference;
 		this.refType = 'd';
 		modeCombo.setSelectedIndex(0);
 		
@@ -88,21 +87,8 @@ public class StartComputationDialog extends JDialog {
 		refCombo.setPreferredSize(new Dimension(190, 30));
 		
 		modeCombo.addActionListener(new ActionListener() {
-			
 			public void actionPerformed(ActionEvent e) {
-				switch (modeCombo.getSelectedIndex()) {
-				case 0:
-					opMode = 'r';
-					PrintUtils.printDebug("Using REFERENCE mode!");	
-					break;
-				case 1:
-					opMode = 'm';
-					PrintUtils.printDebug("Using MEDIAN mode!");
-					break;
-				default:
-					opMode = 'c';
-					PrintUtils.printDebug("Using CENTER mode!");
-				}
+                opMode = (Parameter.OperationMode)modeCombo.getSelectedItem();
 			}
 		});
 		
@@ -281,7 +267,7 @@ public class StartComputationDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				StartComputationDialog.this.setVisible(false);
 				// Reorder the genomes if necessary
-				if (opMode=='r' && refType=='g' && refGenomeCombo.getSelectedIndex()!=0) {
+				if (opMode==Parameter.OperationMode.reference && refType=='g' && refGenomeCombo.getSelectedIndex()!=0) {
 					PrintUtils.printDebug("swapping genomes");
 					Genome[] genomes = GeckoInstance.getInstance().getGenomes();
 					Genome first = genomes[0];
@@ -291,7 +277,7 @@ public class StartComputationDialog extends JDialog {
 					gecko.getGui().closeCurrentSession();
 					gecko.setGenomes(genomes);
 					//TODO improve
-				} else if (opMode=='r' && refType=='c') {
+				} else if (opMode==Parameter.OperationMode.reference && refType=='c') {
 					Genome[] oldGenomes = gecko.getGenomes();
 					Genome[] genomes = new Genome[oldGenomes.length+1];
 					Genome cluster = new Genome();
@@ -310,7 +296,7 @@ public class StartComputationDialog extends JDialog {
 					gecko.setGenomes(genomes);
 				}
 				boolean mergeResultsEnabled = false;
-				if (opMode == 'r' && mergeResults.isSelected())
+				if (opMode==Parameter.OperationMode.reference && mergeResults.isSelected())
 					mergeResultsEnabled = true;
 				GeckoInstance.getInstance().performClusterDetection(new Parameter((Integer) dSpinner.getValue(), 
 						(Integer) sSpinner.getValue(),

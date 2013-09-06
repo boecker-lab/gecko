@@ -1,6 +1,31 @@
 package gecko2.algorithm;
 
 public class Parameter {
+
+    public enum OperationMode {
+        reference('r'), median('m'), center('c');
+        private final char shortForm;
+        private OperationMode(char c) {
+            shortForm = c;
+        }
+
+        public char getCharMode() {
+            return shortForm;
+        }
+
+        public static OperationMode getOperationModeFromChar(char c) {
+            switch (c) {
+                case 'r':
+                    return reference;
+                case 'm':
+                    return median;
+                case 'c':
+                    return center;
+                default:
+                    throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
+            }
+        }
+    };
 	
     private final static int DELTA_TABLE_SIZE = 3;
 	
@@ -11,7 +36,7 @@ public class Parameter {
 	private int q;
 	private short qtype;
 	private char refType;
-	private char operationMode;
+	private OperationMode operationMode;
 	private boolean searchRefInRef;
 	
 	// used to interrupt the c function when requested by the user.
@@ -29,12 +54,12 @@ public class Parameter {
 		return run;
 	}	
 	
-	public Parameter(int delta, int minClusterSize, int q, short qtype, char operationMode, char refType) {
+	public Parameter(int delta, int minClusterSize, int q, short qtype, OperationMode operationMode, char refType) {
 		this(delta, minClusterSize, q, qtype, operationMode, refType, false);
 	}
 	
-	public Parameter(int delta, int minClusterSize, int q, short qtype, char operationMode, char refType, boolean searchRefInRef) {
-		if (searchRefInRef && operationMode != 'r')
+	public Parameter(int delta, int minClusterSize, int q, short qtype, OperationMode operationMode, char refType, boolean searchRefInRef) {
+		if (searchRefInRef && operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Searching the reference occurrence in the reference genome is only compatible with reference mode!");
 		if (refType != 'd' && refType != 'g' && refType != 'c')
 			throw new IllegalArgumentException("Invalid reference Type. Only (d)efault, (g)enome or (c)luster are valid!");
@@ -50,12 +75,12 @@ public class Parameter {
 		this.searchRefInRef = searchRefInRef;
 	}
 	
-	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, char operationMode, char refType) {
+	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, OperationMode operationMode, char refType) {
 		this(deltaTable, minClusterSize, q, qtype, operationMode, refType, false);
 	}
 	
-	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, char operationMode, char refType, boolean searchRefInRef) {
-		if (operationMode != 'r')
+	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, OperationMode operationMode, char refType, boolean searchRefInRef) {
+		if (operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Delta table is only compatible with reference mode!");
 		
 		this.delta = -1;
@@ -79,11 +104,11 @@ public class Parameter {
 		return refType;
 	}
 		
-	public void setOperationMode(char opmode) {
+	public void setOperationMode(OperationMode opmode) {
 		this.operationMode = opmode;
 	}
 	
-	public char getOperationMode() {
+	public OperationMode getOperationMode() {
 		return operationMode;
 	}
 	
@@ -136,6 +161,6 @@ public class Parameter {
 	}
 	
 	public boolean useJavaAlgorithm() {
-		return operationMode == 'r';
+		return operationMode == OperationMode.reference;
 	}
 }

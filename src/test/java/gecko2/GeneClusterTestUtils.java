@@ -290,19 +290,19 @@ public class GeneClusterTestUtils {
 			switch (testType) {
 				case fiveProteobacterDeltaTable:
 					int[][] deltaArray = {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}};
-					p = new Parameter(deltaArray, 4, 4, Parameter.QUORUM_NO_COST, 'r', 'd');
+					p = new Parameter(deltaArray, 4, 4, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
 					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").toURI());
 					outFile = new File("src/test/resources/fiveProteobacterDeltaTable.txt");
 					break;
 					
 				case fiveProteobacterD3S6Q4:
-					p = new Parameter(3, 6, 4, Parameter.QUORUM_NO_COST, 'r', 'd');
+					p = new Parameter(3, 6, 4, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
 					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").toURI());
 					outFile = new File("src/test/resources/fiveProteobacterD3S6Q4.txt");
 					break;
 					
 				case fiveProteobacterD3S6Q2Grouping:
-					p = new Parameter(3, 6, 2, Parameter.QUORUM_NO_COST, 'r', 'd');
+					p = new Parameter(3, 6, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
 					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").toURI());
 					outFile = new File("src/test/resources/fiveProteobacterD3S6Q2Grouping.txt");
 					genomeGroups = new ArrayList<Set<Integer>>(2);
@@ -320,7 +320,7 @@ public class GeneClusterTestUtils {
 					break;
 					
 				case statisticsDataD5S8Q10FixedRef:
-					p = new Parameter(5, 8, 10, Parameter.QUORUM_NO_COST, 'r', 'g');
+					p = new Parameter(5, 8, 10, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'g');
 					inCogFile = new File(GeneClusterTestUtils.class.getResource("/statisticsData.cog").toURI());
 					outFile = new File("src/test/resources/statisticsDataD5S8Q10FixedRef.txt");
 					break;
