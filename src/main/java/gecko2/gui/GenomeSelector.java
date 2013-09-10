@@ -133,8 +133,7 @@ public class GenomeSelector extends JDialog {
 				// Better double check...
 				checkSelectionCount();
 				if (!importAction.isEnabled()) return;
-				
-				deleteNotFlaggedEntries();
+
 				GenomeSelector.this.setVisible(false);
                 GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.READING_GENOMES);
 
@@ -291,11 +290,6 @@ public class GenomeSelector extends JDialog {
 	
 	private Color getRandomColor() {
 		return new Color(ColorUtils.HSVtoRGB(rand.nextFloat(),(205+rand.nextInt(50))/255F,(205+rand.nextInt(50))/255F));
-	}
-	
-	private void deleteNotFlaggedEntries() {
-		for (int i=this.occs.size()-1;i>=0;i--)
-			if (!this.occs.get(i).isFlagged()) this.occs.remove(i);
 	}
 	
 	private void checkAll() {

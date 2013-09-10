@@ -82,7 +82,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5};
 			
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -136,7 +136,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -207,7 +207,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -274,7 +274,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -329,7 +329,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'g');
+		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -384,7 +384,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -465,7 +465,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -533,7 +533,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,12};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -629,7 +629,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
-		Parameter p = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -688,7 +688,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
-		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -760,7 +760,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -832,7 +832,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -888,7 +888,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -943,7 +943,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -1013,7 +1013,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2};
 
-		Parameter p = new Parameter(1, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(1, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -1066,7 +1066,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3};
 
-		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -1127,7 +1127,7 @@ public class ReferenceClusterTest
 
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5};
-		Parameter p = new Parameter(0, 2, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd', true);
+		Parameter p = new Parameter(0, 2, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// Test the java implementation
@@ -1176,7 +1176,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5};
 
-		Parameter p = new Parameter(1, 3, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd', true);
+		Parameter p = new Parameter(1, 3, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// Test the java implementation
@@ -1241,13 +1241,13 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3};
 
-		Parameter maxQuorumParamters = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter maxQuorumParamters = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		maxQuorumParamters.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
 		GeneCluster[] maxQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, maxQuorumParamters);
 
-		Parameter noQuorumParameters = new Parameter(0, 3, 0, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter noQuorumParameters = new Parameter(0, 3, 0, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		noQuorumParameters.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -1265,13 +1265,13 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3};
 
-		Parameter maxQuorumParamters = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter maxQuorumParamters = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		maxQuorumParamters.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
 		GeneCluster[] maxQuorumResult = GeckoInstance.getInstance().computeClustersLibgecko(genomes, maxQuorumParamters);
 
-		Parameter noQuorumParameters = new Parameter(0, 3, 0, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter noQuorumParameters = new Parameter(0, 3, 0, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		noQuorumParameters.setAlphabetSize(geneLabelMap.length);
 
 		// result of computation
@@ -1313,7 +1313,7 @@ public class ReferenceClusterTest
 		// def parameters
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-		Parameter p = new Parameter(0, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(0, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.length);
 
 		// Test the java implementation

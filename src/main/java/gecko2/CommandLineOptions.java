@@ -1,8 +1,14 @@
 package gecko2;
 
+import gecko2.algorithm.Parameter;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.OptionDef;
+import org.kohsuke.args4j.spi.*;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)
@@ -24,14 +30,27 @@ public class CommandLineOptions {
     @Option(name="-gGF", aliases = "--genomeGroupingFactor", usage = "all genomes with lower breakpoint distance are treated as one group")
     private double genomeGroupingFactor = 1.1;
 
+    @Option(name="-o", aliases = "--operationMode", usage = "the operation mode, [reference] cluster (default), [median] gene cluster, or [center] gene cluster.")
+    private Parameter.OperationMode operationMode = Parameter.OperationMode.reference;
+
     @Option(name="-r", aliases = "--referenceGenomeIndex", usage = "index of the reference genome.\nIf not set all genomes are used as reference")
-    private int referenceGenome = -1;
+    private int referenceGenomeIndex = -1;
 
     /*
      * Files
      */
-    @Option(name="-i", aliases = "--Infile", usage = "the .gck input file")
+    @Option(name="-in", aliases = "--Infile", usage = "the .gck or .cog input file")
     private File infile = null;
+
+
+    @Option(name="-gL", aliases = "--genomeList", handler=GenomeListOptionHandler.class, usage = "the indices of the genomes that shall be imported from the .cog file.\n A String containing a comma separated list of integers (\"1, 3, 5, 8\")")
+    private List<Integer> genomeList = null;
+    /*private void setGenomesList(String line){
+        String[] sLine = line.split(",");
+        genomeList = new ArrayList<Integer>(sLine.length);
+        for (String index : sLine)
+            genomeList.add(Integer.parseInt(index));
+    }*/
 
     @Option(name="-out", aliases = "--Outfile", required = true, usage = "the output file")
     private File outfile;
@@ -64,12 +83,20 @@ public class CommandLineOptions {
         return genomeGroupingFactor;
     }
 
-    public int getReferenceGenome() {
-        return referenceGenome;
+    public Parameter.OperationMode getOperationMode() {
+        return operationMode;
+    }
+
+    public int getReferenceGenomeIndex() {
+        return referenceGenomeIndex;
     }
 
     public File getInfile() {
         return infile;
+    }
+
+    public List<Integer> getGenomeList() {
+        return genomeList;
     }
 
     public File getOutfile() {
@@ -83,4 +110,28 @@ public class CommandLineOptions {
     public boolean showHelp() {
         return help;
     }
+
+    public static class GenomeListOptionHandler extends DelimitedOptionHandler<Integer> {
+        public GenomeListOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super Integer> setter) {
+            super(parser, option, setter, ",", new GenomeOptionHandler(parser, option,setter));
+        }
+    }
+
+    public static class GenomeOptionHandler extends OneArgumentOptionHandler<Integer> {
+        public GenomeOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super Integer> setter) {
+            super(parser, option, setter);
+        }
+
+        @Override
+        protected Integer parse(String argument) throws CmdLineException {
+            try {
+                return Integer.parseInt(argument.trim());
+            } catch (NumberFormatException e) {
+                throw new CmdLineException(owner, e);
+            }
+        }
+    }
+
+
+
 }

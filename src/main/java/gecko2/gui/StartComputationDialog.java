@@ -31,7 +31,7 @@ public class StartComputationDialog extends JDialog {
 	private static final long serialVersionUID = -5635614016950101153L;
 	private int quorum;
 	private Parameter.OperationMode opMode;
-    private char refType;
+    private Parameter.ReferenceType refType;
 	private final JComboBox refCombo;
 	private final JCheckBox mergeResults;
 	private final GeckoInstance gecko = GeckoInstance.getInstance();
@@ -78,12 +78,12 @@ public class StartComputationDialog extends JDialog {
 		modeCombo.setPreferredSize(new Dimension(190,30));
 
 		this.opMode = Parameter.OperationMode.reference;
-		this.refType = 'd';
+		this.refType = Parameter.ReferenceType.allAgainstAll;
 		modeCombo.setSelectedIndex(0);
-		
+
 		final String[] refModes = {"all against all", "fixed genome", "manual cluster"};
         JLabel refLabel = new JLabel("Reference:");
-		refCombo = new JComboBox(refModes);
+		refCombo = new JComboBox(Parameter.ReferenceType.values());
 		refCombo.setPreferredSize(new Dimension(190, 30));
 		
 		modeCombo.addActionListener(new ActionListener() {
@@ -228,32 +228,29 @@ public class StartComputationDialog extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				switch (refCombo.getSelectedIndex()) {
-				case 1:
-					p6b.remove(refClusterField);
-					p6b.add(refGenomeCombo);
-					refType = 'g';
-					break;
-				case 2:
-					p6b.add(refClusterField);
-					ToolTipManager.sharedInstance().mouseMoved(
+                refType = (Parameter.ReferenceType) refCombo.getSelectedItem();
+                switch (refType) {
+                    case genome:
+                        p6b.remove(refClusterField);
+					    p6b.add(refGenomeCombo);
+                        break;
+                    case cluster:
+                        p6b.remove(refGenomeCombo);
+                        p6b.add(refClusterField);
+					    ToolTipManager.sharedInstance().mouseMoved(
 					        new MouseEvent(refClusterField, 0, 0, 0,
 					                (int) refClusterField.getLocation().getX(), // X-Y of the mouse for the tool tip
 					                (int) refClusterField.getLocation().getY(),
 					                0, false));
-					refType = 'c';
-					p6b.remove(refGenomeCombo);
-					break;
-				default:
-					p6b.remove(refClusterField);
-					p6b.remove(refGenomeCombo);		
-					refType = 'd';
-				}
+                        break;
+                    default:
+                        p6b.remove(refClusterField);
+					    p6b.remove(refGenomeCombo);
+                }
 				p6b.validate();
 				gridpanel.validate();
 				
 				StartComputationDialog.this.repaint();
-				
 			}
 		};
 		refCombo.addActionListener(refGenomeComboListener);
@@ -267,7 +264,7 @@ public class StartComputationDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				StartComputationDialog.this.setVisible(false);
 				// Reorder the genomes if necessary
-				if (opMode==Parameter.OperationMode.reference && refType=='g' && refGenomeCombo.getSelectedIndex()!=0) {
+				if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.genome && refGenomeCombo.getSelectedIndex()!=0) {
 					PrintUtils.printDebug("swapping genomes");
 					Genome[] genomes = GeckoInstance.getInstance().getGenomes();
 					Genome first = genomes[0];
@@ -277,7 +274,7 @@ public class StartComputationDialog extends JDialog {
 					gecko.getGui().closeCurrentSession();
 					gecko.setGenomes(genomes);
 					//TODO improve
-				} else if (opMode==Parameter.OperationMode.reference && refType=='c') {
+				} else if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.cluster) {
 					Genome[] oldGenomes = gecko.getGenomes();
 					Genome[] genomes = new Genome[oldGenomes.length+1];
 					Genome cluster = new Genome();

@@ -4,7 +4,9 @@ public class Parameter {
 
     public enum OperationMode {
         reference('r'), median('m'), center('c');
+
         private final char shortForm;
+
         private OperationMode(char c) {
             shortForm = c;
         }
@@ -26,6 +28,41 @@ public class Parameter {
             }
         }
     };
+
+    public enum ReferenceType {
+        allAgainstAll('a', "all against all"), genome('g', "fixed genome"), cluster('c', "manual cluster");
+
+        private final char shortForm;
+        private final String text;
+
+        private ReferenceType(char c, String text) {
+            shortForm = c;
+            this.text = text;
+        }
+
+        public char getCharMode() {
+            return shortForm;
+        }
+
+        public String toString() {
+            return text;
+        }
+
+        public static ReferenceType getReferenceTypeFromChar(char c) {
+            switch (c) {
+                case 'a':
+                    return allAgainstAll;
+                case 'd':  // old default case, for compatibility reasons
+                    return allAgainstAll;
+                case 'g':
+                    return genome;
+                case 'c':
+                    return cluster;
+                default:
+                    throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
+            }
+        }
+    };
 	
     private final static int DELTA_TABLE_SIZE = 3;
 	
@@ -35,7 +72,7 @@ public class Parameter {
 	private int alphabetSize;
 	private int q;
 	private short qtype;
-	private char refType;
+	private ReferenceType refType;
 	private OperationMode operationMode;
 	private boolean searchRefInRef;
 	
@@ -54,15 +91,13 @@ public class Parameter {
 		return run;
 	}	
 	
-	public Parameter(int delta, int minClusterSize, int q, short qtype, OperationMode operationMode, char refType) {
+	public Parameter(int delta, int minClusterSize, int q, short qtype, OperationMode operationMode, ReferenceType refType) {
 		this(delta, minClusterSize, q, qtype, operationMode, refType, false);
 	}
 	
-	public Parameter(int delta, int minClusterSize, int q, short qtype, OperationMode operationMode, char refType, boolean searchRefInRef) {
+	public Parameter(int delta, int minClusterSize, int q, short qtype, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
 		if (searchRefInRef && operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Searching the reference occurrence in the reference genome is only compatible with reference mode!");
-		if (refType != 'd' && refType != 'g' && refType != 'c')
-			throw new IllegalArgumentException("Invalid reference Type. Only (d)efault, (g)enome or (c)luster are valid!");
 		
 		this.delta = delta;
 		this.deltaTable = null;
@@ -75,11 +110,11 @@ public class Parameter {
 		this.searchRefInRef = searchRefInRef;
 	}
 	
-	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, OperationMode operationMode, char refType) {
+	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, OperationMode operationMode, ReferenceType refType) {
 		this(deltaTable, minClusterSize, q, qtype, operationMode, refType, false);
 	}
 	
-	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, OperationMode operationMode, char refType, boolean searchRefInRef) {
+	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
 		if (operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Delta table is only compatible with reference mode!");
 		
@@ -100,7 +135,7 @@ public class Parameter {
 		this.searchRefInRef = searchRefInRef;
 	}
 	
-	public char getRefType() {
+	public ReferenceType getRefType() {
 		return refType;
 	}
 		

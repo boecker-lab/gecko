@@ -91,7 +91,7 @@ public class Gecko2 {
             if (extension.equals("gck")) {
                 reader = new GckFileReader(infile);
             } else if (extension.equals("cog")) {
-                reader = new CogFileReader(infile);
+                reader = new CogFileReader(infile, options.getGenomeList());
             } else {
                 printUsage(System.err, parser, new CmdLineException(parser, "Input file is not of type .gck or .cog!"));
                 return;
@@ -114,7 +114,7 @@ public class Gecko2 {
 
 
         if (args.length > 1) {
-            CommandLineExecution.runAlgorithm(options);
+            CommandLineExecution.runAlgorithm(options, reader.getGeneLabelMap().size());
         }
 
 	}

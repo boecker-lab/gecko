@@ -41,6 +41,8 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 	 */
 	private GeneCluster selection;
 
+    private int lastSplitPos;
+
 	/**
 	 * Creates a new {@link OccurrenceSelector}.
 	 * the details of a selected occurrence.
@@ -110,8 +112,7 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		} else
 			return gc.getOccurrences();
 	}
-	
-	private int lastSplitPos;
+
 	@Override
 	public void selectionChanged(ClusterSelectionEvent e) {
 		GeneCluster gc = e.getSelection();

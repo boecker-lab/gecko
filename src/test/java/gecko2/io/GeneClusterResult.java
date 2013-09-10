@@ -331,21 +331,14 @@ public class GeneClusterResult
 	        if (!s[5].contains("RT=")) {
 	            throw new DataFormatException("Header line corrupt! Missing RT=<referenceType>");
 	        }
-	        
-	        char referenceType = ' ';
-	        char rT = s[5].substring(3).trim().charAt(0);
-	        char[] types2 = {'d', 'g', 'c'};
-	       
-	        for (char rTypes : types2) {
-	            if (rT == rTypes) {
-	                referenceType = rTypes;
-	                break;
-	            }
-	        }
-	        
-	        if (referenceType == ' ') {
-	            throw new DataFormatException("Header line corrupt! Could not parse <referenceType>");
-	        }
+
+            Parameter.ReferenceType referenceType;
+            char rT = s[5].substring(3).trim().charAt(0);
+            try{
+                referenceType = Parameter.ReferenceType.getReferenceTypeFromChar(rT);
+            } catch (IllegalArgumentException e) {
+              throw new DataFormatException("Header line corrupt! Could not parse <referenceType>");
+            }
 	                 
 	        if (!s[6].contains("FN=")) {
 	            throw new DataFormatException("Header line corrupt! Missing FN=<fileName>");

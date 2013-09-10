@@ -55,11 +55,24 @@ public class CogFileReader implements GeckoDataReader {
      * The input File
      */
     private final File inputFile;
-
+    private List<Integer> genomeList;
 	
 	public CogFileReader(File inputFile) {
-		this.inputFile = inputFile;
+		this(inputFile, null);
 	}
+
+    /**
+     * genomeList is only used for readData(), to still be able to choose genome occurrences
+     * @param inputFile
+     * @param genomeList
+     */
+    public CogFileReader(File inputFile, List<Integer> genomeList) {
+        this.inputFile = inputFile;
+        if (genomeList == null)
+            this.genomeList = null;
+        else
+            this.genomeList = new ArrayList<Integer>(genomeList);
+    }
 	
 	/**
 	 * The method generates the genome name for the grouping of the genes.
@@ -228,6 +241,8 @@ public class CogFileReader implements GeckoDataReader {
             int maxIdWidth = 0;
 
             for (GenomeOccurence occ : occs) {
+                if (!occ.isFlagged())
+                    continue;
                 Genome g;
                 if (occ.getGroup() == 0) {
                     // If the group id is zero than we have a single chromosome genome,
@@ -405,9 +420,20 @@ public class CogFileReader implements GeckoDataReader {
      */
     @Override
     public void readData() throws IOException, ParseException {
+        // Read all occs
         importGenomesOccs();
-        for (GenomeOccurence occ : occs)
-            occ.setFlagged(true);
+
+        // Choose genomes to import
+        if (genomeList != null){
+            for (Integer selectedGenome : genomeList) {
+                occs.get(selectedGenome).setFlagged(true);
+            }
+        } else {
+            for (GenomeOccurence occ : occs)
+                occ.setFlagged(true);
+        }
+
+        // Import the genomes
         readFileContent();
     }
 

@@ -17,11 +17,13 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 public class GeckoInstance {
 	private static GeckoInstance instance;
-	
+
 	private native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
 	
@@ -565,11 +567,16 @@ public class GeckoInstance {
 		//return computeClustersLibgecko(genomes, params);
 	}
 	
-	public void performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
-		this.lastParameter = p;
+	public ExecutorService performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+		lastParameter = p;
 		p.setAlphabetSize(geneLabelMap.size());
-		gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
-		new ComputationThread(p, mergeResults, genomeGroupingFactor);
+        if (gui != null)
+		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
+		ClusterComputationRunnable clusterComputation = new ClusterComputationRunnable(p, mergeResults, genomeGroupingFactor);
+
+        executor.submit(clusterComputation);
+        return executor;
 	}
 	
 	void handleUpdatedClusterResults() {
@@ -583,21 +590,20 @@ public class GeckoInstance {
 		gui.changeMode(Gui.Mode.SESSION_IDLE);
 	}
 	
-	public class ComputationThread implements Runnable {
+	private class ClusterComputationRunnable implements Runnable {
 
 		private final Parameter p;
 		private final boolean mergeResults;
         private final double groupingFactor;
 		
-		public ComputationThread(Parameter p){
+		public ClusterComputationRunnable(Parameter p){
 			this(p, false, -1.0);
 		}
 		
-		public ComputationThread(Parameter p, boolean mergeResults, double groupingFactor) {
+		public ClusterComputationRunnable(Parameter p, boolean mergeResults, double groupingFactor) {
 			this.p = p;
 			this.mergeResults = mergeResults;
             this.groupingFactor = groupingFactor;
-			new Thread(this).start();
 		}
 		
 		public void run() {
@@ -623,11 +629,13 @@ public class GeckoInstance {
 				GeckoInstance.this.clusters = mergeResults(GeckoInstance.this.clusters, res);
 			else
 				GeckoInstance.this.clusters = res;
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					GeckoInstance.this.handleUpdatedClusterResults();
-				}
-			});
+            if (gui != null) {
+			    EventQueue.invokeLater(new Runnable() {
+				    public void run() {
+					    GeckoInstance.this.handleUpdatedClusterResults();
+				    }
+			    });
+            }
 		}
 		
 		/**
@@ -804,7 +812,7 @@ public class GeckoInstance {
 			minQuorum = Math.min(minQuorum, cluster.getSize());
 		}
 		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.length));
-		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, 'd');
+		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(geneLabelMap.size());
 		return this.computeReferenceStatistics(genomes, p, clusters, this);
 	}
