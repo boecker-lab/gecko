@@ -4,6 +4,8 @@ import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
 import gecko2.io.SessionWriter;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -13,18 +15,26 @@ import java.util.concurrent.TimeUnit;
 public class CommandLineExecution {
     public static void runAlgorithm(CommandLineOptions options, int alphabetSize) {
         Parameter.ReferenceType refType;
-        if (options.getReferenceGenomeIndex() == -1)
+        if (options.getReferenceGenomeName().equals(""))
             refType = Parameter.ReferenceType.allAgainstAll;
         else {
             refType = Parameter.ReferenceType.genome;
             Genome[] genomes = GeckoInstance.getInstance().getGenomes();
 
-            if (options.getReferenceGenomeIndex() >= genomes.length)
-                throw new IllegalArgumentException(String.format("Error! Reference genome index (%d) is higher than total number of genomes (%d)!", options.getReferenceGenomeIndex(), genomes.length));
+            int index = -1;
+            for (int i=0; i<genomes.length; i++) {
+                if (genomes[i].getName().contains(options.getReferenceGenomeName()))
+                    if (index != -1)
+                         throw new IllegalArgumentException(String.format("Error! Reference genome name (%s) is contained in more than one genome name (%s and %s)!", options.getReferenceGenomeName(), genomes[index].getName(), genomes[i].getName()));
+                    else
+                        index = i;
+            }
+            if (index == -1)
+                 throw new IllegalArgumentException(String.format("Error! Reference genome name (%s) is not contained in any genome name!", options.getReferenceGenomeName()));
 
             Genome first = genomes[0];
-            genomes[0] = genomes[options.getReferenceGenomeIndex()];
-            genomes[options.getReferenceGenomeIndex()] = first;
+            genomes[0] = genomes[index];
+            genomes[index] = first;
         }
 
         Parameter parameter = new Parameter(options.getMaxDistance(), options.getMinClusterSize(), options.getMinCoveredGenomes(), Parameter.QUORUM_NO_COST, options.getOperationMode(), refType);

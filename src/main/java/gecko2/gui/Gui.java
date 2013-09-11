@@ -301,10 +301,6 @@ public class Gui {
 			this.mgb.addGenomes(gecko.getGenomes());
 	}
 	
-//	public void refreshClusterList() {
-//		this.gcSelector.refresh();
-//	}
-	
 	public AbstractMultipleGenomeBrowser getMgb() {
 		return mgb;
 	}

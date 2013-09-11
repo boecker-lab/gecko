@@ -390,12 +390,19 @@ public class GeckoInstance {
 	
 	public void setGenomes(Genome[] genomes) {
 		this.genomes = genomes;
-		if (genomes!=null && GeckoInstance.this.gui != null)
-			scd = new StartComputationDialog(genomes.length);
-		else
-			scd = null;
-		if (GeckoInstance.this.gui != null)
-			GeckoInstance.this.gui.updateViewscreen();
+        if (this.gui != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (GeckoInstance.this.genomes != null)
+                        scd = new StartComputationDialog(GeckoInstance.this.genomes.length);
+                    else
+                        scd = null;
+                    gui.updateViewscreen();
+                }
+            });
+        } else
+            scd = null;
 		this.fireDataChanged();
 	}
 	
@@ -404,26 +411,31 @@ public class GeckoInstance {
         this.reducedList = null;
 		
 		if (gui != null) {
-			gui.getGcSelector().refresh();
-		}
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    gui.getGcSelector().refresh();
+                }
+            });
+        }
 	}
 
     public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                GeckoInstance.getInstance().setClusters(reader.getGeneClusters());
-                GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
-                GeckoInstance.getInstance().setColorMap(reader.getColorMap());
-                GeckoInstance.getInstance().setGenomes(reader.getGenomes());
-                GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
-                if (gui != null){
+        GeckoInstance.getInstance().setClusters(reader.getGeneClusters());
+        GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
+        GeckoInstance.getInstance().setColorMap(reader.getColorMap());
+        GeckoInstance.getInstance().setGenomes(reader.getGenomes());
+        GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
+        if (gui != null){
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
                     gui.updateViewscreen();
                     gui.updategcSelector();
                     gui.changeMode(Gui.Mode.SESSION_IDLE);
                 }
-            }
-        });
+            });
+        }
 
         GeckoInstance.getInstance().fireDataChanged();
     }

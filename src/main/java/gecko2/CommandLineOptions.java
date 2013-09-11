@@ -33,8 +33,8 @@ public class CommandLineOptions {
     @Option(name="-o", aliases = "--operationMode", usage = "the operation mode, [reference] cluster (default), [median] gene cluster, or [center] gene cluster.")
     private Parameter.OperationMode operationMode = Parameter.OperationMode.reference;
 
-    @Option(name="-r", aliases = "--referenceGenomeIndex", usage = "index of the reference genome.\nIf not set all genomes are used as reference")
-    private int referenceGenomeIndex = -1;
+    @Option(name="-r", aliases = "--referenceGenomeName", usage = "name of the reference genome.\nIf not set all genomes are used as reference.\nThe name has to be uniquely contained in a single genome")
+    private String referenceGenomeName = "";
 
     /*
      * Files
@@ -87,8 +87,8 @@ public class CommandLineOptions {
         return operationMode;
     }
 
-    public int getReferenceGenomeIndex() {
-        return referenceGenomeIndex;
+    public String getReferenceGenomeName() {
+        return referenceGenomeName;
     }
 
     public File getInfile() {
