@@ -400,4 +400,113 @@ public class CogFileReaderTest {
 			}	
 		}
 	}
+
+    /**
+     * Simple test for file with two genomes which contain one gene, with two ids.
+     */
+    @Test
+    public void readFileContentMultiIdTest()
+    {
+        // define the result we want to get
+
+        // using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later
+        // releases
+        Map<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
+        Genome[] refGenomes = new Genome[2];
+
+        int geneID1 = 1;
+        int geneID2 = 2;
+        int geneID3 = 3;
+        int geneID4 = 4;
+
+        String[] geneString1 = {"25"};
+        String[] geneString2 = {"21"};
+        String[] geneString3 = {"7"};
+        String[] geneString4 = {"4"};
+
+        geneLabelMap.put(1, geneString1);
+        geneLabelMap.put(2, geneString2);
+        geneLabelMap.put(3, geneString3);
+        geneLabelMap.put(4, geneString4);
+
+
+        List<Gene> genes1 = new ArrayList<Gene>();
+        List<Gene> genes2 = new ArrayList<Gene>();
+        Gene gen1 = new Gene("fusA", geneID1, "elongation factor EF-A", false);
+        Gene gen2 = new Gene("fusA", geneID2, "elongation factor EF-A", false);
+        Gene gen3 = new Gene("fusB", geneID3, "elongation factor EF-B", false);
+        Gene gen4 = new Gene("fusB", geneID4, "elongation factor EF-B", false);
+
+        genes1.add(gen1);
+        genes1.add(gen2);
+        genes2.add(gen3);
+        genes2.add(gen4);
+
+        refGenomes[0] = new Genome("Shorty 1");
+        refGenomes[1] = new Genome("Shorty 2");
+        refGenomes[0].addChromosome(new Chromosome("", genes1, refGenomes[0]));
+        refGenomes[1].addChromosome(new Chromosome("", genes2, refGenomes[1]));
+
+        List<GenomeOccurence> genOcc;
+
+        File inputFile = new File(getClass().getResource("/c2MultiIdGenes.cog").getFile());
+
+        CogFileReader reader = new CogFileReader(inputFile);
+        try
+        {
+            reader = new CogFileReader(inputFile);
+            GeckoInstance.getInstance().setCurrentInputFile(inputFile);
+
+            reader.readData();
+        }
+        catch (EOFException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
+
+        assertEquals(reader.getGeneLabelMap().size(), geneLabelMap.size());
+
+        for( int i = 1; i < reader.getGeneLabelMap().size() + 1; i++)
+        {
+            // Check keys and values for the geneLabelMap
+            for(int z = 0; z < reader.getGeneLabelMap().keySet().toArray().length; z++)
+            {
+                //int z;
+                assertEquals(geneLabelMap.keySet().toArray()[z], reader.getGeneLabelMap().keySet().toArray()[z]);
+            }
+
+            for( int j = 1; j <= reader.getGeneLabelMap().size(); j++)
+            {
+                assertArrayEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
+            }
+
+            // check the genome array
+            for( int j = 0; j < reader.getGenomes().length; j++)
+            {
+                for (int k = 0; k < refGenomes[j].getChromosomes().size(); k++)
+                {
+                    assertEquals(refGenomes[j].getChromosomes().get(k).getName(), reader.getGenomes()[j].getChromosomes().get(k).getName());
+
+                    int p = 0;
+
+                    for (Gene gene: refGenomes[j].getChromosomes().get(k).getGenes())
+                    {
+                        assertEquals(gene.getAnnotation(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getAnnotation());
+                        assertEquals(gene.getId(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getId());
+                        assertEquals(gene.getName(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getName());
+                        assertEquals(gene.getSummary(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getSummary());
+                        p++;
+                    }
+                }
+            }
+        }
+    }
 }
