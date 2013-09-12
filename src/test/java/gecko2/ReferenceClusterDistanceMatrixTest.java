@@ -301,9 +301,9 @@ public class ReferenceClusterDistanceMatrixTest {
 	
 	
 	@Test
-	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
-		File inputFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacter.cog").toURI());
-		File resultFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacterDeltaTable.txt").toURI());
+	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws IOException, DataFormatException, ParseException {
+		File inputFile = new File(getClass().getResource("/fiveProteobacter.cog").getFile());
+		File resultFile = new File(getClass().getResource("/fiveProteobacterDeltaTable.txt").getFile());
 		
 		automaticGeneClusterTestFromFile(inputFile, resultFile);
 	}

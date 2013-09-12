@@ -26,12 +26,12 @@ public class CogFileReader implements GeckoDataReader {
 	/**
 	 * Storing place for the colorMap
 	 */
-	private HashMap<Integer, Color> colorMap;
+	private Map<Integer, Color> colorMap;
 	
 	/**
 	 * Storing place for the geneLabelMap 
 	 */
-	private HashMap<Integer, String[]> geneLabelMap;
+	private Map<Integer, String[]> geneLabelMap;
 	
 	/**
 	 * Storing place for the genomes.
@@ -109,7 +109,8 @@ public class CogFileReader implements GeckoDataReader {
 	 * @param id current string id
 	 * @return 0 (as string) if id contains only zeros else the unmodified id
 	 */
-	private String testOldIdFormat(String id) {
+	private String convertToValidIdFormat(String id) {
+        id = id.trim();
 		try {
 			int newID = Integer.parseInt(id);
 			return Integer.toString(newID);
@@ -126,13 +127,13 @@ public class CogFileReader implements GeckoDataReader {
 	 */
 	public void importGenomesOccs() throws FileNotFoundException	{
 		occs = new ArrayList<GenomeOccurence>();
-		HashMap<Integer, Integer> groupSize = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> groupSize = new HashMap<Integer, Integer>();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
 			try {
 				String line;
 				GenomeOccurence add = new GenomeOccurence();
-				HashMap<String, Integer> groups = new HashMap<String, Integer>();
+				Map<String, Integer> groups = new HashMap<String, Integer>();
 
 				int curline = 0;
 				int j = 1;
@@ -224,14 +225,14 @@ public class CogFileReader implements GeckoDataReader {
 	public void readFileContent() throws IOException, ParseException{
         SortUtils.resortGenomeOccurencesByStart(occs);
 
-		HashMap<Integer, Genome> groupedGenomes = new HashMap<Integer, Genome>();
-		ArrayList<Genome> ungroupedGenomes = new ArrayList<Genome>();
+		Map<Integer, Genome> groupedGenomes = new HashMap<Integer, Genome>();
+		List<Genome> ungroupedGenomes = new ArrayList<Genome>();
 		String line;
         CountedReader reader = null;
         try {
             reader = new CountedReader(new FileReader(inputFile));
 
-            ArrayList<String[]> stringidlist = new ArrayList<String[]>();
+            List<String[]> stringidlist = new ArrayList<String[]>();
 
             // This is a bit dirty we look only into the first index of the array and store it in this map
             // But it seems like containsKey can't handle arrays as key.
@@ -274,34 +275,34 @@ public class CogFileReader implements GeckoDataReader {
                         String[] explode = line.split("\t");
                         String[] ids = explode[0].split(",");
                         for (int j = 0; j < ids.length; j++)
-                            ids[j] = this.testOldIdFormat(ids[j]);
+                            ids[j] = this.convertToValidIdFormat(ids[j]);
 
-                        int sign;
-                        if (explode[1].equals("-"))
-                            sign = -1;
-                        else
-                            sign = 1;
+                        int sign = explode[1].equals("-") ? -1 : 1;
 
-                        if (ids[0].length() > maxIdWidth)
-                            maxIdWidth = ids[0].length();
+                        for (String id : ids) {
+                            String[] single_id_array = {id}; // We split multi id genes into multiple genes.
 
-                        if (!isUnhomologe(ids) && backmap.containsKey(ids[0])) {
-                            if (explode.length > 5)
-                                genes.add(new Gene(explode[5], explode[3], sign * backmap.get(ids[0]), explode[4], false));
-                            else
-                                genes.add(new Gene(explode[3], sign * backmap.get(ids[0]), explode[4], false));
-                        } else {
-                            stringidlist.add(ids);
-                            int intid = stringidlist.size();
+                            if (single_id_array[0].length() > maxIdWidth)
+                                maxIdWidth = single_id_array[0].length();
 
-                            if (!isUnhomologe(ids)) {
-                                this.colorMap.put(intid, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
-                                backmap.put(ids[0], intid);
+                            if (!isUnhomologe(single_id_array) && backmap.containsKey(single_id_array[0])) {
+                                if (explode.length > 5)
+                                    genes.add(new Gene(explode[5], explode[3], sign * backmap.get(single_id_array[0]), explode[4], false));
+                                else
+                                    genes.add(new Gene(explode[3], sign * backmap.get(single_id_array[0]), explode[4], false));
+                            } else {
+                                stringidlist.add(single_id_array);
+                                int intid = stringidlist.size();
+
+                                if (!isUnhomologe(single_id_array)) {
+                                    this.colorMap.put(intid, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
+                                    backmap.put(single_id_array[0], intid);
+                                }
+                                if (explode.length > 5)
+                                    genes.add(new Gene(explode[5], explode[3], sign * intid, explode[4], isUnhomologe(single_id_array)));
+                                else
+                                    genes.add(new Gene(explode[3], sign * intid, explode[4], isUnhomologe(single_id_array)));
                             }
-                            if (explode.length > 5)
-                                genes.add(new Gene(explode[5], explode[3], sign * intid, explode[4], isUnhomologe(ids)));
-                            else
-                                genes.add(new Gene(explode[3], sign * intid, explode[4], isUnhomologe(ids)));
                         }
                     }
                 }

@@ -2,6 +2,7 @@ package gecko2.io;
 
 import gecko2.GeckoInstance;
 import gecko2.GenomeOccurence;
+import gecko2.ReferenceClusterTest;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
@@ -14,6 +15,8 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -37,7 +40,7 @@ public class CogFileReaderTest {
 		
 		// using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later 
 		// releases
-		HashMap<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
+		Map<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
 		Genome[] refGenomes = new Genome[2];
 		
 		int geneID1 = 1;
@@ -56,8 +59,8 @@ public class CogFileReaderTest {
 		geneLabelMap.put(4, geneString4);
 		
 		
-		ArrayList<Gene> genes1 = new ArrayList<Gene>();
-		ArrayList<Gene> genes2 = new ArrayList<Gene>();
+		List<Gene> genes1 = new ArrayList<Gene>();
+		List<Gene> genes2 = new ArrayList<Gene>();
 		Gene gen1 = new Gene("fusA", geneID1, "elongation factor EF-G", false);
 		Gene gen2 = new Gene("tufA1", geneID2, "elongation factor EF-Tu", false);
 		Gene gen3 = new Gene("fusA", geneID3, "elongation factor EF-G", false);
@@ -75,12 +78,7 @@ public class CogFileReaderTest {
 		
 		ArrayList<GenomeOccurence> genOcc;
 
-        File inputFile = null;
-        try {
-            inputFile = new File(CogFileReaderTest.class.getResource("/c2.cog").toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        File inputFile = new File(getClass().getResource("/c2.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
         try
@@ -88,9 +86,7 @@ public class CogFileReaderTest {
             reader = new CogFileReader(inputFile);
 			GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 			
-			reader.importGenomesOccs();
-		
-			reader.readFileContent();
+			reader.readData();
 		}
 		catch (EOFException e) 
 		{
@@ -152,7 +148,7 @@ public class CogFileReaderTest {
 		
 		// using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later 
 		// releases
-		HashMap<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
+		Map<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
 		
 		Genome[] refGenomes = new Genome[4];
 		
@@ -260,19 +256,19 @@ public class CogFileReaderTest {
 		
 		// build chromosomes		
 		//Shorty1
-		ArrayList<Gene> genes1 = new ArrayList<Gene>();
+		List<Gene> genes1 = new ArrayList<Gene>();
 			
 		//Shorty2
-		ArrayList<Gene> genes2 = new ArrayList<Gene>();
+		List<Gene> genes2 = new ArrayList<Gene>();
 		
 		//Shorty3
-		ArrayList<Gene> genes3 = new ArrayList<Gene>();
+		List<Gene> genes3 = new ArrayList<Gene>();
 		
 		//Shorty4 C1
-		ArrayList<Gene> genes4 = new ArrayList<Gene>();
+		List<Gene> genes4 = new ArrayList<Gene>();
 			
 		//Shorty4 C2
-		ArrayList<Gene> genes42 = new ArrayList<Gene>();
+		List<Gene> genes42 = new ArrayList<Gene>();
 
 		
 		genes1.add(gen11);
@@ -342,12 +338,7 @@ public class CogFileReaderTest {
 		
 		ArrayList<GenomeOccurence> genOcc;
 
-        File inputFile = null;
-        try {
-            inputFile = new File(CogFileReaderTest.class.getResource("/c.cog").toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        File inputFile = new File(getClass().getResource("/c.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
 		
@@ -355,9 +346,7 @@ public class CogFileReaderTest {
 		{
 			GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 			
-			reader.importGenomesOccs();
-		
-			reader.readFileContent();
+			reader.readData();
 		} 
 		catch (EOFException e) 
 		{

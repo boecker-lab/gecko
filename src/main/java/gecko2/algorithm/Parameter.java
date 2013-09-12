@@ -138,6 +138,10 @@ public class Parameter {
 	public ReferenceType getRefType() {
 		return refType;
 	}
+
+    public char getRefTypeChar() {
+        return refType.getCharMode();
+    }
 		
 	public void setOperationMode(OperationMode opmode) {
 		this.operationMode = opmode;
@@ -146,6 +150,10 @@ public class Parameter {
 	public OperationMode getOperationMode() {
 		return operationMode;
 	}
+
+    public char getOperationModeChar() {
+        return operationMode.getCharMode();
+    }
 	
 	public void setDelta(int delta) {
 		this.delta = delta;

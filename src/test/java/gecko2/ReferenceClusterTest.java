@@ -40,22 +40,7 @@ public class ReferenceClusterTest
 	@BeforeClass
 	public static void loadLibGecko2()
 	{
-		System.err.println("You are running " + System.getProperty("os.arch") + "-Java on " + System.getProperty("os.name"));
-		
-		try 
-		{
-			LibraryUtils.loadLibrary("libgecko2");
-		} 
-		catch (PlatformNotSupportedException e) 
-		{
-			e.printStackTrace();
-			System.exit(1);
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-			System.exit(1);
-		}
+        GeneClusterTestUtils.loadLibGecko2();
 	}
 	
 	

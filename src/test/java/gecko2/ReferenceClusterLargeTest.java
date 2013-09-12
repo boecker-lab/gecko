@@ -21,28 +21,13 @@ public class ReferenceClusterLargeTest {
 	@BeforeClass
 	public static void loadLibGecko2()
 	{
-		System.err.println("You are running " + System.getProperty("os.arch") + "-Java on " + System.getProperty("os.name"));
-		
-		try 
-		{
-			LibraryUtils.loadLibrary("libgecko2");
-		} 
-		catch (PlatformNotSupportedException e) 
-		{
-			e.printStackTrace();
-			System.exit(1);
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-			System.exit(1);
-		}
+        GeneClusterTestUtils.loadLibGecko2();
 	}
 	
 	@Test
-	public void statisticDataReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
-		File inputFile = new File(ReferenceClusterTest.class.getResource("/statisticsData.cog").toURI());
-		File resultFile = new File(ReferenceClusterTest.class.getResource("/statisticsDataD5S8Q10FixedRef.txt").toURI());
+	public void statisticDataReferenceClusterTest() throws IOException, DataFormatException, ParseException {
+		File inputFile = new File(getClass().getResource("/statisticsData.cog").getFile());
+		File resultFile = new File(getClass().getResource("/statisticsDataD5S8Q10FixedRef.txt").getFile());
 		
 		automaticGeneClusterTestFromFile(inputFile, resultFile);
 	}

@@ -180,13 +180,12 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void testFromGenomes() throws Exception{
-		File inputFile = new File(CogFileReaderTest.class.getResource("/c.cog").toURI());
+		File inputFile = new File(getClass().getResource("/c.cog").getFile());
         CogFileReader reader = new CogFileReader(inputFile);
         GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 
-		reader.importGenomesOccs();
-		reader.readFileContent();
-				
+        reader.readData();
+
 		Genome[] genomes = reader.getGenomes();
 		
 		breakpointDistanceTest(genomes, new int[][] {{0, 14, 20, 20}, {14, 0, 22, 24},{20, 22, 0, 24},{20, 24, 24, 0}}, false);
@@ -194,12 +193,11 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void testGrouping() throws Exception{
-		File inputFile = new File(CogFileReaderTest.class.getResource("/c.cog").toURI());
+		File inputFile = new File(getClass().getResource("/c.cog").getFile());
         CogFileReader reader = new CogFileReader(inputFile);
 		GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 
-		reader.importGenomesOccs();
-		reader.readFileContent();
+        reader.readData();
 				
 		Genome[] genomes = reader.getGenomes();
 		
