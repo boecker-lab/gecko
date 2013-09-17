@@ -39,6 +39,11 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * The variable stores the currently selected gene cluster
 	 */
 	private GeneCluster selectedCluster = null;
+
+    /**
+     * What name is shown for each gene
+     */
+    private GenomePainting.NameType nameType = GenomePainting.NameType.LOCUS_TAG;
 	
 	/**
 	 * The variable stores the filter activity: <br>
@@ -240,7 +245,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	}
 
 	private void addGenome(Genome g)	{	
-		AbstractGenomeBrowser gb = new PaintingGenomeBrowser(g, this);
+		AbstractGenomeBrowser gb = new PaintingGenomeBrowser(g, this, nameType);
 		gb.addMouseWheelListener(mouseWheelListener);
 		gb.addComponentListener(genomeBrowserComponentListener);
 		this.genomeBrowsers.add(gb);

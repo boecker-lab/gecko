@@ -63,22 +63,8 @@ public class GeneClusterPicture {
 	 * Default is false.
 	 */
 	private boolean gNames = false;
-	
-	/**
-	 * Tells us whether to write gene name, gene ID or locus tag
-	 */
-	public enum NameType {
-		ID("ID"), NAME("Name"), LOCUS_TAG("locus_tag");
-		private final String display;
-		private NameType(String s) {
-			display = s;
-		}
-		@Override
-		public String toString() {
-			return display;
-		}
-	}
-	private NameType nameType = null;
+
+    private GenomePainting.NameType nameType = null;
 	
 	/**
 	 * Stores the current data from GeckoInstance.
@@ -165,7 +151,7 @@ public class GeneClusterPicture {
 	 * @param gnames true if the genome name shall be replace the number
 	 * @param nameType either id, name or locus_tag
 	 */
-	public GeneClusterPicture(boolean gnames, NameType nameType, GeneCluster selectedCluster, int[] subselection) {
+	public GeneClusterPicture(boolean gnames, GenomePainting.NameType nameType, GeneCluster selectedCluster, int[] subselection) {
 		
 		this.gecko = GeckoInstance.getInstance();
 		this.selectedCluster = selectedCluster;
@@ -179,7 +165,7 @@ public class GeneClusterPicture {
 	 * Default constructor which sets all important global variable.
 	 */
 	public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection) {
-		this(false, NameType.ID, selectedCluster, subselection);
+		this(false, GenomePainting.NameType.ID, selectedCluster, subselection);
 	}
 	
 	/**
@@ -220,7 +206,7 @@ public class GeneClusterPicture {
 	 *
 	 * @param nameType the name type
 	 */
-	public void setNameType(NameType nameType) {
+	public void setNameType(GenomePainting.NameType nameType) {
 		if (this.nameType != nameType) {
 			this.nameType = nameType;
 			resetPageSize();
@@ -232,7 +218,7 @@ public class GeneClusterPicture {
 	 * It also calculates the length of the longest genome name.
 	 * @param nameType the type of naming that is used.
 	 */
-	private void calcLengths(NameType nameType) {		
+	private void calcLengths(GenomePainting.NameType nameType) {
 		maxGeneCodeLength = 0;
 		maxGenomeNameLength = 0;
 		maxSubseqLength = 0;
@@ -252,10 +238,10 @@ public class GeneClusterPicture {
 							maxSubseqLength = stop - start + 1;
 						
 						Gene gene = gecko.getGenomes()[i].getChromosomes().get(chrom).getGenes().get(k);
-						if (nameType == NameType.NAME)
+						if (nameType == GenomePainting.NameType.NAME)
 							if (gene.getName().length() > maxGeneCodeLength)
 								maxGeneCodeLength = gene.getName().length();
-						if (nameType == NameType.LOCUS_TAG)
+						if (nameType == GenomePainting.NameType.LOCUS_TAG)
 							if (gene.getTag().length() > maxGeneCodeLength)
 								maxGeneCodeLength = gene.getTag().length();
 					}
@@ -269,10 +255,10 @@ public class GeneClusterPicture {
 		this.pageHeight = selectedCluster.getSize() * (this.elemHeight + 2 * this.vgap);
 				
 		// we have to set the width here in the constructor it does not work
-		if (this.nameType != NameType.ID) 
+		if (this.nameType != GenomePainting.NameType.ID)
 			this.elemWidth = this.maxGeneCodeLength * 8 + 8;
 		else 	
-			this.elemWidth = gecko.getMaxIdLength() * 7 + 12;
+			this.elemWidth = gecko.getMaxLength(GenomePainting.NameType.ID) * 7 + 12;
 		
 		if (gNames)
 			this.nameWidth = 7 * maxGenomeNameLength + 4;

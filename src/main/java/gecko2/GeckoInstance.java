@@ -4,6 +4,7 @@ import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.*;
 import gecko2.event.DataEvent;
 import gecko2.event.DataListener;
+import gecko2.gui.GenomePainting;
 import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
 import gecko2.io.GeckoDataReader;
@@ -24,7 +25,7 @@ import java.util.regex.Pattern;
 public class GeckoInstance {
 	private static GeckoInstance instance;
 
-	private native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
+    private native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
 	
 	public enum ResultFilter {showAll, showFiltered, showSelected}
@@ -51,6 +52,8 @@ public class GeckoInstance {
 	private int geneElementWidth;
 	
 	private int maxIdLength;
+    private int maxNameLength;
+    private int maxLocusTagLength;
 
     private final EventListenerList eventListener = new EventListenerList();
 	
@@ -58,11 +61,13 @@ public class GeckoInstance {
 	 * Setter for the variable maxIdLength which is the length of the
 	 * longest appearing id.
 	 * 
-	 * @param length longest id
+	 * @param idLength longest id length
 	 */
-	public void setMaxIdLength(int length)
+	public void setMaxLengths(int idLength, int nameLength, int locusTagLength)
 	{
-		this.maxIdLength = length;
+		this.maxIdLength = idLength;
+        this.maxNameLength = nameLength;
+        this.maxLocusTagLength = locusTagLength;
 	}
 	
 	/**
@@ -70,9 +75,15 @@ public class GeckoInstance {
 	 * 
 	 * @return the length of the longest id in the read data
 	 */
-	public int getMaxIdLength()
+	public int getMaxLength(GenomePainting.NameType nameType)
 	{
-		return this.maxIdLength;
+        switch (nameType) {
+            case ID: return maxIdLength;
+            case NAME: return maxNameLength;
+            case LOCUS_TAG:return maxLocusTagLength;
+            default:
+                return -1;
+        }
 	}
 	
 	/**
@@ -421,11 +432,11 @@ public class GeckoInstance {
 	}
 
     public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
+        GeckoInstance.getInstance().setMaxLengths(reader.getMaxIdLength(), reader.getMaxNameLength(), reader.getMaxLocusTagLength());
         GeckoInstance.getInstance().setClusters(reader.getGeneClusters());
         GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
         GeckoInstance.getInstance().setColorMap(reader.getColorMap());
         GeckoInstance.getInstance().setGenomes(reader.getGenomes());
-        GeckoInstance.getInstance().setMaxIdLength(reader.getMaxIdLength());
         if (gui != null){
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -857,7 +868,10 @@ public class GeckoInstance {
 					if (v<gui.getProgressbar().getMaximum()) {
 						gui.changeMode(Gui.Mode.COMPUTING);
 						gui.getProgressbar().setValue(v);
-					} else {
+					} else if (v<gui.getProgressbar().getMaximum()*2) {
+                        gui.changeMode(Gui.Mode.DOING_STATISTICS);
+                        gui.getProgressbar().setValue(v-gui.getProgressbar().getMaximum());
+                    } else {
 						gui.changeMode(Gui.Mode.FINISHING_COMPUTATION);
 					}
 				}

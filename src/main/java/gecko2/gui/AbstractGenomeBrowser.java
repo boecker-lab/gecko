@@ -18,4 +18,5 @@ abstract class AbstractGenomeBrowser extends JScrollPane implements Adjustable{
 	public abstract Genome getGenome();
 	public abstract int getGeneWidth();
 	public abstract int getGBHeight();
+    public abstract void setNameType(GenomePainting.NameType nameType);
 }

@@ -1,7 +1,7 @@
 package gecko2.gui;
 
 import gecko2.algorithm.GeneCluster;
-import gecko2.gui.GeneClusterPicture.NameType;
+import gecko2.gui.GenomePainting.NameType;
 import gecko2.io.GeneClusterToPDFWriter;
 import gecko2.io.ImageWriter;
 import gecko2.util.FileUtils;
@@ -153,7 +153,7 @@ public class GeneClusterExportDialog extends JDialog {
 		});
 		
 		
-		final JComboBox geneNamingComboBox = new JComboBox(NameType.values());
+		final JComboBox geneNamingComboBox = new JComboBox(GenomePainting.NameType.values());
 		geneNamingComboBox.setSelectedIndex(0);
 		geneNamingComboBox.addActionListener(new ActionListener() {
 			

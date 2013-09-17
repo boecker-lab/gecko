@@ -11,6 +11,21 @@ public class GenomePainting {
 	
 	private final static int ARROWSIZE = 8;
 	private final static int CHROMOSOME_END_WIDTH = 18;
+
+    /**
+     * Tells us whether to write gene name, gene ID or locus tag
+     */
+    public enum NameType {
+        ID("ID"), NAME("Name"), LOCUS_TAG("locus_tag");
+        private final String display;
+        private NameType(String s) {
+            display = s;
+        }
+        @Override
+        public String toString() {
+            return display;
+        }
+    }
 	
 	/**
 	 * Paints the header of the genome.
@@ -95,10 +110,36 @@ public class GenomePainting {
 	  * @param vgap the vertical gap size
 	  * @return the x coordinate after the painting
 	  */
-	public static int paintGene(Graphics g, Gene gene, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
-		String geneName = GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(gene.getId()))[0];
-		return paintGene(g, gene, backgroundColor, color, geneName, x, y, width, height, hgap, vgap);
-	}
+	/*public static int paintGene(Graphics g, Gene gene, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
+		return paintGene(g, gene, NameType.NAME, backgroundColor, color, x, y, width, height, hgap, vgap);
+	}*/
+
+    /**
+     * Paints one gene, the gene text is automatically generated from the gene id and the gecko gene label map
+     * @param g the Graphics
+     * @param gene the gene
+     * @param backgroundColor the color of the background
+     * @param color the color of the gene arrow
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param width the width of the gene box
+     * @param height the height of the gene box
+     * @param hgap the size of the gap next to the gene
+     * @param vgap the vertical gap size
+     * @return the x coordinate after the painting
+     */
+    public static int paintGene(Graphics g, Gene gene, NameType nameType, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
+        String name = "";
+        switch (nameType) {
+            case ID: name = GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(gene.getId()))[0];
+                break;
+            case NAME: name = gene.getName();
+                break;
+            case LOCUS_TAG: name = gene.getTag();
+                break;
+        }
+        return paintGene(g, gene, backgroundColor, color, name, x, y, width, height, hgap, vgap);
+    }
 	
 	/**
 	  * Paints one gene
@@ -206,6 +247,7 @@ public class GenomePainting {
 	 * Paints the Genome
 	 * @param g the used Graphics
 	 * @param genome the Genome
+     * @param nameType what information shall be painted in each gene
 	 * @param x the x coordinate to start the painting at
 	 * @param y the y coordinate to start the painting at
 	 * @param width the width of one gene
@@ -213,9 +255,9 @@ public class GenomePainting {
 	 * @param hgap the size of the gap between genes
 	 * @param vgap the vertical gap size
 	 */
-	public static void paintGenome(Graphics g, Genome genome, int x, int y, int width, int height, int hgap, int vgap) {
+	public static void paintGenome(Graphics g, Genome genome, NameType nameType, int x, int y, int width, int height, int hgap, int vgap) {
 		for (Chromosome chr : genome.getChromosomes()) {
-			x = paintChromosome(g, chr, x, y, width, height, hgap, vgap);
+			x = paintChromosome(g, chr, nameType, x, y, width, height, hgap, vgap);
 		}
 	}
 	
@@ -224,6 +266,7 @@ public class GenomePainting {
 	 * @param g the used Graphics
 	 * @param genome the Genome
 	 * @param highlights the chromsome index, start and end gene of the area that will be highlighted
+     * @param nameType what information shall be painted in each gene
 	 * @param x the x coordinate to start the painting at
 	 * @param y the y coordinate to start the painting at
 	 * @param width the width of one gene
@@ -231,16 +274,16 @@ public class GenomePainting {
 	 * @param hgap the size of the gap between genes
 	 * @param vgap the vertical gap size
 	 */
-	public static void paintGenomeWithCluster(Graphics g, Genome genome, int[] highlights, Color highlightColor, int x, int y, int width, int height, int hgap, int vgap) {
+	public static void paintGenomeWithCluster(Graphics g, Genome genome, int[] highlights, NameType nameType, Color highlightColor, int x, int y, int width, int height, int hgap, int vgap) {
 		if (highlights == null || highlights.length != 3)
-			paintGenome(g, genome, x, y, width, height, hgap, vgap);
+			paintGenome(g, genome, nameType, x, y, width, height, hgap, vgap);
 		else {
 			for (int i=0; i<genome.getChromosomes().size(); i++) {
 				Chromosome chr = genome.getChromosomes().get(i);
 				if (i != highlights[0])
-					x = paintChromosomeGrey(g, chr, x, y, width, height, hgap, vgap);
+					x = paintChromosomeGrey(g, chr, nameType, x, y, width, height, hgap, vgap);
 				else
-					x = paintChromosomeWithCluster(g, chr, highlights[1], highlights[2], highlightColor, x, y, width, height, hgap, vgap);
+					x = paintChromosomeWithCluster(g, chr, highlights[1], highlights[2], nameType, highlightColor, x, y, width, height, hgap, vgap);
 			}
 		}
 	}
@@ -249,6 +292,7 @@ public class GenomePainting {
 	 * Paints the Chromosome
 	 * @param g the used Graphics
 	 * @param chromosome the Chromosome
+     * @param nameType what information shall be painted in each gene
 	 * @param x the x coordinate to start the painting at
 	 * @param y the y coordinate to start the painting at
 	 * @param width the width of one gene
@@ -256,10 +300,10 @@ public class GenomePainting {
 	 * @param hgap the size of the gap between genes
 	 * @param vgap the vertical gap size
 	 */
-	private static int paintChromosome(Graphics g, Chromosome chromosome, int x, int y, int width, int height, int hgap, int vgap){
+	private static int paintChromosome(Graphics g, Chromosome chromosome, NameType nameType, int x, int y, int width, int height, int hgap, int vgap){
 		x = paintChromosomeStart(g, x, y, width, height, hgap);
 		for (Gene gene : chromosome.getGenes()) {
-			x = paintGene(g, gene, Color.WHITE, getColor(gene), x, y, width, height, hgap, vgap);
+			x = paintGene(g, gene, nameType, Color.WHITE, getColor(gene), x, y, width, height, hgap, vgap);
 		}
 		x = paintChromosomeEnd(g, x, y, width, height, hgap);
 		
@@ -270,6 +314,7 @@ public class GenomePainting {
 	 * Paints the Chromosome with grey value gene colors
 	 * @param g the used Graphics
 	 * @param chromosome the Chromosome
+     * @param nameType what information shall be painted in each gene
 	 * @param x the x coordinate to start the painting at
 	 * @param y the y coordinate to start the painting at
 	 * @param width the width of one gene
@@ -277,10 +322,10 @@ public class GenomePainting {
 	 * @param hgap the size of the gap between genes
  	 * @param vgap the vertical gap size
 	 */
-	private static int paintChromosomeGrey(Graphics g, Chromosome chromosome, int x, int y, int width, int height, int hgap, int vgap){
+	private static int paintChromosomeGrey(Graphics g, Chromosome chromosome, NameType nameType, int x, int y, int width, int height, int hgap, int vgap){
 		x = paintChromosomeStart(g, x, y, width, height, hgap);
 		for (Gene gene : chromosome.getGenes()) {
-			x = paintGene(g, gene, Color.WHITE, getGreyValueColor(gene), x, y, width, height, hgap, vgap);
+			x = paintGene(g, gene, nameType, Color.WHITE, getGreyValueColor(gene), x, y, width, height, hgap, vgap);
 		}
 		x = paintChromosomeEnd(g, x, y, width, height, hgap);
 		
@@ -293,6 +338,7 @@ public class GenomePainting {
 	 * @param chr the Chromosome
 	 * @param start the start gene of the cluster
 	 * @param stop the end gene of the cluster
+     * @param nameType what information shall be painted in each gene
 	 * @param highlightColor the color the cluster background is color with
 	 * @param x the x coordinate to start the painting at
 	 * @param y the y coordinate to start the painting at
@@ -302,15 +348,15 @@ public class GenomePainting {
  	 * @param vgap the vertical gap size
 	 */
 	private static int paintChromosomeWithCluster(Graphics g, Chromosome chr,
-			int start, int stop, Color highlightColor, int x, int y, int width,
+			int start, int stop, NameType nameType, Color highlightColor, int x, int y, int width,
 			int height, int hgap, int vgap) {
 		x = paintChromosomeStart(g, x, y, width, height, hgap);
 		for (int i=0; i<chr.getGenes().size(); i++) {
 			Gene gene = chr.getGenes().get(i);
 			if (i>=start && i<=stop)
-				x = paintGene(g, gene, highlightColor, getColor(gene), x, y, width, height, hgap, vgap);
+				x = paintGene(g, gene, nameType, highlightColor, getColor(gene), x, y, width, height, hgap, vgap);
 			else
-				x = paintGene(g, gene, Color.WHITE, getGreyValueColor(gene), x, y, width, height, hgap, vgap);
+				x = paintGene(g, gene, nameType, Color.WHITE, getGreyValueColor(gene), x, y, width, height, hgap, vgap);
 		}
 		x = paintChromosomeEnd(g, x, y, width, height, hgap);
 		

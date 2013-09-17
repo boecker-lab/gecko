@@ -1,6 +1,7 @@
 package gecko2.io;
 
 import gecko2.GeckoInstance;
+import gecko2.gui.GenomePainting;
 
 import java.io.*;
 
@@ -30,7 +31,9 @@ public class SessionWriter
 			o.writeObject(GeckoInstance.getInstance().getGenLabelMap());
 			o.writeObject(GeckoInstance.getInstance().getColormap());
 			o.writeObject(GeckoInstance.getInstance().getClusters());
-			o.writeObject(GeckoInstance.getInstance().getMaxIdLength());
+			o.writeObject(GeckoInstance.getInstance().getMaxLength(GenomePainting.NameType.ID));
+            o.writeObject(GeckoInstance.getInstance().getMaxLength(GenomePainting.NameType.NAME));
+            o.writeObject(GeckoInstance.getInstance().getMaxLength(GenomePainting.NameType.LOCUS_TAG));
 			o.close();
 		} 
 		catch (FileNotFoundException e) 

@@ -38,6 +38,16 @@ public interface GeckoDataReader {
     public int getMaxIdLength();
 
     /**
+     * @return the maxNameLength from the input file
+     */
+    public int getMaxNameLength();
+
+    /**
+     * @return the maxLocusTagLength from the input file
+     */
+    public int getMaxLocusTagLength();
+
+    /**
      * @return the gene clusters
      */
     public GeneCluster[] getGeneClusters();

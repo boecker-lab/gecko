@@ -325,11 +325,11 @@ public class Gui {
 	 * The users possibilities to interact with the ui depending on the current
 	 * state of the application are handled here
 	 */
-	
-	/**
-	 * The application is currently performing the gene cluster computation
-	 */
-	public enum Mode {COMPUTING
+	public enum Mode {
+        /**
+         * The application is currently performing the gene cluster computation
+         */
+        COMPUTING,DOING_STATISTICS
 		/**
 		 * The application is idle, a session is currently open
 		 */
@@ -386,6 +386,9 @@ public class Gui {
 			case COMPUTING:
 				changeMode("Computing gene clusters...", false, true, false, false);
 				break;
+            case DOING_STATISTICS:
+                changeMode("Computing cluster statistics...", false, true, false, false);
+                break;
 			case SESSION_IDLE:
 				changeMode("Ready", false, false, true, true);
 				break;

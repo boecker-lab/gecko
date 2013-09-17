@@ -5,10 +5,7 @@ import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +42,16 @@ public class GckFileReader implements GeckoDataReader {
 	 * Storing place for the length of the longest id.
 	 */
 	private int maxIdLength;
+
+    /**
+     * Storing place for the length of the longest name.
+     */
+    private int maxNameLength;
+
+    /**
+     * Storing place for the length of the longest locus tag.
+     */
+    private int maxLocusTagLength;
 
     /**
      * The input file
@@ -90,6 +97,22 @@ public class GckFileReader implements GeckoDataReader {
 	}
 
     /**
+     * @return the maxNameLength from the input file
+     */
+    @Override
+    public int getMaxNameLength() {
+        return maxNameLength;
+    }
+
+    /**
+     * @return the maxLocusTagLength from the input file
+     */
+    @Override
+    public int getMaxLocusTagLength() {
+        return maxLocusTagLength;
+    }
+
+    /**
      * @return the gene clusters
      */
     public GeneCluster[] getGeneClusters(){
@@ -111,6 +134,13 @@ public class GckFileReader implements GeckoDataReader {
             colorMap = (HashMap<Integer, Color>) o.readObject();
             clusters = (GeneCluster[]) o.readObject();
             maxIdLength = (Integer) o.readObject();
+            try {
+                maxNameLength = (Integer) o.readObject();
+                maxLocusTagLength = (Integer) o.readObject();
+            } catch (EOFException e) {  // old format did not serialize this.
+                maxNameLength = Genome.getMaxNameLength(genomes);
+                maxLocusTagLength = Genome.getMaxLocusTagLength(genomes);
+            }
 
             if (clusters != null) {
                 for (GeneCluster c : clusters)

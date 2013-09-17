@@ -276,8 +276,13 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 	public int getGBHeight() {
 		return 4+gecko.getGeneElementHight()+this.flowlayout.getVgap();
 	}
-	
-	@Override
+
+    @Override
+    public void setNameType(GenomePainting.NameType nameType) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
 	public void flip() {
 		arrangeGeneElements(!flipped);
 	}

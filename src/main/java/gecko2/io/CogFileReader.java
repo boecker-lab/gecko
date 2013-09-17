@@ -43,6 +43,19 @@ public class CogFileReader implements GeckoDataReader {
 	 */
 	private int maxIdLength;
 
+    /**
+     * Storing place for the length of the longest name.
+     */
+    private int maxNameLength;
+
+    /**
+     * Storing place for the length of the longest locus tag.
+     */
+    private int maxLocusTagLength;
+
+    /**
+     * The list of genome occurrences. Used for choosing which genome to import.
+     */
     private List<GenomeOccurence> occs;
 	
 	/**
@@ -239,7 +252,9 @@ public class CogFileReader implements GeckoDataReader {
             HashMap<String, Integer> backmap = new HashMap<String, Integer>();
             Random r = new Random();
             this.colorMap = new HashMap<Integer, Color>();
-            int maxIdWidth = 0;
+            this.maxIdLength = -1;
+            this.maxNameLength = -1;
+            this.maxLocusTagLength = -1;
 
             for (GenomeOccurence occ : occs) {
                 if (!occ.isFlagged())
@@ -282,8 +297,17 @@ public class CogFileReader implements GeckoDataReader {
                         for (String id : ids) {
                             String[] single_id_array = {id}; // We split multi id genes into multiple genes.
 
-                            if (single_id_array[0].length() > maxIdWidth)
-                                maxIdWidth = single_id_array[0].length();
+                            if (single_id_array[0].length() > maxIdLength)
+                                maxIdLength = single_id_array[0].length();
+
+                            if (explode.length > 5 && explode[5].length() > maxNameLength)
+                                maxNameLength = explode[5].length();
+
+                            if (explode[3].length() > maxLocusTagLength) {
+                                maxLocusTagLength = explode[3].length();
+                                if (explode.length <= 5 && explode[3].length() > maxNameLength)
+                                    maxNameLength = explode[3].length();
+                            }
 
                             if (!isUnhomologe(single_id_array) && backmap.containsKey(single_id_array[0])) {
                                 if (explode.length > 5)
@@ -306,8 +330,6 @@ public class CogFileReader implements GeckoDataReader {
                         }
                     }
                 }
-
-                this.maxIdLength = maxIdWidth;
 
                 // Thank you for the not existing autoboxing on arrays...
                 this.geneLabelMap = new HashMap<Integer, String[]>();
@@ -403,6 +425,22 @@ public class CogFileReader implements GeckoDataReader {
 		
 		return this.maxIdLength;
 	}
+
+    /**
+     * @return the maxNameLength from the input file
+     */
+    @Override
+    public int getMaxNameLength() {
+        return maxNameLength;
+    }
+
+    /**
+     * @return the maxLocusTagLength from the input file
+     */
+    @Override
+    public int getMaxLocusTagLength() {
+        return maxLocusTagLength;
+    }
 
     /**
      * Always returns an empty GeneCluster[]. .cog files don't contain gene cluster data.

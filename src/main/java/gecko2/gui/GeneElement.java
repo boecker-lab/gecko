@@ -69,7 +69,7 @@ public class GeneElement extends JPanel implements Adjustable {
 		if (fixedSize)
 			return gecko.getGeneElementWidth();
 		else
-			return 8 * gecko.getMaxIdLength() + 3;
+			return 8 * gecko.getMaxLength(GenomePainting.NameType.ID) + 3;
 	}
 
 	/**
@@ -188,8 +188,8 @@ public class GeneElement extends JPanel implements Adjustable {
 			String geneId = gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0];
 			int fontY_Position = ELEMHIGHT / 2 + Y_OFFSET + (g.getFont().getSize() / 2);
 			
-			if (geneId.length() < gecko.getMaxIdLength())
-				g.drawString(geneId , ((8 * gecko.getMaxIdLength() + 3) / 2) - ((8 * geneId.length()) / 2) + 5, fontY_Position);
+			if (geneId.length() < gecko.getMaxLength(GenomePainting.NameType.ID))
+				g.drawString(geneId , ((8 * gecko.getMaxLength(GenomePainting.NameType.ID) + 3) / 2) - ((8 * geneId.length()) / 2) + 5, fontY_Position);
 			else
 				g.drawString(geneId , 5 + fontoffset, fontY_Position);
 		}

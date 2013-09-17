@@ -87,7 +87,6 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			/*
 			 * Involed Chromosomes
 			 */
-			{
 		
 			JPanel involvedChrTitle = new JPanel();
 			involvedChrTitle.setBackground(masterPanel.getBackground());
@@ -100,30 +99,12 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			masterPanel.add(Box.createVerticalStrut(5));
 			
 			for (int i = 0; i < gOcc.getSubsequences().length; i++) {
-				
-				if (subselections[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
-					continue;
-				
-				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
-				
-				if (!s.isValid()) 
-					continue;
-				
-				JPanel cpanel = new JPanel();
-				FlowLayout f = new FlowLayout(FlowLayout.LEFT);
-				f.setVgap(1);
-				cpanel.setLayout(f);
-				cpanel.setBackground(masterPanel.getBackground());
-				
-				Chromosome c = GeckoInstance.getInstance().getGenomes()[i].getChromosomes().get(s.getChromosome());
-				cpanel.add(new NumberInRectangle(i + 1, getBackground(), mlisteners.get(i), Integer.toString(i + 1).length()));
-				
-				cpanel.add(new TextLabel(c.getFullName()));
-				
-				masterPanel.add(cpanel);
+
+                JPanel cpanel = generateGenomeNamePanel(i);
+				if (cpanel != null)
+				    masterPanel.add(cpanel);
 			}
 			masterPanel.add(Box.createVerticalStrut(5));
-			}
 
 			
 			/*
@@ -166,17 +147,16 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			title3.setBackground(masterPanel.getBackground());
 			title3.setLayout(new BoxLayout(title3,BoxLayout.X_AXIS));
 
-			{
-				JLabel label = new JLabel();
-				if (cluster.getType() == 'm')
-					label.setText("Distance to median per dataset:");
-				else if (cluster.getType()=='c')
-					label.setText("Distance to center set per dataset:");
-				else
-					label.setText("Distance to reference gene set per dataset:");
-				label.setFont(boldFont);
-				title3.add(label);
-			}
+            JLabel distanceLabel = new JLabel();
+            if (cluster.getType() == 'm')
+                distanceLabel.setText("Distance to median per dataset:");
+            else if (cluster.getType()=='c')
+                distanceLabel.setText("Distance to center set per dataset:");
+            else
+                distanceLabel.setText("Distance to reference gene set per dataset:");
+            distanceLabel.setFont(boldFont);
+            title3.add(distanceLabel);
+
 			title3.add(Box.createHorizontalGlue());
 			masterPanel.add(title3);
 			
@@ -210,11 +190,10 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			title2.setBackground(masterPanel.getBackground());
 			title2.setLayout(new BoxLayout(title2,BoxLayout.X_AXIS));
 
-			{
-				TextLabel label = new TextLabel(GENES_TITLE);
-				label.setFont(boldFont);
-				title2.add(label);
-			}
+
+            TextLabel label = new TextLabel(GENES_TITLE);
+            label.setFont(boldFont);
+            title2.add(label);
 			
 			title2.add(Box.createHorizontalGlue());
 			
@@ -268,6 +247,29 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 		this.revalidate();
 		this.getVerticalScrollBar().setValue(0);
 	}
+
+    private JPanel generateGenomeNamePanel(int i) {
+        if (subselections[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+            return null;
+
+        Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
+
+        if (!s.isValid())
+            return null;
+
+        JPanel cpanel = new JPanel();
+        FlowLayout f = new FlowLayout(FlowLayout.LEFT);
+        f.setVgap(1);
+        cpanel.setLayout(f);
+        cpanel.setBackground(masterPanel.getBackground());
+
+        Chromosome c = GeckoInstance.getInstance().getGenomes()[i].getChromosomes().get(s.getChromosome());
+        cpanel.add(new NumberInRectangle(i + 1, getBackground(), c.getChromosomeMouseListener(), Integer.toString(i + 1).length()));
+
+        cpanel.add(new TextLabel(c.getFullName()));
+
+        return cpanel;
+    }
 	
 	private static class TextLabel extends JLabel {
 		/**

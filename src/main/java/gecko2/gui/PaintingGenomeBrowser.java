@@ -25,7 +25,8 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	private static final int vgap = 2;
 	
 	private String maxLengthString;
-	
+	private GenomePainting.NameType nameType;
+
 	/**
 	 * The genes that will be highlighted.
 	 * An array of int arrays, that contain the chromosome index, the start and the stop gene index
@@ -34,19 +35,20 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	private Color highlightColor;
 	
 	
-	public PaintingGenomeBrowser(Genome g, MultipleGenomesBrowser parent) {
+	public PaintingGenomeBrowser(Genome g, MultipleGenomesBrowser parent, GenomePainting.NameType nameType) {
 		this.gecko = GeckoInstance.getInstance();
 		this.setBorder(null);
 		this.genome = g;
 		this.parent = parent;
+        this.nameType = nameType;
 		
 		FlowLayout flowlayout = new FlowLayout(FlowLayout.LEFT);
 		flowlayout.setHgap(0);
 		flowlayout.setVgap(0);
-		canvas = new GenomeCanvas();
+		this.canvas = new GenomeCanvas();
 		this.setBackground(Color.WHITE);
-		canvas.setBackground(Color.WHITE);
-		this.canvas.setPreferredSize(new Dimension (getCanvasWidth(), getGBHeight()));
+		this.canvas.setBackground(Color.WHITE);
+		this.canvas.setPreferredSize(new Dimension (this.getCanvasWidth(), this.getGBHeight()));
 		this.setViewportBorder(null);
 		this.setViewportView(this.canvas);
 		this.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -175,11 +177,11 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	
 	private int getGeneElementWidth() {
 		if (canvas.getGraphics() == null)	// if we have no graphics
-			return 8 * gecko.getMaxIdLength(); // improvise!
-		
-		if (maxLengthString == null || maxLengthString.length() != gecko.getMaxIdLength()){
-			StringBuilder builder = new StringBuilder(gecko.getMaxIdLength());
-			for (int i=0; i<gecko.getMaxIdLength(); i++)
+			return 8 * gecko.getMaxLength(nameType); // improvise!
+
+		if (maxLengthString == null || maxLengthString.length() != gecko.getMaxLength(nameType)){
+			StringBuilder builder = new StringBuilder(gecko.getMaxLength(nameType));
+			for (int i=0; i<gecko.getMaxLength(nameType); i++)
 				builder.append("w");
 			maxLengthString = new String(builder);
 		}
@@ -190,8 +192,14 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	public int getGBHeight() {
 		return 2 * vgap + gecko.getGeneElementHight();
 	}
-	
-	private int getCanvasWidth() {
+
+    @Override
+    public void setNameType(GenomePainting.NameType nameType) {
+        this.nameType = nameType;
+        canvas.repaint();
+    }
+
+    private int getCanvasWidth() {
 		return 2 * borderSpace + 
 				genome.getTotalGeneNumber() * getGeneWidth() + 
 				2 * genome.getChromosomes().size() * getChromosomeEndingWidth();
@@ -211,6 +219,8 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		highlightColor = null;
 		canvas.repaint();
 	}
+
+
 	
 	private class GenomeCanvas extends JPanel {
 		private static final long serialVersionUID = 6009238153875103381L;
@@ -219,7 +229,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			//TODO evlt Bild speicher und nicht immer neu zeichnen
-			GenomePainting.paintGenomeWithCluster(g, genome, highlights, highlightColor, borderSpace, vgap, getGeneElementWidth(), gecko.getGeneElementHight(), hgap, vgap);
+			GenomePainting.paintGenomeWithCluster(g, genome, highlights, nameType, highlightColor, borderSpace, vgap, getGeneElementWidth(), gecko.getGeneElementHight(), hgap, vgap);
 		}
 	}
 	

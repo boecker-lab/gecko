@@ -88,4 +88,25 @@ public class Genome implements Serializable {
 			return getName();
 	}
 
+    public static int getMaxNameLength(Genome[] genomes) {
+        int maxLength = -1;
+        for (Genome g : genomes)
+            for (Chromosome chr : g.chromosomes)
+                for (Gene gene : chr.getGenes())
+                    if (gene.getName().length() > maxLength)
+                        maxLength = gene.getName().length();
+
+        return maxLength;
+    }
+
+    public static int getMaxLocusTagLength(Genome[] genomes) {
+        int maxLength = -1;
+        for (Genome g : genomes)
+            for (Chromosome chr : g.chromosomes)
+                for (Gene gene : chr.getGenes())
+                    if (gene.getTag().length() > maxLength)
+                        maxLength = gene.getTag().length();
+
+        return maxLength;
+    }
 }
