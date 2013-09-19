@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 
-public class NumberInRectangle extends JPanel {
+public class NumberInRectangle extends JLabel {
 
 	private static final long serialVersionUID = -5779445240934635898L;
     private final NumberIcon icon;
@@ -18,12 +18,13 @@ public class NumberInRectangle extends JPanel {
         this.icon = new NumberIcon(number);
 
         this.setPreferredSize(new Dimension(icon.getIconWidth()+1, icon.getIconHeight()+1));
-		
-		this.setMaximumSize(new Dimension(icon.getIconWidth()+1, icon.getIconHeight()+1));
+        this.setMaximumSize(new Dimension(icon.getIconWidth()+1, icon.getIconHeight()+1));
+        this.setMinimumSize(new Dimension(icon.getIconWidth() + 1, icon.getIconHeight() + 1));
+
 		if (ml!=null)
 			this.addMouseListener(ml);
 
-        this.add(new JLabel(icon));
+        this.setIcon(icon);
 	}
 
     public class NumberIcon implements Icon{
@@ -59,7 +60,7 @@ public class NumberInRectangle extends JPanel {
             if (number<10)
                 g.drawString(Integer.toString(number), x+5, y+12);
             else
-                g.drawString(Integer.toString(number), x+1, y+12);
+                g.drawString(Integer.toString(number), x+3, y+12);
         }
 
         /**

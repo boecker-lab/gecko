@@ -1,6 +1,5 @@
 package gecko2.gui;
 
-
 import gecko2.GeckoInstance;
 import gecko2.algorithm.*;
 import gecko2.event.ClusterSelectionEvent;
@@ -8,38 +7,21 @@ import gecko2.event.ClusterSelectionListener;
 import gecko2.event.LocationSelectionEvent;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.util.*;
-import java.util.List;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionListener {
 
 	private static final long serialVersionUID = -2156280340296694286L;
-
-    private static final Font monoFont = new Font("Monospaced",Font.PLAIN,new JLabel().getFont().getSize()-1);
-    private static final Font boldFont = new JLabel().getFont().deriveFont(Font.BOLD);
-
 	private final JPanel masterPanel;
 	private final JPanel flowpanel;
+	private HashMap<Integer, Gene[]> annotations;
 	private GeneCluster cluster;
 	private GeneClusterOccurrence gOcc;
-
-    private List<Subsequence> subsequences;
-    private List<Chromosome> chromosomes;
-    private List<Integer> genomeIndexMapping;
-
-    private List<Gene> geneList;
-    private List<Integer> genomeIndexInGeneList;
-    private Map<Integer, Integer> geneIdAtTablePosition;
-
-    // local!
-    private JTable chromosomeNameTable;
-    private JTable annotationTable;
-
-    // end local!
+	private int[] subselections;
 	
 	private static final String VALUES_TITLE = "Global cluster information:";
 
@@ -53,33 +35,6 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 		flowpanel.setBackground(masterPanel.getBackground());
 		flowpanel.add(masterPanel);
 		this.setViewportView(flowpanel);
-
-        chromosomeNameTable = new JTable(new ChromsomeNameTableModel());
-        chromosomeNameTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        chromosomeNameTable.setShowGrid(false);
-        final TableColumnModel chromosomeNameTableColumnModel = chromosomeNameTable.getColumnModel();
-        chromosomeNameTableColumnModel.getColumn(0).setPreferredWidth(50); // Index
-        chromosomeNameTableColumnModel.getColumn(0).setMaxWidth(50); // Index
-        chromosomeNameTableColumnModel.getColumn(1).setPreferredWidth(200);
-
-        annotationTable = new JTable(new GeneAnnotationTableModel());
-        annotationTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        annotationTable.setShowGrid(false);
-        final TableColumnModel annotationTableColumnModel = annotationTable.getColumnModel();
-        annotationTableColumnModel.getColumn(0).setPreferredWidth(50); // Index
-        annotationTableColumnModel.getColumn(0).setMaxWidth(50); // Index
-        annotationTableColumnModel.getColumn(1).setPreferredWidth(50); // Index
-        annotationTableColumnModel.getColumn(1).setMaxWidth(50); // Index
-        annotationTableColumnModel.getColumn(2).setPreferredWidth(200);
-
-        subsequences = new ArrayList<Subsequence>();
-        chromosomes = new ArrayList<Chromosome>();
-        genomeIndexMapping = new ArrayList<Integer>();
-
-        geneList = new ArrayList<Gene>();
-        genomeIndexInGeneList = new ArrayList<Integer>();
-        geneIdAtTablePosition = new HashMap<Integer, Integer>();
-
 		update();
 	}
 
@@ -88,50 +43,51 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 		if (! (e instanceof LocationSelectionEvent))
 			return;
 		LocationSelectionEvent l = (LocationSelectionEvent) e;
-
-        GeckoInstance gecko = GeckoInstance.getInstance();
-
 		this.cluster = l.getSelection();
 		if (this.cluster!=null) {
-			int[] subselections = l.getsubselection();
-            this.gOcc = l.getgOcc();
-
-            this.setAnnotationData(gecko.generateAnnotations(l.getSelection(),
-                    l.getgOcc(),
-                    l.getsubselection()));
-
-            subsequences = new ArrayList<Subsequence>();
-            chromosomes = new ArrayList<Chromosome>();
-            genomeIndexMapping = new ArrayList<Integer>();
-            for (int i=0; i<subselections.length; i++){
-                if (subselections[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED && gOcc.getSubsequences()[i][subselections[i]].isValid()) {
-                    Subsequence subseq =  gOcc.getSubsequences()[i][subselections[i]];
-                    subsequences.add(subseq);
-                    chromosomes.add(gecko.getGenomes()[i].getChromosomes().get(subseq.getChromosome()));
-                    genomeIndexMapping.add(i);
-                }
-            }
+			this.annotations = GeckoInstance.getInstance().generateAnnotations(l.getSelection(), 
+					l.getgOcc(), 
+					l.getsubselection());
+			this.subselections = l.getsubselection();
+			this.gOcc = l.getgOcc();
 		} else {
-            subsequences = new ArrayList<Subsequence>();
-            chromosomes = new ArrayList<Chromosome>();
-            genomeIndexMapping = new ArrayList<Integer>();
-
-            geneList = new ArrayList<Gene>();
-            genomeIndexInGeneList = new ArrayList<Integer>();
-            geneIdAtTablePosition = new HashMap<Integer, Integer>();
-
-        }
-
+			this.annotations = null;
+			this.subselections = null;
+		}
 		update();
 	}
-
+	
+	
 	private void update() {
 		masterPanel.removeAll();
-		if (geneList.size() != 0) {
+		if (annotations!=null) {
+
+			/*
+			 * Get the mouselisteners
+			 */
+			GeckoInstance instance = GeckoInstance.getInstance();
+			ArrayList<MouseListener> mlisteners = new ArrayList<MouseListener>();
+
+			for (int i=0;i<gOcc.getSubsequences().length;i++) {
+				if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
+					mlisteners.add(i,null);
+					continue;
+				}
+				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
+				if (s.isValid())
+					mlisteners.add(i, instance.getGenomes()[i].getChromosomes().get(s.getChromosome()).getChromosomeMouseListener());
+				else
+					mlisteners.add(i, null);
+			}
+				
+			
+			Font monoFont = new Font("Monospaced",Font.PLAIN,new JLabel().getFont().getSize()-1);
+			Font boldFont = new JLabel().getFont().deriveFont(Font.BOLD);
 
 			/*
 			 * Involed Chromosomes
 			 */
+		
 			JPanel involvedChrTitle = new JPanel();
 			involvedChrTitle.setBackground(masterPanel.getBackground());
 			involvedChrTitle.setLayout(new BoxLayout(involvedChrTitle,BoxLayout.X_AXIS));
@@ -141,13 +97,21 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			involvedChrTitle.add(Box.createHorizontalGlue());
 			masterPanel.add(involvedChrTitle);
 			masterPanel.add(Box.createVerticalStrut(5));
+			
+			for (int i = 0; i < gOcc.getSubsequences().length; i++) {
 
-            masterPanel.add(chromosomeNameTable);
+                JPanel cpanel = generateGenomeNamePanel(i);
+				if (cpanel != null)
+				    masterPanel.add(cpanel);
+			}
 			masterPanel.add(Box.createVerticalStrut(5));
+
 			
 			/*
 			 * Global data
 			 */
+			
+			
 			JPanel title1 = new JPanel();
 			title1.setBackground(masterPanel.getBackground());
 			title1.setLayout(new BoxLayout(title1,BoxLayout.X_AXIS));
@@ -156,18 +120,29 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			title1.add(valTitle);
 			title1.add(Box.createHorizontalGlue());
 			masterPanel.add(title1);
-
-            JPanel totalDistancePanel = generateGeneralGenomeInformationPanel("Best total distance: " + gOcc.getTotalDist());
-            masterPanel.add(totalDistancePanel);
-
-            JPanel bestScorePanel = generateGeneralGenomeInformationPanel("         Best score: " + gOcc.getBestScore());
-            masterPanel.add(bestScorePanel);
-
+			
+			String[] titles = {"Best total distance: ", 
+					           "         Best score: "};
+			Object[] values = { gOcc.getTotalDist(), 
+								gOcc.getBestScore() };
+			masterPanel.add(Box.createVerticalStrut(5));
+			for (int i=0; i<titles.length; i++) {
+				JPanel cpanel = new JPanel();
+				FlowLayout f = new FlowLayout(FlowLayout.LEFT);
+				f.setVgap(1);
+				cpanel.setLayout(f);
+				cpanel.setBackground(masterPanel.getBackground());
+				TextLabel textLabel = new TextLabel(titles[i]+values[i]);
+				textLabel.setFont(monoFont);
+				cpanel.add(textLabel);
+				masterPanel.add(cpanel);
+			}
 			masterPanel.add(Box.createVerticalStrut(5));
 
 			/*
 			 * Local distances to median/center
 			 */
+			
 			JPanel title3 = new JPanel();
 			title3.setBackground(masterPanel.getBackground());
 			title3.setLayout(new BoxLayout(title3,BoxLayout.X_AXIS));
@@ -184,18 +159,37 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
 			title3.add(Box.createHorizontalGlue());
 			masterPanel.add(title3);
+			
 			masterPanel.add(Box.createVerticalStrut(5));
+			JPanel cpanel = new JPanel();
+			FlowLayout f = new FlowLayout(FlowLayout.LEFT);
+			f.setVgap(1);
+			cpanel.setLayout(f);
+			cpanel.setBackground(masterPanel.getBackground());
 
-			JPanel cpanel = generateChromsomeDistancePanel();
-            masterPanel.add(cpanel);
+			for (int i=0; i<gOcc.getSubsequences().length; i++) {
+				if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) 
+					continue;
+				Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
+				if (s.getStart()>s.getStop()) 
+					continue;
+				cpanel.add(new NumberInRectangle(i+1, getBackground(), mlisteners.get(i)));
+				TextLabel textLabel = new TextLabel(Integer.toString(s.getDist()));
+				textLabel.setFont(monoFont);
+				cpanel.add(textLabel);
+				cpanel.add(Box.createHorizontalStrut(5));
+			}
+			masterPanel.add(cpanel);
 			masterPanel.add(Box.createVerticalStrut(5));
 			
 			/*
 			 * List of genes
 			 */
+			
 			JPanel title2 = new JPanel();
 			title2.setBackground(masterPanel.getBackground());
 			title2.setLayout(new BoxLayout(title2,BoxLayout.X_AXIS));
+
 
             TextLabel label = new TextLabel(GENES_TITLE);
             label.setFont(boldFont);
@@ -205,9 +199,44 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			
 			masterPanel.add(title2);
 			masterPanel.add(Box.createVerticalStrut(10));
-
-            masterPanel.add(annotationTable);
-
+			for (int genid : annotations.keySet()) {
+				GeneElement e = new GeneElement(new Gene(null, genid), false);
+				Gene[] genes = annotations.get(genid);
+				e.setToolTipText(null);
+				e.setOrientation(GeneElement.ORIENTATION_NONE);
+				JPanel p = new JPanel();
+				p.setBackground(masterPanel.getBackground());
+				p.setLayout(new FlowLayout(FlowLayout.LEFT));
+				((FlowLayout)p.getLayout()).setVgap(0);
+				((FlowLayout)p.getLayout()).setHgap(0);
+				p.add(e);
+				JPanel refPanel = p;
+				for (int i=0;i<genes.length;i++) {
+					if (genes[i]!=null) {
+						boolean first = false;
+						if (refPanel == null) { // if we are not using the first panel (shared with GeneElement)
+							first = true;
+							refPanel = new JPanel();
+							refPanel.setBackground(masterPanel.getBackground());
+							refPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+							((FlowLayout)refPanel.getLayout()).setVgap(0);
+							((FlowLayout)refPanel.getLayout()).setHgap(0);
+							refPanel.add(Box.createRigidArea(new Dimension((int)e.getPreferredSize().getWidth(), 0)));
+						}
+						TextLabel l = new TextLabel(genes[i].getSummary());
+						l.setFont(monoFont);
+						NumberInRectangle n = new NumberInRectangle(i+1,refPanel.getBackground(), mlisteners.get(i));
+						refPanel.add(n);
+						refPanel.add(Box.createRigidArea(new Dimension(4, 0)));
+						refPanel.add(l);
+						masterPanel.add(refPanel);
+						if (i<genes.length && first) masterPanel.add(Box.createRigidArea(new Dimension(0,4)));
+						refPanel = null;
+					}
+				}
+				if (!masterPanel.isAncestorOf(p))
+					masterPanel.add(p);
+			}
 			masterPanel.add(Box.createHorizontalGlue());
 			masterPanel.repaint();
 			flowpanel.repaint();
@@ -219,7 +248,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 		this.getVerticalScrollBar().setValue(0);
 	}
 
-    private JPanel generateGenomeNamePanel(int i, int[] subselections) {
+    private JPanel generateGenomeNamePanel(int i) {
         if (subselections[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
             return null;
 
@@ -241,55 +270,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         return cpanel;
     }
-
-    private JPanel generateGeneralGenomeInformationPanel(String text) {
-        JPanel cpanel = new JPanel();
-        FlowLayout f = new FlowLayout(FlowLayout.LEFT);
-        f.setVgap(1);
-        cpanel.setLayout(f);
-        cpanel.setBackground(masterPanel.getBackground());
-        TextLabel textLabel = new TextLabel(text);
-        textLabel.setFont(monoFont);
-        cpanel.add(textLabel);
-        return cpanel;
-    }
-
-    private JPanel generateChromsomeDistancePanel() {  //TODO smarter Object?
-        JPanel cpanel = new JPanel();
-        FlowLayout f = new FlowLayout(FlowLayout.LEFT);
-        f.setVgap(1);
-        cpanel.setLayout(f);
-        cpanel.setBackground(masterPanel.getBackground());
-
-        for (int i=0; i<subsequences.size(); i++) {
-            cpanel.add(new NumberInRectangle(genomeIndexMapping.get(i)+1, getBackground(), chromosomes.get(i).getChromosomeMouseListener()));
-            TextLabel textLabel = new TextLabel(Integer.toString(subsequences.get(i).getDist()));
-            textLabel.setFont(monoFont);
-            cpanel.add(textLabel);
-            cpanel.add(Box.createHorizontalStrut(5));
-        }
-        return cpanel;
-    }
-
-    private void setAnnotationData(HashMap<Integer, Gene[]> annotations) {
-        geneList = new ArrayList<Gene>();
-        genomeIndexInGeneList = new ArrayList<Integer>();
-        geneIdAtTablePosition = new HashMap<Integer, Integer>();
-
-        for (Map.Entry<Integer, Gene[]> entry : annotations.entrySet()) {
-            geneIdAtTablePosition.put(geneList.size(), entry.getKey());
-            Gene[] genes = entry.getValue();
-
-            for (int i=0;i<genes.length;i++) {
-                if (genes[i] != null) {
-                    geneList.add(genes[i]);
-                    genomeIndexInGeneList.add(i+1);
-                }
-            }
-        }
-    }
 	
-	private class TextLabel extends JLabel {
+	private static class TextLabel extends JLabel {
 		/**
 		 * Random generated serialization UID
 		 */
@@ -300,69 +282,9 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			setBorder(null);
 			setBackground(Color.WHITE);
 		}
+		
 	}
 
-    private class ChromsomeNameTableModel extends AbstractTableModel {
 
-        private static final long serialVersionUID = -3306238610287868813L;
 
-        private final Class<?>[] columns = {Integer.class, String.class};
-
-        @Override
-        public int getRowCount() {
-            return chromosomes.size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return columns.length;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            switch (columnIndex) {
-                case 0:
-                    return genomeIndexMapping.get(rowIndex);
-                case 1:
-                    return chromosomes.get(rowIndex).getFullName();
-                default:
-                    return null;
-            }
-        }
-    }
-
-    private class GeneAnnotationTableModel extends AbstractTableModel {
-
-        private static final long serialVersionUID = -3306238610287868813L;
-
-        private final Class<?>[] columns = {Integer.class, Integer.class, String.class};
-
-        @Override
-        public int getRowCount() {
-            return geneList.size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return columns.length;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            switch (columnIndex) {
-                case 0:
-                    Integer geneId = geneIdAtTablePosition.get(rowIndex);
-                    if (geneId == null)
-                        return -1;
-                    else
-                        return geneId;
-                case 1:
-                    return genomeIndexInGeneList.get(rowIndex);
-                case 2:
-                    return geneList.get(rowIndex).getSummary();
-                default:
-                    return null;
-            }
-        }
-    }
 }
