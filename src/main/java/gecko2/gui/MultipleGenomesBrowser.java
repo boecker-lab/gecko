@@ -253,7 +253,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		
 		boxPanel.setBackground(gb.getBackground());
 		boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
-		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(), gb.getBackground(), Integer.toString(this.genomeBrowsers.size()).length());
+		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(), gb.getBackground());
 //		n.addMouseListener(gb.getGenomebrowsermouseover());
 		JComboBox box = createComboBox(genomeBrowsers.size(), getGenomeBrowserHeight());
 		boxPanel.add(box);

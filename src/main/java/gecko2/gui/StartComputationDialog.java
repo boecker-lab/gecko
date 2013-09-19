@@ -81,7 +81,6 @@ public class StartComputationDialog extends JDialog {
 		this.refType = Parameter.ReferenceType.allAgainstAll;
 		modeCombo.setSelectedIndex(0);
 
-		final String[] refModes = {"all against all", "fixed genome", "manual cluster"};
         JLabel refLabel = new JLabel("Reference:");
 		refCombo = new JComboBox(Parameter.ReferenceType.values());
 		refCombo.setPreferredSize(new Dimension(190, 30));
