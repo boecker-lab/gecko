@@ -338,7 +338,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         private static final long serialVersionUID = -3306238610287868813L;
 
-        private final Class<?>[] columns = {Integer.class, NumberInRectangle.NumberIcon.class, String.class};
+        private final Class<?>[] columns = {Gene.class, NumberInRectangle.NumberIcon.class, String.class};
 
         @Override
         public int getRowCount() {
@@ -379,8 +379,27 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             super();
             setHorizontalAlignment(JLabel.LEFT);
         }
+
+        @Override
         public void setValue(Object value) {
             if (value instanceof NumberInRectangle.NumberIcon) {
+                NumberInRectangle.NumberIcon numberIcon = (NumberInRectangle.NumberIcon)value;
+                setIcon(numberIcon);
+                setToolTipText(chromosomes.get(genomeIndexBackmap.get(numberIcon.getNumber() - 1)).getFullName());
+            } else
+                setIcon(null);
+        }
+    }
+
+    private class GeneRenderer extends DefaultTableCellRenderer.UIResource {
+        public GeneRenderer() {
+            super();
+            setHorizontalAlignment(JLabel.LEFT);
+        }
+
+        @Override
+        public void setValue(Object value) {
+            if (value instanceof Gene) {
                 NumberInRectangle.NumberIcon numberIcon = (NumberInRectangle.NumberIcon)value;
                 setIcon(numberIcon);
                 setToolTipText(chromosomes.get(genomeIndexBackmap.get(numberIcon.getNumber() - 1)).getFullName());

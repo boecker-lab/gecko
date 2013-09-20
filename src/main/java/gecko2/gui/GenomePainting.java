@@ -5,6 +5,7 @@ import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
 
+import javax.swing.*;
 import java.awt.*;
 
 public class GenomePainting {
@@ -362,4 +363,44 @@ public class GenomePainting {
 		
 		return x;
 	}
+
+    public static class GeneIcon implements Icon {
+        private final Gene gene;
+        private final int width;
+        private final int height;
+
+        public GeneIcon(Gene gene) {
+            this.gene = gene;
+        }
+
+        /**
+         * Draw the icon at the specified location.  Icon implementations
+         * may use the Component argument to get properties useful for
+         * painting, e.g. the foreground or background color.
+         */
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            paintGene(g, gene, NameType.ID, Color.WHITE, getColor(gene), x, y, width, height, 0, 0);
+        }
+
+        /**
+         * Returns the icon's width.
+         *
+         * @return an int specifying the fixed width of the icon.
+         */
+        @Override
+        public int getIconWidth() {
+            return width;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        /**
+         * Returns the icon's height.
+         *
+         * @return an int specifying the fixed height of the icon.
+         */
+        @Override
+        public int getIconHeight() {
+            return height;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
 }
