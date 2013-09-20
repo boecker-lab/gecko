@@ -453,24 +453,28 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			this.instance = GeckoInstance.getInstance();
 			matchingClusters = new ArrayList<GeneCluster>();
 		}
-		
+
+        @Override
 		public Class<?> getColumnClass(int columnIndex)	{
 			return this.columns[columnIndex];
 		}
 
+        @Override
 		public int getColumnCount()	{
 			return this.columns.length;
 		}
 
+        @Override
 		public String getColumnName(int columnIndex) {
 			return this.columnNames[columnIndex];
 		}
 
+        @Override
 		public int getRowCount() {
 			return matchingClusters.size();
 		}
 
-
+        @Override
 		public Object getValueAt(int rowIndex, int columnIndex)	{
 			
 			switch(columnIndex)	{
@@ -508,7 +512,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			}
 		}
 
-		
+        @Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			// Read-only table
 			return false;

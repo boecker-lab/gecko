@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 
-public class NumberInRectangle extends JLabel {
+public class NumberInRectangle extends JLabel{
 
 	private static final long serialVersionUID = -5779445240934635898L;
     private final NumberIcon icon;
@@ -27,7 +27,7 @@ public class NumberInRectangle extends JLabel {
         this.setIcon(icon);
 	}
 
-    public class NumberIcon implements Icon{
+    public static class NumberIcon implements Icon{
         private final int number;
         private final int width;
         private final int height;
@@ -81,6 +81,14 @@ public class NumberInRectangle extends JLabel {
         @Override
         public int getIconHeight() {
             return height;
+        }
+
+        /**
+         * Returns the number the icon displays
+         * @return the number that is displayed
+         */
+        public int getNumber() {
+            return number;
         }
     }
 }

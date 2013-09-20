@@ -9,6 +9,7 @@ import gecko2.event.LocationSelectionEvent;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.util.*;
@@ -30,6 +31,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     private List<Subsequence> subsequences;
     private List<Chromosome> chromosomes;
     private List<Integer> genomeIndexMapping;
+    private Map<Integer, Integer> genomeIndexBackmap;
 
     private List<Gene> geneList;
     private List<Integer> genomeIndexInGeneList;
@@ -57,6 +59,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         chromosomeNameTable = new JTable(new ChromsomeNameTableModel());
         chromosomeNameTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         chromosomeNameTable.setShowGrid(false);
+        chromosomeNameTable.setDefaultRenderer(NumberInRectangle.NumberIcon.class, new NumberIconRenderer());
         final TableColumnModel chromosomeNameTableColumnModel = chromosomeNameTable.getColumnModel();
         chromosomeNameTableColumnModel.getColumn(0).setPreferredWidth(50); // Index
         chromosomeNameTableColumnModel.getColumn(0).setMaxWidth(50); // Index
@@ -65,6 +68,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         annotationTable = new JTable(new GeneAnnotationTableModel());
         annotationTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         annotationTable.setShowGrid(false);
+        annotationTable.setDefaultRenderer(NumberInRectangle.NumberIcon.class, new NumberIconRenderer());
         final TableColumnModel annotationTableColumnModel = annotationTable.getColumnModel();
         annotationTableColumnModel.getColumn(0).setPreferredWidth(50); // Index
         annotationTableColumnModel.getColumn(0).setMaxWidth(50); // Index
@@ -75,6 +79,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         subsequences = new ArrayList<Subsequence>();
         chromosomes = new ArrayList<Chromosome>();
         genomeIndexMapping = new ArrayList<Integer>();
+        genomeIndexBackmap = new HashMap<Integer, Integer>();
 
         geneList = new ArrayList<Gene>();
         genomeIndexInGeneList = new ArrayList<Integer>();
@@ -92,6 +97,15 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         GeckoInstance gecko = GeckoInstance.getInstance();
 
 		this.cluster = l.getSelection();
+
+        subsequences = new ArrayList<Subsequence>();
+        chromosomes = new ArrayList<Chromosome>();
+        genomeIndexMapping = new ArrayList<Integer>();
+        genomeIndexBackmap = new HashMap<Integer, Integer>();
+        geneList = new ArrayList<Gene>();
+        genomeIndexInGeneList = new ArrayList<Integer>();
+        geneIdAtTablePosition = new HashMap<Integer, Integer>();
+
 		if (this.cluster!=null) {
 			int[] subselections = l.getsubselection();
             this.gOcc = l.getgOcc();
@@ -100,28 +114,16 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
                     l.getgOcc(),
                     l.getsubselection()));
 
-            subsequences = new ArrayList<Subsequence>();
-            chromosomes = new ArrayList<Chromosome>();
-            genomeIndexMapping = new ArrayList<Integer>();
             for (int i=0; i<subselections.length; i++){
                 if (subselections[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED && gOcc.getSubsequences()[i][subselections[i]].isValid()) {
                     Subsequence subseq =  gOcc.getSubsequences()[i][subselections[i]];
                     subsequences.add(subseq);
                     chromosomes.add(gecko.getGenomes()[i].getChromosomes().get(subseq.getChromosome()));
+                    genomeIndexBackmap.put(i, genomeIndexMapping.size());
                     genomeIndexMapping.add(i);
                 }
             }
-		} else {
-            subsequences = new ArrayList<Subsequence>();
-            chromosomes = new ArrayList<Chromosome>();
-            genomeIndexMapping = new ArrayList<Integer>();
-
-            geneList = new ArrayList<Gene>();
-            genomeIndexInGeneList = new ArrayList<Integer>();
-            geneIdAtTablePosition = new HashMap<Integer, Integer>();
-
-        }
-
+		}
 		update();
 	}
 
@@ -272,10 +274,6 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     }
 
     private void setAnnotationData(HashMap<Integer, Gene[]> annotations) {
-        geneList = new ArrayList<Gene>();
-        genomeIndexInGeneList = new ArrayList<Integer>();
-        geneIdAtTablePosition = new HashMap<Integer, Integer>();
-
         for (Map.Entry<Integer, Gene[]> entry : annotations.entrySet()) {
             geneIdAtTablePosition.put(geneList.size(), entry.getKey());
             Gene[] genes = entry.getValue();
@@ -283,7 +281,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             for (int i=0;i<genes.length;i++) {
                 if (genes[i] != null) {
                     geneList.add(genes[i]);
-                    genomeIndexInGeneList.add(i+1);
+                    genomeIndexInGeneList.add(i);
                 }
             }
         }
@@ -306,7 +304,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         private static final long serialVersionUID = -3306238610287868813L;
 
-        private final Class<?>[] columns = {Integer.class, String.class};
+        private final Class<?>[] columns = {NumberInRectangle.NumberIcon.class, String.class};
 
         @Override
         public int getRowCount() {
@@ -319,10 +317,15 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         }
 
         @Override
+        public Class<?> getColumnClass(int columnIndex)	{
+            return this.columns[columnIndex];
+        }
+
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return genomeIndexMapping.get(rowIndex);
+                    return new NumberInRectangle.NumberIcon(genomeIndexMapping.get(rowIndex)+1);
                 case 1:
                     return chromosomes.get(rowIndex).getFullName();
                 default:
@@ -335,7 +338,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         private static final long serialVersionUID = -3306238610287868813L;
 
-        private final Class<?>[] columns = {Integer.class, Integer.class, String.class};
+        private final Class<?>[] columns = {Integer.class, NumberInRectangle.NumberIcon.class, String.class};
 
         @Override
         public int getRowCount() {
@@ -348,6 +351,11 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         }
 
         @Override
+        public Class<?> getColumnClass(int columnIndex)	{
+            return this.columns[columnIndex];
+        }
+
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
                 case 0:
@@ -357,12 +365,27 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
                     else
                         return geneId;
                 case 1:
-                    return genomeIndexInGeneList.get(rowIndex);
+                    return new NumberInRectangle.NumberIcon(genomeIndexInGeneList.get(rowIndex)+1);
                 case 2:
                     return geneList.get(rowIndex).getSummary();
                 default:
                     return null;
             }
+        }
+    }
+
+    private class NumberIconRenderer extends DefaultTableCellRenderer.UIResource {
+        public NumberIconRenderer() {
+            super();
+            setHorizontalAlignment(JLabel.LEFT);
+        }
+        public void setValue(Object value) {
+            if (value instanceof NumberInRectangle.NumberIcon) {
+                NumberInRectangle.NumberIcon numberIcon = (NumberInRectangle.NumberIcon)value;
+                setIcon(numberIcon);
+                setToolTipText(chromosomes.get(genomeIndexBackmap.get(numberIcon.getNumber() - 1)).getFullName());
+            } else
+                setIcon(null);
         }
     }
 }
