@@ -546,8 +546,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         int maxIdLength = -1;
 
         for (Integer geneId : annotations.keySet())
-            if (geneId > maxIdLength)
-                maxIdLength = geneId;
+            if (Gene.getExternalId(geneId).length() > maxIdLength)
+                maxIdLength = Gene.getExternalId(geneId).length();
 
         return maxIdLength;
     }

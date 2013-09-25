@@ -1,5 +1,7 @@
 package gecko2.algorithm;
 
+import gecko2.GeckoInstance;
+
 import java.io.Serializable;
 
 public class Gene implements Serializable {
@@ -43,9 +45,25 @@ public class Gene implements Serializable {
 		this.unknown = other.unknown;
 	}
 
+    /**
+     * Returns the internal integer id
+     * @return
+     */
 	public int getId() {
 		return id;
 	}
+
+    /**
+     * Returns the external id from the input file
+     * @return
+     */
+    public String getExternalId(){
+        return Gene.getExternalId(id);
+    }
+
+    public static String getExternalId(int id) {
+        return GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(id))[0];
+    }
 	
 	public String getName() {
 		return name;

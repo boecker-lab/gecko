@@ -109,7 +109,8 @@ public class GenomePainting {
 	}
 
     /**
-     * Paints one gene, the gene text is automatically generated from the gene id, the gecko gene label map and the nameType
+     * Paints one gene, the gene text is automatically generated from the gene id, the gecko gene label map and the nameType,
+     * the orientation is generated from the gene id (id < 0 = LEFT, id > 0 = RIGHT)
      * @param g the Graphics
      * @param gene the gene
      * @param nameType the type of name information that shall be used
@@ -124,16 +125,36 @@ public class GenomePainting {
      * @return the x coordinate after the painting
      */
     public static int paintGene(Graphics g, Gene gene, NameType nameType, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
+        return paintGene(g, gene, nameType, GeneOrientation.getOrientationFromGeneId(gene.getId()), backgroundColor, color, x, y, width, height, hgap, vgap);
+    }
+
+    /**
+     * Paints one gene, the gene text is automatically generated from the gene id, the gecko gene label map and the nameType
+     * @param g the Graphics
+     * @param gene the gene
+     * @param nameType the type of name information that shall be used
+     *  @param orientation the orientation of the gene, LEFT, RIGHT, or NONE
+     * @param backgroundColor the color of the background
+     * @param color the color of the gene arrow
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param width the width of the gene box
+     * @param height the height of the gene box
+     * @param hgap the size of the gap next to the gene
+     * @param vgap the vertical gap size
+     * @return the x coordinate after the painting
+     */
+    public static int paintGene(Graphics g, Gene gene, NameType nameType, GeneOrientation orientation, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
         String name = "";
         switch (nameType) {
-            case ID: name = GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(gene.getId()))[0];
+            case ID: name = gene.getExternalId();
                 break;
             case NAME: name = gene.getName();
                 break;
             case LOCUS_TAG: name = gene.getTag();
                 break;
         }
-        return paintGene(g, GeneOrientation.getOrientationFromGeneId(gene.getId()), backgroundColor, color, name, x, y, width, height, hgap, vgap);
+        return paintGene(g, orientation, backgroundColor, color, name, x, y, width, height, hgap, vgap);
     }
 
 	/**
@@ -197,15 +218,19 @@ public class GenomePainting {
 			g.setColor(Color.WHITE);
 
 		setTextSize(g, height);
-		FontMetrics metrics = g.getFontMetrics();
-		int fontY_Position = y + Math.round(height / 2.0f) + Math.round(metrics.getHeight() / 2.0f);
+        int baseline = getBaseline(g.getFontMetrics(), y, height);
 
-		g.drawString(text, x + 5, fontY_Position);
+		g.drawString(text, x + 5, baseline);
 		
 		g.setColor(color);
 		
 		return returnX;
 	}
+
+    private static int getBaseline(FontMetrics metrics, int y, int height){
+        int top = y + height;
+        return (top+((y+1-top)/2) - ((metrics.getAscent() + metrics.getDescent())/2)) + metrics.getAscent();
+    }
 	
 	private static void setTextSize(Graphics g, int geneHeight){
 		float newTextSize = Math.round((float)geneHeight - ((float)geneHeight / 2.4F));
@@ -392,7 +417,7 @@ public class GenomePainting {
          */
         @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
-            paintGene(g, GeneOrientation.NONE, Color.WHITE, getColor(geneId), Integer.toString(geneId), x, y, width, height, 0, 0);
+            paintGene(g, GeneOrientation.NONE, Color.WHITE, getColor(geneId), Gene.getExternalId(geneId), x, y, width, height, 0, 0);
         }
 
         /**

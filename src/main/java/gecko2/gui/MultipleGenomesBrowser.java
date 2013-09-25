@@ -43,7 +43,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
     /**
      * What name is shown for each gene
      */
-    private GenomePainting.NameType nameType = GenomePainting.NameType.LOCUS_TAG;
+    private GenomePainting.NameType nameType = GenomePainting.NameType.ID;
 	
 	/**
 	 * The variable stores the filter activity: <br>

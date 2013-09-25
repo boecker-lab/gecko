@@ -74,8 +74,6 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         annotationTable.setDefaultRenderer(NumberInRectangle.NumberIcon.class, new NumberIconRenderer());
         annotationTable.setDefaultRenderer(Integer.class, new GeneRenderer());
         final TableColumnModel annotationTableColumnModel = annotationTable.getColumnModel();
-        annotationTableColumnModel.getColumn(0).setPreferredWidth(50); // Index
-        annotationTableColumnModel.getColumn(0).setMaxWidth(50); // Index
         annotationTableColumnModel.getColumn(1).setPreferredWidth(50); // Index
         annotationTableColumnModel.getColumn(1).setMaxWidth(50); // Index
         annotationTableColumnModel.getColumn(2).setPreferredWidth(200);
@@ -118,6 +116,9 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
                     l.getsubselection());
 
             setMaxLengthStringWidth(GeneCluster.getMaximumIdLength(annotations));
+            final TableColumnModel annotationTableColumnModel = annotationTable.getColumnModel();
+            annotationTableColumnModel.getColumn(0).setPreferredWidth(geneWidth); // Index
+            annotationTableColumnModel.getColumn(0).setMaxWidth(geneWidth); // Index
 
             this.setAnnotationData(annotations);
 
