@@ -27,6 +27,17 @@ public class GenomePainting {
             return display;
         }
     }
+
+    public enum GeneOrientation {LEFT, RIGHT, NONE;
+
+        public static GeneOrientation getOrientationFromGeneId(int geneId) {
+            if (geneId < 0)
+                return LEFT;
+            if (geneId > 0)
+                return RIGHT;
+            return NONE;
+        }
+    }
 	
 	/**
 	 * Paints the header of the genome.
@@ -96,29 +107,12 @@ public class GenomePainting {
 		
 		return x + width + 2 * hgap;
 	}
-	
-	/**
-	  * Paints one gene, the gene text is automatically generated from the gene id and the gecko gene label map
-	  * @param g the Graphics
-	  * @param gene the gene
-	  * @param backgroundColor the color of the background
-	  * @param color the color of the gene arrow
-	  * @param x the x coordinate
-	  * @param y the y coordinate
-	  * @param width the width of the gene box
-	  * @param height the height of the gene box
-	  * @param hgap the size of the gap next to the gene
-	  * @param vgap the vertical gap size
-	  * @return the x coordinate after the painting
-	  */
-	/*public static int paintGene(Graphics g, Gene gene, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
-		return paintGene(g, gene, NameType.NAME, backgroundColor, color, x, y, width, height, hgap, vgap);
-	}*/
 
     /**
-     * Paints one gene, the gene text is automatically generated from the gene id and the gecko gene label map
+     * Paints one gene, the gene text is automatically generated from the gene id, the gecko gene label map and the nameType
      * @param g the Graphics
      * @param gene the gene
+     * @param nameType the type of name information that shall be used
      * @param backgroundColor the color of the background
      * @param color the color of the gene arrow
      * @param x the x coordinate
@@ -139,13 +133,13 @@ public class GenomePainting {
             case LOCUS_TAG: name = gene.getTag();
                 break;
         }
-        return paintGene(g, gene, backgroundColor, color, name, x, y, width, height, hgap, vgap);
+        return paintGene(g, GeneOrientation.getOrientationFromGeneId(gene.getId()), backgroundColor, color, name, x, y, width, height, hgap, vgap);
     }
-	
+
 	/**
 	  * Paints one gene
 	  * @param g the Graphics
-	  * @param gene the gene
+	  * @param geneOrientation the orientation of the gene,
 	  * @param backgroundColor the color of the background
 	  * @param color the color of the gene arrow
 	  * @param text the text in the gene box
@@ -157,7 +151,7 @@ public class GenomePainting {
 	  * @param vgap the vertical gap size
 	  * @return the x coordinate after the painting
 	  */
-	public static int paintGene(Graphics g, Gene gene, Color backgroundColor, Color color, String text, int x, int y, int width, int height, int hgap, int vgap) {
+	public static int paintGene(Graphics g, GeneOrientation geneOrientation, Color backgroundColor, Color color, String text, int x, int y, int width, int height, int hgap, int vgap) {
 		g.setColor(color);
 		
 		int returnX = x + width + 2 * hgap;
@@ -172,9 +166,8 @@ public class GenomePainting {
 		// Start gap
 		x += hgap;
 		
-		// check the id the first time to know whether we have to paint the triangle 
-		// to the left side
-		if (gene.getId() < 0) {
+		// check the id the first time to know whether we have to paint the triangle to the left side
+		if (geneOrientation == GeneOrientation.LEFT) {
 			int xPoints[] = {x , x + ARROWSIZE, x + width, x + width, x + ARROWSIZE};
 			int yPoints[] = {y + (height / 2), y + height, y + height, y, y};
 			g.fillPolygon(xPoints, yPoints, 5);
@@ -182,13 +175,19 @@ public class GenomePainting {
 			x = x + ARROWSIZE; // don't paint text in the arrow
 		}
 		
-		// check the id to know whether we have to paint the triangle 
-		// to the right side
-		if (gene.getId() > 0) {
+		// check the id to know whether we have to paint the triangle to the right side
+		if (geneOrientation == GeneOrientation.RIGHT) {
 			int xPoints[] = {x , x + width - ARROWSIZE, x + width, x + width - ARROWSIZE, x};
 			int yPoints[] = {y + height, y + height,y + (height / 2), y, y};
 			g.fillPolygon(xPoints, yPoints, 5);
 		}
+
+        // check the id to know whether we have to paint no triangle
+        if (geneOrientation == GeneOrientation.NONE) {
+            int xPoints[] = {x , x + width, x + width, x};
+            int yPoints[] = {y + height, y + height, y, y};
+            g.fillPolygon(xPoints, yPoints, 4);
+        }
 			
 		// draw the gene number or the name into the rectangle
 		// change color of the letters to white if element color is to dark
@@ -196,9 +195,7 @@ public class GenomePainting {
 			g.setColor(Color.BLACK);
 		else 
 			g.setColor(Color.WHITE);
-		
-		//float newSize = Math.round((float) height - ((float) height / 2.4F));
-		//g.setFont(g.getFont().deriveFont(newSize));
+
 		setTextSize(g, height);
 		FontMetrics metrics = g.getFontMetrics();
 		int fontY_Position = y + Math.round(height / 2.0f) + Math.round(metrics.getHeight() / 2.0f);
@@ -214,17 +211,30 @@ public class GenomePainting {
 		float newTextSize = Math.round((float)geneHeight - ((float)geneHeight / 2.4F));
 		g.setFont(g.getFont().deriveFont(newTextSize));
 	}
-	
-	public static int getGeneWidth(Graphics g, String text, int geneHeight) {
-		setTextSize(g, geneHeight);
-		return g.getFontMetrics().stringWidth(text) + ARROWSIZE + 4;
-	}
+
+    public static String buildMaxLengthString(int textWidth) {
+        StringBuilder builder = new StringBuilder(textWidth);
+        for (int i=0; i<textWidth; i++)
+            builder.append("W");
+        return builder.toString();
+    }
+
+    public static int getGeneWidth(Graphics g, String text, int geneHeight) {
+        setTextSize(g, geneHeight);
+        return g.getFontMetrics().stringWidth(text) + ARROWSIZE + 4;
+    }
 	
 	private static Color getColor(Gene gene) {
-		if (gene.isUnknown())
-			return Color.GRAY;
-		return GeckoInstance.getInstance().getColormap().get(Math.abs(gene.getId()));
+        return getColor(gene.getId());
 	}
+
+    private static Color getColor(int geneId) {
+        Color color = GeckoInstance.getInstance().getColormap().get(Math.abs(geneId));
+        if (color == null)
+            return Color.GRAY;
+        else
+            return color;
+    }
 	
 	private static Color getGreyValueColor(Gene gene) {
 		Color original = getColor(gene);
@@ -365,12 +375,14 @@ public class GenomePainting {
 	}
 
     public static class GeneIcon implements Icon {
-        private final Gene gene;
+        private final int geneId;
         private final int width;
         private final int height;
 
-        public GeneIcon(Gene gene) {
-            this.gene = gene;
+        public GeneIcon(int geneId, int width, int height) {
+            this.geneId = geneId;
+            this.width = width;
+            this.height = height;
         }
 
         /**
@@ -380,7 +392,7 @@ public class GenomePainting {
          */
         @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
-            paintGene(g, gene, NameType.ID, Color.WHITE, getColor(gene), x, y, width, height, 0, 0);
+            paintGene(g, GeneOrientation.NONE, Color.WHITE, getColor(geneId), Integer.toString(geneId), x, y, width, height, 0, 0);
         }
 
         /**

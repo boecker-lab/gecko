@@ -23,7 +23,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	private int borderSpace;
 	private static final int hgap = 2;
 	private static final int vgap = 2;
-	
+
 	private String maxLengthString;
 	private GenomePainting.NameType nameType;
 
@@ -180,10 +180,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 			return 8 * gecko.getMaxLength(nameType); // improvise!
 
 		if (maxLengthString == null || maxLengthString.length() != gecko.getMaxLength(nameType)){
-			StringBuilder builder = new StringBuilder(gecko.getMaxLength(nameType));
-			for (int i=0; i<gecko.getMaxLength(nameType); i++)
-				builder.append("w");
-			maxLengthString = new String(builder);
+			maxLengthString = GenomePainting.buildMaxLengthString(gecko.getMaxLength(nameType));
 		}
 		return GenomePainting.getGeneWidth(canvas.getGraphics(), maxLengthString, gecko.getGeneElementHight());
 	}

@@ -47,9 +47,14 @@ public class GeckoInstance {
 	private boolean animationEnabled = true;
 	private File lastSavedFile = null, lastOpenedFile = null, lastExportedFile = null;
 	private Parameter lastParameter;
+    private Gui gui;
+
+    private StartComputationDialog scd = null;
 	
 	private int geneElementHight;
-	private int geneElementWidth;
+    public static int DEFAULT_GENE_HIGHT = 20;
+    private final static int MAX_GENEELEMENT_HIGHT = 40;
+    private final static int MIN_GENEELEMENT_HIGHT = 9;
 	
 	private int maxIdLength;
     private int maxNameLength;
@@ -126,15 +131,6 @@ public class GeckoInstance {
 	/*
 	 * END DataEvents
 	 */
-	
-	
-	private Gui gui;
-	
-	private StartComputationDialog scd = null;
-	
-	private final static int MAX_GENEELEMENT_HIGHT = 40;
-	private final static int MIN_GENEELEMENT_HIGHT = 9;
-	public final static int DISPLAY_GENEELEMENT_HIGHT = 20;
 	
 	public File getLastExportedFile() {
 		return lastExportedFile;
@@ -367,12 +363,11 @@ public class GeckoInstance {
 	}
 	
 	public int getGeneElementWidth() {
-		return geneElementWidth;
+        return (int) Math.round(geneElementHight*1.75);
 	}
 	
 	public void setGeneElementHight(int geneElementHight) {
 		this.geneElementHight = geneElementHight;
-		this.geneElementWidth = (int) Math.round(geneElementHight*1.75);
 	}
 	
 	public boolean canZoomIn() {
@@ -454,70 +449,6 @@ public class GeckoInstance {
 	public GeneCluster[] getClusters() {
 		return clusters;
 	}
-	
-	/**
-	 * Creates a Map that assigns an array of Gene Object to each gene id. Each array element refers
-	 * to one of the currently observed genomes.
-	 * @param c The GeneCluster whose genes should be associated with their annotations
-	 * @return A map with the gene id as the key and an array of Gene Objects as the value. The i-th
-	 * array element refers to the i-th currently observed genome, e.g. array[3] assigned to id 5 is
-	 * a reference to the Gene Object with id 5 in genome 3. If an array element is a null reference
-	 * a gene with that id does not occur in the subsequence (that is refered by the GeneCluster)
-	 * of that genome.
-	 */
-	public HashMap<Integer, Gene[]> generateAnnotations(GeneCluster c, GeneClusterOccurrence gOcc, int[] subselection) {
-		int[] genes = c.getGenes();
-		Subsequence[][] subsequences = gOcc.getSubsequences();
-		HashMap<Integer, Gene[]> map = new HashMap<Integer, Gene[]>();
-		for (int gene : genes) {
-			if (geneLabelMap.get(gene) != null)
-				map.put(gene, new Gene[subsequences.length]);
-		}
-		for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
-			if (subsequences[seqnum].length<=subselection[seqnum] || 
-					subselection[seqnum]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
-				continue;
-			Subsequence subseq = subsequences[seqnum][subselection[seqnum]];
-			Chromosome chromosome = genomes[seqnum].getChromosomes().get(subseq.getChromosome());
-			for (int i=subseq.getStart()-1; i<subseq.getStop(); i++) {
-				Gene gene = chromosome.getGenes().get(i);
-				if (map.containsKey(Math.abs(gene.getId()))) {
-					Gene[] g = map.get(Math.abs(gene.getId()));
-					if (g[seqnum]==null) g[seqnum]=gene;
-				}
-			}
-		}
-		return map;
-	}
-	
-	public HashMap<Integer, Gene[][]> generateAnnotations(GeneCluster c, GeneClusterOccurrence gOcc) {
-		int[] genes = c.getGenes();
-		Subsequence[][] subsequences = gOcc.getSubsequences();
-		HashMap<Integer, Gene[][]> map = new HashMap<Integer, Gene[][]>();
-		for (int gene : genes) {
-			if (geneLabelMap.get(gene) != null) {
-				Gene[][] geneArray = new Gene[subsequences.length][];
-				for (int i=0; i<subsequences.length; i++)
-					geneArray[i] = new Gene[subsequences[i].length];
-				map.put(gene, geneArray);
-			}
-		}
-		for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
-			for (int i=0; i<subsequences[seqnum].length; i++) {
-				Subsequence subseq = subsequences[seqnum][i];
-				Chromosome chromosome = genomes[seqnum].getChromosomes().get(subseq.getChromosome());
-				for (int j=subseq.getStart()-1; j<subseq.getStop(); j++) {
-					Gene gene = chromosome.getGenes().get(j);
-					if (map.containsKey(Math.abs(gene.getId()))) {
-						Gene[][] g = map.get(Math.abs(gene.getId()));
-						if (g[seqnum][i]==null)
-							g[seqnum][i] = gene;
-					}
-				}
-			}
-		}
-		return map;
-	}	
 
 	public Map<Integer, Color> getColormap() {
 		return colormap;
@@ -537,7 +468,7 @@ public class GeckoInstance {
 
 	private GeckoInstance() {
 		this.clusters = new GeneCluster[0];
-		this.setGeneElementHight(20);
+		this.setGeneElementHight(DEFAULT_GENE_HIGHT);
 		ToolTipManager.sharedInstance().setInitialDelay(0);
 	}
 	

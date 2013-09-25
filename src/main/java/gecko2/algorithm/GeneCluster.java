@@ -345,8 +345,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 			}
 		}
 		builder.chromosomes(chromosomes);
-		Map<Integer, Gene[][]> annotations = GeckoInstance.getInstance().generateAnnotations(this, 
-				occ);
+		Map<Integer, Gene[][]> annotations = generateAnnotations(occ);
 		
 		Map<Integer, Gene[][]> newAnnotations = new HashMap<Integer, Gene[][]>();
 		for (Map.Entry<Integer, Gene[][]> entry : annotations.entrySet())
@@ -507,8 +506,82 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		}
 		return builder.toString();
 	}
-	
-	/**
+
+    /**
+     * Creates a Map that assigns an array of Gene Object to each gene id. Each array element refers
+     * to one of the currently observed genomes.
+     * @return A map with the gene id as the key and an array of Gene Objects as the value. The i-th
+     * array element refers to the i-th currently observed genome, e.g. array[3] assigned to id 5 is
+     * a reference to the Gene Object with id 5 in genome 3. If an array element is a null reference
+     * a gene with that id does not occur in the subsequence (that is refered by the GeneCluster)
+     * of that genome.
+     */
+    public Map<Integer, Gene[]> generateAnnotations(GeneClusterOccurrence gOcc, int[] subselection) {
+        GeckoInstance instance = GeckoInstance.getInstance();
+
+        Subsequence[][] subsequences = gOcc.getSubsequences();
+        HashMap<Integer, Gene[]> map = new HashMap<Integer, Gene[]>();
+        for (int gene : genes) {
+            if (instance.getGenLabelMap().get(gene) != null)
+                map.put(gene, new Gene[subsequences.length]);
+        }
+        for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
+            if (subsequences[seqnum].length<=subselection[seqnum] ||
+                    subselection[seqnum]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                continue;
+            Subsequence subseq = subsequences[seqnum][subselection[seqnum]];
+            Chromosome chromosome = instance.getGenomes()[seqnum].getChromosomes().get(subseq.getChromosome());
+            for (int i=subseq.getStart()-1; i<subseq.getStop(); i++) {
+                Gene gene = chromosome.getGenes().get(i);
+                if (map.containsKey(Math.abs(gene.getId()))) {
+                    Gene[] g = map.get(Math.abs(gene.getId()));
+                    if (g[seqnum]==null) g[seqnum]=gene;
+                }
+            }
+        }
+        return map;
+    }
+
+    public static int getMaximumIdLength(Map<Integer, Gene[]> annotations) {
+        int maxIdLength = -1;
+
+        for (Integer geneId : annotations.keySet())
+            if (geneId > maxIdLength)
+                maxIdLength = geneId;
+
+        return maxIdLength;
+    }
+
+    public Map<Integer, Gene[][]> generateAnnotations(GeneClusterOccurrence gOcc) {
+        GeckoInstance instance = GeckoInstance.getInstance();
+        Subsequence[][] subsequences = gOcc.getSubsequences();
+        HashMap<Integer, Gene[][]> map = new HashMap<Integer, Gene[][]>();
+        for (int gene : genes) {
+            if (instance.getGenLabelMap().get(gene) != null) {
+                Gene[][] geneArray = new Gene[subsequences.length][];
+                for (int i=0; i<subsequences.length; i++)
+                    geneArray[i] = new Gene[subsequences[i].length];
+                map.put(gene, geneArray);
+            }
+        }
+        for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
+            for (int i=0; i<subsequences[seqnum].length; i++) {
+                Subsequence subseq = subsequences[seqnum][i];
+                Chromosome chromosome = instance.getGenomes()[seqnum].getChromosomes().get(subseq.getChromosome());
+                for (int j=subseq.getStart()-1; j<subseq.getStop(); j++) {
+                    Gene gene = chromosome.getGenes().get(j);
+                    if (map.containsKey(Math.abs(gene.getId()))) {
+                        Gene[][] g = map.get(Math.abs(gene.getId()));
+                        if (g[seqnum][i]==null)
+                            g[seqnum][i] = gene;
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
+    /**
 	 * Tests, if this gene cluster is similar to the the other gene cluster
 	 * @param other the other gene cluster
 	 * @return if they are similar

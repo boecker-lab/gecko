@@ -320,18 +320,9 @@ public class GeneClusterPicture {
 	 * @return the new x coordinate behind the gene
 	 */
 	private int paintGene(Graphics g, Gene gene, boolean partOfCluster, int x, int y) {
-		Color currentColor = getColor(Math.abs(gene.getId()));		
-		String name = "";
-		switch (this.nameType) {
-			case ID: name = gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0];
-				break;
-			case NAME: name = gene.getName();
-				break;
-			case LOCUS_TAG: name = gene.getTag();
-				break;
-		}
+		Color currentColor = getColor(Math.abs(gene.getId()));
 		
-		return GenomePainting.paintGene(g, gene, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, name, x, y, elemWidth, elemHeight, hgap, vgap);
+		return GenomePainting.paintGene(g, gene, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
 	}
 	
 	public void paint(Graphics g){

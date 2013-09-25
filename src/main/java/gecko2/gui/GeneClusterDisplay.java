@@ -28,6 +28,9 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 	private GeneCluster cluster;
 	private GeneClusterOccurrence gOcc;
 
+    private String maxLengthString;
+    private int geneWidth;
+
     private List<Subsequence> subsequences;
     private List<Chromosome> chromosomes;
     private List<Integer> genomeIndexMapping;
@@ -37,11 +40,11 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     private List<Integer> genomeIndexInGeneList;
     private Map<Integer, Integer> geneIdAtTablePosition;
 
-    // local!
+    // local?
     private JTable chromosomeNameTable;
     private JTable annotationTable;
 
-    // end local!
+    // end local?
 	
 	private static final String VALUES_TITLE = "Global cluster information:";
 
@@ -69,6 +72,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         annotationTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         annotationTable.setShowGrid(false);
         annotationTable.setDefaultRenderer(NumberInRectangle.NumberIcon.class, new NumberIconRenderer());
+        annotationTable.setDefaultRenderer(Integer.class, new GeneRenderer());
         final TableColumnModel annotationTableColumnModel = annotationTable.getColumnModel();
         annotationTableColumnModel.getColumn(0).setPreferredWidth(50); // Index
         annotationTableColumnModel.getColumn(0).setMaxWidth(50); // Index
@@ -110,9 +114,12 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			int[] subselections = l.getsubselection();
             this.gOcc = l.getgOcc();
 
-            this.setAnnotationData(gecko.generateAnnotations(l.getSelection(),
-                    l.getgOcc(),
-                    l.getsubselection()));
+            Map<Integer, Gene[]> annotations = l.getSelection().generateAnnotations(l.getgOcc(),
+                    l.getsubselection());
+
+            setMaxLengthStringWidth(GeneCluster.getMaximumIdLength(annotations));
+
+            this.setAnnotationData(annotations);
 
             for (int i=0; i<subselections.length; i++){
                 if (subselections[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED && gOcc.getSubsequences()[i][subselections[i]].isValid()) {
@@ -126,6 +133,13 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 		}
 		update();
 	}
+
+    private void setMaxLengthStringWidth(int idLength){
+        if (maxLengthString == null || maxLengthString.length() != idLength){
+            maxLengthString = GenomePainting.buildMaxLengthString(idLength);
+        }
+        geneWidth = GenomePainting.getGeneWidth(masterPanel.getGraphics(), maxLengthString, GeckoInstance.DEFAULT_GENE_HIGHT);
+    }
 
 	private void update() {
 		masterPanel.removeAll();
@@ -273,7 +287,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         return cpanel;
     }
 
-    private void setAnnotationData(HashMap<Integer, Gene[]> annotations) {
+    private void setAnnotationData(Map<Integer, Gene[]> annotations) {
         for (Map.Entry<Integer, Gene[]> entry : annotations.entrySet()) {
             geneIdAtTablePosition.put(geneList.size(), entry.getKey());
             Gene[] genes = entry.getValue();
@@ -338,7 +352,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         private static final long serialVersionUID = -3306238610287868813L;
 
-        private final Class<?>[] columns = {Gene.class, NumberInRectangle.NumberIcon.class, String.class};
+        private final Class<?>[] columns = {Integer.class, NumberInRectangle.NumberIcon.class, String.class};
 
         @Override
         public int getRowCount() {
@@ -359,11 +373,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    Integer geneId = geneIdAtTablePosition.get(rowIndex);
-                    if (geneId == null)
-                        return -1;
-                    else
-                        return geneId;
+                    return geneIdAtTablePosition.get(rowIndex);
                 case 1:
                     return new NumberInRectangle.NumberIcon(genomeIndexInGeneList.get(rowIndex)+1);
                 case 2:
@@ -399,10 +409,9 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         @Override
         public void setValue(Object value) {
-            if (value instanceof Gene) {
-                NumberInRectangle.NumberIcon numberIcon = (NumberInRectangle.NumberIcon)value;
-                setIcon(numberIcon);
-                setToolTipText(chromosomes.get(genomeIndexBackmap.get(numberIcon.getNumber() - 1)).getFullName());
+            if (value instanceof Integer) {
+                GenomePainting.GeneIcon icon = new GenomePainting.GeneIcon((Integer)value, geneWidth, GeckoInstance.DEFAULT_GENE_HIGHT);
+                setIcon(icon);
             } else
                 setIcon(null);
         }

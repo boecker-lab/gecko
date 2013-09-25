@@ -27,7 +27,7 @@ public class NumberInRectangle extends JLabel{
         this.setIcon(icon);
 	}
 
-    public static class NumberIcon implements Icon{
+    public static class NumberIcon implements Icon {
         private final int number;
         private final int width;
         private final int height;

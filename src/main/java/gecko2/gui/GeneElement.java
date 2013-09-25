@@ -60,7 +60,7 @@ public class GeneElement extends JPanel implements Adjustable {
 	
 	private int computeHeight() {
 		if (fixedSize)
-			return GeckoInstance.DISPLAY_GENEELEMENT_HIGHT;
+			return GeckoInstance.DEFAULT_GENE_HIGHT;
 		else
 			return gecko.getGeneElementHight();
 	}
