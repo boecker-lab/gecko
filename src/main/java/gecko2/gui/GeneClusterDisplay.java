@@ -236,6 +236,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 		this.repaint();
 		this.revalidate();
 		this.getVerticalScrollBar().setValue(0);
+        this.getHorizontalScrollBar().setValue(0);
 	}
 
     private JPanel generateGeneralGenomeInformationPanel(String text) {
