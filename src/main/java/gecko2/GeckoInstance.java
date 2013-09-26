@@ -52,7 +52,7 @@ public class GeckoInstance {
     private StartComputationDialog scd = null;
 	
 	private int geneElementHight;
-    public static int DEFAULT_GENE_HIGHT = 20;
+    public static final int DEFAULT_GENE_HIGHT = 20;
     private final static int MAX_GENEELEMENT_HIGHT = 40;
     private final static int MIN_GENEELEMENT_HIGHT = 9;
 	

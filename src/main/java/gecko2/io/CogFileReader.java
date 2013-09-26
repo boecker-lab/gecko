@@ -68,7 +68,7 @@ public class CogFileReader implements GeckoDataReader {
      * The input File
      */
     private final File inputFile;
-    private List<Integer> genomeList;
+    private final List<Integer> genomeList;
 	
 	public CogFileReader(File inputFile) {
 		this(inputFile, null);

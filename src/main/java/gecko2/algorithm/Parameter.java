@@ -27,7 +27,7 @@ public class Parameter {
                     throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
             }
         }
-    };
+    }
 
     public enum ReferenceType {
         allAgainstAll('a', "all against all"), genome('g', "fixed genome"), cluster('c', "manual cluster");
@@ -62,7 +62,7 @@ public class Parameter {
                     throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
             }
         }
-    };
+    }
 	
     private final static int DELTA_TABLE_SIZE = 3;
 	

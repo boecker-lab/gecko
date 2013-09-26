@@ -4,8 +4,6 @@ import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
 import gecko2.io.SessionWriter;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 

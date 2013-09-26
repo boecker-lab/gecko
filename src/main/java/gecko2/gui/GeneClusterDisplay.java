@@ -12,8 +12,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionListener {
@@ -41,9 +43,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     private Map<Integer, Integer> geneIdAtTablePosition;
 
     // local?
-    private JTable chromosomeNameTable;
-    private JTable annotationTable;
-
+    private final JTable chromosomeNameTable;
+    private final JTable annotationTable;
     // end local?
 	
 	private static final String VALUES_TITLE = "Global cluster information:";
