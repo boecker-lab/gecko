@@ -63,6 +63,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         chromosomeNameTable = new JTable(new ChromsomeNameTableModel());
         chromosomeNameTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         chromosomeNameTable.setShowGrid(false);
+        chromosomeNameTable.setAlignmentX(Component.LEFT_ALIGNMENT);
         chromosomeNameTable.setDefaultRenderer(NumberInRectangle.NumberIcon.class, new NumberIconRenderer());
         final TableColumnModel chromosomeNameTableColumnModel = chromosomeNameTable.getColumnModel();
         chromosomeNameTableColumnModel.getColumn(0).setPreferredWidth(50); // Index
@@ -72,6 +73,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         annotationTable = new JTable(new GeneAnnotationTableModel());
         annotationTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         annotationTable.setShowGrid(false);
+        annotationTable.setAlignmentX(Component.LEFT_ALIGNMENT);
         annotationTable.setDefaultRenderer(NumberInRectangle.NumberIcon.class, new NumberIconRenderer());
         annotationTable.setDefaultRenderer(Integer.class, new GeneRenderer());
         final TableColumnModel annotationTableColumnModel = annotationTable.getColumnModel();
@@ -150,15 +152,12 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			/*
 			 * Involed Chromosomes
 			 */
-			JPanel involvedChrTitle = new JPanel();
-			involvedChrTitle.setBackground(masterPanel.getBackground());
-			involvedChrTitle.setLayout(new BoxLayout(involvedChrTitle,BoxLayout.X_AXIS));
 			JLabel invChrTitle = new JLabel("Involved chromosomes");
 			invChrTitle.setFont(boldFont);
-			involvedChrTitle.add(invChrTitle);
-			involvedChrTitle.add(Box.createHorizontalGlue());
-			masterPanel.add(involvedChrTitle);
-			masterPanel.add(Box.createVerticalStrut(5));
+            invChrTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+			masterPanel.add(invChrTitle);
+
+            masterPanel.add(Box.createVerticalStrut(5));
 
             masterPanel.add(chromosomeNameTable);
 			masterPanel.add(Box.createVerticalStrut(5));
@@ -173,12 +172,15 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			valTitle.setFont(boldFont);
 			title1.add(valTitle);
 			title1.add(Box.createHorizontalGlue());
+            title1.setAlignmentX(Component.LEFT_ALIGNMENT);
 			masterPanel.add(title1);
 
             JPanel totalDistancePanel = generateGeneralGenomeInformationPanel("Best total distance: " + gOcc.getTotalDist());
+            totalDistancePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             masterPanel.add(totalDistancePanel);
 
             JPanel bestScorePanel = generateGeneralGenomeInformationPanel("         Best score: " + gOcc.getBestScore());
+            bestScorePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             masterPanel.add(bestScorePanel);
 
 			masterPanel.add(Box.createVerticalStrut(5));
@@ -201,10 +203,12 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             title3.add(distanceLabel);
 
 			title3.add(Box.createHorizontalGlue());
+            title3.setAlignmentX(Component.LEFT_ALIGNMENT);
 			masterPanel.add(title3);
 			masterPanel.add(Box.createVerticalStrut(5));
 
 			JPanel cpanel = generateChromsomeDistancePanel();
+            cpanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             masterPanel.add(cpanel);
 			masterPanel.add(Box.createVerticalStrut(5));
 			
@@ -220,45 +224,19 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             title2.add(label);
 			
 			title2.add(Box.createHorizontalGlue());
-			
+
+            title2.setAlignmentX(Component.LEFT_ALIGNMENT);
 			masterPanel.add(title2);
 			masterPanel.add(Box.createVerticalStrut(10));
 
             masterPanel.add(annotationTable);
 
 			masterPanel.add(Box.createHorizontalGlue());
-			masterPanel.repaint();
-			flowpanel.repaint();
-		
-			
 		}
 		this.repaint();
 		this.revalidate();
 		this.getVerticalScrollBar().setValue(0);
 	}
-
-    private JPanel generateGenomeNamePanel(int i, int[] subselections) {
-        if (subselections[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
-            return null;
-
-        Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
-
-        if (!s.isValid())
-            return null;
-
-        JPanel cpanel = new JPanel();
-        FlowLayout f = new FlowLayout(FlowLayout.LEFT);
-        f.setVgap(1);
-        cpanel.setLayout(f);
-        cpanel.setBackground(masterPanel.getBackground());
-
-        Chromosome c = GeckoInstance.getInstance().getGenomes()[i].getChromosomes().get(s.getChromosome());
-        cpanel.add(new NumberInRectangle(i + 1, getBackground(), c.getChromosomeMouseListener()));
-
-        cpanel.add(new TextLabel(c.getFullName()));
-
-        return cpanel;
-    }
 
     private JPanel generateGeneralGenomeInformationPanel(String text) {
         JPanel cpanel = new JPanel();
