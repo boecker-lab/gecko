@@ -1,9 +1,7 @@
 package gecko2.algorithm;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 public class Genome implements Serializable {
@@ -108,5 +106,139 @@ public class Genome implements Serializable {
                         maxLength = gene.getTag().length();
 
         return maxLength;
+    }
+
+    /**
+     * Print statistics of gene family sizes for all genomes
+     * @param genomes The genomes
+     * @param alphabetSize The size of the alphabet
+     */
+    private static void printGenomeStatistics(Genome[] genomes, int alphabetSize){
+        printGenomeStatistics(genomes, alphabetSize, -1, -1);
+    }
+
+    /**
+     * Print statistics of gene family sizes for all genomes with genomeSize +/- genomeSizeDelta genes.
+     * @param genomes The genomes
+     * @param alphabetSize The size of the alphabet
+     * @param genomeSize  The number of genes that is needed for a genome to be reported. -1 will report statistics for all genomes.
+     * @param genomeSizeDelta The maximum deviation form the genomeSize for a genome to be reported
+     */
+    private static void printGenomeStatistics(Genome[] genomes, int alphabetSize, int genomeSize, int genomeSizeDelta) {
+        int[][] alphabetPerGenome = new int[genomes.length][alphabetSize + 1];
+        String[][] annotations = new String[genomes.length][alphabetSize + 1];
+
+        SortedMap<Integer,Integer> summedFamilySizes = new TreeMap<Integer, Integer>();
+        int nrReportedGenomes = 0;
+        List<Integer> genomeSizes = new ArrayList<Integer>();
+        // Generate family sizes per genome and print it
+        for (int n=0; n<genomes.length; n++){
+            Genome g = genomes[n];
+            if (genomeSize != -1 && (g.getTotalGeneNumber() < genomeSize-genomeSizeDelta || g.getTotalGeneNumber() > genomeSize + genomeSizeDelta))
+                continue;
+            else {
+                nrReportedGenomes++;
+                genomeSizes.add(g.getTotalGeneNumber());
+            }
+            for (Chromosome chr : g.getChromosomes()) {
+                for (Gene gene : chr.getGenes()) {
+                    alphabetPerGenome[n][Math.abs(gene.getId())]++;
+                    //if (n!=0)
+                    annotations[n][Math.abs(gene.getId())] = gene.getAnnotation();
+                    //else
+                    //annotations[n][Math.abs(gene.getId())] = String.format("%s: %s", chr.getName().substring(24), gene.getAnnotation());
+                }
+            }
+            SortedMap<Integer,Integer> familySizes = new TreeMap<Integer, Integer>();
+            for (int i=1; i<alphabetPerGenome[n].length; i++){
+                // add family size for this genome
+                Integer fS = familySizes.get(alphabetPerGenome[n][i]);
+                if (fS != null)
+                    familySizes.put(alphabetPerGenome[n][i], ++fS);
+                else
+                    familySizes.put(alphabetPerGenome[n][i], 1);
+
+                // add summed family sizes
+                fS = summedFamilySizes.get(alphabetPerGenome[n][i]);
+                if (fS != null)
+                    summedFamilySizes.put(alphabetPerGenome[n][i], ++fS);
+                else
+                    summedFamilySizes.put(alphabetPerGenome[n][i], 1);
+            }
+
+            Integer nonOccFamilies = familySizes.get(0);
+            System.out.println(String.format("%s: %d genes, %d gene families", g.getName(), g.getTotalGeneNumber(), (nonOccFamilies == null) ? alphabetPerGenome[n].length-1 : alphabetPerGenome[n].length - 1 - nonOccFamilies));
+            for (Map.Entry<Integer, Integer> entry : familySizes.entrySet()){
+                System.out.println(String.format("%d\t%d", entry.getKey(), entry.getValue()));
+            }
+            System.out.println();
+        }
+
+        for (Integer size : genomeSizes)
+            System.out.print(size + ", ");
+        System.out.println("");
+        System.out.println(String.format("Sum of %d genomes:", nrReportedGenomes));
+        for (Map.Entry<Integer, Integer> entry : summedFamilySizes.entrySet()){
+            if (entry.getKey() != 0)
+                System.out.println(String.format("%d\t%d", entry.getKey(), entry.getValue()));
+        }
+        System.out.println();
+
+        // generate complete family sizes and print it
+        int[] alphabet = new int[alphabetSize + 1];
+        for (Genome g : genomes){
+            if (genomeSize != -1 && (g.getTotalGeneNumber() < genomeSize-genomeSizeDelta || g.getTotalGeneNumber() > genomeSize + genomeSizeDelta))
+                continue;
+            for (Chromosome chr : g.getChromosomes())
+                for (Gene gene : chr.getGenes())
+                    alphabet[Math.abs(gene.getId())]++;
+        }
+        SortedMap<Integer,Integer> familySizes = new TreeMap<Integer, Integer>();
+        for (int i=1; i<alphabet.length; i++){
+            Integer fS = familySizes.get(alphabet[i]);
+            if (fS != null)
+                familySizes.put(alphabet[i], ++fS);
+            else
+                familySizes.put(alphabet[i], 1);
+        }
+
+        System.out.println("Complete:");
+        for (Map.Entry<Integer, Integer> entry : familySizes.entrySet()){
+            System.out.println(String.format("%d\t%d", entry.getKey(), entry.getValue()));
+        }
+
+			/*
+			for(int j=0; j<alphabetPerGenome.length; j++) {
+				System.out.print(String.format("%s\t", genomes[j].getName()));
+			}
+			System.out.println("");
+			for (int i=0; i<alphabet.length; i++) {
+				for(int j=0; j<alphabetPerGenome.length; j++) {
+					System.out.print(String.format("%d\t", alphabetPerGenome[j][i]));
+				}
+				System.out.println("");
+			}
+			for(int j=0; j<alphabetPerGenome.length; j++) {
+				System.out.print(String.format("%s\t", genomes[j].getName()));
+			}
+			System.out.println("");
+			*/
+			/*
+			for (int i=0; i<alphabet.length; i++) {
+				if (alphabetPerGenome[0][i] == 1) {
+					boolean print = false;
+					StringBuilder builder = new StringBuilder();
+					builder.append("\"").append(annotations[0][i]).append("\"");
+					for(int j=1; j<alphabetPerGenome.length; j++) {
+						if (alphabetPerGenome[j][i] == 1) {
+							builder.append("\t").append("\"").append(annotations[j][i]).append("\"");
+							print = true;
+						} else
+							builder.append("\t").append("-");
+					}
+					if (print)
+						System.out.println(builder.toString());
+				}
+			}*/
     }
 }
