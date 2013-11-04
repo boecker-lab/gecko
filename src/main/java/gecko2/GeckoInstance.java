@@ -580,7 +580,7 @@ public class GeckoInstance {
 			Date after = new Date();
 			System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
 			if (mergeResults)				
-				GeckoInstance.this.clusters = mergeResults(GeckoInstance.this.clusters, res);
+				GeckoInstance.this.clusters = GeneCluster.mergeResults(GeckoInstance.this.clusters, res);
 			else
 				GeckoInstance.this.clusters = res;
             if (gui != null) {
@@ -724,24 +724,6 @@ public class GeckoInstance {
 						System.out.println(builder.toString());
 				}
 			}*/
-		}
-		
-		private GeneCluster[] mergeResults(GeneCluster[] oldResults, GeneCluster[] additionalResults) {
-			GeneCluster[] newResults;
-			if (oldResults == null)
-				newResults = additionalResults;
-			else if(additionalResults == null)
-				newResults = oldResults;
-			else {
-				newResults = Arrays.copyOf(oldResults, oldResults.length + additionalResults.length);
-				int newId = oldResults.length;
-				for (GeneCluster cluster : additionalResults) {
-					cluster.setId(newId);
-					newResults[newId] =  cluster;
-					newId++;
-				}	
-			}
-			return newResults;
 		}
 
 	}
