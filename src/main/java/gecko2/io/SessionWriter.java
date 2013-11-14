@@ -1,9 +1,19 @@
 package gecko2.io;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
 import gecko2.GeckoInstance;
+import gecko2.algorithm.GeneCluster;
+import gecko2.algorithm.Genome;
 import gecko2.gui.GenomePainting;
 
+import java.awt.*;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 /**
@@ -24,43 +34,50 @@ public class SessionWriter
 		GeckoInstance.getInstance().setLastSavedFile(f);
         ObjectOutputStream o = null;
         boolean returnValue = true;
-		try 
-		{
-			o = new ObjectOutputStream(new FileOutputStream(f));
-			o.writeObject(GeckoInstance.getInstance().getGenomes());
-			o.writeObject(GeckoInstance.getInstance().getGenLabelMap());
-			o.writeObject(GeckoInstance.getInstance().getColormap());
-			o.writeObject(GeckoInstance.getInstance().getClusters());
-			o.writeObject(GeckoInstance.getInstance().getMaxLength(GenomePainting.NameType.ID));
-            o.writeObject(GeckoInstance.getInstance().getMaxLength(GenomePainting.NameType.NAME));
-            o.writeObject(GeckoInstance.getInstance().getMaxLength(GenomePainting.NameType.LOCUS_TAG));
-			o.close();
-		} 
-		catch (FileNotFoundException e) 
-		{
-			e.printStackTrace();
+
+
+        XStream xstream = new XStream(new JsonHierarchicalStreamDriver());
+
+        try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), Charset.forName("UTF-8"))) {
+        //try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(f)); ObjectOutputStream out = xstream.createObjectOutputStream(zos)) {
+        //    zos.putNextEntry(new ZipEntry(f.getName()));
+            writeGenomes(out, GeckoInstance.getInstance().getGenomes());
+            writeLengthInformation(out, GenomePainting.NameType.values());
+            writeGeneLabelMap(out, GeckoInstance.getInstance().getGenLabelMap());
+            writeColorMap(out, GeckoInstance.getInstance().getColormap());
+            writeClusters(out, GeckoInstance.getInstance().getClusters());
+
+        }
+        catch (IOException e) {
+            e.printStackTrace();
             returnValue = false;
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-            returnValue = false;
-		}
-		finally 
-		{
-			try 
-			{
-				if (o!=null)
-				{
-					o.close();
-				}
-			} 
-			catch (IOException e) 
-			{
-				e.printStackTrace();
-				returnValue = false;
-			}
-		}
+        }
         return returnValue;
 	}
+
+    private static void writeClusters(Writer out, GeneCluster[] clusters) {
+
+
+    }
+
+    private static void writeColorMap(Writer out, Map<Integer, Color> colormap) {
+
+
+    }
+
+    private static void writeGeneLabelMap(Writer out, Map<Integer, String[]> geneLabelMap) {
+
+
+    }
+
+    private static void writeLengthInformation(Writer out, GenomePainting.NameType[] values) {
+
+
+    }
+
+    private static void writeGenomes(Writer out, Genome[] genomes) {
+
+    }
+
+
 }
