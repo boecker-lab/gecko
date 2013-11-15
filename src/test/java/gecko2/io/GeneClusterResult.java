@@ -395,7 +395,7 @@ public class GeneClusterResult
 	                throw new DataFormatException("Line corrupt! Missing type in: " + Arrays.toString(s));
 	            }
 	            
-	            char type = s[5].charAt(5);
+	            Parameter.OperationMode type = Parameter.OperationMode.getOperationModeFromChar(s[5].charAt(5));
 	            
 	            line1 = reader.readLine();
 	            s = line1.split("\t");

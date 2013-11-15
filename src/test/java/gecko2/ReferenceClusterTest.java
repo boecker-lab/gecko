@@ -92,7 +92,7 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -155,13 +155,13 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									1,
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes2,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									1,
 									1,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 
@@ -225,13 +225,13 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes2,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									0,
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -286,7 +286,7 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									1,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -341,7 +341,7 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -409,19 +409,19 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									1,
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									1,
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(2, bestOccurrences3, allOccurrences3, genes2,
 									res[2].getBestPValue(),
 									res[2].getBestPValueCorrected(),
 									1,
 									1,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -483,13 +483,13 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									0,
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -565,25 +565,25 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									1,
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									1,
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(2, bestOccurrences3, allOccurrences3, genes2,
 									res[2].getBestPValue(),
 									res[2].getBestPValueCorrected(),
 									1,
 									1,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(3, bestOccurrences4, allOccurrences4, genes3,
 									res[3].getBestPValue(),
 									res[3].getBestPValueCorrected(),
 									1,
 									1,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
@@ -643,7 +643,7 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -710,13 +710,13 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									1,
 									1,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences1, allOccurrences1, genes3,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									2,
 									2,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -782,13 +782,13 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									1,
 									1,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences1, allOccurrences1, genes3,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									2,
 									2,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -844,7 +844,7 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									1,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -900,7 +900,7 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									1,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -965,13 +965,13 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									2,
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences, allOccurrences, genes,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									1,
 									1,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -1023,7 +1023,7 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -1079,13 +1079,13 @@ public class ReferenceClusterTest
 									res[0].getBestPValueCorrected(),
 									0,
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									0,
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -1133,7 +1133,7 @@ public class ReferenceClusterTest
 				res[0].getBestPValueCorrected(),
 				0,
 				0,
-				'r')};
+				Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -1182,7 +1182,7 @@ public class ReferenceClusterTest
 				res[0].getBestPValueCorrected(),
 				1,
 				0,
-				'r')};
+				Parameter.OperationMode.reference)};
 
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
@@ -1331,13 +1331,13 @@ public class ReferenceClusterTest
 				res[0].getBestPValueCorrected(),
 				0,
 				0,
-				'r'),
+				Parameter.OperationMode.reference),
 				new GeneCluster(1, bestOccurrences2, allOccurrences2, genes2,
 						res[1].getBestPValue(),
 						res[1].getBestPValueCorrected(),
 						0,
 						0,
-						'r')};
+						Parameter.OperationMode.reference)};
 				
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}

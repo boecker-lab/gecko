@@ -92,16 +92,6 @@ public class GeckoInstance {
 	}
 	
 	/**
-	 * Setter for the colormap
-	 * 
-	 * @param colormap the colormap
-	 */
-	public void setColorMap(Map<Integer, Color> colormap)
-	{
-		this.colormap = colormap;
-	}
-	
-	/**
 	 * Setter for the geneLabelMap
 	 * 
 	 * @param geneLabelMap the gene label map
@@ -430,7 +420,6 @@ public class GeckoInstance {
         GeckoInstance.getInstance().setMaxLengths(reader.getMaxIdLength(), reader.getMaxNameLength(), reader.getMaxLocusTagLength());
         GeckoInstance.getInstance().setClusters(reader.getGeneClusters());
         GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
-        GeckoInstance.getInstance().setColorMap(reader.getColorMap());
         GeckoInstance.getInstance().setGenomes(reader.getGenomes());
         if (gui != null){
             SwingUtilities.invokeLater(new Runnable() {
@@ -451,6 +440,12 @@ public class GeckoInstance {
 	}
 
 	public Map<Integer, Color> getColormap() {
+        if (colormap == null) {
+            Random r = new Random();
+            colormap = new HashMap<>();
+            for (Integer id : geneLabelMap.keySet())
+                colormap.put(id, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
+        }
 		return colormap;
 	}
 	

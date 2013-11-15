@@ -21,13 +21,6 @@ public interface GeckoDataReader {
     public Map<Integer, String[]> getGeneLabelMap();
 
     /**
-     * Getter for the colorMap.
-     *
-     * @return the colorMap of the input file
-     */
-    public Map<Integer, Color> getColorMap();
-
-    /**
      * @return the genomes from the input file.
      */
     public Genome[] getGenomes();

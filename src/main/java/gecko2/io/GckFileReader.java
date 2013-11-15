@@ -1,14 +1,18 @@
 package gecko2.io;
 
 import gecko2.GeckoInstance;
+import gecko2.algorithm.Chromosome;
+import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 /**
  * The class implements a reader for .gck files (session files).
@@ -18,11 +22,6 @@ import java.util.Map;
  * @version 0.03
  */
 public class GckFileReader implements GeckoDataReader {
-	/**
-	 * Storing place for the colorMap
-	 */
-	private Map<Integer, Color> colorMap;
-	
 	/**
 	 * Storing place for the geneLabelMap 
 	 */
@@ -71,16 +70,6 @@ public class GckFileReader implements GeckoDataReader {
 	public Map<Integer, String[]> getGeneLabelMap() {
 		return this.geneLabelMap;
 	}
-	
-	
-	/**
-	 * Getter for the colorMap.
-	 * 
-	 * @return the colorMap of the input file
-	 */
-	public Map<Integer, Color> getColorMap() {
-		return colorMap;
-	}
 
 	/**
 	 * @return the genomes from the input file.
@@ -124,60 +113,89 @@ public class GckFileReader implements GeckoDataReader {
      */
     public void readData() throws IOException, ParseException {
         GeckoInstance.getInstance().setLastOpendFile(inputFile);
-
-        ObjectInputStream o = null;
-
-        try	{
-            o = new ObjectInputStream(new FileInputStream(inputFile));
-            genomes = (Genome[]) o.readObject();
-            geneLabelMap = (HashMap<Integer, String[]>) o.readObject();
-            colorMap = (HashMap<Integer, Color>) o.readObject();
-            clusters = (GeneCluster[]) o.readObject();
-            maxIdLength = (Integer) o.readObject();
-            try {
-                maxNameLength = (Integer) o.readObject();
-                maxLocusTagLength = (Integer) o.readObject();
-            } catch (EOFException e) {  // old format did not serialize this.
-                maxNameLength = Genome.getMaxNameLength(genomes);
-                maxLocusTagLength = Genome.getMaxLocusTagLength(genomes);
-            }
-
-            if (clusters != null) {
-                for (GeneCluster c : clusters)
-                    c.setMatch(true);
-            }
-        }
-        catch (IOException e) {
+        try	(BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), Charset.forName("UTF-8"))) {
+            String line = reader.readLine().trim();
+            if (!line.equals(SessionWriter.GENOME_SECTION_START))
+                throw new ParseException("Malformed first line: " + line, 0);
+            readGenomeData(reader);
+            line = reader.readLine().trim();
+            if (!line.startsWith(SessionWriter.CLUSTER_SECTION_START))
+                throw new ParseException("Malformed cluster section start: " + line, 0);
+            readClusterData(reader);
+        }catch (IOException | ParseException e) {
             handleFailedSessionLoad();
             throw e;
         }
-        catch (ClassNotFoundException e) {
-            handleFailedSessionLoad();
-            throw new ParseException(e.getMessage(), 0);
-        }
-        catch (ClassCastException e) {
-            handleFailedSessionLoad();
-            throw new ParseException(e.getMessage(), 0);
-        }
-        finally {
-            if (o!=null) {
-                try {
-                    o.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+    }
+
+    private void readGenomeData(BufferedReader reader) throws IOException, ParseException {
+        List<Genome> genomeList = new ArrayList<>();
+        geneLabelMap = new HashMap<>();
+        Genome genome = null;
+        while(true) {
+            String line = reader.readLine().trim();
+            switch (line) {
+                case SessionWriter.GENOME_START:
+                    genome = new Genome(reader.readLine().trim());
+                    genomeList.add(genome);
+                    break;
+                case SessionWriter.GENOME_END:
+                    genome = null;
+                    break;
+                case SessionWriter.CHROMOSOME_START:
+                    if (genome == null)
+                        throw new ParseException("Not in Genome at chromosome start!" , 0);
+                    genome.addChromosome(readChromosome(reader, genome));
+                    break;
+                case SessionWriter.GENOME_SECTION_END:
+                    if (genome != null)
+                        throw new ParseException("Genome or chromosome not closed at genomes end.", 0);
+                    genomes = genomeList.toArray(new Genome[genomeList.size()]);
+                    return;
+                default:
+                    throw new ParseException("Maleformed line: " + line, 0);
             }
         }
     }
-		
-	/**
+
+    private Chromosome readChromosome(BufferedReader reader, Genome genome) throws IOException, ParseException {
+        Chromosome chr = new Chromosome(reader.readLine().trim(), genome);
+        chr.setGenes(new ArrayList<Gene>());
+
+        while (true) {
+            String line = reader.readLine().trim();
+            if (line.equals(SessionWriter.CHROMOSOME_END))
+                return chr;
+            else {
+                String[] split = line.split("\t");
+                Gene newGene = new Gene(split[4], split[2], Integer.parseInt(split[0]), split[3], (split[5].equals("unknown") ? false : true));
+                maxIdLength = Math.max(maxIdLength, (split[0].startsWith("-") ? split[0].length()-1 : split[0].length()));
+                maxLocusTagLength = Math.max(maxLocusTagLength, newGene.getTag().length());
+                maxNameLength = Math.max(maxNameLength, newGene.getName().length());
+                String[] label = geneLabelMap.get(newGene.getId());
+                String[] newLabel = new String[]{split[1]};
+                if (label == null)
+                    geneLabelMap.put(newGene.getId(), newLabel);
+                else if (label.equals(newLabel))
+                    throw new ParseException(String.format("Conflicting gene labels %s and %s!", Arrays.toString(newLabel), Arrays.toString(label)), 0);
+                chr.getGenes().add(newGene);
+            }
+        }
+    }
+
+    private void readClusterData(BufferedReader reader) throws IOException, ParseException {
+
+    }
+
+    /**
 	 * Method for handling errors while the file is read.
 	 */
 	private void handleFailedSessionLoad() {
         genomes = null;
         geneLabelMap = null;
-        colorMap = null;
         clusters = null;
         maxIdLength = 0;
+        maxLocusTagLength = 0;
+        maxNameLength = 0;
 	}
 }

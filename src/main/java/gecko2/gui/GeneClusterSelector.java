@@ -4,6 +4,7 @@ import gecko2.GeckoInstance;
 import gecko2.GeckoInstance.ResultFilter;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
+import gecko2.algorithm.Parameter;
 import gecko2.event.ClusterSelectionEvent;
 import gecko2.event.ClusterSelectionListener;
 import gecko2.event.LocationSelectionEvent;
@@ -103,7 +104,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 
                 GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
 
-                if (gc != null && !(gc.getType() == GeneCluster.TYPE_REFERENCE)) {
+                if (gc != null && !(gc.getType() == Parameter.OperationMode.reference)) {
                     fireSelectionEvent(false);
                 }
             }
@@ -278,7 +279,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		
 		GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
 		
-		if (gc.getType() == GeneCluster.TYPE_CENTER || gc.getType() == GeneCluster.TYPE_MEDIAN) {
+		if (gc.getType() == Parameter.OperationMode.center || gc.getType() == Parameter.OperationMode.median) {
 			
 			showSuboptimalCheckBox.setVisible(false);
 			fireSelectionEvent(new ClusterSelectionEvent(GeneClusterSelector.this, 

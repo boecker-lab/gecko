@@ -22,12 +22,6 @@ import java.util.regex.Pattern;
  * The code is originally from GeckoInstance.java and is modified.
  */
 public class CogFileReader implements GeckoDataReader {
-
-	/**
-	 * Storing place for the colorMap
-	 */
-	private Map<Integer, Color> colorMap;
-	
 	/**
 	 * Storing place for the geneLabelMap 
 	 */
@@ -250,8 +244,6 @@ public class CogFileReader implements GeckoDataReader {
             // This is a bit dirty we look only into the first index of the array and store it in this map
             // But it seems like containsKey can't handle arrays as key.
             HashMap<String, Integer> backmap = new HashMap<String, Integer>();
-            Random r = new Random();
-            this.colorMap = new HashMap<Integer, Color>();
             this.maxIdLength = -1;
             this.maxNameLength = -1;
             this.maxLocusTagLength = -1;
@@ -316,23 +308,22 @@ public class CogFileReader implements GeckoDataReader {
                                     genes.add(new Gene(explode[3], sign * backmap.get(single_id_array[0]), explode[4], false));
                             } else {
                                 stringidlist.add(single_id_array);
-                                int intid = stringidlist.size();
+                                int intID = stringidlist.size();
 
                                 if (!isUnhomologe(single_id_array)) {
-                                    this.colorMap.put(intid, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
-                                    backmap.put(single_id_array[0], intid);
+                                    backmap.put(single_id_array[0], intID);
                                 }
                                 if (explode.length > 5)
-                                    genes.add(new Gene(explode[5], explode[3], sign * intid, explode[4], isUnhomologe(single_id_array)));
+                                    genes.add(new Gene(explode[5], explode[3], sign * intID, explode[4], isUnhomologe(single_id_array)));
                                 else
-                                    genes.add(new Gene(explode[3], sign * intid, explode[4], isUnhomologe(single_id_array)));
+                                    genes.add(new Gene(explode[3], sign * intID, explode[4], isUnhomologe(single_id_array)));
                             }
                         }
                     }
                 }
 
                 // Thank you for the not existing autoboxing on arrays...
-                this.geneLabelMap = new HashMap<Integer, String[]>();
+                this.geneLabelMap = new HashMap<>();
 
                 for (int j = 1; j < stringidlist.size() + 1; j++) {
                     this.geneLabelMap.put(j, stringidlist.get(j - 1));
@@ -380,21 +371,9 @@ public class CogFileReader implements GeckoDataReader {
     private void handleFailedSessionLoad() {
         genomes = null;
         geneLabelMap = null;
-        colorMap = null;
         maxIdLength = 0;
     }
-	
-	/**
-	 * The method is a getter for the colormap. Which contains the relation between the gene and his
-	 * color in the GUI.
-	 *   
-	 * @return the colorMap (HashMap)
-	 */
-	public Map<Integer, Color> getColorMap()
-	{
-		return this.colorMap;
-	}
-	
+
 	/**
 	 * The method is the getter for the genomes.
 	 * 

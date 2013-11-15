@@ -462,18 +462,20 @@ public class Gui {
                                 protected Void doInBackground() {
                                     try{
                                         reader.readData();
-                                    } catch (IOException e) {
+                                    } catch (final IOException e) {
                                         EventQueue.invokeLater(new Runnable() {
                                             public void run() {
+                                            e.printStackTrace();
                                             JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
                                                     "An error occured while reading the file!",
                                                     "Error",
                                                     JOptionPane.ERROR_MESSAGE);
                                             }
                                         });
-                                    } catch (ParseException e) {
+                                    } catch (final ParseException e) {
                                         EventQueue.invokeLater(new Runnable() {
                                             public void run() {
+                                                e.printStackTrace();
                                                 JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
                                                     "The input file is not in the right format!",
                                                     "Wrong format",

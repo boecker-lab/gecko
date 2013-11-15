@@ -193,9 +193,9 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			title3.setLayout(new BoxLayout(title3,BoxLayout.X_AXIS));
 
             JLabel distanceLabel = new JLabel();
-            if (cluster.getType() == 'm')
+            if (cluster.getType() == Parameter.OperationMode.median)
                 distanceLabel.setText("Distance to median per dataset:");
-            else if (cluster.getType()=='c')
+            else if (cluster.getType() == Parameter.OperationMode.center)
                 distanceLabel.setText("Distance to center set per dataset:");
             else
                 distanceLabel.setText("Distance to reference gene set per dataset:");
