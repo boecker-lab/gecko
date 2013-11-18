@@ -131,80 +131,74 @@ public class CogFileReader implements GeckoDataReader {
 	 * @throws FileNotFoundException
 	 */
 	public void importGenomesOccs() throws FileNotFoundException	{
-		occs = new ArrayList<GenomeOccurrence>();
-		Map<Integer, Integer> groupSize = new HashMap<Integer, Integer>();
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-			try {
-				String line;
-				GenomeOccurrence add = new GenomeOccurrence();
-				Map<String, Integer> groups = new HashMap<String, Integer>();
+		occs = new ArrayList<>();
+		Map<Integer, Integer> groupSize = new HashMap<>();
+		try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
+            String line;
+            GenomeOccurrence add = new GenomeOccurrence();
+            Map<String, Integer> groups = new HashMap<>();
 
-				int curline = 0;
-				int j = 1;
-				
-				if ((line = reader.readLine()) != null)	{	
-					add.setDesc(line);
-					String genomeName = getGenomeName(line);
-					String chromName = getChromosomeName(line);
-					add.setGenomeName(genomeName);
-					add.setChromosomeName(chromName);
-					groups.put(genomeName, j);
-					add.setGroup(j);
-					groupSize.put(j, 1);
-					add.setStart_line(curline);
-				}
-				
-				boolean next = false;
-				
-				while ((line = reader.readLine()) != null) {
-					curline++;
-					
-					if (next) {
-						add.setEnd_line(curline - 2);
-						occs.add(add);
-						add = new GenomeOccurrence();
-						add.setDesc(line);
-						String genomeName = getGenomeName(line);
-						String chromName = getChromosomeName(line);
-						add.setGenomeName(genomeName);
-						add.setChromosomeName(chromName);
-						
-						if (!groups.containsKey(genomeName)) {
-							j++;
-							groups.put(genomeName, j);
-							add.setGroup(j);
-							groupSize.put(j, 1);
-						} 
-						else {		
-							int group = groups.get(genomeName);
-							add.setGroup(group);
-							groupSize.put(group, groupSize.get(group) + 1);
-						}
-						
-						add.setStart_line(curline);
-						next = false;
-					}
-					
-					if (line.equals("")) {
-						next = true;
-					}
-				}
-				
-				
-				if (next) {
-					add.setEnd_line(curline - 1); 
-				}
-				else {
-					add.setEnd_line(curline);
-				}
-				
-				if (add.getDesc() != null) {
-					occs.add(add);
-				}
-			} finally{
-				reader.close();
-			}
+            int curline = 0;
+            int j = 1;
+
+            if ((line = reader.readLine()) != null)	{
+                add.setDesc(line);
+                String genomeName = getGenomeName(line);
+                String chromName = getChromosomeName(line);
+                add.setGenomeName(genomeName);
+                add.setChromosomeName(chromName);
+                groups.put(genomeName, j);
+                add.setGroup(j);
+                groupSize.put(j, 1);
+                add.setStart_line(curline);
+            }
+
+            boolean next = false;
+
+            while ((line = reader.readLine()) != null) {
+                curline++;
+
+                if (next) {
+                    add.setEnd_line(curline - 2);
+                    occs.add(add);
+                    add = new GenomeOccurrence();
+                    add.setDesc(line);
+                    String genomeName = getGenomeName(line);
+                    String chromName = getChromosomeName(line);
+                    add.setGenomeName(genomeName);
+                    add.setChromosomeName(chromName);
+
+                    if (!groups.containsKey(genomeName)) {
+                        j++;
+                        groups.put(genomeName, j);
+                        add.setGroup(j);
+                        groupSize.put(j, 1);
+                    }
+                    else {
+                        int group = groups.get(genomeName);
+                        add.setGroup(group);
+                        groupSize.put(group, groupSize.get(group) + 1);
+                    }
+
+                    add.setStart_line(curline);
+                    next = false;
+                }
+
+                if (line.equals("")) {
+                    next = true;
+                }
+            }
+
+            if (next) {
+                add.setEnd_line(curline - 1);
+            }
+            else {
+                add.setEnd_line(curline);
+            }
+
+            if (add.getDesc() != null) {
+                occs.add(add);
+            }
 			
 			// Remove singleton groups
 			for (GenomeOccurrence occ : occs) {
@@ -212,7 +206,7 @@ public class CogFileReader implements GeckoDataReader {
 					occ.setGroup(0);
 				}
 			}
-		} 
+        }
 		catch (IOException e) {
 			if (e instanceof FileNotFoundException)	{
 				throw (FileNotFoundException) e;
@@ -339,16 +333,17 @@ public class CogFileReader implements GeckoDataReader {
             throw new ParseException(e.getMessage(), 0);
         }
 		
-		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()]; {
-			int i = 0;
-			for (Genome x : ungroupedGenomes) {
-				this.genomes[i++] = x;
-			}
-			
-			for (Genome x : groupedGenomes.values()) {
-				this.genomes[i++] = x;
-			}
-		}		
+		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()];
+
+        int i = 0;
+        for (Genome x : ungroupedGenomes) {
+            this.genomes[i++] = x;
+        }
+
+        for (Genome x : groupedGenomes.values()) {
+            this.genomes[i++] = x;
+        }
+
 	}
 	
 	private boolean isUnhomologe(String[] ids) {
