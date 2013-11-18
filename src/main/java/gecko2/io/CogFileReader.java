@@ -232,10 +232,8 @@ public class CogFileReader implements GeckoDataReader {
 
 		Map<Integer, Genome> groupedGenomes = new HashMap<Integer, Genome>();
 		List<Genome> ungroupedGenomes = new ArrayList<Genome>();
-		String line;
-        CountedReader reader = null;
-        try {
-            reader = new CountedReader(new FileReader(inputFile));
+
+        try (CountedReader reader = new CountedReader(new FileReader(inputFile))){
 
             List<String[]> stringIdList = new ArrayList<>();
 
@@ -275,6 +273,7 @@ public class CogFileReader implements GeckoDataReader {
 
                 // Forward file pointer to genomes first gene
                 reader.jumpToLine(occ.getStart_line() + 2);
+                String line;
                 while (reader.getCurrentLineNumber() <= occ.getEnd_line() && (line = reader.readLine()) != null) {
                     if (!line.equals("")) {
                         String[] explode = line.split("\t");
@@ -338,18 +337,11 @@ public class CogFileReader implements GeckoDataReader {
             }
         } catch (LinePassedException e) {
             throw new ParseException(e.getMessage(), 0);
-        }  finally {
-            if (reader != null)
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
         }
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()]; {
 			int i = 0;
-			for (Genome x : ungroupedGenomes) {	
+			for (Genome x : ungroupedGenomes) {
 				this.genomes[i++] = x;
 			}
 			
