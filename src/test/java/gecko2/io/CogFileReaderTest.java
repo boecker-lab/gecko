@@ -1,8 +1,6 @@
 package gecko2.io;
 
 import gecko2.GeckoInstance;
-import gecko2.GenomeOccurence;
-import gecko2.ReferenceClusterTest;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
@@ -11,7 +9,6 @@ import org.junit.Test;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +73,7 @@ public class CogFileReaderTest {
 		refGenomes[0].addChromosome(new Chromosome("", genes1, refGenomes[0]));
 		refGenomes[1].addChromosome(new Chromosome("", genes2, refGenomes[1]));
 		
-		ArrayList<GenomeOccurence> genOcc;
+		ArrayList<GenomeOccurrence> genOcc;
 
         File inputFile = new File(getClass().getResource("/c2.cog").getFile());
 
@@ -336,7 +333,7 @@ public class CogFileReaderTest {
 		refGenomes[3].addChromosome(new Chromosome("chromosome I", genes4, refGenomes[3]));
 		refGenomes[3].addChromosome(new Chromosome("chromosome II", genes42, refGenomes[3]));
 		
-		ArrayList<GenomeOccurence> genOcc;
+		ArrayList<GenomeOccurrence> genOcc;
 
         File inputFile = new File(getClass().getResource("/c.cog").getFile());
 
@@ -447,7 +444,7 @@ public class CogFileReaderTest {
         refGenomes[0].addChromosome(new Chromosome("", genes1, refGenomes[0]));
         refGenomes[1].addChromosome(new Chromosome("", genes2, refGenomes[1]));
 
-        List<GenomeOccurence> genOcc;
+        List<GenomeOccurrence> genOcc;
 
         File inputFile = new File(getClass().getResource("/c2MultiIdGenes.cog").getFile());
 

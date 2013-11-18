@@ -1,6 +1,6 @@
-package gecko2;
+package gecko2.io;
 
-public class GenomeOccurence {
+public class GenomeOccurrence {
 	
 	private String desc;
 	private String genomeName;
@@ -10,7 +10,7 @@ public class GenomeOccurence {
 	private int group=0;
 	private boolean flagged=false;
 	
-	public String getGenomSelectorText(){
+	public String getGenomeSelectorText(){
 		if (chromosomeName.isEmpty())
 			return String.format("<html><B>%s</B></html>", genomeName); 
 		else

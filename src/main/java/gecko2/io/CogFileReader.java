@@ -1,6 +1,5 @@
 package gecko2.io;
 
-import gecko2.GenomeOccurence;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
@@ -8,7 +7,6 @@ import gecko2.algorithm.Genome;
 import gecko2.exceptions.LinePassedException;
 import gecko2.util.SortUtils;
 
-import java.awt.*;
 import java.io.*;
 import java.text.ParseException;
 import java.util.*;
@@ -50,7 +48,7 @@ public class CogFileReader implements GeckoDataReader {
     /**
      * The list of genome occurrences. Used for choosing which genome to import.
      */
-    private List<GenomeOccurence> occs;
+    private List<GenomeOccurrence> occs;
 	
 	/**
 	 * Pattern list for getGenomeName and getChromosomeName
@@ -133,13 +131,13 @@ public class CogFileReader implements GeckoDataReader {
 	 * @throws FileNotFoundException
 	 */
 	public void importGenomesOccs() throws FileNotFoundException	{
-		occs = new ArrayList<GenomeOccurence>();
+		occs = new ArrayList<GenomeOccurrence>();
 		Map<Integer, Integer> groupSize = new HashMap<Integer, Integer>();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
 			try {
 				String line;
-				GenomeOccurence add = new GenomeOccurence();
+				GenomeOccurrence add = new GenomeOccurrence();
 				Map<String, Integer> groups = new HashMap<String, Integer>();
 
 				int curline = 0;
@@ -165,7 +163,7 @@ public class CogFileReader implements GeckoDataReader {
 					if (next) {
 						add.setEnd_line(curline - 2);
 						occs.add(add);
-						add = new GenomeOccurence();
+						add = new GenomeOccurrence();
 						add.setDesc(line);
 						String genomeName = getGenomeName(line);
 						String chromName = getChromosomeName(line);
@@ -209,7 +207,7 @@ public class CogFileReader implements GeckoDataReader {
 			}
 			
 			// Remove singleton groups
-			for (GenomeOccurence occ : occs) {
+			for (GenomeOccurrence occ : occs) {
 				if (groupSize.get(occ.getGroup()) == 1)	{
 					occ.setGroup(0);
 				}
@@ -239,16 +237,16 @@ public class CogFileReader implements GeckoDataReader {
         try {
             reader = new CountedReader(new FileReader(inputFile));
 
-            List<String[]> stringidlist = new ArrayList<String[]>();
+            List<String[]> stringIdList = new ArrayList<>();
 
             // This is a bit dirty we look only into the first index of the array and store it in this map
             // But it seems like containsKey can't handle arrays as key.
-            HashMap<String, Integer> backmap = new HashMap<String, Integer>();
+            Map<String, Integer> backMap = new HashMap<>();
             this.maxIdLength = -1;
             this.maxNameLength = -1;
             this.maxLocusTagLength = -1;
 
-            for (GenomeOccurence occ : occs) {
+            for (GenomeOccurrence occ : occs) {
                 if (!occ.isFlagged())
                     continue;
                 Genome g;
@@ -273,7 +271,7 @@ public class CogFileReader implements GeckoDataReader {
                 Chromosome c = new Chromosome(occ.getChromosomeName(), g);
                 g.addChromosome(c);
                 c.setName(occ.getChromosomeName());
-                ArrayList<Gene> genes = new ArrayList<Gene>();
+                List<Gene> genes = new ArrayList<>();
 
                 // Forward file pointer to genomes first gene
                 reader.jumpToLine(occ.getStart_line() + 2);
@@ -286,11 +284,11 @@ public class CogFileReader implements GeckoDataReader {
 
                         int sign = explode[1].equals("-") ? -1 : 1;
 
-                        for (String id : ids) {
-                            String[] single_id_array = {id}; // We split multi id genes into multiple genes.
+                        for (String id : ids) {   // We split multi id genes into multiple genes.
+                            String[] singleIdArray = {id};
 
-                            if (single_id_array[0].length() > maxIdLength)
-                                maxIdLength = single_id_array[0].length();
+                            if (singleIdArray[0].length() > maxIdLength)
+                                maxIdLength = singleIdArray[0].length();
 
                             if (explode.length > 5 && explode[5].length() > maxNameLength)
                                 maxNameLength = explode[5].length();
@@ -301,22 +299,22 @@ public class CogFileReader implements GeckoDataReader {
                                     maxNameLength = explode[3].length();
                             }
 
-                            if (!isUnhomologe(single_id_array) && backmap.containsKey(single_id_array[0])) {
+                            if (!isUnhomologe(singleIdArray) && backMap.containsKey(singleIdArray[0])) {
                                 if (explode.length > 5)
-                                    genes.add(new Gene(explode[5], explode[3], sign * backmap.get(single_id_array[0]), explode[4], false));
+                                    genes.add(new Gene(explode[5], explode[3], sign * backMap.get(singleIdArray[0]), explode[4], false));
                                 else
-                                    genes.add(new Gene(explode[3], sign * backmap.get(single_id_array[0]), explode[4], false));
+                                    genes.add(new Gene(explode[3], sign * backMap.get(singleIdArray[0]), explode[4], false));
                             } else {
-                                stringidlist.add(single_id_array);
-                                int intID = stringidlist.size();
+                                stringIdList.add(singleIdArray);
+                                int intID = stringIdList.size();
 
-                                if (!isUnhomologe(single_id_array)) {
-                                    backmap.put(single_id_array[0], intID);
+                                if (!isUnhomologe(singleIdArray)) {
+                                    backMap.put(singleIdArray[0], intID);
                                 }
                                 if (explode.length > 5)
-                                    genes.add(new Gene(explode[5], explode[3], sign * intID, explode[4], isUnhomologe(single_id_array)));
+                                    genes.add(new Gene(explode[5], explode[3], sign * intID, explode[4], isUnhomologe(singleIdArray)));
                                 else
-                                    genes.add(new Gene(explode[3], sign * intID, explode[4], isUnhomologe(single_id_array)));
+                                    genes.add(new Gene(explode[3], sign * intID, explode[4], isUnhomologe(singleIdArray)));
                             }
                         }
                     }
@@ -325,8 +323,8 @@ public class CogFileReader implements GeckoDataReader {
                 // Thank you for the not existing autoboxing on arrays...
                 this.geneLabelMap = new HashMap<>();
 
-                for (int j = 1; j < stringidlist.size() + 1; j++) {
-                    this.geneLabelMap.put(j, stringidlist.get(j - 1));
+                for (int j = 1; j < stringIdList.size() + 1; j++) {
+                    this.geneLabelMap.put(j, stringIdList.get(j - 1));
                 }
 
                 // TODO handle the case where EOF is reached before endline
@@ -447,7 +445,7 @@ public class CogFileReader implements GeckoDataReader {
                 occs.get(selectedGenome).setFlagged(true);
             }
         } else {
-            for (GenomeOccurence occ : occs)
+            for (GenomeOccurrence occ : occs)
                 occ.setFlagged(true);
         }
 
@@ -459,7 +457,7 @@ public class CogFileReader implements GeckoDataReader {
      * Get the genome occurrences.
      * @return
      */
-    public List<GenomeOccurence> getOccs() {
+    public List<GenomeOccurrence> getOccs() {
         return occs;
     }
 }
