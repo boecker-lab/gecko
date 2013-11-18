@@ -7,7 +7,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 
-public class CountedReader implements Cloneable, AutoCloseable {
+public class CountedReader implements AutoCloseable {
 	
 	private final BufferedReader buff;
 	private int counter;
