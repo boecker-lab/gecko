@@ -30,6 +30,11 @@ public class ReferenceClusterAlgorithm {
 	 * @return the gene clusters
 	 */
 	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
+        for (int[][] genome : genomes)
+            for (int[] chr: genome)
+                System.out.println(Arrays.toString(chr));
+
+
 		if (!param.useJavaAlgorithm()) 
 			throw new IllegalArgumentException("invalid parameters");
 		
@@ -41,12 +46,12 @@ public class ReferenceClusterAlgorithm {
 			param.setAlphabetSize(data.getAlphabetSize());
 		}
 		//AlgorithmParameters algoParameters = AlgorithmParameters.getLowConservedParameters(param, param.getAlphabetSize(), data.size());
-		AlgorithmParameters algoParameters = AlgorithmParameters.getHighlyConservedParameters(param, param.getAlphabetSize(), data.size());
+		//AlgorithmParameters algoParameters = AlgorithmParameters.getHighlyConservedParameters(param, param.getAlphabetSize(), data.size());
 		//AlgorithmParameters algoParameters = AlgorithmParameters.getLichtheimiaParameters(param, param.getAlphabetSize(), data.size());
 		//AlgorithmParameters algoParameters = AlgorithmParameters.getStatisticPaperGenomeParameters(param, param.getAlphabetSize(), data.size());
 		//AlgorithmParameters algoParameters = AlgorithmParameters.getFiveProteobacterDeltaTableTestParameters(param.getAlphabetSize(), data.size());
 		
-		//AlgorithmParameters algoParameters = new AlgorithmParameters(param, param.getAlphabetSize(), data.size());
+		AlgorithmParameters algoParameters = new AlgorithmParameters(param, param.getAlphabetSize(), data.size());
 		
 		if (!checkParameters(algoParameters)) 
 			throw new IllegalArgumentException("invalid parameters");
