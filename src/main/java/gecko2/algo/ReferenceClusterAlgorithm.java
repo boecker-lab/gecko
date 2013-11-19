@@ -21,7 +21,8 @@ public class ReferenceClusterAlgorithm {
 	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param) {
 		return computeReferenceClusters(genomes, param, null);
 	}
-	
+
+
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
 	 * @param genomes the genomes
