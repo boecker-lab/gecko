@@ -313,7 +313,6 @@ public class CogFileReader implements GeckoDataReader {
                     }
                 }
 
-                // Thank you for the not existing autoboxing on arrays...
                 this.geneLabelMap = new HashMap<>();
 
                 for (int j = 1; j < stringIdList.size() + 1; j++) {

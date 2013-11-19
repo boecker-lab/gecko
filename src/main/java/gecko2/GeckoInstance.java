@@ -34,7 +34,7 @@ public class GeckoInstance {
 	
 	private File currentInputFile; 
 	private Genome[] genomes = null;
-	private Map<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
+	private Map<Integer, String[]> geneLabelMap = new HashMap<>();
 	private Map<Integer, Color> colormap;
 	
 	private GeneCluster[] clusters;
@@ -262,7 +262,7 @@ public class GeckoInstance {
 				// Check if there is a match in the gene label
 				int[] genes = c.getGenes().clone();
 				for (int i=0; i<genes.length; i++)
-					genes[i] = (Integer) geneLabelMap.keySet().toArray()[genes[i]];
+                    genes[i] = (Integer) geneLabelMap.keySet().toArray()[genes[i]];
 				String geneString = Arrays.toString(genes);
 				for (String pattern : searchPatterns) {
 					if (geneString.matches(".*[\\[ ,]"+pattern+"[ ,\\]].*")) {
