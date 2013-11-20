@@ -224,13 +224,11 @@ public class CogFileReader implements GeckoDataReader {
 	public void readFileContent() throws IOException, ParseException{
         SortUtils.resortGenomeOccurencesByStart(occs);
 
-		Map<Integer, Genome> groupedGenomes = new HashMap<Integer, Genome>();
-		List<Genome> ungroupedGenomes = new ArrayList<Genome>();
+		Map<Integer, Genome> groupedGenomes = new HashMap<>();
+		List<Genome> ungroupedGenomes = new ArrayList<>();
+        List<String[]> stringIdList = new ArrayList<>();
 
         try (CountedReader reader = new CountedReader(new FileReader(inputFile))){
-
-            List<String[]> stringIdList = new ArrayList<>();
-
             // This is a bit dirty we look only into the first index of the array and store it in this map
             // But it seems like containsKey can't handle arrays as key.
             Map<String, Integer> backMap = new HashMap<>();
@@ -244,7 +242,7 @@ public class CogFileReader implements GeckoDataReader {
                 Genome g;
                 if (occ.getGroup() == 0) {
                     // If the group id is zero than we have a single chromosome genome,
-                    // therefore we have to greate a new genome
+                    // therefore we have to create a new genome
                     g = new Genome();
                     g.setName(occ.getGenomeName());
                     ungroupedGenomes.add(g);
@@ -263,73 +261,24 @@ public class CogFileReader implements GeckoDataReader {
                 Chromosome c = new Chromosome(occ.getChromosomeName(), g);
                 g.addChromosome(c);
                 c.setName(occ.getChromosomeName());
-                List<Gene> genes = new ArrayList<>();
+
 
                 // Forward file pointer to genomes first gene
                 reader.jumpToLine(occ.getStart_line() + 2);
-                String line;
-                while (reader.getCurrentLineNumber() <= occ.getEnd_line() && (line = reader.readLine()) != null) {
-                    if (!line.equals("")) {
-                        String[] explode = line.split("\t");
-                        String[] ids = explode[0].split(",");
-                        for (int j = 0; j < ids.length; j++)
-                            ids[j] = this.convertToValidIdFormat(ids[j]);
 
-                        int sign = explode[1].equals("-") ? -1 : 1;
-
-                        for (String id : ids) {   // We split multi id genes into multiple genes.
-                            String[] singleIdArray = {id};
-
-                            if (singleIdArray[0].length() > maxIdLength)
-                                maxIdLength = singleIdArray[0].length();
-
-                            if (explode.length > 5 && explode[5].length() > maxNameLength)
-                                maxNameLength = explode[5].length();
-
-                            if (explode[3].length() > maxLocusTagLength) {
-                                maxLocusTagLength = explode[3].length();
-                                if (explode.length <= 5 && explode[3].length() > maxNameLength)
-                                    maxNameLength = explode[3].length();
-                            }
-
-                            if (!isUnhomologe(singleIdArray) && backMap.containsKey(singleIdArray[0])) {
-                                if (explode.length > 5)
-                                    genes.add(new Gene(explode[5], explode[3], sign * backMap.get(singleIdArray[0]), explode[4], false));
-                                else
-                                    genes.add(new Gene(explode[3], sign * backMap.get(singleIdArray[0]), explode[4], false));
-                            } else {
-                                stringIdList.add(singleIdArray);
-                                int intID = stringIdList.size();
-
-                                if (!isUnhomologe(singleIdArray)) {
-                                    backMap.put(singleIdArray[0], intID);
-                                }
-                                if (explode.length > 5)
-                                    genes.add(new Gene(explode[5], explode[3], sign * intID, explode[4], isUnhomologe(singleIdArray)));
-                                else
-                                    genes.add(new Gene(explode[3], sign * intID, explode[4], isUnhomologe(singleIdArray)));
-                            }
-                        }
-                    }
-                }
-
-                this.geneLabelMap = new HashMap<>();
-
-                for (int j = 1; j < stringIdList.size() + 1; j++) {
-                    this.geneLabelMap.put(j, stringIdList.get(j - 1));
-                }
+                List<Gene> genes = readGenes(reader, occ.getEnd_line(), backMap, stringIdList);
 
                 // TODO handle the case where EOF is reached before endline
                 c.setGenes(genes);
-                this.genomes = new Genome[groupedGenomes.size()];
-                int j = 0;
-                for (Genome x : groupedGenomes.values()) {
-                    this.genomes[j] = x;
-                    j++;
-                }
             }
         } catch (LinePassedException e) {
             throw new ParseException(e.getMessage(), 0);
+        }
+
+        this.geneLabelMap = new HashMap<>();
+
+        for (int j = 1; j < stringIdList.size() + 1; j++) {
+            this.geneLabelMap.put(j, stringIdList.get(j - 1));
         }
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()];
@@ -344,7 +293,67 @@ public class CogFileReader implements GeckoDataReader {
         }
 
 	}
-	
+
+    /**
+     * Reads all the genes of one chromosome
+     * @param reader the reader that is used
+     * @param endLine the last line that contains a gene of the chromosome
+     * @param backMap the mapping of external (String) on internal (int) ids, is modified
+     * @param stringIdList the list of string ids, is modified
+     * @return the list of all genes
+     * @throws IOException
+     */
+    private List<Gene> readGenes(CountedReader reader, int endLine, Map<String, Integer> backMap, List<String[]> stringIdList) throws  IOException{
+        List<Gene> genes = new ArrayList<>();
+        String line;
+
+        while (reader.getCurrentLineNumber() <= endLine && (line = reader.readLine()) != null) {
+            if (!line.equals("")) {
+                String[] explode = line.split("\t");
+                String[] ids = explode[0].split(",");
+                for (int j = 0; j < ids.length; j++)
+                    ids[j] = this.convertToValidIdFormat(ids[j]);
+
+                int sign = explode[1].equals("-") ? -1 : 1;
+
+                for (String id : ids) {   // We split multi id genes into multiple genes.
+                    String[] singleIdArray = {id};
+
+                    if (singleIdArray[0].length() > maxIdLength)
+                        maxIdLength = singleIdArray[0].length();
+
+                    if (explode.length > 5 && explode[5].length() > maxNameLength)
+                        maxNameLength = explode[5].length();
+
+                    if (explode[3].length() > maxLocusTagLength) {
+                        maxLocusTagLength = explode[3].length();
+                        if (explode.length <= 5 && explode[3].length() > maxNameLength)
+                            maxNameLength = explode[3].length();
+                    }
+
+                    if (!isUnhomologe(singleIdArray) && backMap.containsKey(singleIdArray[0])) {
+                        if (explode.length > 5)
+                            genes.add(new Gene(explode[5], explode[3], sign * backMap.get(singleIdArray[0]), explode[4], false));
+                        else
+                            genes.add(new Gene(explode[3], sign * backMap.get(singleIdArray[0]), explode[4], false));
+                    } else {
+                        stringIdList.add(singleIdArray);
+                        int intID = stringIdList.size();
+
+                        if (!isUnhomologe(singleIdArray)) {
+                            backMap.put(singleIdArray[0], intID);
+                        }
+                        if (explode.length > 5)
+                            genes.add(new Gene(explode[5], explode[3], sign * intID, explode[4], isUnhomologe(singleIdArray)));
+                        else
+                            genes.add(new Gene(explode[3], sign * intID, explode[4], isUnhomologe(singleIdArray)));
+                    }
+                }
+            }
+        }
+        return genes;
+    }
+
 	private boolean isUnhomologe(String[] ids) {
 		return (ids[0] == null || ids[0].equals("0") || ids[0].equals(""));
 	}

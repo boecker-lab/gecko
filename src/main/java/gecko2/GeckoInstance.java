@@ -417,10 +417,11 @@ public class GeckoInstance {
 	}
 
     public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
-        GeckoInstance.getInstance().setMaxLengths(reader.getMaxIdLength(), reader.getMaxNameLength(), reader.getMaxLocusTagLength());
-        GeckoInstance.getInstance().setClusters(reader.getGeneClusters());
-        GeckoInstance.getInstance().setGeneLabelMap(reader.getGeneLabelMap());
-        GeckoInstance.getInstance().setGenomes(reader.getGenomes());
+        setMaxLengths(reader.getMaxIdLength(), reader.getMaxNameLength(), reader.getMaxLocusTagLength());
+        setClusters(reader.getGeneClusters());
+        this.geneLabelMap = reader.getGeneLabelMap();
+        this.colormap = null;
+        setGenomes(reader.getGenomes());
         if (gui != null){
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
