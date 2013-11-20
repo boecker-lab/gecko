@@ -242,11 +242,9 @@ public class CogFileReader implements GeckoDataReader {
 		List<Genome> ungroupedGenomes = new ArrayList<Genome>();
 		String line;
         CountedReader reader = null;
+        List<String[]> stringidlist = new ArrayList<String[]>();
         try {
             reader = new CountedReader(new FileReader(inputFile));
-
-            List<String[]> stringidlist = new ArrayList<String[]>();
-
             // This is a bit dirty we look only into the first index of the array and store it in this map
             // But it seems like containsKey can't handle arrays as key.
             HashMap<String, Integer> backmap = new HashMap<String, Integer>();
@@ -278,9 +276,9 @@ public class CogFileReader implements GeckoDataReader {
                     }
                 }
 
-                Chromosome c = new Chromosome(occ.getChromosomeName(), g);
-                g.addChromosome(c);
-                c.setName(occ.getChromosomeName());
+                Chromosome chr = new Chromosome(occ.getChromosomeName(), g);
+                g.addChromosome(chr);
+                chr.setName(occ.getChromosomeName());
                 ArrayList<Gene> genes = new ArrayList<Gene>();
 
                 // Forward file pointer to genomes first gene
@@ -330,22 +328,8 @@ public class CogFileReader implements GeckoDataReader {
                         }
                     }
                 }
-
-                // Thank you for the not existing autoboxing on arrays...
-                this.geneLabelMap = new HashMap<Integer, String[]>();
-
-                for (int j = 1; j < stringidlist.size() + 1; j++) {
-                    this.geneLabelMap.put(j, stringidlist.get(j - 1));
-                }
-
                 // TODO handle the case where EOF is reached before endline
-                c.setGenes(genes);
-                this.genomes = new Genome[groupedGenomes.size()];
-                int j = 0;
-                for (Genome x : groupedGenomes.values()) {
-                    this.genomes[j] = x;
-                    j++;
-                }
+                chr.setGenes(genes);
             }
         } catch (LinePassedException e) {
             throw new ParseException(e.getMessage(), 0);
@@ -356,6 +340,12 @@ public class CogFileReader implements GeckoDataReader {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+        }
+
+        this.geneLabelMap = new HashMap<Integer, String[]>();
+
+        for (int j = 1; j < stringidlist.size() + 1; j++) {
+            this.geneLabelMap.put(j, stringidlist.get(j - 1));
         }
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()]; {
