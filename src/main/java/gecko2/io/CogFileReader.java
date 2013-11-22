@@ -1,9 +1,6 @@
 package gecko2.io;
 
-import gecko2.algorithm.Chromosome;
-import gecko2.algorithm.Gene;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.Genome;
+import gecko2.algorithm.*;
 import gecko2.exceptions.LinePassedException;
 import gecko2.util.SortUtils;
 
@@ -23,7 +20,7 @@ public class CogFileReader implements GeckoDataReader {
 	/**
 	 * Storing place for the geneLabelMap 
 	 */
-	private Map<Integer, String[]> geneLabelMap;
+	private Map<Integer, ExternalGeneId> geneLabelMap;
 	
 	/**
 	 * Storing place for the genomes.
@@ -76,7 +73,7 @@ public class CogFileReader implements GeckoDataReader {
         if (genomeList == null)
             this.genomeList = null;
         else
-            this.genomeList = new ArrayList<Integer>(genomeList);
+            this.genomeList = new ArrayList<>(genomeList);
     }
 	
 	/**
@@ -226,12 +223,13 @@ public class CogFileReader implements GeckoDataReader {
 
 		Map<Integer, Genome> groupedGenomes = new HashMap<>();
 		List<Genome> ungroupedGenomes = new ArrayList<>();
-        List<String[]> stringIdList = new ArrayList<>();
+        List<String> stringIdList = new ArrayList<>();
+        /*
+            Maps each possible homologue gene (string) id to the first gene that had this id and got an int id
+         */
+        Map<String, IntId> backMap = new HashMap<>();
 
         try (CountedReader reader = new CountedReader(new FileReader(inputFile))){
-            // This is a bit dirty we look only into the first index of the array and store it in this map
-            // But it seems like containsKey can't handle arrays as key.
-            Map<String, Integer> backMap = new HashMap<>();
             this.maxIdLength = -1;
             this.maxNameLength = -1;
             this.maxLocusTagLength = -1;
@@ -262,11 +260,10 @@ public class CogFileReader implements GeckoDataReader {
                 g.addChromosome(c);
                 c.setName(occ.getChromosomeName());
 
-
                 // Forward file pointer to genomes first gene
                 reader.jumpToLine(occ.getStart_line() + 2);
 
-                List<Gene> genes = readGenes(reader, occ.getEnd_line(), backMap, stringIdList);
+                List<Gene> genes = readChromosome(reader, occ.getEnd_line(), backMap, stringIdList);
 
                 // TODO handle the case where EOF is reached before endline
                 c.setGenes(genes);
@@ -278,7 +275,7 @@ public class CogFileReader implements GeckoDataReader {
         this.geneLabelMap = new HashMap<>();
 
         for (int j = 1; j < stringIdList.size() + 1; j++) {
-            this.geneLabelMap.put(j, stringIdList.get(j - 1));
+            this.geneLabelMap.put(j, new ExternalGeneId(stringIdList.get(j - 1), backMap.get(stringIdList.get(j - 1)).unknown));
         }
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()];
@@ -303,59 +300,71 @@ public class CogFileReader implements GeckoDataReader {
      * @return the list of all genes
      * @throws IOException
      */
-    private List<Gene> readGenes(CountedReader reader, int endLine, Map<String, Integer> backMap, List<String[]> stringIdList) throws  IOException{
+    private List<Gene> readChromosome(CountedReader reader, int endLine, Map<String, IntId> backMap, List<String> stringIdList) throws  IOException{
         List<Gene> genes = new ArrayList<>();
-        String line;
 
+        String line;
         while (reader.getCurrentLineNumber() <= endLine && (line = reader.readLine()) != null) {
             if (!line.equals("")) {
-                String[] explode = line.split("\t");
-                String[] ids = explode[0].split(",");
-                for (int j = 0; j < ids.length; j++)
-                    ids[j] = this.convertToValidIdFormat(ids[j]);
-
-                int sign = explode[1].equals("-") ? -1 : 1;
-
-                for (String id : ids) {   // We split multi id genes into multiple genes.
-                    String[] singleIdArray = {id};
-
-                    if (singleIdArray[0].length() > maxIdLength)
-                        maxIdLength = singleIdArray[0].length();
-
-                    if (explode.length > 5 && explode[5].length() > maxNameLength)
-                        maxNameLength = explode[5].length();
-
-                    if (explode[3].length() > maxLocusTagLength) {
-                        maxLocusTagLength = explode[3].length();
-                        if (explode.length <= 5 && explode[3].length() > maxNameLength)
-                            maxNameLength = explode[3].length();
-                    }
-
-                    if (!isUnhomologe(singleIdArray) && backMap.containsKey(singleIdArray[0])) {
-                        if (explode.length > 5)
-                            genes.add(new Gene(explode[5], explode[3], sign * backMap.get(singleIdArray[0]), explode[4], false));
-                        else
-                            genes.add(new Gene(explode[3], sign * backMap.get(singleIdArray[0]), explode[4], false));
-                    } else {
-                        stringIdList.add(singleIdArray);
-                        int intID = stringIdList.size();
-
-                        if (!isUnhomologe(singleIdArray)) {
-                            backMap.put(singleIdArray[0], intID);
-                        }
-                        if (explode.length > 5)
-                            genes.add(new Gene(explode[5], explode[3], sign * intID, explode[4], isUnhomologe(singleIdArray)));
-                        else
-                            genes.add(new Gene(explode[3], sign * intID, explode[4], isUnhomologe(singleIdArray)));
-                    }
-                }
+                parseGeneLine(line, genes, backMap, stringIdList);
             }
         }
         return genes;
     }
 
-	private boolean isUnhomologe(String[] ids) {
-		return (ids[0] == null || ids[0].equals("0") || ids[0].equals(""));
+    /**
+     * Parses one gene containing line of the cog file, append all contained genes to the given list
+     * @param line the line that is parsed
+     * @param genes the list the new found genes will be appended to, is modified
+     * @param backMap the mapping of external (String) on internal (int) ids, is modified
+     * @param stringIdList the list of string ids, is modified
+     */
+    private void parseGeneLine(String line, List<Gene> genes, Map<String, IntId> backMap, List<String> stringIdList) {
+        String[] explode = line.split("\t");
+        String[] ids = explode[0].split(",");
+        for (int j = 0; j < ids.length; j++)
+            ids[j] = this.convertToValidIdFormat(ids[j]);
+
+        int sign = explode[1].equals("-") ? -1 : 1;
+
+        for (String singleId : ids) {   // We split multi id genes into multiple genes.
+            if (singleId.length() > maxIdLength)
+                maxIdLength = singleId.length();
+
+            if (explode.length > 5 && explode[5].length() > maxNameLength)
+                maxNameLength = explode[5].length();
+
+            if (explode[3].length() > maxLocusTagLength) {
+                maxLocusTagLength = explode[3].length();
+                if (explode.length <= 5 && explode[3].length() > maxNameLength)
+                    maxNameLength = explode[3].length();
+            }
+
+            if (!isUnhomologe(singleId) && backMap.containsKey(singleId)) {
+                backMap.get(singleId).unknown = false;
+                if (explode.length > 5)
+                    genes.add(new Gene(explode[5], explode[3], sign * backMap.get(singleId).id, explode[4]));
+                else
+                    genes.add(new Gene(explode[3], sign * backMap.get(singleId).id, explode[4]));
+            } else {
+                stringIdList.add(singleId);
+                int intID = stringIdList.size();
+
+                Gene gene;
+                if (explode.length > 5)
+                    gene = new Gene(explode[5], explode[3], sign * intID, explode[4]);
+                else
+                    gene = new Gene(explode[3], sign * intID, explode[4]);
+                genes.add(gene);
+                if (!isUnhomologe(singleId)) {
+                    backMap.put(singleId, new IntId(gene.getId()));
+                }
+            }
+        }
+    }
+
+	private boolean isUnhomologe(String id) {
+		return (id == null || id.equals("0") || id.equals(""));
 	}
 
     /**
@@ -383,7 +392,7 @@ public class CogFileReader implements GeckoDataReader {
 	 * 
 	 * @return the geneLabelMap (HashMap)
 	 */
-	public Map<Integer, String[]> getGeneLabelMap()
+	public Map<Integer, ExternalGeneId> getGeneLabelMap()
 	{
 		return this.geneLabelMap;
 	}
@@ -454,5 +463,15 @@ public class CogFileReader implements GeckoDataReader {
      */
     public List<GenomeOccurrence> getOccs() {
         return occs;
+    }
+
+    private static class IntId{
+        int id;
+        boolean unknown;
+
+        IntId(int id) {
+            this.id = Math.abs(id);
+            this.unknown = true;
+        }
     }
 }

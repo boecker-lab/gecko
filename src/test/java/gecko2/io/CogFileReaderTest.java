@@ -2,6 +2,7 @@ package gecko2.io;
 
 import gecko2.GeckoInstance;
 import gecko2.algorithm.Chromosome;
+import gecko2.algorithm.ExternalGeneId;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class CogFileReaderTest {
 		
 		// using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later 
 		// releases
-		Map<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
+		Map<Integer, ExternalGeneId> geneLabelMap = new HashMap<>();
 		Genome[] refGenomes = new Genome[2];
 		
 		int geneID1 = 1;
@@ -45,23 +46,23 @@ public class CogFileReaderTest {
 		int geneID3 = 3;
 		int geneID4 = 4;
 		
-		String[] geneString1 = {"25"};
-		String[] geneString2 = {"21"};
-		String[] geneString3 = {"7"};
-		String[] geneString4 = {"4"};
+		String geneString1 = "25";
+		String geneString2 = "21";
+		String geneString3 = "7";
+		String geneString4 = "4";
 	
-		geneLabelMap.put(1, geneString1);
-		geneLabelMap.put(2, geneString2);
-		geneLabelMap.put(3, geneString3);
-		geneLabelMap.put(4, geneString4);
+		geneLabelMap.put(1, new ExternalGeneId(geneString1, false));
+		geneLabelMap.put(2, new ExternalGeneId(geneString2, false));
+		geneLabelMap.put(3, new ExternalGeneId(geneString3, false));
+		geneLabelMap.put(4, new ExternalGeneId(geneString4, false));
 		
 		
-		List<Gene> genes1 = new ArrayList<Gene>();
-		List<Gene> genes2 = new ArrayList<Gene>();
-		Gene gen1 = new Gene("fusA", geneID1, "elongation factor EF-G", false);
-		Gene gen2 = new Gene("tufA1", geneID2, "elongation factor EF-Tu", false);
-		Gene gen3 = new Gene("fusA", geneID3, "elongation factor EF-G", false);
-		Gene gen4 = new Gene("tufA1", geneID4, "elongation factor EF-Tu", false);
+		List<Gene> genes1 = new ArrayList<>();
+		List<Gene> genes2 = new ArrayList<>();
+		Gene gen1 = new Gene("fusA", geneID1, "elongation factor EF-G");
+		Gene gen2 = new Gene("tufA1", geneID2, "elongation factor EF-Tu");
+		Gene gen3 = new Gene("fusA", geneID3, "elongation factor EF-G");
+		Gene gen4 = new Gene("tufA1", geneID4, "elongation factor EF-Tu");
 		
 		genes1.add(gen1);
 		genes1.add(gen2);
@@ -72,8 +73,6 @@ public class CogFileReaderTest {
 		refGenomes[1] = new Genome("Shorty 2");
 		refGenomes[0].addChromosome(new Chromosome("", genes1, refGenomes[0]));
 		refGenomes[1].addChromosome(new Chromosome("", genes2, refGenomes[1]));
-		
-		ArrayList<GenomeOccurrence> genOcc;
 
         File inputFile = new File(getClass().getResource("/c2.cog").getFile());
 
@@ -85,15 +84,7 @@ public class CogFileReaderTest {
 			
 			reader.readData();
 		}
-		catch (EOFException e) 
-		{
-			e.printStackTrace();
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		} 
-		catch (ParseException e)
+		catch (IOException | ParseException e)
 		{
 			e.printStackTrace();
 		}
@@ -111,7 +102,7 @@ public class CogFileReaderTest {
 			
 			for( int j = 1; j <= reader.getGeneLabelMap().size(); j++)
 			{
-				assertArrayEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
+				assertEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
 			}
 			
 			// check the genome array
@@ -193,63 +184,63 @@ public class CogFileReaderTest {
 		
 		// build genes
 		// Shorty1
-		Gene gen11 = new Gene("fusA", geneID1, "elongation factor EF-G", false);
-		Gene gen21 = new Gene("tufA1", geneID2, "elongation factor EF-Tu", false);
-		Gene gen31 = new Gene("rpsJ", geneID3, "ribosomal protein S10", false);
-		Gene gen41 = new Gene("rplC", geneID4, "ribosomal protein L03", false);
-		Gene gen51 = new Gene("rplD", geneID5, "ribosomal protein L04", false);
-		Gene gen61 = new Gene("rplW", geneID6, "ribosomal protein L23", false);
-		Gene gen71 = new Gene("rpsJ", geneID3, "ribosomal protein S10", false);
-		Gene gen81 = new Gene("fusA", geneID1, "elongation factor EF-G", false);
+		Gene gen11 = new Gene("fusA", geneID1, "elongation factor EF-G");
+		Gene gen21 = new Gene("tufA1", geneID2, "elongation factor EF-Tu");
+		Gene gen31 = new Gene("rpsJ", geneID3, "ribosomal protein S10");
+		Gene gen41 = new Gene("rplC", geneID4, "ribosomal protein L03");
+		Gene gen51 = new Gene("rplD", geneID5, "ribosomal protein L04");
+		Gene gen61 = new Gene("rplW", geneID6, "ribosomal protein L23");
+		Gene gen71 = new Gene("rpsJ", geneID3, "ribosomal protein S10");
+		Gene gen81 = new Gene("fusA", geneID1, "elongation factor EF-G");
 		
 		// Shorty2
-		Gene gen12 = new Gene("fusA", geneID7, "elongation factor EF-G", false);
-		Gene gen22 = new Gene("tufA1", geneID4, "elongation factor EF-Tu", false);
-		Gene gen32 = new Gene("rpsJ", geneID3, "ribosomal protein S10", false);
-		Gene gen42 = new Gene("rplC", geneID1, "ribosomal protein L03", false);
-		Gene gen52 = new Gene("rplD", geneID8, "ribosomal protein L04", false);
-		Gene gen62 = new Gene("rplW", geneID4, "ribosomal protein L23", false);
-		Gene gen72 = new Gene("rplB", geneID5, "ribosomal protein L02", false);
-		Gene gen82 = new Gene("rpsS", geneID4, "ribosomal protein S19", false);
-		Gene gen92 = new Gene("rplV", geneID1, "ribosomal protein L22", false);
-		Gene gen102 = new Gene("rpsC", geneID6, "ribosomal protein S03", false);
-		Gene gen112 = new Gene("rplP", geneID9, "ribosomal protein L16", false);
-		Gene gen122 = new Gene("rplP", geneID7, "ribosomal protein L16", false);
+		Gene gen12 = new Gene("fusA", geneID7, "elongation factor EF-G");
+		Gene gen22 = new Gene("tufA1", geneID4, "elongation factor EF-Tu");
+		Gene gen32 = new Gene("rpsJ", geneID3, "ribosomal protein S10");
+		Gene gen42 = new Gene("rplC", geneID1, "ribosomal protein L03");
+		Gene gen52 = new Gene("rplD", geneID8, "ribosomal protein L04");
+		Gene gen62 = new Gene("rplW", geneID4, "ribosomal protein L23");
+		Gene gen72 = new Gene("rplB", geneID5, "ribosomal protein L02");
+		Gene gen82 = new Gene("rpsS", geneID4, "ribosomal protein S19");
+		Gene gen92 = new Gene("rplV", geneID1, "ribosomal protein L22");
+		Gene gen102 = new Gene("rpsC", geneID6, "ribosomal protein S03");
+		Gene gen112 = new Gene("rplP", geneID9, "ribosomal protein L16");
+		Gene gen122 = new Gene("rplP", geneID7, "ribosomal protein L16");
 		
 		// Shorty3
-		Gene gen13 = new Gene("smb ", -geneID10, "small protein B", false);
-		Gene gen23 = new Gene("----", -geneID3, "hypothetical protein", false);
-		Gene gen33 = new Gene("----", geneID5, "hypothetical protein", false);
-		Gene gen43 = new Gene("----", geneID1, "putative protein", false);
-		Gene gen53 = new Gene("nsd ", -geneID4, "nucleotide sugar dehydrogenase", false);
-		Gene gen63 = new Gene("----", geneID11, "hypothetical protein", false);
-		Gene gen73 = new Gene("----", geneID11, "hypothetical protein", false);
-		Gene gen83 = new Gene("abcT8", geneID2, "ABC transporter", false);
-		Gene gen93 = new Gene("serS", -geneID4, "seryl-tRNA synthetase", false);
-		Gene gen103 = new Gene("glmS", geneID3, "glucosamine-fructose-6-phosphate aminotransferase", false);
-		Gene gen113 = new Gene("argD", -geneID6, "N-acetylornithine aminotransferase", false);
-		Gene gen123 = new Gene("nsd ", -geneID1, "nucleotide sugar dehydrogenase", false);
-		Gene gen133 = new Gene("rodA", -geneID5, "rod shape determining protein RodA", false);
-		Gene gen143 = new Gene("rodA", -geneID12, "rod shape determining protein RodA", false);
+		Gene gen13 = new Gene("smb ", -geneID10, "small protein B");
+		Gene gen23 = new Gene("----", -geneID3, "hypothetical protein");
+		Gene gen33 = new Gene("----", geneID5, "hypothetical protein");
+		Gene gen43 = new Gene("----", geneID1, "putative protein");
+		Gene gen53 = new Gene("nsd ", -geneID4, "nucleotide sugar dehydrogenase");
+		Gene gen63 = new Gene("----", geneID11, "hypothetical protein");
+		Gene gen73 = new Gene("----", geneID11, "hypothetical protein");
+		Gene gen83 = new Gene("abcT8", geneID2, "ABC transporter");
+		Gene gen93 = new Gene("serS", -geneID4, "seryl-tRNA synthetase");
+		Gene gen103 = new Gene("glmS", geneID3, "glucosamine-fructose-6-phosphate aminotransferase");
+		Gene gen113 = new Gene("argD", -geneID6, "N-acetylornithine aminotransferase");
+		Gene gen123 = new Gene("nsd ", -geneID1, "nucleotide sugar dehydrogenase");
+		Gene gen133 = new Gene("rodA", -geneID5, "rod shape determining protein RodA");
+		Gene gen143 = new Gene("rodA", -geneID12, "rod shape determining protein RodA");
 		
 		// Shorty4 C1
-		Gene gen14 = new Gene("smb ", -geneID7, "small protein B", false);
-		Gene gen24 = new Gene("smb ", -geneID7, "small protein B", false);
-		Gene gen34 = new Gene("----", -geneID4, "hypothetical protein", false);
-		Gene gen44 = new Gene("----", geneID4, "hypothetical protein", false);
-		Gene gen54 = new Gene("----", geneID2, "putative protein", false);
-		Gene gen64 = new Gene("nsd ", -geneID3, "nucleotide sugar dehydrogenase", false);
-		Gene gen74 = new Gene("----", geneID1, "hypothetical protein", false);
-		Gene gen84 = new Gene("abcT8", geneID12, "ABC transporter", false);
+		Gene gen14 = new Gene("smb ", -geneID7, "small protein B");
+		Gene gen24 = new Gene("smb ", -geneID7, "small protein B");
+		Gene gen34 = new Gene("----", -geneID4, "hypothetical protein");
+		Gene gen44 = new Gene("----", geneID4, "hypothetical protein");
+		Gene gen54 = new Gene("----", geneID2, "putative protein");
+		Gene gen64 = new Gene("nsd ", -geneID3, "nucleotide sugar dehydrogenase");
+		Gene gen74 = new Gene("----", geneID1, "hypothetical protein");
+		Gene gen84 = new Gene("abcT8", geneID12, "ABC transporter");
 		
 		// Shorty4 C2
-		Gene gen15 = new Gene("smb ", -geneID9, "small protein B", false);
-		Gene gen25 = new Gene("----", -geneID1, "hypothetical protein", false);
-		Gene gen35 = new Gene("----", geneID4, "hypothetical protein", false);
-		Gene gen45 = new Gene("----", geneID8, "putative protein", false);
-		Gene gen55 = new Gene("nsd ", -geneID5, "nucleotide sugar dehydrogenase", false);
-		Gene gen65 = new Gene("----", geneID12, "hypothetical protein", false);
-		Gene gen75 = new Gene("abcT8", geneID5, "ABC transporter", false);
+		Gene gen15 = new Gene("smb ", -geneID9, "small protein B");
+		Gene gen25 = new Gene("----", -geneID1, "hypothetical protein");
+		Gene gen35 = new Gene("----", geneID4, "hypothetical protein");
+		Gene gen45 = new Gene("----", geneID8, "putative protein");
+		Gene gen55 = new Gene("nsd ", -geneID5, "nucleotide sugar dehydrogenase");
+		Gene gen65 = new Gene("----", geneID12, "hypothetical protein");
+		Gene gen75 = new Gene("abcT8", geneID5, "ABC transporter");
 		
 		// build chromosomes		
 		//Shorty1
@@ -360,7 +351,7 @@ public class CogFileReaderTest {
 		
 		assertEquals(reader.getGeneLabelMap().size(), geneLabelMap.size());
 		
-		//assertEquals(GeckoInstance.getInstance().getColormap(), colorMap);
+		//assertEquals(GeckoInstance.getInstance().getColorMap(), colorMap);
 		for( int i = 1; i <= reader.getGeneLabelMap().size(); i++)
 		{	
 			// Check keys and values for the geneLabelMap
@@ -372,7 +363,7 @@ public class CogFileReaderTest {
 			
 			for( int j = 1; j <= reader.getGeneLabelMap().size(); j++)
 			{
-				assertArrayEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
+				assertEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
 			}
 			
 			// check the genome array
@@ -429,10 +420,10 @@ public class CogFileReaderTest {
 
         List<Gene> genes1 = new ArrayList<Gene>();
         List<Gene> genes2 = new ArrayList<Gene>();
-        Gene gen1 = new Gene("fusA", geneID1, "elongation factor EF-A", false);
-        Gene gen2 = new Gene("fusA", geneID2, "elongation factor EF-A", false);
-        Gene gen3 = new Gene("fusB", geneID3, "elongation factor EF-B", false);
-        Gene gen4 = new Gene("fusB", geneID4, "elongation factor EF-B", false);
+        Gene gen1 = new Gene("fusA", geneID1, "elongation factor EF-A");
+        Gene gen2 = new Gene("fusA", geneID2, "elongation factor EF-A");
+        Gene gen3 = new Gene("fusB", geneID3, "elongation factor EF-B");
+        Gene gen4 = new Gene("fusB", geneID4, "elongation factor EF-B");
 
         genes1.add(gen1);
         genes1.add(gen2);
@@ -482,7 +473,7 @@ public class CogFileReaderTest {
 
             for( int j = 1; j <= reader.getGeneLabelMap().size(); j++)
             {
-                assertArrayEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
+                assertEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
             }
 
             // check the genome array

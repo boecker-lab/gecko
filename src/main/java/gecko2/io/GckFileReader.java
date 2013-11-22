@@ -1,10 +1,7 @@
 package gecko2.io;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.Chromosome;
-import gecko2.algorithm.Gene;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.Genome;
+import gecko2.algorithm.*;
 
 import java.awt.*;
 import java.io.*;
@@ -25,7 +22,7 @@ public class GckFileReader implements GeckoDataReader {
 	/**
 	 * Storing place for the geneLabelMap 
 	 */
-	private Map<Integer, String[]> geneLabelMap;
+	private Map<Integer, ExternalGeneId> geneLabelMap;
 	
 	/**
 	 * Storing place for the genomes.
@@ -67,7 +64,7 @@ public class GckFileReader implements GeckoDataReader {
 	 * 
 	 * @return the geneLabelMap (HashMap)
 	 */
-	public Map<Integer, String[]> getGeneLabelMap() {
+	public Map<Integer, ExternalGeneId> getGeneLabelMap() {
 		return this.geneLabelMap;
 	}
 
@@ -168,16 +165,16 @@ public class GckFileReader implements GeckoDataReader {
                 return chr;
             else {
                 String[] split = line.split("\t");
-                Gene newGene = new Gene(split[4], split[2], Integer.parseInt(split[0]), split[3], (split[5].equals("unknown") ? false : true));
+                Gene newGene = new Gene(split[4], split[2], Integer.parseInt(split[0]), split[3]);
                 maxIdLength = Math.max(maxIdLength, (split[0].startsWith("-") ? split[0].length()-1 : split[0].length()));
                 maxLocusTagLength = Math.max(maxLocusTagLength, newGene.getTag().length());
                 maxNameLength = Math.max(maxNameLength, newGene.getName().length());
-                String[] label = geneLabelMap.get(newGene.getId());
-                String[] newLabel = new String[]{split[1]};
+                ExternalGeneId label = geneLabelMap.get(newGene.getId());
+                String newLabel = split[1];
                 if (label == null)
-                    geneLabelMap.put(newGene.getId(), newLabel);
+                    geneLabelMap.put(newGene.getId(), new ExternalGeneId(newLabel, split[5].equals("unknown")));
                 else if (label.equals(newLabel))
-                    throw new ParseException(String.format("Conflicting gene labels %s and %s!", Arrays.toString(newLabel), Arrays.toString(label)), 0);
+                    throw new ParseException(String.format("Conflicting gene labels %s and %s!", newLabel, label), 0);
                 chr.getGenes().add(newGene);
             }
         }

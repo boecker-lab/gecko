@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public class GenomeSelector extends JDialog {
@@ -166,6 +167,11 @@ public class GenomeSelector extends JDialog {
 
                     @Override
                     public void done() {
+                        try {
+                            get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        }
                         GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
                     }
                 };

@@ -4,10 +4,7 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
 import gecko2.GeckoInstance;
-import gecko2.algorithm.Chromosome;
-import gecko2.algorithm.Gene;
-import gecko2.algorithm.Genome;
-import gecko2.algorithm.Parameter;
+import gecko2.algorithm.*;
 import gecko2.util.PrintUtils;
 import gecko2.util.SortUtils;
 
@@ -278,7 +275,7 @@ public class StartComputationDialog extends JDialog {
 					Genome[] genomes = new Genome[oldGenomes.length+1];
 					Genome cluster = new Genome();
 					ArrayList<Gene> genes = new ArrayList<Gene>();
-					Map<String[], Integer> revIDMap = SortUtils.invertIntArray(gecko.getGenLabelMap());
+					Map<ExternalGeneId, Integer> revIDMap = SortUtils.invertIntArray(gecko.getGenLabelMap());
 					for (String id : refClusterField.getText().split(" "))
 						if (id!=null && (!(id.equals("")))) {
 							Integer iid = revIDMap.get(Integer.parseInt(id)); //TODO contains strings, should not work!

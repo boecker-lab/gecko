@@ -254,7 +254,7 @@ public class GenomePainting {
 	}
 
     private static Color getColor(int geneId) {
-        Color color = GeckoInstance.getInstance().getColormap().get(Math.abs(geneId));
+        Color color = GeckoInstance.getInstance().getColorMap().get(Math.abs(geneId));
         if (color == null)
             return Color.GRAY;
         else

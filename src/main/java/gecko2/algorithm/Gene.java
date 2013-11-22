@@ -3,34 +3,30 @@ package gecko2.algorithm;
 import gecko2.GeckoInstance;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class Gene implements Serializable {
+
+    static Map<Integer, ExternalGeneId> getGenLabelMap;
 	
 	private static final long serialVersionUID = 7903694077854093398L;
 	private final String name;
 	private final String tag;
 	private final int id;
 	private final String annotation;
-	private final boolean unknown;
-	
-	public boolean isUnknown() {
-		return unknown;
-	}
-	
+
 	public Gene(String name, int id) {
-		this(name, name, id, null,false);
+		this(name, name, id, null);
 	}
 	
-	public Gene(String name, int id, String annotation, boolean unknown) {
-		this.unknown = unknown;
+	public Gene(String name, int id, String annotation) {
 		this.name = name;
 		this.tag = name;
 		this.id = id;
 		this.annotation = annotation;
 	}
 	
-	public Gene(String name, String tag, int id, String annotation, boolean unknown) {
-		this.unknown = unknown;
+	public Gene(String name, String tag, int id, String annotation) {
 		this.name = name;
 		this.tag = tag;
 		this.id = id;
@@ -42,7 +38,6 @@ public class Gene implements Serializable {
 		this.tag = other.tag;
 		this.id = other.id;
 		this.annotation = other.annotation;
-		this.unknown = other.unknown;
 	}
 
     /**
@@ -53,6 +48,14 @@ public class Gene implements Serializable {
 		return id;
 	}
 
+    public boolean isUnknown() {
+        return Gene.isSingleGeneFamily(id);
+    }
+
+    public static boolean isSingleGeneFamily(int id) {
+        return GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(id)).isSingleGeneFamily();
+    }
+
     /**
      * Returns the external id from the input file
      * @return
@@ -62,7 +65,7 @@ public class Gene implements Serializable {
     }
 
     public static String getExternalId(int id) {
-        return GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(id))[0];
+        return GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(id)).getId();
     }
 	
 	public String getName() {

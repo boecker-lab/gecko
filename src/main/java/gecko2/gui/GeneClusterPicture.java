@@ -396,10 +396,10 @@ public class GeneClusterPicture {
 	private Color getColor(int colorID) {
 		Color out;
 		
-		if (this.gecko.getGenLabelMap().get(colorID)[0].equals("0")) {
+		if (this.gecko.getGenLabelMap().get(colorID).isSingleGeneFamily()) {
 			out = Color.GRAY;
 		}
-		else {		
+		else {
 			if (newColorMap.containsKey(colorID)) {
 				out = newColorMap.get(colorID);
 			}
@@ -411,7 +411,7 @@ public class GeneClusterPicture {
 				}
 				else {
 					// fallback if we do not have enough colors defined
-					out = gecko.getColormap().get(colorID);
+					out = gecko.getColorMap().get(colorID);
 				}	
 			}
 		}

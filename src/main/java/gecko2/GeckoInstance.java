@@ -34,8 +34,8 @@ public class GeckoInstance {
 	
 	private File currentInputFile; 
 	private Genome[] genomes = null;
-	private Map<Integer, String[]> geneLabelMap = new HashMap<>();
-	private Map<Integer, Color> colormap;
+	private Map<Integer, ExternalGeneId> geneLabelMap = new HashMap<>();
+	private Map<Integer, Color> colorMap;
 	
 	private GeneCluster[] clusters;
 	private SortedSet<Integer> clusterSelection;
@@ -96,7 +96,7 @@ public class GeckoInstance {
 	 * 
 	 * @param geneLabelMap the gene label map
 	 */
-	public void setGeneLabelMap(Map<Integer, String[]> geneLabelMap)
+	public void setGeneLabelMap(Map<Integer, ExternalGeneId> geneLabelMap)
 	{
 		this.geneLabelMap = geneLabelMap;
 	}
@@ -336,7 +336,7 @@ public class GeckoInstance {
 	 * @return the list of gene clusters
 	 */
 	private List<GeneCluster> getClusterList(ResultFilter filter) {
-		ArrayList<GeneCluster> result = new ArrayList<GeneCluster>(clusters.length);
+		ArrayList<GeneCluster> result = new ArrayList<>(clusters.length);
 		
 		for (int i=0; i<clusters.length; i++) {
 			if (applyFilter(i, filter))
@@ -420,7 +420,7 @@ public class GeckoInstance {
         setMaxLengths(reader.getMaxIdLength(), reader.getMaxNameLength(), reader.getMaxLocusTagLength());
         setClusters(reader.getGeneClusters());
         this.geneLabelMap = reader.getGeneLabelMap();
-        this.colormap = null;
+        this.colorMap = null;
         setGenomes(reader.getGenomes());
         if (gui != null){
             SwingUtilities.invokeLater(new Runnable() {
@@ -440,17 +440,18 @@ public class GeckoInstance {
 		return clusters;
 	}
 
-	public Map<Integer, Color> getColormap() {
-        if (colormap == null) {
+	public Map<Integer, Color> getColorMap() {
+        if (colorMap == null) {
             Random r = new Random();
-            colormap = new HashMap<>();
-            for (Integer id : geneLabelMap.keySet())
-                colormap.put(id, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
+            colorMap = new HashMap<>();
+            for (Entry<Integer, ExternalGeneId> entry : geneLabelMap.entrySet())
+                if (!entry.getValue().isSingleGeneFamily())
+                    colorMap.put(entry.getKey(), new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
         }
-		return colormap;
+		return colorMap;
 	}
 	
-	public Map<Integer, String[]> getGenLabelMap() {
+	public Map<Integer, ExternalGeneId> getGenLabelMap() {
 		return geneLabelMap;
 	}
 	
