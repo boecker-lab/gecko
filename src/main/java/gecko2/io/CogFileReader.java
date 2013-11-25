@@ -275,7 +275,9 @@ public class CogFileReader implements GeckoDataReader {
         this.geneLabelMap = new HashMap<>();
 
         for (int j = 1; j < stringIdList.size() + 1; j++) {
-            this.geneLabelMap.put(j, new ExternalGeneId(stringIdList.get(j - 1), backMap.get(stringIdList.get(j - 1)).unknown));
+            String extId = stringIdList.get(j - 1);
+            if (!isUnhomologe(extId))
+                this.geneLabelMap.put(j, new ExternalGeneId(stringIdList.get(j - 1), backMap.get(stringIdList.get(j - 1)).unknown));
         }
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()];
