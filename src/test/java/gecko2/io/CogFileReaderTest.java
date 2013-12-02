@@ -1,23 +1,18 @@
 package gecko2.io;
 
-import gecko2.GeckoInstance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.ExternalGeneId;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
 import org.junit.Test;
 
-import java.io.EOFException;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * JUnit test for the new class InputFileReader.
@@ -32,8 +27,7 @@ public class CogFileReaderTest {
 	 * Simple test for file with two genomes which contain two genes.
 	 */
 	@Test
-	public void readFileContentTest() 
-	{
+	public void readFileContentTest() {
 		// define the result we want to get
 		
 		// using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later 
@@ -45,16 +39,11 @@ public class CogFileReaderTest {
 		int geneID2 = 2;
 		int geneID3 = 3;
 		int geneID4 = 4;
-		
-		String geneString1 = "25";
-		String geneString2 = "21";
-		String geneString3 = "7";
-		String geneString4 = "4";
-	
-		geneLabelMap.put(1, new ExternalGeneId(geneString1, false));
-		geneLabelMap.put(2, new ExternalGeneId(geneString2, false));
-		geneLabelMap.put(3, new ExternalGeneId(geneString3, false));
-		geneLabelMap.put(4, new ExternalGeneId(geneString4, false));
+
+		geneLabelMap.put(1, new ExternalGeneId("25", true));
+		geneLabelMap.put(2, new ExternalGeneId("21", true));
+		geneLabelMap.put(3, new ExternalGeneId("7", true));
+		geneLabelMap.put(4, new ExternalGeneId("4", true));
 		
 		
 		List<Gene> genes1 = new ArrayList<>();
@@ -77,66 +66,25 @@ public class CogFileReaderTest {
         File inputFile = new File(getClass().getResource("/c2.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
-        try
-		{
+        try {
             reader = new CogFileReader(inputFile);
-			GeckoInstance.getInstance().setCurrentInputFile(inputFile);
 			
 			reader.readData();
 		}
-		catch (IOException | ParseException e)
-		{
+		catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
-		
-		assertEquals(reader.getGeneLabelMap().size(), geneLabelMap.size());
-		
-		for( int i = 1; i < reader.getGeneLabelMap().size() + 1; i++)
-		{	
-			// Check keys and values for the geneLabelMap
-			for(int z = 0; z < reader.getGeneLabelMap().keySet().toArray().length; z++)
-			{
-				//int z;
-				assertEquals(geneLabelMap.keySet().toArray()[z], reader.getGeneLabelMap().keySet().toArray()[z]);
-			}
-			
-			for( int j = 1; j <= reader.getGeneLabelMap().size(); j++)
-			{
-				assertEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
-			}
-			
-			// check the genome array
-			for( int j = 0; j < reader.getGenomes().length; j++)
-			{
-				for (int k = 0; k < refGenomes[j].getChromosomes().size(); k++)
-				{
-					assertEquals(refGenomes[j].getChromosomes().get(k).getName(), reader.getGenomes()[j].getChromosomes().get(k).getName());
-					
-					int p = 0;
-					
-					for (Gene gene: refGenomes[j].getChromosomes().get(k).getGenes())
-					{
-						assertEquals(gene.getAnnotation(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getAnnotation());
-						assertEquals(gene.getId(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getId());
-						assertEquals(gene.getName(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getName());
-						assertEquals(gene.getSummary(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getSummary());
-						p++;
-					}
-				}
-			}	
-		}
+
+        testReader(reader, geneLabelMap, refGenomes);
 	}
 	
-	
-	
 	@Test
-	public void readFileContentTest2() 
-	{
+	public void readFileContentTest2() {
 		// define the result we want to get
 		
 		// using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later 
 		// releases
-		Map<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
+		Map<Integer, ExternalGeneId> geneLabelMap = new HashMap<>();
 		
 		Genome[] refGenomes = new Genome[4];
 		
@@ -153,34 +101,20 @@ public class CogFileReaderTest {
 		int geneID10 = 10;
 		int geneID11 = 11;
 		int geneID12 = 12;
-		
-		// setup string IDs
-		String[] geneString1 = {"1"};
-		String[] geneString2 = {"2"};
-		String[] geneString3 = {"3"};
-		String[] geneString4 = {"4"};
-		String[] geneString5 = {"5"};
-		String[] geneString6 = {"6"};
-		String[] geneString7 = {"7"};
-		String[] geneString8 = {"8"};
-		String[] geneString9 = {"9"};
-		String[] geneString10 = {"10"};
-		String[] geneString11 = {"11"};
-		String[] geneString12 = {"12"};
-	
+
 		// setup genelabelmap
-		geneLabelMap.put(1, geneString1);
-		geneLabelMap.put(2, geneString2);
-		geneLabelMap.put(3, geneString3);
-		geneLabelMap.put(4, geneString4);
-		geneLabelMap.put(5, geneString5);
-		geneLabelMap.put(6, geneString6);
-		geneLabelMap.put(7, geneString7);
-		geneLabelMap.put(8, geneString8);
-		geneLabelMap.put(9, geneString9);
-		geneLabelMap.put(10, geneString10);
-		geneLabelMap.put(11, geneString11);
-		geneLabelMap.put(12, geneString12);		
+		geneLabelMap.put(1, new ExternalGeneId("1", false));
+		geneLabelMap.put(2, new ExternalGeneId("2", false));
+		geneLabelMap.put(3, new ExternalGeneId("3", false));
+		geneLabelMap.put(4, new ExternalGeneId("4", false));
+		geneLabelMap.put(5, new ExternalGeneId("5", false));
+		geneLabelMap.put(6, new ExternalGeneId("6", false));
+		geneLabelMap.put(7, new ExternalGeneId("7", false));
+		geneLabelMap.put(8, new ExternalGeneId("8", false));
+		geneLabelMap.put(9, new ExternalGeneId("9", false));
+		geneLabelMap.put(10, new ExternalGeneId("10", true));
+		geneLabelMap.put(11, new ExternalGeneId("11", false));
+		geneLabelMap.put(12, new ExternalGeneId("12", false));
 		
 		// build genes
 		// Shorty1
@@ -244,19 +178,19 @@ public class CogFileReaderTest {
 		
 		// build chromosomes		
 		//Shorty1
-		List<Gene> genes1 = new ArrayList<Gene>();
+		List<Gene> genes1 = new ArrayList<>();
 			
 		//Shorty2
-		List<Gene> genes2 = new ArrayList<Gene>();
+		List<Gene> genes2 = new ArrayList<>();
 		
 		//Shorty3
-		List<Gene> genes3 = new ArrayList<Gene>();
+		List<Gene> genes3 = new ArrayList<>();
 		
 		//Shorty4 C1
-		List<Gene> genes4 = new ArrayList<Gene>();
+		List<Gene> genes4 = new ArrayList<>();
 			
 		//Shorty4 C2
-		List<Gene> genes42 = new ArrayList<Gene>();
+		List<Gene> genes42 = new ArrayList<>();
 
 		
 		genes1.add(gen11);
@@ -323,83 +257,31 @@ public class CogFileReaderTest {
 		refGenomes[2].addChromosome(new Chromosome("", genes3, refGenomes[2]));
 		refGenomes[3].addChromosome(new Chromosome("chromosome I", genes4, refGenomes[3]));
 		refGenomes[3].addChromosome(new Chromosome("chromosome II", genes42, refGenomes[3]));
-		
-		ArrayList<GenomeOccurrence> genOcc;
 
         File inputFile = new File(getClass().getResource("/c.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
 		
-		try 
-		{
-			GeckoInstance.getInstance().setCurrentInputFile(inputFile);
-			
+		try {
 			reader.readData();
-		} 
-		catch (EOFException e) 
-		{
-			e.printStackTrace();
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		} 
-		catch (ParseException e)
-		{
-			e.printStackTrace();
 		}
-		
-		assertEquals(reader.getGeneLabelMap().size(), geneLabelMap.size());
-		
-		//assertEquals(GeckoInstance.getInstance().getColorMap(), colorMap);
-		for( int i = 1; i <= reader.getGeneLabelMap().size(); i++)
-		{	
-			// Check keys and values for the geneLabelMap
-			for(int z = 0; z < reader.getGeneLabelMap().keySet().toArray().length; z++)
-			{
-				//int z;
-				assertEquals(geneLabelMap.keySet().toArray()[z], reader.getGeneLabelMap().keySet().toArray()[z]);
-			}
-			
-			for( int j = 1; j <= reader.getGeneLabelMap().size(); j++)
-			{
-				assertEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
-			}
-			
-			// check the genome array
-			for( int j = 0; j < reader.getGenomes().length; j++)
-			{
-				for (int k = 0; k < refGenomes[j].getChromosomes().size(); k++)
-				{
-					assertEquals(refGenomes[j].getChromosomes().get(k).getName(), reader.getGenomes()[j].getChromosomes().get(k).getName());
-					
-					int p = 0;
-					
-					for (Gene gene: refGenomes[j].getChromosomes().get(k).getGenes())
-					{
-						// System.out.println(p);
-						assertEquals(gene.getAnnotation(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getAnnotation());
-						assertEquals(gene.getId(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getId());
-						assertEquals(gene.getName(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getName());
-						assertEquals(gene.getSummary(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getSummary());
-						p++;
-					}
-				}
-			}	
-		}
+		catch (IOException | ParseException e) {
+			e.printStackTrace();
+		} 
+
+        testReader(reader, geneLabelMap, refGenomes);
 	}
 
     /**
      * Simple test for file with two genomes which contain one gene, with two ids.
      */
     @Test
-    public void readFileContentMultiIdTest()
-    {
+    public void readFileContentMultiIdTest() {
         // define the result we want to get
 
         // using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later
         // releases
-        Map<Integer, String[]> geneLabelMap = new HashMap<Integer, String[]>();
+        Map<Integer, ExternalGeneId> geneLabelMap = new HashMap<>();
         Genome[] refGenomes = new Genome[2];
 
         int geneID1 = 1;
@@ -407,19 +289,14 @@ public class CogFileReaderTest {
         int geneID3 = 3;
         int geneID4 = 4;
 
-        String[] geneString1 = {"25"};
-        String[] geneString2 = {"21"};
-        String[] geneString3 = {"7"};
-        String[] geneString4 = {"4"};
-
-        geneLabelMap.put(1, geneString1);
-        geneLabelMap.put(2, geneString2);
-        geneLabelMap.put(3, geneString3);
-        geneLabelMap.put(4, geneString4);
+        geneLabelMap.put(1, new ExternalGeneId("25", true));
+        geneLabelMap.put(2, new ExternalGeneId("21", true));
+        geneLabelMap.put(3, new ExternalGeneId("7", true));
+        geneLabelMap.put(4, new ExternalGeneId("4", true));
 
 
-        List<Gene> genes1 = new ArrayList<Gene>();
-        List<Gene> genes2 = new ArrayList<Gene>();
+        List<Gene> genes1 = new ArrayList<>();
+        List<Gene> genes2 = new ArrayList<>();
         Gene gen1 = new Gene("fusA", geneID1, "elongation factor EF-A");
         Gene gen2 = new Gene("fusA", geneID2, "elongation factor EF-A");
         Gene gen3 = new Gene("fusB", geneID3, "elongation factor EF-B");
@@ -435,58 +312,76 @@ public class CogFileReaderTest {
         refGenomes[0].addChromosome(new Chromosome("", genes1, refGenomes[0]));
         refGenomes[1].addChromosome(new Chromosome("", genes2, refGenomes[1]));
 
-        List<GenomeOccurrence> genOcc;
-
-        File inputFile = new File(getClass().getResource("/c2MultiIdGenes.cog").getFile());
+        File inputFile = new File(getClass().getResource("/multiIdGenes.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
-        try
-        {
-            reader = new CogFileReader(inputFile);
-            GeckoInstance.getInstance().setCurrentInputFile(inputFile);
-
+        try {
             reader.readData();
         }
-        catch (EOFException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        catch (ParseException e)
-        {
+        catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
+        testReader(reader, geneLabelMap, refGenomes);
+    }
+
+    @Test
+    public void readUnHomologueGenesTest() {
+        File inputFile = new File(getClass().getResource("/unHomologueGenes.cog").getFile());
+
+        CogFileReader reader = new CogFileReader(inputFile);
+        try {
+            reader.readData();
+        }
+        catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(reader.getGenomes().length, 2);
+        assertEquals(reader.getGenomes()[0].getChromosomes().size(), 1);
+        assertEquals(reader.getGenomes()[0].getChromosomes().get(0).getGenes().size(), 10);
+
+        assertEquals(reader.getGenomes()[1].getChromosomes().size(), 1);
+        assertEquals(reader.getGenomes()[1].getChromosomes().get(0).getGenes().size(), 3);
+
+        Map<Integer, ExternalGeneId> geneLabelMap = reader.getGeneLabelMap();
+        assertEquals(geneLabelMap.size(), 5);
+        for (ExternalGeneId entry : geneLabelMap.values()) {
+            if (entry.getId().equals("1"))
+                assertTrue(entry.isSingleGeneFamily());
+            else if (entry.getId().equals("gF1"))
+                assertTrue(entry.isSingleGeneFamily());
+            else if (entry.getId().equals("4"))
+                assertFalse(entry.isSingleGeneFamily());
+            else if (entry.getId().equals("5"))
+                assertFalse(entry.isSingleGeneFamily());
+            else if (entry.getId().equals("gF2"))
+                assertFalse(entry.isSingleGeneFamily());
+            else
+                fail("unexpected map entry: " + entry.toString());
+        }
+    }
+
+
+    private static void testReader(CogFileReader reader, Map<Integer, ExternalGeneId> geneLabelMap, Genome[] refGenomes) {
         assertEquals(reader.getGeneLabelMap().size(), geneLabelMap.size());
 
-        for( int i = 1; i < reader.getGeneLabelMap().size() + 1; i++)
-        {
+        for( int i = 1; i < reader.getGeneLabelMap().size() + 1; i++) {
             // Check keys and values for the geneLabelMap
             for(int z = 0; z < reader.getGeneLabelMap().keySet().toArray().length; z++)
-            {
-                //int z;
                 assertEquals(geneLabelMap.keySet().toArray()[z], reader.getGeneLabelMap().keySet().toArray()[z]);
-            }
 
             for( int j = 1; j <= reader.getGeneLabelMap().size(); j++)
-            {
                 assertEquals(geneLabelMap.get(j), reader.getGeneLabelMap().get(j));
-            }
 
             // check the genome array
-            for( int j = 0; j < reader.getGenomes().length; j++)
-            {
-                for (int k = 0; k < refGenomes[j].getChromosomes().size(); k++)
-                {
+            for( int j = 0; j < reader.getGenomes().length; j++) {
+                for (int k = 0; k < refGenomes[j].getChromosomes().size(); k++) {
                     assertEquals(refGenomes[j].getChromosomes().get(k).getName(), reader.getGenomes()[j].getChromosomes().get(k).getName());
 
                     int p = 0;
 
-                    for (Gene gene: refGenomes[j].getChromosomes().get(k).getGenes())
-                    {
+                    for (Gene gene: refGenomes[j].getChromosomes().get(k).getGenes()) {
                         assertEquals(gene.getAnnotation(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getAnnotation());
                         assertEquals(gene.getId(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getId());
                         assertEquals(gene.getName(), reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(p).getName());

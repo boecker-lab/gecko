@@ -53,4 +53,11 @@ public class ExternalGeneId {
         result = 31 * result + (id != null ? id.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "ExternalGeneId{" +
+                "id='" + id + "', " + singleGeneFamily +
+                '}';
+    }
 }

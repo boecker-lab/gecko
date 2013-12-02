@@ -65,7 +65,8 @@ public class Gene implements Serializable {
     }
 
     public static String getExternalId(int id) {
-        return GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(id)).getId();
+        ExternalGeneId externalGeneId = GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(id));
+        return externalGeneId == null ? "0" : externalGeneId.getId();
     }
 	
 	public String getName() {
