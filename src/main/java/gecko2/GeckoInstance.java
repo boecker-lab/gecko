@@ -34,8 +34,6 @@ public class GeckoInstance {
 	
 	private File currentInputFile; 
 	private Genome[] genomes = null;
-	private Map<Integer, ExternalGeneId> geneLabelMap = new HashMap<>();
-	private Map<Integer, Color> colorMap;
 	
 	private GeneCluster[] clusters;
 	private SortedSet<Integer> clusterSelection;
@@ -89,16 +87,6 @@ public class GeckoInstance {
             default:
                 return -1;
         }
-	}
-	
-	/**
-	 * Setter for the geneLabelMap
-	 * 
-	 * @param geneLabelMap the gene label map
-	 */
-	public void setGeneLabelMap(Map<Integer, ExternalGeneId> geneLabelMap)
-	{
-		this.geneLabelMap = geneLabelMap;
 	}
 	
 	/*
@@ -262,7 +250,7 @@ public class GeckoInstance {
 				// Check if there is a match in the gene label
 				int[] genes = c.getGenes().clone();
 				for (int i=0; i<genes.length; i++)
-                    genes[i] = (Integer) geneLabelMap.keySet().toArray()[genes[i]];
+                    genes[i] = (Integer) Gene.getIntegerAlphabet().toArray()[genes[i]];
 				String geneString = Arrays.toString(genes);
 				for (String pattern : searchPatterns) {
 					if (geneString.matches(".*[\\[ ,]"+pattern+"[ ,\\]].*")) {
@@ -419,8 +407,7 @@ public class GeckoInstance {
     public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
         setMaxLengths(reader.getMaxIdLength(), reader.getMaxNameLength(), reader.getMaxLocusTagLength());
         setClusters(reader.getGeneClusters());
-        this.geneLabelMap = reader.getGeneLabelMap();
-        this.colorMap = null;
+        Gene.setGeneLabelMap(reader.getGeneLabelMap());
         setGenomes(reader.getGenomes());
         if (gui != null){
             SwingUtilities.invokeLater(new Runnable() {
@@ -438,21 +425,6 @@ public class GeckoInstance {
 	
 	public GeneCluster[] getClusters() {
 		return clusters;
-	}
-
-	public Map<Integer, Color> getColorMap() {
-        if (colorMap == null) {
-            Random r = new Random();
-            colorMap = new HashMap<>();
-            for (Entry<Integer, ExternalGeneId> entry : geneLabelMap.entrySet())
-                if (!entry.getValue().isSingleGeneFamily())
-                    colorMap.put(entry.getKey(), new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
-        }
-		return colorMap;
-	}
-	
-	public Map<Integer, ExternalGeneId> getGenLabelMap() {
-		return geneLabelMap;
 	}
 	
 	public File getCurrentInputFile() {
@@ -521,7 +493,7 @@ public class GeckoInstance {
 	public ExecutorService performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
 		lastParameter = p;
-		p.setAlphabetSize(geneLabelMap.size());
+		p.setAlphabetSize(Gene.getAlphabetSize());
         if (gui != null)
 		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
 		ClusterComputationRunnable clusterComputation = new ClusterComputationRunnable(p, mergeResults, genomeGroupingFactor);
@@ -611,7 +583,7 @@ public class GeckoInstance {
 		}
 		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.length));
 		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.size());
+		p.setAlphabetSize(Gene.getAlphabetSize());
 		return this.computeReferenceStatistics(genomes, p, clusters, this);
 	}
 	

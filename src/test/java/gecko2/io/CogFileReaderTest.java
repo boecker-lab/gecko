@@ -40,10 +40,10 @@ public class CogFileReaderTest {
 		int geneID3 = 3;
 		int geneID4 = 4;
 
-		geneLabelMap.put(1, new ExternalGeneId("25", true));
-		geneLabelMap.put(2, new ExternalGeneId("21", true));
-		geneLabelMap.put(3, new ExternalGeneId("7", true));
-		geneLabelMap.put(4, new ExternalGeneId("4", true));
+		geneLabelMap.put(1, new ExternalGeneId("25", 1));
+		geneLabelMap.put(2, new ExternalGeneId("21", 1));
+		geneLabelMap.put(3, new ExternalGeneId("7", 1));
+		geneLabelMap.put(4, new ExternalGeneId("4", 1));
 		
 		
 		List<Gene> genes1 = new ArrayList<>();
@@ -103,18 +103,18 @@ public class CogFileReaderTest {
 		int geneID12 = 12;
 
 		// setup genelabelmap
-		geneLabelMap.put(1, new ExternalGeneId("1", false));
-		geneLabelMap.put(2, new ExternalGeneId("2", false));
-		geneLabelMap.put(3, new ExternalGeneId("3", false));
-		geneLabelMap.put(4, new ExternalGeneId("4", false));
-		geneLabelMap.put(5, new ExternalGeneId("5", false));
-		geneLabelMap.put(6, new ExternalGeneId("6", false));
-		geneLabelMap.put(7, new ExternalGeneId("7", false));
-		geneLabelMap.put(8, new ExternalGeneId("8", false));
-		geneLabelMap.put(9, new ExternalGeneId("9", false));
-		geneLabelMap.put(10, new ExternalGeneId("10", true));
-		geneLabelMap.put(11, new ExternalGeneId("11", false));
-		geneLabelMap.put(12, new ExternalGeneId("12", false));
+		geneLabelMap.put(1, new ExternalGeneId("1", 8));
+		geneLabelMap.put(2, new ExternalGeneId("2", 3));
+		geneLabelMap.put(3, new ExternalGeneId("3", 6));
+		geneLabelMap.put(4, new ExternalGeneId("4", 9));
+		geneLabelMap.put(5, new ExternalGeneId("5", 6));
+		geneLabelMap.put(6, new ExternalGeneId("6", 3));
+		geneLabelMap.put(7, new ExternalGeneId("7", 4));
+		geneLabelMap.put(8, new ExternalGeneId("8", 2));
+		geneLabelMap.put(9, new ExternalGeneId("9", 2));
+		geneLabelMap.put(10, new ExternalGeneId("10", 1));
+		geneLabelMap.put(11, new ExternalGeneId("11", 2));
+		geneLabelMap.put(12, new ExternalGeneId("12", 3));
 		
 		// build genes
 		// Shorty1
@@ -289,10 +289,10 @@ public class CogFileReaderTest {
         int geneID3 = 3;
         int geneID4 = 4;
 
-        geneLabelMap.put(1, new ExternalGeneId("25", true));
-        geneLabelMap.put(2, new ExternalGeneId("21", true));
-        geneLabelMap.put(3, new ExternalGeneId("7", true));
-        geneLabelMap.put(4, new ExternalGeneId("4", true));
+        geneLabelMap.put(1, new ExternalGeneId("25", 1));
+        geneLabelMap.put(2, new ExternalGeneId("21", 1));
+        geneLabelMap.put(3, new ExternalGeneId("7", 1));
+        geneLabelMap.put(4, new ExternalGeneId("4", 1));
 
 
         List<Gene> genes1 = new ArrayList<>();

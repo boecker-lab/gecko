@@ -1,19 +1,23 @@
 package gecko2.algorithm;
 
-import gecko2.GeckoInstance;
-
+import java.awt.*;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class Gene implements Serializable {
-
-    static Map<Integer, ExternalGeneId> getGenLabelMap;
 	
 	private static final long serialVersionUID = 7903694077854093398L;
 	private final String name;
 	private final String tag;
 	private final int id;
 	private final String annotation;
+
+    private static Map<Integer, ExternalGeneId> geneLabelMap;
+    private static Map<Integer, Color> colorMap;
+    private static int alphabetSize;
 
 	public Gene(String name, int id) {
 		this(name, name, id, null);
@@ -52,8 +56,8 @@ public class Gene implements Serializable {
         return Gene.isSingleGeneFamily(id);
     }
 
-    public static boolean isSingleGeneFamily(int id) {
-        return GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(id)).isSingleGeneFamily();
+    public int getFamilySize() {
+        return Gene.getFamilySize(id);
     }
 
     /**
@@ -65,7 +69,7 @@ public class Gene implements Serializable {
     }
 
     public static String getExternalId(int id) {
-        ExternalGeneId externalGeneId = GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(id));
+        ExternalGeneId externalGeneId = Gene.geneLabelMap.get(Math.abs(id));
         return externalGeneId == null ? "0" : externalGeneId.getId();
     }
 	
@@ -100,6 +104,44 @@ public class Gene implements Serializable {
 	public String toString() {
 		return "["+id+","+name+","+annotation+"]";
 	}
-	
-	
+
+    public static void setGeneLabelMap(Map<Integer, ExternalGeneId> geneLabelMap) {
+        Gene.geneLabelMap = geneLabelMap;
+        colorMap = null;
+    }
+
+    public static Map<Integer, ExternalGeneId> getGeneLabelMap() {
+        return geneLabelMap;
+    }
+
+    public static int getAlphabetSize() {
+        return geneLabelMap.size() - 1 + geneLabelMap.get(0).getFamilySize();
+    }
+
+    public static boolean isSingleGeneFamily(int geneId) {
+        return geneLabelMap.get(geneId).isSingleGeneFamily();
+    }
+
+    private static int getFamilySize(int geneId) {
+        return geneLabelMap.get(geneId).getFamilySize();
+    }
+
+    public static Set<Integer> getIntegerAlphabet() {
+        return geneLabelMap.keySet();
+    }
+
+    public static Map<Integer, Color> getColorMap() {
+        if (colorMap == null) {
+            Random r = new Random();
+            colorMap = new HashMap<>();
+            for (Map.Entry<Integer, ExternalGeneId> entry : geneLabelMap.entrySet())
+                if (!entry.getValue().isSingleGeneFamily())
+                    colorMap.put(entry.getKey(), new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
+        }
+        return colorMap;
+    }
+
+    public static Color getGeneColor(int id) {
+        return getColorMap().get(Math.abs(id));
+    }
 }

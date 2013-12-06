@@ -73,7 +73,7 @@ public class SessionWriter
                 out.write(chr.getName());
                 out.newLine();
                 for (Gene gene : chr.getGenes()) {
-                    out.write(gene.getId() + SEPERATOR + gene.getExternalId() + SEPERATOR + gene.getTag() + SEPERATOR + gene.getAnnotation() + SEPERATOR + gene.getName() + SEPERATOR + (gene.isUnknown() ? "unknown" : "known"));
+                    out.write(gene.getId() + SEPERATOR + gene.getExternalId() + SEPERATOR + gene.getTag() + SEPERATOR + gene.getAnnotation() + SEPERATOR + gene.getName() + SEPERATOR + gene.getFamilySize());
                     out.newLine();
                 }
                 out.write(CHROMOSOME_END);

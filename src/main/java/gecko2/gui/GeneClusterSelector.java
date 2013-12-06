@@ -2,6 +2,7 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 import gecko2.GeckoInstance.ResultFilter;
+import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
 import gecko2.algorithm.Parameter;
@@ -180,7 +181,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
                 StringBuilder geneIDs = new StringBuilder();
 
                 for (int geneID : gc.getGenes()) {
-                    geneIDs.append(GeckoInstance.getInstance().getGenLabelMap().keySet().toArray()[geneID]).append(" ");
+                    geneIDs.append(Gene.getGeneLabelMap().keySet().toArray()[geneID]).append(" ");
                 }
 
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(geneIDs.toString()), GeneClusterSelector.this);
@@ -490,14 +491,14 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 				case 4:
 					return matchingClusters.get(rowIndex).getBestCorrectedScore();
 				case 5:
-					if (instance.getGenLabelMap() != null) {
+					if (Gene.getGeneLabelMap() != null) {
 						
 						int[] genes = matchingClusters.get(rowIndex).getGenes();
 						ArrayList<String> knownGenes = new ArrayList<String>();
 					
 						for (int g : genes)	{
-							if (! (instance.getGenLabelMap().get(g).getId().equals("0") && instance.getGenLabelMap().get(g).getId().equals("") && instance.getGenLabelMap().get(g).getId() == null)) {
-								knownGenes.add(instance.getGenLabelMap().get(g).getId());
+							if (! (Gene.getGeneLabelMap().get(g).getId().equals("0") && Gene.getGeneLabelMap().get(g).getId().equals("") && Gene.getGeneLabelMap().get(g).getId() == null)) {
+								knownGenes.add(Gene.getGeneLabelMap().get(g).getId());
 							}
 						}
 						

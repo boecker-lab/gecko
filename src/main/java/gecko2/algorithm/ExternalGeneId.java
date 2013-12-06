@@ -5,16 +5,16 @@ package gecko2.algorithm;
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
 public class ExternalGeneId {
-    private final boolean singleGeneFamily;
+    private final int familySize;
     private final String id;
 
     /**
      *
      * @param id the String id
-     * @param singleGeneFamily if the gene family contains only one gene
+     * @param familySize if the gene family size
      */
-    public ExternalGeneId(String id, boolean singleGeneFamily) {
-        this.singleGeneFamily = singleGeneFamily;
+    public ExternalGeneId(String id, int familySize) {
+        this.familySize = familySize;
         this.id = id;
     }
 
@@ -31,8 +31,13 @@ public class ExternalGeneId {
      * @return true if the gene family contains only one gene
      */
     public boolean isSingleGeneFamily() {
-        return singleGeneFamily;
+        return 1 == familySize;
     }
+
+    public int getFamilySize() {
+        return familySize;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -41,23 +46,23 @@ public class ExternalGeneId {
 
         ExternalGeneId that = (ExternalGeneId) o;
 
-        if (singleGeneFamily != that.singleGeneFamily) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (familySize != that.familySize) return false;
+        if (!id.equals(that.id)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = (singleGeneFamily ? 1 : 0);
-        result = 31 * result + (id != null ? id.hashCode() : 0);
+        int result = familySize;
+        result = 31 * result + id.hashCode();
         return result;
     }
 
     @Override
     public String toString() {
         return "ExternalGeneId{" +
-                "id='" + id + "', " + singleGeneFamily +
+                "id='" + id + "', size=" + familySize +
                 '}';
     }
 }

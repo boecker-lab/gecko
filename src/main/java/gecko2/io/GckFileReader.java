@@ -172,7 +172,7 @@ public class GckFileReader implements GeckoDataReader {
                 ExternalGeneId label = geneLabelMap.get(newGene.getId());
                 String newLabel = split[1];
                 if (label == null)
-                    geneLabelMap.put(newGene.getId(), new ExternalGeneId(newLabel, split[5].equals("unknown")));
+                    geneLabelMap.put(newGene.getId(), new ExternalGeneId(newLabel, Integer.parseInt(split[5])));
                 else if (label.equals(newLabel))
                     throw new ParseException(String.format("Conflicting gene labels %s and %s!", newLabel, label), 0);
                 chr.getGenes().add(newGene);

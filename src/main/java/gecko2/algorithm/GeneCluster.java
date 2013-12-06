@@ -517,7 +517,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         Subsequence[][] subsequences = gOcc.getSubsequences();
         HashMap<Integer, Gene[]> map = new HashMap<Integer, Gene[]>();
         for (int gene : genes) {
-            if (instance.getGenLabelMap().get(gene) != null)
+            if (Gene.getGeneLabelMap().get(gene) != null)
                 map.put(gene, new Gene[subsequences.length]);
         }
         for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
@@ -552,7 +552,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         Subsequence[][] subsequences = gOcc.getSubsequences();
         HashMap<Integer, Gene[][]> map = new HashMap<Integer, Gene[][]>();
         for (int gene : genes) {
-            if (instance.getGenLabelMap().get(gene) != null) {
+            if (Gene.getGeneLabelMap().get(gene) != null) {
                 Gene[][] geneArray = new Gene[subsequences.length][];
                 for (int i=0; i<subsequences.length; i++)
                     geneArray[i] = new Gene[subsequences[i].length];

@@ -273,11 +273,15 @@ public class CogFileReader implements GeckoDataReader {
         }
 
         this.geneLabelMap = new HashMap<>();
+        int numberOfUnHomologueGenes = 0;
+        this.geneLabelMap.put(0, new ExternalGeneId("0", numberOfUnHomologueGenes));
 
         for (int j = 1; j < stringIdList.size() + 1; j++) {
             String extId = stringIdList.get(j - 1);
             if (!isUnhomologe(extId))
-                this.geneLabelMap.put(j, new ExternalGeneId(stringIdList.get(j - 1), backMap.get(stringIdList.get(j - 1)).unknown));
+                this.geneLabelMap.put(j, new ExternalGeneId(stringIdList.get(j - 1), backMap.get(stringIdList.get(j - 1)).size));
+            else
+                this.geneLabelMap.put(0, new ExternalGeneId("0", ++numberOfUnHomologueGenes));
         }
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()];
@@ -343,7 +347,7 @@ public class CogFileReader implements GeckoDataReader {
             }
 
             if (!isUnhomologe(singleId) && backMap.containsKey(singleId)) {
-                backMap.get(singleId).unknown = false;
+                backMap.get(singleId).size++;;
                 if (explode.length > 5)
                     genes.add(new Gene(explode[5], explode[3], sign * backMap.get(singleId).id, explode[4]));
                 else
@@ -469,11 +473,11 @@ public class CogFileReader implements GeckoDataReader {
 
     private static class IntId{
         int id;
-        boolean unknown;
+        int size;
 
         IntId(int id) {
             this.id = Math.abs(id);
-            this.unknown = true;
+            this.size = 1;
         }
     }
 }

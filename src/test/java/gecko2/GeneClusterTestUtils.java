@@ -199,7 +199,7 @@ public class GeneClusterTestUtils {
         int genomes[][][] = readGenomes(reader, input);
 		
 		Parameter p = gcr.getParameterSet();
-		p.setAlphabetSize(reader.getGeneLabelMap().size());
+		p.setAlphabetSize(reader.getGeneLabelMap().size() - 1 + reader.getGeneLabelMap().get(0).getFamilySize());
 		
 		GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(genomes, p, genomeGroups);
 		
