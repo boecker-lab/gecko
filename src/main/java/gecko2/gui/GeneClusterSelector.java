@@ -497,7 +497,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 						ArrayList<String> knownGenes = new ArrayList<String>();
 					
 						for (int g : genes)	{
-							if (! (Gene.getGeneLabelMap().get(g).getId().equals("0") && Gene.getGeneLabelMap().get(g).getId().equals("") && Gene.getGeneLabelMap().get(g).getId() == null)) {
+							if (!Gene.getGeneLabelMap().get(g).getId().equals(Gene.UNKNOWN_GENE_ID)) {
 								knownGenes.add(Gene.getGeneLabelMap().get(g).getId());
 							}
 						}

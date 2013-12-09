@@ -117,6 +117,8 @@ public class CogFileReader implements GeckoDataReader {
 			int newID = Integer.parseInt(id);
 			return Integer.toString(newID);
 		} catch (NumberFormatException e) {}
+        if (id.equals(""))
+            return Gene.UNKNOWN_GENE_ID;
 		
 		return id;
 	}
@@ -274,15 +276,15 @@ public class CogFileReader implements GeckoDataReader {
 
         this.geneLabelMap = new HashMap<>();
         int numberOfUnHomologueGenes = 0;
-        this.geneLabelMap.put(0, new ExternalGeneId("0", numberOfUnHomologueGenes));
 
         for (int j = 1; j < stringIdList.size() + 1; j++) {
             String extId = stringIdList.get(j - 1);
-            if (!isUnhomologe(extId))
+            if (!isUnHomologe(extId))
                 this.geneLabelMap.put(j, new ExternalGeneId(stringIdList.get(j - 1), backMap.get(stringIdList.get(j - 1)).size));
             else
-                this.geneLabelMap.put(0, new ExternalGeneId("0", ++numberOfUnHomologueGenes));
+                numberOfUnHomologueGenes++;
         }
+        this.geneLabelMap.put(0, new ExternalGeneId(Gene.UNKNOWN_GENE_ID, numberOfUnHomologueGenes));
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()];
 
@@ -346,8 +348,8 @@ public class CogFileReader implements GeckoDataReader {
                     maxNameLength = explode[3].length();
             }
 
-            if (!isUnhomologe(singleId) && backMap.containsKey(singleId)) {
-                backMap.get(singleId).size++;;
+            if (!isUnHomologe(singleId) && backMap.containsKey(singleId)) {
+                backMap.get(singleId).size++;
                 if (explode.length > 5)
                     genes.add(new Gene(explode[5], explode[3], sign * backMap.get(singleId).id, explode[4]));
                 else
@@ -362,15 +364,15 @@ public class CogFileReader implements GeckoDataReader {
                 else
                     gene = new Gene(explode[3], sign * intID, explode[4]);
                 genes.add(gene);
-                if (!isUnhomologe(singleId)) {
+                if (!isUnHomologe(singleId)) {
                     backMap.put(singleId, new IntId(gene.getId()));
                 }
             }
         }
     }
 
-	private boolean isUnhomologe(String id) {
-		return (id == null || id.equals("0") || id.equals(""));
+	private boolean isUnHomologe(String id) {
+		return id.equals(Gene.UNKNOWN_GENE_ID);
 	}
 
     /**

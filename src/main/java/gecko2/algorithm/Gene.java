@@ -8,16 +8,17 @@ import java.util.Random;
 import java.util.Set;
 
 public class Gene implements Serializable {
-	
 	private static final long serialVersionUID = 7903694077854093398L;
+
+    public static final String UNKNOWN_GENE_ID = "0";
+
+    private static Map<Integer, ExternalGeneId> geneLabelMap;
+    private static Map<Integer, Color> colorMap;
+
 	private final String name;
 	private final String tag;
 	private final int id;
 	private final String annotation;
-
-    private static Map<Integer, ExternalGeneId> geneLabelMap;
-    private static Map<Integer, Color> colorMap;
-    private static int alphabetSize;
 
 	public Gene(String name, int id) {
 		this(name, name, id, null);
@@ -70,7 +71,7 @@ public class Gene implements Serializable {
 
     public static String getExternalId(int id) {
         ExternalGeneId externalGeneId = Gene.geneLabelMap.get(Math.abs(id));
-        return externalGeneId == null ? "0" : externalGeneId.getId();
+        return externalGeneId == null ? Gene.UNKNOWN_GENE_ID : externalGeneId.getId();
     }
 	
 	public String getName() {
@@ -119,11 +120,13 @@ public class Gene implements Serializable {
     }
 
     public static boolean isSingleGeneFamily(int geneId) {
-        return geneLabelMap.get(geneId).isSingleGeneFamily();
+        ExternalGeneId eId = geneLabelMap.get(geneId);
+        return eId != null ? eId.isSingleGeneFamily() : true;
     }
 
     private static int getFamilySize(int geneId) {
-        return geneLabelMap.get(geneId).getFamilySize();
+        ExternalGeneId eId = geneLabelMap.get(geneId);
+        return eId != null ? eId.getFamilySize() : 1;
     }
 
     public static Set<Integer> getIntegerAlphabet() {
