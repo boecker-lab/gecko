@@ -515,9 +515,9 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         GeckoInstance instance = GeckoInstance.getInstance();
 
         Subsequence[][] subsequences = gOcc.getSubsequences();
-        HashMap<Integer, Gene[]> map = new HashMap<Integer, Gene[]>();
+        HashMap<Integer, Gene[]> map = new HashMap<>();
         for (int gene : genes) {
-            if (Gene.getGeneLabelMap().get(gene) != null)
+            if (!Gene.isUnknownGene(gene))
                 map.put(gene, new Gene[subsequences.length]);
         }
         for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
@@ -550,9 +550,9 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
     public Map<Integer, Gene[][]> generateAnnotations(GeneClusterOccurrence gOcc) {
         GeckoInstance instance = GeckoInstance.getInstance();
         Subsequence[][] subsequences = gOcc.getSubsequences();
-        HashMap<Integer, Gene[][]> map = new HashMap<Integer, Gene[][]>();
+        HashMap<Integer, Gene[][]> map = new HashMap<>();
         for (int gene : genes) {
-            if (Gene.getGeneLabelMap().get(gene) != null) {
+            if (!Gene.isUnknownGene(gene)) {
                 Gene[][] geneArray = new Gene[subsequences.length][];
                 for (int i=0; i<subsequences.length; i++)
                     geneArray[i] = new Gene[subsequences[i].length];

@@ -21,14 +21,11 @@ public class Gene implements Serializable {
 	private final String annotation;
 
 	public Gene(String name, int id) {
-		this(name, name, id, null);
+		this(name, id, null);
 	}
 	
 	public Gene(String name, int id, String annotation) {
-		this.name = name;
-		this.tag = name;
-		this.id = id;
-		this.annotation = annotation;
+        this(name, name, id, annotation);
 	}
 	
 	public Gene(String name, String tag, int id, String annotation) {
@@ -67,6 +64,10 @@ public class Gene implements Serializable {
      */
     public String getExternalId(){
         return Gene.getExternalId(id);
+    }
+
+    public Color getGeneColor() {
+        return Gene.getGeneColor(id);
     }
 
     public static String getExternalId(int id) {
@@ -135,12 +136,20 @@ public class Gene implements Serializable {
         colorMap = null;
     }
 
-    public static Map<Integer, ExternalGeneId> getGeneLabelMap() {
-        return geneLabelMap;
+    public static Map<ExternalGeneId, Integer> getInverseGeneLabelMap() {
+        Map<ExternalGeneId, Integer> result = new HashMap<>();
+        for (Map.Entry<Integer, ExternalGeneId> entry : geneLabelMap.entrySet())
+            result.put(entry.getValue(), entry.getKey());
+        return result;
     }
 
     public static int getAlphabetSize() {
         return geneLabelMap.size() - 1 + geneLabelMap.get(0).getFamilySize();
+    }
+
+    public static boolean isUnknownGene(int geneId) {
+        ExternalGeneId eId = geneLabelMap.get(Math.abs(geneId));
+        return eId != null ? eId.getId().equals(Gene.UNKNOWN_GENE_ID) : true;
     }
 
     public static boolean isSingleGeneFamily(int geneId) {
@@ -157,7 +166,7 @@ public class Gene implements Serializable {
         return geneLabelMap.keySet();
     }
 
-    public static Map<Integer, Color> getColorMap() {
+    private static Map<Integer, Color> getColorMap() {
         if (colorMap == null) {
             Random r = new Random();
             colorMap = new HashMap<>();

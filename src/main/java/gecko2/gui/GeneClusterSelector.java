@@ -181,7 +181,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
                 StringBuilder geneIDs = new StringBuilder();
 
                 for (int geneID : gc.getGenes()) {
-                    geneIDs.append(Gene.getGeneLabelMap().keySet().toArray()[geneID]).append(" ");
+                    geneIDs.append(Gene.getIntegerAlphabet().toArray()[geneID]).append(" ");
                 }
 
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(geneIDs.toString()), GeneClusterSelector.this);
@@ -491,22 +491,17 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 				case 4:
 					return matchingClusters.get(rowIndex).getBestCorrectedScore();
 				case 5:
-					if (Gene.getGeneLabelMap() != null) {
-						
-						int[] genes = matchingClusters.get(rowIndex).getGenes();
-						ArrayList<String> knownGenes = new ArrayList<String>();
-					
-						for (int g : genes)	{
-							if (!Gene.getGeneLabelMap().get(g).getId().equals(Gene.UNKNOWN_GENE_ID)) {
-								knownGenes.add(Gene.getGeneLabelMap().get(g).getId());
-							}
-						}
-						
-						return Arrays.toString(knownGenes.toArray(new String[knownGenes.size()]));
-					} 
-					else {
-						return "";
-					}
+
+                    int[] genes = matchingClusters.get(rowIndex).getGenes();
+                    ArrayList<String> knownGenes = new ArrayList<>();
+
+                    for (int g : genes)	{
+                        if (!Gene.isUnknownGene(g)) {
+                            knownGenes.add(Gene.getExternalId(g));
+                        }
+                    }
+
+                    return Arrays.toString(knownGenes.toArray(new String[knownGenes.size()]));
 
 				default:
 					return null;

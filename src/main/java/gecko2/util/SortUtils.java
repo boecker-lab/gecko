@@ -1,6 +1,5 @@
 package gecko2.util;
 
-import gecko2.algorithm.ExternalGeneId;
 import gecko2.io.GenomeOccurrence;
 
 import java.io.Serializable;
@@ -16,14 +15,7 @@ public class SortUtils {
 	public static void resortGenomeOccurencesByStart(List<GenomeOccurrence> occs) {
 		Collections.sort(occs, new GenomeOccurenceStartComparator());
 	}
-	
-	public static Map<ExternalGeneId, Integer> invertIntArray(Map<Integer, ExternalGeneId> orig) {
-		Map<ExternalGeneId, Integer> result = new HashMap<>();
-		for (int i = 0; i < orig.size() ; i++)
-			result.put(orig.get(i), i);
-		return result;		
-	}
-	
+
 }
 
 class GenomeOccurenceComparator implements Comparator<GenomeOccurrence>, Serializable {
