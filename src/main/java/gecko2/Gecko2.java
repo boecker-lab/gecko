@@ -98,9 +98,7 @@ public class Gecko2 {
             }
             try {
                 reader.readData();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
+            } catch (IOException | ParseException e) {
                 e.printStackTrace();
             }
         }

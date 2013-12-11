@@ -53,8 +53,28 @@ public class Chromosome implements Serializable {
 	public List<Gene> getGenes() {
 		return genes;
 	}
-	
-	public int[] toIntArray(boolean addZeros, boolean abs) {
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Chromosome that = (Chromosome) o;
+
+        if (!genes.equals(that.genes)) return false;
+        if (!name.equals(that.name)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + genes.hashCode();
+        return result;
+    }
+
+    public int[] toIntArray(boolean addZeros, boolean abs) {
 		int array[];
 		if (!addZeros) {
 			array = new int[genes.size()];

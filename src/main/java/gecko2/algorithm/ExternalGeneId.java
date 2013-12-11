@@ -19,6 +19,15 @@ public class ExternalGeneId {
     }
 
     /**
+     * An ExternalGeneId for Genes without homology information
+     * @param numberOfUnknownGenes
+     * @return
+     */
+    public static ExternalGeneId getUnknownGeneID(int numberOfUnknownGenes) {
+        return new ExternalGeneId(Gene.UNKNOWN_GENE_ID, numberOfUnknownGenes);
+    }
+
+    /**
      *
      * @return the String id
      */
@@ -31,6 +40,8 @@ public class ExternalGeneId {
      * @return true if the gene family contains only one gene
      */
     public boolean isSingleGeneFamily() {
+        if (id.equals(Gene.UNKNOWN_GENE_ID))
+            return true;
         return 1 == familySize;
     }
 

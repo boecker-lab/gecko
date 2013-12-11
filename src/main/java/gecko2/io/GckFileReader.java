@@ -123,7 +123,7 @@ public class GckFileReader implements GeckoDataReader {
             if (!line.startsWith(SessionWriter.CLUSTER_SECTION_START))
                 throw new ParseException("Malformed cluster section start: " + line, 0);
             readClusterData(reader);
-        }catch (IOException | ParseException e) {
+        } catch (IOException | ParseException e) {
             handleFailedSessionLoad();
             throw e;
         }
@@ -176,7 +176,7 @@ public class GckFileReader implements GeckoDataReader {
             else {
                 String[] split = line.split(SessionWriter.SEPERATOR);
                 Gene newGene = new Gene(split[4], split[2], Integer.parseInt(split[0]), split[3]);
-                maxIdLength = Math.max(maxIdLength, (split[0].startsWith("-") ? split[0].length()-1 : split[0].length()));
+                maxIdLength = Math.max(maxIdLength, (split[1].length()));
                 maxLocusTagLength = Math.max(maxLocusTagLength, newGene.getTag().length());
                 maxNameLength = Math.max(maxNameLength, newGene.getName().length());
 
@@ -184,9 +184,9 @@ public class GckFileReader implements GeckoDataReader {
                 if (newLabel.equals(Gene.UNKNOWN_GENE_ID)) {
                     numberOfUnHomologueGenes++;
                 } else {
-                    ExternalGeneId eId = geneLabelMap.get(newGene.getId());
+                    ExternalGeneId eId = geneLabelMap.get(Math.abs(newGene.getId()));
                     if (eId == null)
-                        geneLabelMap.put(newGene.getId(), new ExternalGeneId(newLabel, Integer.parseInt(split[5])));
+                        geneLabelMap.put(Math.abs(newGene.getId()), new ExternalGeneId(newLabel, Integer.parseInt(split[5])));
                     else if (eId.equals(newLabel))
                         throw new ParseException(String.format("Conflicting gene labels %s and %s!", newLabel, eId), 0);
                 }
@@ -263,7 +263,7 @@ public class GckFileReader implements GeckoDataReader {
             String[] genes = line.substring(1, line.length()-1).split(",");
             this.genes = new int[genes.length];
             for (int i=0; i<genes.length; i++)
-                this.genes[i] = Integer.parseInt(genes[i]);
+                this.genes[i] = Integer.parseInt(genes[i].trim());
         }
 
         GeneCluster build() throws ParseException{
@@ -280,6 +280,7 @@ public class GckFileReader implements GeckoDataReader {
                 bestOccList = new ArrayList<>();
             }
             allOccList.add(occ);
+            bestOccList.add(occ.getBestOccurrence());
         }
     }
 
@@ -320,15 +321,11 @@ public class GckFileReader implements GeckoDataReader {
         Subsequence[][] subsequences = new Subsequence[genomes.length][];
 
         int listIndex = 0;
-        for (int i=0; i<subsequences.length; i++){
-            if (numberOfSubseq[i] == 0)
-                subsequences[i] = null;
-            else {
-                subsequences[i] = new Subsequence[numberOfSubseq[i]];
-                for (int j=0; j<subsequences[i].length; j++){
-                    subsequences[i][j] = subsequenceList.get(listIndex);
-                    listIndex++;
-                }
+        for (int i=0; i<subsequences.length; i++) {
+            subsequences[i] = new Subsequence[numberOfSubseq[i]];
+            for (int j=0; j<subsequences[i].length; j++) {
+                subsequences[i][j] = subsequenceList.get(listIndex);
+                listIndex++;
             }
         }
         return new GeneClusterOccurrence(id, subsequences, pValue, totalDist, support);

@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class Gui {
 	
@@ -488,6 +489,11 @@ public class Gui {
 
                                 @Override
                                 public void done() {
+                                    try {
+                                        get();
+                                    } catch (InterruptedException | ExecutionException e) {
+                                        e.printStackTrace();
+                                    }
                                     GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
                                 }
                             };

@@ -106,6 +106,30 @@ public class Gene implements Serializable {
 		return "["+id+","+name+","+annotation+"]";
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Gene gene = (Gene) o;
+
+        if (id != gene.id) return false;
+        if (!annotation.equals(gene.annotation)) return false;
+        if (!name.equals(gene.name)) return false;
+        if (!tag.equals(gene.tag)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + tag.hashCode();
+        result = 31 * result + id;
+        result = 31 * result + annotation.hashCode();
+        return result;
+    }
+
     public static void setGeneLabelMap(Map<Integer, ExternalGeneId> geneLabelMap) {
         Gene.geneLabelMap = geneLabelMap;
         colorMap = null;
@@ -120,12 +144,12 @@ public class Gene implements Serializable {
     }
 
     public static boolean isSingleGeneFamily(int geneId) {
-        ExternalGeneId eId = geneLabelMap.get(geneId);
+        ExternalGeneId eId = geneLabelMap.get(Math.abs(geneId));
         return eId != null ? eId.isSingleGeneFamily() : true;
     }
 
     private static int getFamilySize(int geneId) {
-        ExternalGeneId eId = geneLabelMap.get(geneId);
+        ExternalGeneId eId = geneLabelMap.get(Math.abs(geneId));
         return eId != null ? eId.getFamilySize() : 1;
     }
 

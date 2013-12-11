@@ -27,7 +27,7 @@ public class CogFileReaderTest {
 	 * Simple test for file with two genomes which contain two genes.
 	 */
 	@Test
-	public void readFileContentTest() {
+	public void readFileContentTest() throws  IOException, ParseException {
 		// define the result we want to get
 		
 		// using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later 
@@ -40,6 +40,7 @@ public class CogFileReaderTest {
 		int geneID3 = 3;
 		int geneID4 = 4;
 
+        geneLabelMap.put(0, ExternalGeneId.getUnknownGeneID(0));
 		geneLabelMap.put(1, new ExternalGeneId("25", 1));
 		geneLabelMap.put(2, new ExternalGeneId("21", 1));
 		geneLabelMap.put(3, new ExternalGeneId("7", 1));
@@ -66,20 +67,14 @@ public class CogFileReaderTest {
         File inputFile = new File(getClass().getResource("/c2.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
-        try {
-            reader = new CogFileReader(inputFile);
 			
-			reader.readData();
-		}
-		catch (IOException | ParseException e) {
-			e.printStackTrace();
-		}
+        reader.readData();
 
         testReader(reader, geneLabelMap, refGenomes);
 	}
 	
 	@Test
-	public void readFileContentTest2() {
+	public void readFileContentTest2() throws  IOException, ParseException {
 		// define the result we want to get
 		
 		// using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later 
@@ -103,6 +98,7 @@ public class CogFileReaderTest {
 		int geneID12 = 12;
 
 		// setup genelabelmap
+        geneLabelMap.put(0, ExternalGeneId.getUnknownGeneID(0));
 		geneLabelMap.put(1, new ExternalGeneId("1", 8));
 		geneLabelMap.put(2, new ExternalGeneId("2", 3));
 		geneLabelMap.put(3, new ExternalGeneId("3", 6));
@@ -261,13 +257,8 @@ public class CogFileReaderTest {
         File inputFile = new File(getClass().getResource("/c.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
-		
-		try {
-			reader.readData();
-		}
-		catch (IOException | ParseException e) {
-			e.printStackTrace();
-		} 
+
+        reader.readData();
 
         testReader(reader, geneLabelMap, refGenomes);
 	}
@@ -276,7 +267,7 @@ public class CogFileReaderTest {
      * Simple test for file with two genomes which contain one gene, with two ids.
      */
     @Test
-    public void readFileContentMultiIdTest() {
+    public void readFileContentMultiIdTest() throws  IOException, ParseException {
         // define the result we want to get
 
         // using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later
@@ -289,6 +280,7 @@ public class CogFileReaderTest {
         int geneID3 = 3;
         int geneID4 = 4;
 
+        geneLabelMap.put(0, ExternalGeneId.getUnknownGeneID(0));
         geneLabelMap.put(1, new ExternalGeneId("25", 1));
         geneLabelMap.put(2, new ExternalGeneId("21", 1));
         geneLabelMap.put(3, new ExternalGeneId("7", 1));
@@ -315,27 +307,19 @@ public class CogFileReaderTest {
         File inputFile = new File(getClass().getResource("/multiIdGenes.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
-        try {
-            reader.readData();
-        }
-        catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+
+        reader.readData();
 
         testReader(reader, geneLabelMap, refGenomes);
     }
 
     @Test
-    public void readUnHomologueGenesTest() {
+    public void readUnHomologueGenesTest() throws  IOException, ParseException {
         File inputFile = new File(getClass().getResource("/unHomologueGenes.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
-        try {
-            reader.readData();
-        }
-        catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+
+        reader.readData();
 
         assertEquals(reader.getGenomes().length, 2);
         assertEquals(reader.getGenomes()[0].getChromosomes().size(), 1);
@@ -345,7 +329,7 @@ public class CogFileReaderTest {
         assertEquals(reader.getGenomes()[1].getChromosomes().get(0).getGenes().size(), 3);
 
         Map<Integer, ExternalGeneId> geneLabelMap = reader.getGeneLabelMap();
-        assertEquals(geneLabelMap.size(), 5);
+        assertEquals(geneLabelMap.size(), 6);
         for (ExternalGeneId entry : geneLabelMap.values()) {
             if (entry.getId().equals("1"))
                 assertTrue(entry.isSingleGeneFamily());
@@ -357,6 +341,10 @@ public class CogFileReaderTest {
                 assertFalse(entry.isSingleGeneFamily());
             else if (entry.getId().equals("gF2"))
                 assertFalse(entry.isSingleGeneFamily());
+            else if (entry.getId().equals(Gene.UNKNOWN_GENE_ID)) {
+                assertEquals(entry.getFamilySize(), 5);
+                assertTrue(entry.isSingleGeneFamily());
+            }
             else
                 fail("unexpected map entry: " + entry.toString());
         }
