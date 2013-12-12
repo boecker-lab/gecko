@@ -367,6 +367,7 @@ public class CogFileReader implements GeckoDataReader {
                 if (!isUnHomologe(singleId)) {
                     backMap.put(singleId, new IntId(gene.getId()));
                 }
+            }
         }
     }
 
