@@ -16,11 +16,6 @@ import java.util.*;
  *
  */
 public class GeneCluster implements Serializable, Comparable<GeneCluster> {
-	
-	public final static char TYPE_MEDIAN = 'm';
-	public final static char TYPE_CENTER = 'c';
-	public final static char TYPE_REFERENCE = 'r';
-
 	private static final long serialVersionUID = -5371037483783752995L;
 
 	private int id;
@@ -32,7 +27,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	private int minTotalDist;
 	private final GeneClusterOccurrence[] bestOccurrences;
 	private final GeneClusterOccurrence[] allOccurrences;
-	private final char type;
+	private final Parameter.OperationMode type;
 	// The index of the subsequence containing the reference genecluster
 	private final int refSeqIndex;
 	
@@ -48,7 +43,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 			int refSeqIndex,
 			char type) 
 	{
-		this(id, bestOccurrences, allOccurrences, genes, (new BigDecimal(bestPValueBase)).scaleByPowerOfTen(bestPValueExp), (new BigDecimal(bestPValueCorrectedBase)).scaleByPowerOfTen(bestPValueCorrectedExp), minTotalDist, refSeqIndex, type);		
+		this(id, bestOccurrences, allOccurrences, genes, (new BigDecimal(bestPValueBase)).scaleByPowerOfTen(bestPValueExp), (new BigDecimal(bestPValueCorrectedBase)).scaleByPowerOfTen(bestPValueCorrectedExp), minTotalDist, refSeqIndex, Parameter.OperationMode.getOperationModeFromChar(type));
 	}
 		
 	public GeneCluster(int id, 
@@ -59,7 +54,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 			BigDecimal bestPValueCorrected,
 			int minTotalDist, 
 			int refSeqIndex,
-			char type) 
+			Parameter.OperationMode type)
 	{
 		match=true;
 		//TODO check if this right
@@ -86,7 +81,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		this.bestPValue = refCluster.getBestCombined_pValue();
 		this.bestPValueCorrected = refCluster.getBestCombined_pValueCorrected();
 		this.refSeqIndex = refCluster.getGenomeNr();
-		this.type = TYPE_REFERENCE;
+		this.type = Parameter.OperationMode.reference;
 		this.genes = new int[refCluster.getGeneContent().size()];
 		for (int i=0; i<refCluster.getGeneContent().size(); i++)
 			genes[i] = refCluster.getGeneContent().get(i);
@@ -122,7 +117,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		this.allOccurrences[0] = new GeneClusterOccurrence(0, allSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
 	}
 	
-	public char getType() {
+	public Parameter.OperationMode getType() {
 		return type;
 	}
 	
@@ -133,6 +128,10 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	public BigDecimal getBestPValue() {
 		return bestPValue;
 	}
+
+    public BigDecimal getBestPValueCorrected() {
+        return bestPValueCorrected;
+    }
 	
 	public double getBestScore() {
 		return -getBigDecimalLog(bestPValue);
@@ -158,10 +157,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		}
 		log += Math.log10(base);
 		return log;
-	}
-	
-	public BigDecimal getBestPValueCorrected() {
-		return bestPValueCorrected;
 	}
 	
 	public int getMinTotalDist() {
@@ -520,9 +515,9 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         GeckoInstance instance = GeckoInstance.getInstance();
 
         Subsequence[][] subsequences = gOcc.getSubsequences();
-        HashMap<Integer, Gene[]> map = new HashMap<Integer, Gene[]>();
+        HashMap<Integer, Gene[]> map = new HashMap<>();
         for (int gene : genes) {
-            if (instance.getGenLabelMap().get(gene) != null)
+            if (!Gene.isUnknownGene(gene))
                 map.put(gene, new Gene[subsequences.length]);
         }
         for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
@@ -555,9 +550,9 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
     public Map<Integer, Gene[][]> generateAnnotations(GeneClusterOccurrence gOcc) {
         GeckoInstance instance = GeckoInstance.getInstance();
         Subsequence[][] subsequences = gOcc.getSubsequences();
-        HashMap<Integer, Gene[][]> map = new HashMap<Integer, Gene[][]>();
+        HashMap<Integer, Gene[][]> map = new HashMap<>();
         for (int gene : genes) {
-            if (instance.getGenLabelMap().get(gene) != null) {
+            if (!Gene.isUnknownGene(gene)) {
                 Gene[][] geneArray = new Gene[subsequences.length][];
                 for (int i=0; i<subsequences.length; i++)
                     geneArray[i] = new Gene[subsequences[i].length];

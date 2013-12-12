@@ -1,5 +1,6 @@
 package gecko2.io;
 
+import gecko2.algorithm.ExternalGeneId;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 
@@ -18,14 +19,7 @@ public interface GeckoDataReader {
      *
      * @return the geneLabelMap (HashMap)
      */
-    public Map<Integer, String[]> getGeneLabelMap();
-
-    /**
-     * Getter for the colorMap.
-     *
-     * @return the colorMap of the input file
-     */
-    public Map<Integer, Color> getColorMap();
+    public Map<Integer, ExternalGeneId> getGeneLabelMap();
 
     /**
      * @return the genomes from the input file.

@@ -492,7 +492,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	
 	private void visualizeCluster(GeneCluster gc, GeneClusterOccurrence gOcc, int[] subselection) {
 		clearHighlight();
-		if (gc.getType()==GeneCluster.TYPE_REFERENCE)
+		if (gc.getType()== Parameter.OperationMode.reference)
 			rightPanel.setVisible(true);
 		else
 			rightPanel.setVisible(false);

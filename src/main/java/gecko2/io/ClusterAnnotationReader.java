@@ -1,9 +1,6 @@
 package gecko2.io;
 
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.Genome;
-import gecko2.algorithm.Subsequence;
+import gecko2.algorithm.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -114,7 +111,7 @@ public class ClusterAnnotationReader {
 		if (m.matches()) {
 			BigDecimal pValue = new BigDecimal(m.group(1));
 			int refSeq = Integer.parseInt(m.group(2));
-			return new GeneCluster(clusterId++, null, null, null, pValue, pValue, -1, refSeq-1, 'r');
+			return new GeneCluster(clusterId++, null, null, null, pValue, pValue, -1, refSeq-1, Parameter.OperationMode.reference);
 		} else
 			return null;
 	}

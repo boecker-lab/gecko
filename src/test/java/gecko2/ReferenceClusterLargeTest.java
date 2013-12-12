@@ -26,7 +26,7 @@ public class ReferenceClusterLargeTest {
 	
 	@Test
 	public void statisticDataReferenceClusterTest() throws IOException, DataFormatException, ParseException {
-		File inputFile = new File(getClass().getResource("/statisticsData.cog").getFile());
+		File inputFile = new File(getClass().getResource("/statistics.cog").getFile());
 		File resultFile = new File(getClass().getResource("/statisticsDataD5S8Q10FixedRef.txt").getFile());
 		
 		automaticGeneClusterTestFromFile(inputFile, resultFile);

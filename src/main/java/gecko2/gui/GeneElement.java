@@ -84,7 +84,7 @@ public class GeneElement extends JPanel implements Adjustable {
 	}
 	
 	private void updateElement() {
-		this.geneColor = gecko.getColormap().get(Math.abs(this.gene.getId()));
+		this.geneColor = gene.getGeneColor();
 		// Update Orientation
 		if (gene.getId()<0)
 			this.orientation = ORIENTATION_BACKWARDS;
@@ -185,7 +185,7 @@ public class GeneElement extends JPanel implements Adjustable {
 			g.setFont(new Font("Monospaced", Font.PLAIN, Math.round((float) ELEMHIGHT - ((float) ELEMHIGHT / 2.4F))));
 			
 			/* Draw only the first index of the mapped String array */
-			String geneId = gecko.getGenLabelMap().get(Math.abs(gene.getId()))[0];
+			String geneId = gene.getExternalId();
 			int fontY_Position = ELEMHIGHT / 2 + Y_OFFSET + (g.getFont().getSize() / 2);
 			
 			if (geneId.length() < gecko.getMaxLength(GenomePainting.NameType.ID))

@@ -1,0 +1,16 @@
+Shorty 1
+1 proteins
+0000, 0000	+	J	fusA	not homologue
+0000	-	O	smb 	not homologue
+	-	O	smb 	not homologue
+0001	+	S	----	not homologue
+gF1	+	S	----	not homologue
+0004	+	S	----	homologue to S2 g1
+0005	+	S	----	homologue to next gene
+0005	+	S	----	homologue to prev gene
+gF2	+	S	----	homologue to S2 g2
+
+Shorty 2
+1 proteins
+0000, 0004	+	J	fusB	????
+gF2	+	S	----	homologue

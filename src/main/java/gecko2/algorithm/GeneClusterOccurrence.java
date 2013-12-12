@@ -2,6 +2,8 @@ package gecko2.algorithm;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -45,6 +47,29 @@ public class GeneClusterOccurrence implements Serializable {
 		this.dist = totalDist;
 		this.support = support;
 	}
+
+    /**
+     * Generates a new gene cluster occurrence, that only contains the best occurrences on each genome
+     * @return a new gene cluster occurrence, that only contains the best occurrences on each genome
+     */
+    public GeneClusterOccurrence getBestOccurrence() {
+        Subsequence[][] subs = new Subsequence[subsequences.length][];
+        for (int i=0; i< subs.length; i++) {
+            int minDist = Integer.MAX_VALUE;
+            List<Subsequence> subList = new ArrayList<>(subsequences[i].length);
+            for (int j=0; j<subsequences[i].length; j++){
+                if (subsequences[i][j].getDist() < minDist) {
+                    minDist = subsequences[i][j].getDist();
+                    subList.clear();
+                    subList.add(subsequences[i][j]);
+                } else if (subsequences[i][j].getDist() == minDist)
+                    subList.add(subsequences[i][j]);
+            }
+            subs[i] = subList.toArray(new Subsequence[subList.size()]);
+        }
+
+        return new GeneClusterOccurrence(id, subs, pValue, dist, support);
+    }
 	
 	/**
 	 * Returns the number of genomes that support this occurrence

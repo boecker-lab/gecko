@@ -80,7 +80,7 @@ public class ReferenceClusterAlgorithm {
 		} else {
 			nrOfGenomeGroups = genomeGrouping.size();
 			useGenomeGrouping = nrOfGenomeGroups != genomes.size();
-			genomeGroupMapping = new HashMap<Integer, Integer>();
+			genomeGroupMapping = new HashMap<>();
 			for (int groupId=0; groupId<genomeGrouping.size(); groupId++){
 				for (Integer genomeNr: genomeGrouping.get(groupId))
 					genomeGroupMapping.put(genomeNr, groupId);

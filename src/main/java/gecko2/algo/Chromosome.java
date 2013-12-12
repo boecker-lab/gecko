@@ -107,7 +107,7 @@ class Chromosome {
     }
 
     private int[][] computePOS(int alphabetSize) {
-        List<LinkedList<Integer> > tmp = new ArrayList<LinkedList<Integer> >(alphabetSize+1);
+        List<LinkedList<Integer> > tmp = new ArrayList<>(alphabetSize+1);
         for (int i=0; i<=alphabetSize; i++) {
             tmp.add(null);
         }
