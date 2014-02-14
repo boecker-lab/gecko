@@ -14,21 +14,27 @@ import java.util.zip.DataFormatException;
 import static gecko2.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
 
 public class ReferenceClusterLargeTest {
-	/**
-	 * The method adds libgecko2 to the library path.
-	 * 
-	 */
-	@BeforeClass
-	public static void loadLibGecko2()
-	{
-        GeneClusterTestUtils.loadLibGecko2();
-	}
+    private static boolean libGeckoLoaded = false;
+    /**
+     * The method adds libgecko2 to the library path.
+     *
+     */
+    @BeforeClass
+    public static void loadLibGecko2()
+    {
+        try {
+            LibraryUtils.loadLibrary("libgecko2");
+            libGeckoLoaded = true;
+        } catch (PlatformNotSupportedException | IOException e) {
+            libGeckoLoaded = false;
+        }
+    }
 	
 	@Test
 	public void statisticDataReferenceClusterTest() throws IOException, DataFormatException, ParseException {
 		File inputFile = new File(getClass().getResource("/statistics.cog").getFile());
 		File resultFile = new File(getClass().getResource("/statisticsDataD5S8Q10FixedRef.txt").getFile());
 		
-		automaticGeneClusterTestFromFile(inputFile, resultFile);
+		automaticGeneClusterTestFromFile(inputFile, resultFile, libGeckoLoaded);
 	}
 }

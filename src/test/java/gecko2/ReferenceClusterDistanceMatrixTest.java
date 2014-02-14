@@ -305,6 +305,6 @@ public class ReferenceClusterDistanceMatrixTest {
 		File inputFile = new File(getClass().getResource("/fiveProteobacter.cog").getFile());
 		File resultFile = new File(getClass().getResource("/fiveProteobacterDeltaTable.txt").getFile());
 		
-		automaticGeneClusterTestFromFile(inputFile, resultFile);
+		automaticGeneClusterTestFromFile(inputFile, resultFile, false);
 	}
 }

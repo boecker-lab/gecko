@@ -187,11 +187,11 @@ public class GeneClusterTestUtils {
 		}
 	}
 	
-	static void automaticGeneClusterTestFromFile(File input, File expected) throws IOException, DataFormatException, ParseException {
-		automaticGeneClusterTestFromFile(input, expected, null);
+	static void automaticGeneClusterTestFromFile(File input, File expected, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
+		automaticGeneClusterTestFromFile(input, expected, null, libGeckoLoaded);
 	}
 	
-	static void automaticGeneClusterTestFromFile(File input, File expected, List<Set<Integer>> genomeGroups) throws IOException, DataFormatException, ParseException {
+	static void automaticGeneClusterTestFromFile(File input, File expected, List<Set<Integer>> genomeGroups, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
 		GeneClusterResult gcr = GeneClusterResult.readResultFile(expected);
 
 
@@ -205,7 +205,7 @@ public class GeneClusterTestUtils {
 		
 		performTest(gcr.getCompResult(), javaRes, PValueComparison.COMPARE_ALL);
 		
-		if (p.getDelta() >= 0 && genomeGroups == null){
+		if (libGeckoLoaded && p.getDelta() >= 0 && genomeGroups == null){
 			GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);	
 		
 			// Test the java implementation
@@ -318,11 +318,8 @@ public class GeneClusterTestUtils {
 			}
 			
 			generateRefClusterFile(inCogFile, outFile, p, genomeGroups);
-		} catch (IOException e) {
+		} catch (IOException | ParseException e) {
 			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}	
-
+		}
 	}
 }

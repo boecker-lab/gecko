@@ -65,10 +65,7 @@ public class Gecko2 {
         try {
             LibraryUtils.loadLibrary("libgecko2");
             libgeckoLoaded = true;
-        } catch (PlatformNotSupportedException e) {
-            e.printStackTrace();
-            System.err.println("Not able to load c library! Using Java only version");
-        } catch (IOException e) {
+        } catch (PlatformNotSupportedException | IOException e) {
             e.printStackTrace();
             System.err.println("Not able to load c library! Using Java only version");
         }
