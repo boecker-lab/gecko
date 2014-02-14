@@ -2,6 +2,7 @@ package gecko2.gui;
 
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
+import gecko2.algorithm.Parameter;
 import gecko2.event.ClusterSelectionEvent;
 import gecko2.event.ClusterSelectionListener;
 import gecko2.event.LocationSelectionEvent;
@@ -125,8 +126,8 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 		}
 		// If we are handling median or center gene clusters we
 		// make sure the selector is visible and show the data
-		if (gc.getType()==GeneCluster.TYPE_CENTER ||
-				gc.getType()==GeneCluster.TYPE_MEDIAN) {
+		if (gc.getType()== Parameter.OperationMode.center ||
+				gc.getType()== Parameter.OperationMode.median) {
 			this.selection = gc;
 			model.fireTableDataChanged();
 			if (!isVisible()) {

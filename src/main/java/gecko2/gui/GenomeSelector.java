@@ -1,7 +1,7 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
-import gecko2.GenomeOccurence;
+import gecko2.io.GenomeOccurrence;
 import gecko2.io.CogFileReader;
 import gecko2.util.SortUtils;
 
@@ -20,13 +20,14 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public class GenomeSelector extends JDialog {
 
 	private static final long serialVersionUID = -8491964493540715101L;
     private final CogFileReader reader;
-	private final List<GenomeOccurence> occs;
+	private final List<GenomeOccurrence> occs;
 	private final short[] borders;
 	private int highID =0;
 	private final Random rand;
@@ -52,7 +53,7 @@ public class GenomeSelector extends JDialog {
 		// Create the color map for the initial singleton groups
 		rand = new Random();
         HashMap<Integer, Color> colorMap = new HashMap<Integer, Color>();
-		for (GenomeOccurence occ : occs) {
+		for (GenomeOccurrence occ : occs) {
 			if (!colorMap.containsKey(occ.getGroup()))
 				colorMap.put(occ.getGroup(), getRandomColor());
 			if (occ.getGroup()>highID) highID = occ.getGroup();
@@ -166,6 +167,11 @@ public class GenomeSelector extends JDialog {
 
                     @Override
                     public void done() {
+                        try {
+                            get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        }
                         GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
                     }
                 };
@@ -230,8 +236,8 @@ public class GenomeSelector extends JDialog {
 				while (!touchedGroups.isEmpty()) {
 					int group = touchedGroups.pop();
 					int count = 0;
-					GenomeOccurence last = null;
-					for (GenomeOccurence occ : occs)
+					GenomeOccurrence last = null;
+					for (GenomeOccurrence occ : occs)
 						if (occ.getGroup()==group) {
 							last = occ;
 							count++;
@@ -293,14 +299,14 @@ public class GenomeSelector extends JDialog {
 	}
 	
 	private void checkAll() {
-		for (GenomeOccurence occ : occs)
+		for (GenomeOccurrence occ : occs)
 			occ.setFlagged(true);
 		table.repaint();
 		checkSelectionCount();
 	}
 	
 	private void checkNone() {
-		for (GenomeOccurence occ : occs)
+		for (GenomeOccurrence occ : occs)
 			occ.setFlagged(false);
 		table.repaint();
 		importAction.setEnabled(false);
@@ -308,7 +314,7 @@ public class GenomeSelector extends JDialog {
 	
 	private void checkSelectionCount() {
 		boolean atLeastOneChecked = false;
-		for (GenomeOccurence occ : occs) 
+		for (GenomeOccurrence occ : occs)
 			if (occ.isFlagged()) {
 				atLeastOneChecked = true;
 				break;
@@ -436,7 +442,7 @@ public class GenomeSelector extends JDialog {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 				case 0:
-					return occs.get(rowIndex).getGenomSelectorText();
+					return occs.get(rowIndex).getGenomeSelectorText();
 				case 1:
 					return '\0';
 				default:
@@ -453,7 +459,7 @@ public class GenomeSelector extends JDialog {
 				int group = occs.get(rowIndex).getGroup();
 				if (group==0) occs.get(rowIndex).setFlagged((Boolean) value);
 				else {
-					for (GenomeOccurence occ : occs)
+					for (GenomeOccurrence occ : occs)
 						if (occ.getGroup()==group) occ.setFlagged((Boolean) value);
 					table.tableChanged(new TableModelEvent(this));
 				}

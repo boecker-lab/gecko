@@ -63,8 +63,28 @@ public class Genome implements Serializable {
 		}
 		return geneNumber;
 	}
-	
-	/**
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Genome genome = (Genome) o;
+
+        if (!chromosomes.equals(genome.chromosomes)) return false;
+        if (!name.equals(genome.name)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = chromosomes.hashCode();
+        result = 31 * result + name.hashCode();
+        return result;
+    }
+
+    /**
 	 * Generates an int array from the genomes
 	 * @param genomes the genomes
 	 * @return an int array, containing all the genes

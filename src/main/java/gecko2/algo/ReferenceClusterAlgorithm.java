@@ -31,12 +31,7 @@ public class ReferenceClusterAlgorithm {
 	 * @return the gene clusters
 	 */
 	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
-        for (int[][] genome : genomes)
-            for (int[] chr: genome)
-                System.out.println(Arrays.toString(chr));
-
-
-		if (!param.useJavaAlgorithm()) 
+		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
 		
 		GenomeList data;
@@ -81,7 +76,7 @@ public class ReferenceClusterAlgorithm {
 		} else {
 			nrOfGenomeGroups = genomeGrouping.size();
 			useGenomeGrouping = nrOfGenomeGroups != genomes.size();
-			genomeGroupMapping = new HashMap<Integer, Integer>();
+			genomeGroupMapping = new HashMap<>();
 			for (int groupId=0; groupId<genomeGrouping.size(); groupId++){
 				for (Integer genomeNr: genomeGrouping.get(groupId))
 					genomeGroupMapping.put(genomeNr, groupId);

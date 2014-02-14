@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class Gui {
 	
@@ -462,18 +463,20 @@ public class Gui {
                                 protected Void doInBackground() {
                                     try{
                                         reader.readData();
-                                    } catch (IOException e) {
+                                    } catch (final IOException e) {
                                         EventQueue.invokeLater(new Runnable() {
                                             public void run() {
+                                            e.printStackTrace();
                                             JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
                                                     "An error occured while reading the file!",
                                                     "Error",
                                                     JOptionPane.ERROR_MESSAGE);
                                             }
                                         });
-                                    } catch (ParseException e) {
+                                    } catch (final ParseException e) {
                                         EventQueue.invokeLater(new Runnable() {
                                             public void run() {
+                                                e.printStackTrace();
                                                 JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
                                                     "The input file is not in the right format!",
                                                     "Wrong format",
@@ -486,6 +489,11 @@ public class Gui {
 
                                 @Override
                                 public void done() {
+                                    try {
+                                        get();
+                                    } catch (InterruptedException | ExecutionException e) {
+                                        e.printStackTrace();
+                                    }
                                     GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
                                 }
                             };

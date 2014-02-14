@@ -56,13 +56,13 @@ public class ReferenceClusterDistanceMatrixTest {
 									res[0].getBestPValueCorrected(),
 									1, 
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes2,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									1,
 									1,
-									'r')};
+									Parameter.OperationMode.reference)};
 		
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);	
 	}
@@ -108,13 +108,13 @@ public class ReferenceClusterDistanceMatrixTest {
 									res[0].getBestPValueCorrected(),
 									1, 
 									0,
-									'r'),
+									Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes2,
 									res[1].getBestPValue(),
 									res[1].getBestPValueCorrected(),
 									4,
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 		
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
@@ -158,13 +158,13 @@ public class ReferenceClusterDistanceMatrixTest {
 										res[0].getBestPValueCorrected(),
 										0, 
 										0,
-										'r'),
+										Parameter.OperationMode.reference),
 									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes2,
 											res[1].getBestPValue(),
 											res[1].getBestPValueCorrected(),
 											3,
 											0,
-											'r')};
+											Parameter.OperationMode.reference)};
 		
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
@@ -197,7 +197,7 @@ public class ReferenceClusterDistanceMatrixTest {
 									res[0].getBestPValueCorrected(),
 									1, 
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 		
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
@@ -230,7 +230,7 @@ public class ReferenceClusterDistanceMatrixTest {
 									res[0].getBestPValueCorrected(),
 									1, 
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 		
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
@@ -263,7 +263,7 @@ public class ReferenceClusterDistanceMatrixTest {
 									res[0].getBestPValueCorrected(),
 									2, 
 									0,
-									'r')};
+									Parameter.OperationMode.reference)};
 		
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);		
 	}
@@ -305,6 +305,6 @@ public class ReferenceClusterDistanceMatrixTest {
 		File inputFile = new File(getClass().getResource("/fiveProteobacter.cog").getFile());
 		File resultFile = new File(getClass().getResource("/fiveProteobacterDeltaTable.txt").getFile());
 		
-		automaticGeneClusterTestFromFile(inputFile, resultFile);
+		automaticGeneClusterTestFromFile(inputFile, resultFile, false);
 	}
 }

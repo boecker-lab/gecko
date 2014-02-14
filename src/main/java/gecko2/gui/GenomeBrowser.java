@@ -25,7 +25,7 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 	
 	private static final long serialVersionUID = 7086043901343368118L;
 	private final Genome genome;
-	private ArrayList<GeneElement> genElements[];
+	private List<GeneElement> genElements[];
 	private final JPanel contentPanel;
 	private final GenomeBrowserMouseDrag genomebrowsermousedrag;
 	private final GeckoInstance gecko;
@@ -183,7 +183,7 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 			}
 		} else  {
 			contentPanel.setBackground(Color.WHITE);
-			for (ArrayList<GeneElement> chromo : genElements) {
+			for (List<GeneElement> chromo : genElements) {
 				contentPanel.add(new ChromosomeEnd(contentPanel.getBackground(), ChromosomeEnd.LEFT));
 				for (GeneElement e : chromo) {
 					contentPanel.add(e);
@@ -207,7 +207,7 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 		genElements = new ArrayList[genome.getChromosomes().size()];
 		for (int i=0;i<genome.getChromosomes().size();i++) {
 			MouseListener ml = genome.getChromosomes().get(i).getChromosomeMouseListener();
-			genElements[i] = new ArrayList<GeneElement>();
+			genElements[i] = new ArrayList<>();
 			for (Gene g : this.genome.getChromosomes().get(i).getGenes()) {
 				GeneElement element = new GeneElement(g);
 				if (g.getId()<0) element.setOrientation(GeneElement.ORIENTATION_BACKWARDS);
