@@ -35,7 +35,7 @@ public class ResultExportDialog extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		
 		DefaultFormBuilder contentBuilder = new DefaultFormBuilder(new FormLayout("p, 4dlu, p:g, 4dlu, p"));
-		contentBuilder.setDefaultDialogBorder();
+		contentBuilder.border(Borders.DIALOG);
 		
 		textField = new JTextField();
 		JButton btnBrowse = new JButton("Browse...");
