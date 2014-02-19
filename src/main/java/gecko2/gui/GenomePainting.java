@@ -26,6 +26,18 @@ public class GenomePainting {
         public String toString() {
             return display;
         }
+        public static NameType getNameTypeFromString(String name) {
+            switch (name) {
+                case "ID":
+                    return ID;
+                case "Name":
+                    return NAME;
+                case "locus_tag":
+                    return LOCUS_TAG;
+                default:
+                    throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
+            }
+        }
     }
 
     public enum GeneOrientation {LEFT, RIGHT, NONE;
