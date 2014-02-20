@@ -53,7 +53,8 @@ public class GeckoInstance {
     public static final int DEFAULT_GENE_HIGHT = 20;
     private final static int MAX_GENEELEMENT_HIGHT = 40;
     private final static int MIN_GENEELEMENT_HIGHT = 9;
-	
+
+    private int maxGeneNameLength = Integer.MAX_VALUE;
 	private int maxIdLength;
     private int maxNameLength;
     private int maxLocusTagLength;
@@ -72,6 +73,14 @@ public class GeckoInstance {
         this.maxNameLength = nameLength;
         this.maxLocusTagLength = locusTagLength;
 	}
+
+    /**
+     * Setter for the upper bound of the maximum gene name length.
+     * @param maxGeneNameLength the maximum gene name length.
+     */
+    public void setMaxGeneNameLength(int maxGeneNameLength) {
+        this.maxGeneNameLength = maxGeneNameLength;
+    }
 	
 	/**
 	 * Getter for the variable maxIdLength
@@ -80,13 +89,15 @@ public class GeckoInstance {
 	 */
 	public int getMaxLength(GenomePainting.NameType nameType)
 	{
+        int maxLength;
         switch (nameType) {
-            case ID: return maxIdLength;
-            case NAME: return maxNameLength;
-            case LOCUS_TAG:return maxLocusTagLength;
+            case ID: maxLength = maxIdLength; break;
+            case NAME: maxLength =  maxNameLength; break;
+            case LOCUS_TAG:maxLength =  maxLocusTagLength; break;
             default:
                 return -1;
         }
+        return Math.min(maxLength, maxGeneNameLength);
 	}
 	
 	/*

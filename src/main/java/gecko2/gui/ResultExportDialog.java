@@ -1,6 +1,6 @@
 package gecko2.gui;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.layout.FormLayout;
@@ -35,7 +35,7 @@ public class ResultExportDialog extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		
 		DefaultFormBuilder contentBuilder = new DefaultFormBuilder(new FormLayout("p, 4dlu, p:g, 4dlu, p"));
-		contentBuilder.setDefaultDialogBorder();
+		contentBuilder.border(Borders.DIALOG);
 		
 		textField = new JTextField();
 		JButton btnBrowse = new JButton("Browse...");
@@ -61,7 +61,7 @@ public class ResultExportDialog extends JDialog {
 		contentBuilder.nextLine();
 		contentBuilder.append(new JLabel("Choose Export Type"), exportTypeCompoBox);
 		
-		ButtonBarBuilder2 buttonBuilder = new ButtonBarBuilder2();
+		ButtonBarBuilder buttonBuilder = new ButtonBarBuilder();
 		
 		JButton okButton = new JButton("OK");
 		okButton.setActionCommand("OK");
@@ -94,7 +94,7 @@ public class ResultExportDialog extends JDialog {
 		
 		JPanel contentPanel = contentBuilder.getPanel();
 		JPanel buttonPanel = buttonBuilder.getPanel();
-		buttonPanel.setBorder(Borders.DIALOG_BORDER);
+		buttonPanel.setBorder(Borders.DIALOG);
 		
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);

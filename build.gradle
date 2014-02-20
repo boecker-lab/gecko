@@ -1,0 +1,37 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+version = 2.0
+
+mainClassName = 'gecko2.Gecko2'
+
+jar {
+    manifest {
+        attributes 'Main-Class' : mainClassName
+    }
+}
+
+task uberjar(type: Jar) {
+    from files(sourceSets.main.output.classesDir)
+    from files(sourceSets.main.output.resourcesDir)
+    from {configurations.compile.collect {zipTree(it)}}
+
+    manifest {
+        attributes 'Main-Class' : mainClassName
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'args4j:args4j:2.0.+'
+    compile 'colt:colt:1.2+'
+    compile 'org.apache.commons:commons-math3:3.2'
+    compile 'com.jgoodies:jgoodies-forms:1.7.+'
+    compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.+'
+    compile 'com.itextpdf:itextpdf:5.5.+'
+
+    testCompile 'junit:junit:4.+'
+}
