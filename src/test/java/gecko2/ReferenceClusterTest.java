@@ -126,11 +126,8 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 6, 5, 4, 0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6};
-
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
+		p.setAlphabetSize(3);
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
