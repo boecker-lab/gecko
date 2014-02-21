@@ -6,12 +6,11 @@ import java.io.*;
 import java.util.*;
 
 public class ResultWriter {
-	public enum ExportType {clusterData, table, latexTable, internalDuplications}
+	public enum ExportType {clusterData, table, latexTable, internalDuplications, pdf}
 	
 	public static boolean exportResultsToFileNEW2(File f, List<GeneCluster> clusters, List<String> genomeNames, ExportType type) {
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(f));
-			
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))) {
+
 			Collections.sort(clusters, new Comparator<GeneCluster>() {
 				@Override
 				public int compare(GeneCluster o1, GeneCluster o2) {
@@ -31,8 +30,10 @@ public class ResultWriter {
 				case internalDuplications:
 					writeInternalDuplicationsData(writer, clusters, genomeNames);
 					break;
-			}
+                case pdf:
 
+                    break;
+			}
 			writer.close();
 			return true;
 		} catch (IOException e) {
@@ -41,12 +42,14 @@ public class ResultWriter {
 		}
 	}
 	
-	private static void writeGeneClusterTable(Writer writer, List<GeneCluster> clusters) throws IOException {
+	private static void writeGeneClusterTable(File f, List<GeneCluster> clusters) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(f));
 		//writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
 		for (int i=0; i<clusters.size(); i++) {
 			GeneCluster cluster = clusters.get(i);
 			writer.write(String.format("%d\t%d\t%d\t%d\t%d\t%.1f\t%.2f\t%.2f\t%.4g\t%.4g\t%s%n", i+1, cluster.getGenes().length, cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getBestPValue(), cluster.getBestPValueCorrected(), cluster.getReferenceTags()));
 		}
+        writer.close();
 	}
 	
 	private static void writeGeneClusterLatexTable(Writer writer, List<GeneCluster> clusters) throws IOException {
