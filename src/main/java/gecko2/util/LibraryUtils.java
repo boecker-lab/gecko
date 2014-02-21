@@ -65,7 +65,7 @@ public class LibraryUtils {
 		if (!fixedPath) {
 		
 	
-			String loadPath = "/lib/"+source+"/"+os+"__"+arch+".jni";
+			String loadPath = "/"+source+"/"+os+"__"+arch+".jni";
 			System.err.println("Trying to load library from "+loadPath);
 			
 			InputStream is = LibraryUtils.class.getResourceAsStream(loadPath);
@@ -106,7 +106,7 @@ public class LibraryUtils {
 	
 		
 	}
-	
+
 	public static void loadLibrary(String libname) throws PlatformNotSupportedException,IOException {
 		loadLibrary(libname,false);
 	}

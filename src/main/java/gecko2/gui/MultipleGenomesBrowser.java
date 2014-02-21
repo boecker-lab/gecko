@@ -208,7 +208,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 */
 	private JComboBox createComboBox(int genomeBrowsersSize, int height) {
 		String[] selection = {"None", "Include", "Exclude"};
-		JComboBox box = new JComboBox(selection);
+		JComboBox<String> box = new JComboBox<>(selection);
 		box.setPreferredSize(new Dimension(100, height));
 		box.setMaximumSize(box.getPreferredSize());
 		box.setName(Integer.toString(genomeBrowsersSize - 1));
@@ -244,7 +244,19 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			addGenome(g);
 	}
 
-	private void addGenome(Genome g)	{	
+    @Override
+    public void updateGeneSize() {
+        adjustAllSizes();
+    }
+
+    @Override
+    public void changeNameType(GenomePainting.NameType nameType) {
+        this.nameType = nameType;
+        for (AbstractGenomeBrowser genomeBrowser : genomeBrowsers)
+            genomeBrowser.setNameType(nameType);
+    }
+
+    private void addGenome(Genome g)	{
 		AbstractGenomeBrowser gb = new PaintingGenomeBrowser(g, this, nameType);
 		gb.addMouseWheelListener(mouseWheelListener);
 		gb.addComponentListener(genomeBrowserComponentListener);
@@ -594,8 +606,8 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		else 
 			return this.genomeBrowsers.get(0).getGeneWidth();
 	}
-	
-	@Override
+
+    @Override
 	public int[] getGeneNumbers(int genomeIndex) {
 		int[] lineLengths = new int[genomeBrowsers.get(genomeIndex).getGenome().getChromosomes().size()];
         for (int i=0; i<genomeBrowsers.get(genomeIndex).getGenome().getChromosomes().size(); i++) {

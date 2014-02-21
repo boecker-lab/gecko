@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class Gui {
+    private static final String MAX_WIDTH = "Max Width";
 	
 	private final GeckoInstance gecko;
 
@@ -156,6 +157,35 @@ public class Gui {
 		toolbar.add(new JToolBar.Separator());
 		toolbar.add(zoomIn);
 		toolbar.add(zoomOut);
+
+        JMenu nameWidthChooser = new JMenu("Gene Width");
+        ButtonGroup group = new ButtonGroup();
+        JRadioButtonMenuItem radioButtonMenuItem = new JRadioButtonMenuItem(MAX_WIDTH);
+        radioButtonMenuItem.addActionListener(changeGeneWidth);
+        radioButtonMenuItem.setSelected(true);
+        group.add(radioButtonMenuItem);
+        nameWidthChooser.add(radioButtonMenuItem);
+        for (int i=4; i<=12; i+=2) {
+            radioButtonMenuItem = new JRadioButtonMenuItem(Integer.toString(i));
+            radioButtonMenuItem.addActionListener(changeGeneWidth);
+            group.add(radioButtonMenuItem);
+            nameWidthChooser.add(radioButtonMenuItem);
+        }
+        menuView.add(nameWidthChooser);
+
+        JMenu nameChooser = new JMenu("Gene Display Type");
+        group = new ButtonGroup();
+        boolean first = true;
+        for (GenomePainting.NameType nameType : GenomePainting.NameType.values()) {
+            radioButtonMenuItem = new JRadioButtonMenuItem(nameType.toString());
+            radioButtonMenuItem.addActionListener(changeNameType);
+            group.add(radioButtonMenuItem);
+            nameChooser.add(radioButtonMenuItem);
+            radioButtonMenuItem.setSelected(first);
+            first = false;
+        }
+        menuView.add(nameChooser);
+        menuView.addSeparator();
 		menuView.add(zoomIn);
 		menuView.add(zoomOut);
 		
@@ -181,16 +211,11 @@ public class Gui {
 				int status = arg0.getStateChange();
 	            JCheckBox mgbViewSwitcher2 = (JCheckBox) arg0.getItemSelectable();
 		    
-	            if(mgbViewSwitcher2 == Gui.this.mgbViewSwitcher)
-	            {
+	            if(mgbViewSwitcher2 == Gui.this.mgbViewSwitcher) {
 	            	if (status == ItemEvent.DESELECTED)
-	            	{
 	            		mgb.hideNonClusteredGenomes(false);
-	            	}
-	            	else 
-	            	{	
+	            	else
 	            		mgb.hideNonClusteredGenomes(true);
-	            	}
 	            }
 			}
 			
@@ -516,6 +541,24 @@ public class Gui {
 		}
 		
 	};
+
+    private final Action changeGeneWidth = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (actionEvent.getActionCommand().equals(MAX_WIDTH))
+                gecko.setMaxGeneNameLength(Integer.MAX_VALUE);
+            else
+                gecko.setMaxGeneNameLength(Integer.parseInt(actionEvent.getActionCommand()));
+            mgb.updateGeneSize();
+        }
+    };
+
+    private final Action changeNameType = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            mgb.changeNameType(GenomePainting.NameType.getNameTypeFromString(actionEvent.getActionCommand()));
+        }
+    };
 	
 	private final Action startComputation = new AbstractAction() {
 		private static final long serialVersionUID = -1530838105061978403L;
