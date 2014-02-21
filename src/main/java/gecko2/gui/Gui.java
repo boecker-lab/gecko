@@ -211,16 +211,11 @@ public class Gui {
 				int status = arg0.getStateChange();
 	            JCheckBox mgbViewSwitcher2 = (JCheckBox) arg0.getItemSelectable();
 		    
-	            if(mgbViewSwitcher2 == Gui.this.mgbViewSwitcher)
-	            {
+	            if(mgbViewSwitcher2 == Gui.this.mgbViewSwitcher) {
 	            	if (status == ItemEvent.DESELECTED)
-	            	{
 	            		mgb.hideNonClusteredGenomes(false);
-	            	}
-	            	else 
-	            	{	
+	            	else
 	            		mgb.hideNonClusteredGenomes(true);
-	            	}
 	            }
 			}
 			
@@ -552,7 +547,9 @@ public class Gui {
         public void actionPerformed(ActionEvent actionEvent) {
             if (actionEvent.getActionCommand().equals(MAX_WIDTH))
                 gecko.setMaxGeneNameLength(Integer.MAX_VALUE);
-            else gecko.setMaxGeneNameLength(Integer.parseInt(actionEvent.getActionCommand()));
+            else
+                gecko.setMaxGeneNameLength(Integer.parseInt(actionEvent.getActionCommand()));
+            mgb.updateGeneSize();
         }
     };
 

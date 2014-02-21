@@ -245,6 +245,11 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	}
 
     @Override
+    public void updateGeneSize() {
+        adjustAllSizes();
+    }
+
+    @Override
     public void changeNameType(GenomePainting.NameType nameType) {
         this.nameType = nameType;
         for (AbstractGenomeBrowser genomeBrowser : genomeBrowsers)

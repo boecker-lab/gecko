@@ -17,6 +17,7 @@ public abstract class AbstractMultipleGenomeBrowser extends JPanel implements Cl
 	public abstract void clear();
 	public abstract void clearSelection();
 	public abstract void addGenomes(Genome[] g);
+    public abstract void updateGeneSize();
     public abstract void changeNameType(GenomePainting.NameType nameType);
 	
 	public abstract int getNrGenomes();
