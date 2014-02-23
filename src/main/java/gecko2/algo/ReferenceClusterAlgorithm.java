@@ -13,11 +13,91 @@ public class ReferenceClusterAlgorithm {
 	private final boolean useGenomeGrouping;
 	
 	/**
+	 * Compute reduced genomes
+	 * @param genomes the genomes
+	 * @param p the parameters
+	 * @return the reduced genomes
+	 */
+	
+	private static class MemRed{
+		ArrayList<Integer> id;
+		ArrayList<Integer> anzahl;
+		
+		MemRed(){
+			this.anzahl = new ArrayList<Integer>();
+			this.id = new ArrayList<Integer>();
+		}
+		
+		public void anlegen(int x){
+			this.id.add(x);
+			this.anzahl.add(1);
+		}
+		
+		private void hinzufuegen(int x){
+			this.anzahl.set(this.id.indexOf(x), (this.anzahl.get(this.id.indexOf(x))+1));
+		}
+		
+		public void suche(int x){
+			if(this.id.contains(x)){
+				hinzufuegen(x);
+			} else {
+				anlegen(x);
+			}
+		}
+		
+		public int[] umschreiben(){
+			int[] y = new int[this.id.size()];
+			for(int i=0;i<this.id.size();i++){
+				y[i]=this.id.get(i);
+			}
+			
+			return y;
+		}
+	}
+	
+	private static int[][][] memReducer(int[][][] genomes, Parameter p){
+		MemRed help = new MemRed();
+		
+		for(int l = 0; l<genomes.length;l++){
+			for(int m = 0; m<genomes[l].length; m++){
+				for(int x = 0; x<genomes[l][m].length;x++){
+					help.suche(genomes[l][m][x]);
+				}
+			}
+		}
+		
+		
+		
+		for(int l = 0; l<genomes.length;l++){
+			for(int m = 0; m<genomes[l].length; m++){
+				MemRed help2 = new MemRed();
+				for(int x = 0; x<genomes[l][m].length;x++){
+					if(help.anzahl.get(help.id.indexOf(genomes[l][m][x]))>1){
+						help2.anlegen(genomes[l][m][x]);
+					} else if(help2.id.isEmpty() != true) {
+						if(help2.id.get(help2.id.size()-1) < 0){
+							help2.id.set(help2.id.size()-1, help2.id.get(help2.id.size()-1)-1);
+						} else {
+							help2.anlegen(-1);
+						}
+					} else {
+						help2.anlegen(-1);
+					}
+				}
+			genomes[l][m] = help2.umschreiben();
+			}	
+		}
+		
+		return genomes;
+	}
+
+	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
 	 * @param genomes the genomes
 	 * @param param the parameters
 	 * @return the gene clusters
 	 */
+	
 	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param) {
 		return computeReferenceClusters(genomes, param, null);
 	}
