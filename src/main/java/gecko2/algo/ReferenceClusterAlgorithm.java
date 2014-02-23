@@ -114,6 +114,17 @@ public class ReferenceClusterAlgorithm {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
 		
+		genomes = memReducer(genomes,param);
+		
+		for(int l = 0; l<genomes.length;l++){
+			for(int m = 0; m<genomes[l].length; m++){
+				for(int x = 0; x<genomes[l][m].length;x++){
+					System.out.print(genomes[l][m][x] + " ");
+				}
+				System.out.println("");
+			}
+		}
+		
 		GenomeList data;
 		if (param.getAlphabetSize() >= 0)
 			data = new GenomeList(genomes, param.getAlphabetSize());
