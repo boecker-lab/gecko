@@ -1,6 +1,7 @@
 package gecko2.io;
 
 import gecko2.algorithm.*;
+import gecko2.gui.GeneClusterPicture;
 
 import java.io.*;
 import java.util.*;
@@ -37,6 +38,15 @@ public class ResultWriter {
 	}
 
     private static boolean writeGeneClusterToPdf(File file, List<GeneCluster> clusters) {
+        boolean writtenSuccessfully = true;
+        for (GeneCluster cluster : clusters) {
+            GeneClusterPicture picture = new GeneClusterPicture(cluster);
+            GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(file,
+                "Gecko2",
+                picture);
+            writtenSuccessfully = gcw.createPDF() && writtenSuccessfully;
+        }
+        return writtenSuccessfully;
     }
 
     private static boolean writeGeneClusterTable(File f, List<GeneCluster> clusters) {

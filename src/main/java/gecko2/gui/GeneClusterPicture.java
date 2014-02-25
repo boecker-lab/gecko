@@ -132,7 +132,7 @@ public class GeneClusterPicture {
 	/**
 	 * New color mapping with the gene id.
 	 */
-	private final HashMap<Integer, Color> newColorMap = new HashMap<Integer, Color>();
+	private final HashMap<Integer, Color> newColorMap = new HashMap<>();
 	
 	/**
 	 * Current position in the geneColor array.
@@ -143,7 +143,18 @@ public class GeneClusterPicture {
 	 * The number of additional genes that is shown on each side of the longest cluster occurrence.
 	 */
 	private static final int NR_ADDITIONAL_GENES = 1;
-	
+
+    public GeneClusterPicture(GeneCluster selectedCluster) {
+        this(false, GenomePainting.NameType.ID, selectedCluster, selectedCluster.getDefaultSubSelection());
+    }
+
+    /**
+     * Default constructor which sets all important global variable.
+     */
+    public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection) {
+        this(false, GenomePainting.NameType.ID, selectedCluster, subselection);
+    }
+
 	/**
 	 * The constructor sets all important variables while the variables
 	 * gNames and geneCode depend on the users choice.
@@ -152,20 +163,12 @@ public class GeneClusterPicture {
 	 * @param nameType either id, name or locus_tag
 	 */
 	public GeneClusterPicture(boolean gnames, GenomePainting.NameType nameType, GeneCluster selectedCluster, int[] subselection) {
-		
 		this.gecko = GeckoInstance.getInstance();
 		this.selectedCluster = selectedCluster;
 		this.subselection = subselection;
 		this.genomes = gecko.getGenomes();
 		this.gNames = gnames;
 		this.setNameType(nameType);
-	}
-	
-	/**
-	 * Default constructor which sets all important global variable.
-	 */
-	public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection) {
-		this(false, GenomePainting.NameType.ID, selectedCluster, subselection);
 	}
 	
 	/**

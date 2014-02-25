@@ -23,12 +23,10 @@ public class ImageWriter {
 	 * @param storeLocation the location where to store the image
 	 */
 	public static void createPNGPic(BufferedImage exportPic, String storeLocation) {
-		
 		try {
-				ImageIO.write(exportPic, "png", new File(storeLocation));
+		    ImageIO.write(exportPic, "png", new File(storeLocation));
 		} 
 		catch (IOException e) {
-			
 			JOptionPane.showMessageDialog(null, "Errors occured while creating the image please try again.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -41,12 +39,10 @@ public class ImageWriter {
 	 * @param storeLocation the location where to store the image
 	 */
 	public static void createJPGPic(BufferedImage exportPic, String storeLocation) {
-		
 		try {
-				ImageIO.write(exportPic, "jpg", new File(storeLocation));
+			ImageIO.write(exportPic, "jpg", new File(storeLocation));
 		} 
 		catch (IOException e) {
-			
 			JOptionPane.showMessageDialog(null, "Errors occured while creating the image please try again.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}

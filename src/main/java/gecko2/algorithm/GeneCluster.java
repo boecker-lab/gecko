@@ -578,6 +578,35 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return map;
     }
 
+
+    /**
+     * Generates the default/initial sub-selection of cluster occurrences.
+     * @param includeSubOptimalOccurrences if sub-optimal occurrences should also be included
+     * @return an int[] with the index of each cluster occurrence that shall be used.
+     */
+    public int[] getDefaultSubSelection(boolean includeSubOptimalOccurrences) {
+        GeneClusterOccurrence gOcc;
+
+        if (includeSubOptimalOccurrences) {
+            gOcc = getAllOccurrences()[0];
+        }
+        else {
+            gOcc = getOccurrences()[0];
+        }
+
+        int[] subselections = new int[GeckoInstance.getInstance().getGenomes().length];
+
+        for (int i = 0; i < subselections.length; i++) {
+            if (gOcc.getSubsequences()[i].length == 0) {
+                subselections[i] = GeneClusterOccurrence.GENOME_NOT_INCLUDED;
+            }
+            else {
+                subselections[i] = 0;
+            }
+        }
+        return subselections;
+    }
+
     /**
 	 * Tests, if this gene cluster is similar to the the other gene cluster
 	 * @param other the other gene cluster

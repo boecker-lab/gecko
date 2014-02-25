@@ -289,25 +289,14 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		} 
 		else {
 			showSuboptimalCheckBox.setVisible(true);
-			GeneClusterOccurrence gOcc;
-			
-			if (showSuboptimalCheckBox.isSelected()) {
+
+            GeneClusterOccurrence gOcc;
+			if (showSuboptimalCheckBox.isSelected())
 				gOcc = gc.getAllOccurrences()[0];
-			}
-			else {
+			else
 				gOcc = gc.getOccurrences()[0];
-			}
 			
-			int[] subselections = new int[GeckoInstance.getInstance().getGenomes().length];
-			
-			for (int i = 0; i < subselections.length; i++) {
-				if (gOcc.getSubsequences()[i].length == 0) {
-					subselections[i] = GeneClusterOccurrence.GENOME_NOT_INCLUDED;
-				}
-				else {
-					subselections[i] = 0;
-				}
-			}
+			int[] subselections = gc.getDefaultSubSelection(showSuboptimalCheckBox.isSelected());
 			
 			fireSelectionEvent(new LocationSelectionEvent(GeneClusterSelector.this,
 					gc,
@@ -399,7 +388,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 	 * 
 	 * @param genomeToRemove genome to add to the filter
 	 */
-	public void dontShowClusWthSelecGenome(int genomeToRemove) {
+	public void dontShowClusterWithSelectedGenome(int genomeToRemove) {
 		
 		table.clearSelection();
 		model.showClustersWithoutSelectedGenome(genomeToRemove);
