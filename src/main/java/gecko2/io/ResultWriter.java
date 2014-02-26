@@ -38,15 +38,15 @@ public class ResultWriter {
 	}
 
     private static boolean writeGeneClusterToPdf(File file, List<GeneCluster> clusters) {
-        boolean writtenSuccessfully = true;
-        for (GeneCluster cluster : clusters) {
-            GeneClusterPicture picture = new GeneClusterPicture(cluster);
-            GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(file,
+        List<GeneClusterPicture> pictures = new ArrayList<>(clusters.size());
+        for (GeneCluster cluster : clusters)
+            pictures.add(new GeneClusterPicture(cluster));
+
+        GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(file,
                 "Gecko2",
-                picture);
-            writtenSuccessfully = gcw.createPDF() && writtenSuccessfully;
-        }
-        return writtenSuccessfully;
+                pictures);
+
+        return gcw.createPDF();
     }
 
     private static boolean writeGeneClusterTable(File f, List<GeneCluster> clusters) {
