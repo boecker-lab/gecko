@@ -87,12 +87,7 @@ public class GeneClusterTestUtils {
         {
             LibraryUtils.loadLibrary("libgecko2");
         }
-        catch (LibraryUtils.PlatformNotSupportedException e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        catch (IOException e)
+        catch (LibraryUtils.PlatformNotSupportedException | IOException e)
         {
             e.printStackTrace();
             System.exit(1);

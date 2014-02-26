@@ -99,8 +99,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		Subsequence[][] bestSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
 		Subsequence[][] allSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
 		for (int i=0; i<refCluster.getAllDeltaLocations().size(); i++){
-			List<Subsequence> allSub = new ArrayList<Subsequence>(refCluster.getDeltaLocations(i).size());
-			List<Subsequence> bestSub = new ArrayList<Subsequence>(refCluster.getDeltaLocations(i).size());
+			List<Subsequence> allSub = new ArrayList<>(refCluster.getDeltaLocations(i).size());
+			List<Subsequence> bestSub = new ArrayList<>(refCluster.getDeltaLocations(i).size());
 			for (DeltaLocation dLoc : refCluster.getDeltaLocations(i)){
 				Subsequence subseq = new Subsequence(dLoc.getL(), dLoc.getR(), dLoc.getChrNr(), dLoc.getDistance(), new BigDecimal(dLoc.getpValue()));
 				if (dLoc.getDistance() <= minDistances[i]){
@@ -398,8 +398,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		GeneCluster[] tmp = Arrays.copyOf(allClusters, allClusters.length);
 		Arrays.sort(tmp);
 		for (GeneCluster geneCluster : tmp) {
-            if (!geneCluster.isLinearConserved())
-                System.out.println("NL: " + geneCluster.getId());
             boolean contained = false;
 			for (Iterator<Integer> it = reducedList.iterator(); it.hasNext() && !contained; ) {
 				int index = it.next();

@@ -145,7 +145,7 @@ public class GeneClusterPicture {
 	private static final int NR_ADDITIONAL_GENES = 1;
 
     public GeneClusterPicture(GeneCluster selectedCluster) {
-        this(false, GenomePainting.NameType.ID, selectedCluster, selectedCluster.getDefaultSubSelection());
+        this(false, GenomePainting.NameType.ID, selectedCluster, selectedCluster.getDefaultSubSelection(false));
     }
 
     /**

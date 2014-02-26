@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -38,6 +39,18 @@ public class GeneClusterToPDFWriter {
 	 * The images we want to have as pdf
 	 */
 	private final List<GeneClusterPicture> clusterPictures;
+
+    /**
+     * The constructor sets the global variables gecko, selectedCluster, genomes, eData,
+     * gnames and targetFile.
+     *
+     * @param targetFile this becomes the pdf output file
+     * @param author name of the user
+     * @param picture the cluster image we want to export to pdf
+     */
+    public GeneClusterToPDFWriter(File targetFile, String author, GeneClusterPicture picture) {
+        this(targetFile, author, Arrays.asList(picture));
+    }
 	
 	/**
 	 * The constructor sets the global variables gecko, selectedCluster, genomes, eData, 
@@ -58,7 +71,8 @@ public class GeneClusterToPDFWriter {
 	 */
 	public boolean createPDF() {
         boolean writtenSuccessfully = false;
-		Document clusterPDF = new Document(new Rectangle(clusterPic.getPageWidth(), clusterPic.getPageHeight()));
+		//Document clusterPDF = new Document(new Rectangle(clusterPic.getPageWidth(), clusterPic.getPageHeight()));
+		Document clusterPDF = new Document();
 		try (FileOutputStream out = new FileOutputStream(this.targetFile)) {
             for (GeneClusterPicture picture : clusterPictures) {
                 PdfWriter writer = PdfWriter.getInstance(clusterPDF , out);
