@@ -132,10 +132,7 @@ public class ReferenceClusterAlgorithm {
 	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
-		int[][][] geni;
 		genomes = memReducer(genomes,param);
-		geni = genomes;
-		genomes = memSort(genomes);
 		
 		for(int l = 0; l<genomes.length;l++){
 			for(int m = 0; m<genomes[l].length; m++){

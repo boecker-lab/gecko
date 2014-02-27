@@ -1240,15 +1240,15 @@ public class ReferenceClusterTest
 		File resultFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacterD3S6Q2Grouping.txt").toURI());
 
 		// def genome groups, grouping genomes 2 and 3 and 4 and 5
-		List<Set<Integer>> genomeGroups = new ArrayList<Set<Integer>>(2);
-		Set<Integer> set1 = new HashSet<Integer>();
+		List<Set<Integer>> genomeGroups = new ArrayList<>(2);
+		Set<Integer> set1 = new HashSet<>();
 		set1.add(0);
 		genomeGroups.add(set1);
-		Set<Integer> set2 = new HashSet<Integer>();
+		Set<Integer> set2 = new HashSet<>();
 		set2.add(1);
 		set2.add(2);
 		genomeGroups.add(set2);
-		Set<Integer> set3 = new HashSet<Integer>();
+		Set<Integer> set3 = new HashSet<>();
 		set3.add(3);
 		set3.add(4);
 		genomeGroups.add(set3);
@@ -1325,11 +1325,11 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 3, 8 ,9, 0}}, {{0, 1, 2, 4, 6, 7, 8, 9, 0}}, {{0, 1, 2, 5, 6, 7, 0}}};
 
 		// def genome groups, grouping genomes 2 and 3
-		List<Set<Integer>> genomeGroups = new ArrayList<Set<Integer>>(2);
-		Set<Integer> set1 = new HashSet<Integer>();
+		List<Set<Integer>> genomeGroups = new ArrayList<>(2);
+		Set<Integer> set1 = new HashSet<>();
 		set1.add(0);
 		genomeGroups.add(set1);
-		Set<Integer> set2 = new HashSet<Integer>();
+		Set<Integer> set2 = new HashSet<>();
 		set2.add(1);
 		set2.add(2);
 		genomeGroups.add(set2);
