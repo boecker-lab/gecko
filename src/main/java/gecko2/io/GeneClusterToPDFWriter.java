@@ -78,7 +78,7 @@ public class GeneClusterToPDFWriter {
             maxHeight = Math.max(maxHeight, picture.getPageHeight());
         }
 
-		Document clusterPDF = new Document(new Rectangle(maxWidth, maxHeight));
+		Document clusterPDF = new Document(PageSize.A4);
         clusterPDF.addCreationDate();
         clusterPDF.addAuthor(this.author);
         clusterPDF.addCreator("Gecko2");
@@ -93,15 +93,15 @@ public class GeneClusterToPDFWriter {
             for (int i=0; i<clusterPictures.size(); i++) {
                 clusterPDF.newPage();
                 // open pdf for writing
-                PdfGraphics2D g = new PdfGraphics2D(cb, clusterPDF.getPageSize().getWidth(), clusterPDF.getPageSize().getHeight());
-                //g.translate(0, (clusterPictures.size() - i) * clusterPDF.getPageSize().getHeight());
+                PdfTemplate template = cb.createTemplate(clusterPictures.get(i).getPageWidth(), clusterPictures.get(i).getPageHeight());
+                PdfGraphics2D g = new PdfGraphics2D(template, clusterPictures.get(i).getPageWidth(), clusterPictures.get(i).getPageHeight());
                 clusterPictures.get(i).paint(g);
                 g.dispose();
-                //Image image = Image.getInstance(template);
-                //float width = clusterPDF.getPageSize().getWidth() - clusterPDF.leftMargin() - clusterPDF.rightMargin();
-                //float height = clusterPDF.getPageSize().getHeight() - clusterPDF.topMargin() - clusterPDF.bottomMargin();
-                //image.scaleToFit(width, height);
-                //clusterPDF.add(image);
+                Image image = Image.getInstance(template);
+                float width = clusterPDF.getPageSize().getWidth() - clusterPDF.leftMargin() - clusterPDF.rightMargin();
+                float height = clusterPDF.getPageSize().getHeight() - clusterPDF.topMargin() - clusterPDF.bottomMargin();
+                image.scaleToFit(width, height);
+                clusterPDF.add(image);
             }
             clusterPDF.close();
             writtenSuccessfully = true;
