@@ -48,6 +48,38 @@ public class ReferenceClusterTest
             libGeckoLoaded = false;
         }
 	}
+
+    @Test
+    public void testMemoryReduction()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, -4, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
+
+        Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        p.setAlphabetSize(4);
+
+        // Test the java implementation
+        GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+
+        // def result (using p values from calculated result)
+        Subsequence sub1 = new Subsequence(1, 2, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
+        Subsequence sub2 = new Subsequence(2, 4, 0, 1, javaRes[0].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
+        Subsequence[][] subsequences = {{sub1},{sub2}};
+
+        GeneClusterOccurrence[] bestOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getOccurrences()[0].getBestpValue(), 1, 2)};
+        GeneClusterOccurrence[] allOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getAllOccurrences()[0].getBestpValue(), 1, 2)};
+
+        int[] genes1 = {1, 2};
+
+        GeneCluster[] refCluster = {new GeneCluster(0, bestOccurrences, allOccurrences, genes1,
+                javaRes[0].getBestPValue(),
+                javaRes[0].getBestPValueCorrected(),
+                1,
+                0,
+                Parameter.OperationMode.reference)};
+
+        performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
+    }
 	
 	
 	/**
