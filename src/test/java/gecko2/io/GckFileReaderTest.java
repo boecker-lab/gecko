@@ -7,13 +7,13 @@ import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
 import org.junit.Test;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 
 import static gecko2.GeneClusterTestUtils.performTest;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)

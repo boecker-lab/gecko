@@ -36,7 +36,7 @@ public class ResultExportDialog extends JDialog {
 		
 		DefaultFormBuilder contentBuilder = new DefaultFormBuilder(new FormLayout("p, 4dlu, p:g, 4dlu, p"));
 		contentBuilder.border(Borders.DIALOG);
-		
+
 		textField = new JTextField();
 		JButton btnBrowse = new JButton("Browse...");
 		btnBrowse.addActionListener(new ActionListener() {				
@@ -53,13 +53,15 @@ public class ResultExportDialog extends JDialog {
 				}
 			}
 		});
-		final JComboBox resultFilterComboBox = new JComboBox(ResultFilter.values());
-		final JComboBox exportTypeCompoBox = new JComboBox(ExportType.values());
-		
+		final JComboBox<ResultFilter> resultFilterComboBox = new JComboBox<>(ResultFilter.values());
+		final JComboBox<ExportType> exportTypeCompoBox = new JComboBox<>(ExportType.values());
+
+        contentBuilder.append(new JLabel("Choose Export Type"), exportTypeCompoBox);
+        contentBuilder.nextLine();
+        contentBuilder.append(new JLabel("Choose Filtering"), resultFilterComboBox);
+        contentBuilder.nextLine();
 		contentBuilder.append(new JLabel("Choose File"), textField, btnBrowse);
-		contentBuilder.append(new JLabel("Choose Filtering"), resultFilterComboBox);
-		contentBuilder.nextLine();
-		contentBuilder.append(new JLabel("Choose Export Type"), exportTypeCompoBox);
+
 		
 		ButtonBarBuilder buttonBuilder = new ButtonBarBuilder();
 		
@@ -99,7 +101,7 @@ public class ResultExportDialog extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 	}
-	
+
 	/**
 	 * Validate all settings to check if a result can be exported
 	 * @return the File the results will be written to, or null if not valid 
@@ -111,9 +113,9 @@ public class ResultExportDialog extends JDialog {
 		}
 		File file = new File(textField.getText());
 		if (file.exists()) {
-			int x = JOptionPane.showConfirmDialog(ResultExportDialog.this, 
-					"The chosen file already exists. Overwrite?", 
-					"Overwrite existing file?", 
+			int x = JOptionPane.showConfirmDialog(ResultExportDialog.this,
+					"The chosen file already exists. Overwrite?",
+					"Overwrite existing file?",
 					JOptionPane.YES_NO_OPTION,
 					JOptionPane.WARNING_MESSAGE);
 			if (x==JOptionPane.NO_OPTION) return null;

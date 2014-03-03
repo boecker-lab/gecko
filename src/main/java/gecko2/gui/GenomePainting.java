@@ -1,6 +1,5 @@
 package gecko2.gui;
 
-import gecko2.GeckoInstance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;

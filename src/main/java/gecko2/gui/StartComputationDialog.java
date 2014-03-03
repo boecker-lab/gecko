@@ -6,7 +6,6 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
 import gecko2.GeckoInstance;
 import gecko2.algorithm.*;
 import gecko2.util.PrintUtils;
-import gecko2.util.SortUtils;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;

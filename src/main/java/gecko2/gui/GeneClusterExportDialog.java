@@ -1,11 +1,12 @@
 package gecko2.gui;
 
+import com.itextpdf.text.DocumentException;
 import gecko2.algorithm.GeneCluster;
 import gecko2.gui.GenomePainting.NameType;
 import gecko2.io.GeneClusterToPDFWriter;
-import gecko2.io.ImageWriter;
 import gecko2.util.FileUtils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,6 +15,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 /**
@@ -216,28 +219,30 @@ public class GeneClusterExportDialog extends JDialog {
                 // behavior
                 String filename = checkAndFixFileExtension(GeneClusterExportDialog.this.storingLocation.getText());
                 GeneClusterExportDialog.this.storingLocation.setText(filename);
-
                 if (!checkFileExistence(new File(filename))) {
+                    try (FileOutputStream out = new FileOutputStream(new File(GeneClusterExportDialog.this.storingLocation.getText()))) {
+                        if (GeneClusterExportDialog.this.png) {
+                            ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "png", out);
+                            GeneClusterExportDialog.this.setVisible(false);
+                        }
+
+                        // jpg export
+                        if (GeneClusterExportDialog.this.jpg) {
+                            ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "jpg", out);
+                            GeneClusterExportDialog.this.setVisible(false);
+                        }
+
+                        // pdf export
+                        if (GeneClusterExportDialog.this.pdf) {
+                            GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(out);
+                            gcw.write(GeneClusterExportDialog.this.clusterPics);
+                            GeneClusterExportDialog.this.setVisible(false);
+                        }
+                    }  catch (IOException | DocumentException e) {
+                        e.printStackTrace();
+                    }
                     // png export
-                    if (GeneClusterExportDialog.this.png) {
-                        ImageWriter.createPNGPic(GeneClusterExportDialog.this.clusterPics.createImage(), GeneClusterExportDialog.this.storingLocation.getText());
-                        GeneClusterExportDialog.this.setVisible(false);
-                    }
 
-                    // jpg export
-                    if (GeneClusterExportDialog.this.jpg) {
-                        ImageWriter.createJPGPic(GeneClusterExportDialog.this.clusterPics.createImage(), GeneClusterExportDialog.this.storingLocation.getText());
-                        GeneClusterExportDialog.this.setVisible(false);
-                    }
-
-                    // pdf export
-                    if (GeneClusterExportDialog.this.pdf) {
-                        GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(new File(GeneClusterExportDialog.this.storingLocation.getText()),
-                                GeneClusterExportDialog.this.authorName.getText(),
-                                GeneClusterExportDialog.this.clusterPics);
-                        gcw.createPDF();
-                        GeneClusterExportDialog.this.setVisible(false);
-                    }
                 }
             }
         });

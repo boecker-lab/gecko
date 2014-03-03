@@ -1,17 +1,17 @@
 package gecko2.io;
 
 import com.itextpdf.awt.PdfGraphics2D;
-import com.itextpdf.text.*;
-import com.itextpdf.text.log.SysoCounter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
 import gecko2.gui.GeneClusterPicture;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,54 +23,40 @@ import java.util.List;
  * @author Hans-Martin Haase <hans-martin dot haase at uni-jena dot de>
  * @version 0.17
  */
-public class GeneClusterToPDFWriter {
+public class GeneClusterToPDFWriter implements AutoCloseable {
 
 	/**
-	 * File pointer to the pdf file.
+	 * the output stream.
 	 */
-	private File targetFile;
-	
-	/**
-	 * The variable contains the name of the user.
-	 */
-	private final String author;
-	
-	/**
-	 * The images we want to have as pdf
-	 */
-	private final List<GeneClusterPicture> clusterPictures;
+	private OutputStream out;
 
     /**
-     * The constructor sets the global variables gecko, selectedCluster, genomes, eData,
-     * gnames and targetFile.
+     * Creates a gene cluster to pdf writer using the given output stream
      *
-     * @param targetFile this becomes the pdf output file
-     * @param author name of the user
-     * @param picture the cluster image we want to export to pdf
+     * @param outputStream the output stream
      */
-    public GeneClusterToPDFWriter(File targetFile, String author, GeneClusterPicture picture) {
-        this(targetFile, author, Arrays.asList(picture));
+    public GeneClusterToPDFWriter(OutputStream outputStream) {
+        this.out = outputStream;
     }
-	
-	/**
-	 * The constructor sets the global variables gecko, selectedCluster, genomes, eData, 
-	 * gnames and targetFile.
-	 * 
-	 * @param targetFile this becomes the pdf output file
-	 * @param author name of the user
-	 * @param pictures the cluster images we want to export to pdf
-	 */
-	public GeneClusterToPDFWriter(File targetFile, String author, List<GeneClusterPicture> pictures) {
-		this.targetFile = targetFile;
-		this.author = author;
-		this.clusterPictures = pictures;
-	}
-	
-	/**
-	 * The function creates a PDF file from the panel content.
-	 */
-	public boolean createPDF() {
-        boolean writtenSuccessfully;
+
+
+    /**
+     * Writes the given gene clusters picture to the output stream as a PDF.
+     * @param clusterPicture the cluster picture
+     * @throws IOException
+     * @throws DocumentException
+     */
+    public void write(GeneClusterPicture clusterPicture) throws IOException, DocumentException {
+        write(Arrays.asList(clusterPicture));
+    }
+
+    /**
+     * Writes the given gene clusters pictures to the output stream as a PDF.
+     * @param clusterPictures the list of GeneClusterPictures
+     * @throws IOException
+     * @throws DocumentException
+     */
+	public void write(List<GeneClusterPicture> clusterPictures) throws IOException, DocumentException {
         int maxWidth = 0;
         int maxHeight = 0;
         for (GeneClusterPicture picture : clusterPictures) {
@@ -80,35 +66,74 @@ public class GeneClusterToPDFWriter {
 
 		Document clusterPDF = new Document(PageSize.A4);
         clusterPDF.addCreationDate();
-        clusterPDF.addAuthor(this.author);
+        clusterPDF.addAuthor("Gecko2");
         clusterPDF.addCreator("Gecko2");
         clusterPDF.addProducer();
         clusterPDF.addSubject("Gene cluster pdf export");
         clusterPDF.addTitle("Gene cluster pdf export");
 
-		try (FileOutputStream out = new FileOutputStream(this.targetFile)) {
-            PdfWriter writer = PdfWriter.getInstance(clusterPDF , out);
-            clusterPDF.open();
-            PdfContentByte cb = writer.getDirectContent();
-            for (int i=0; i<clusterPictures.size(); i++) {
-                clusterPDF.newPage();
-                // open pdf for writing
-                PdfTemplate template = cb.createTemplate(clusterPictures.get(i).getPageWidth(), clusterPictures.get(i).getPageHeight());
-                PdfGraphics2D g = new PdfGraphics2D(template, clusterPictures.get(i).getPageWidth(), clusterPictures.get(i).getPageHeight());
-                clusterPictures.get(i).paint(g);
-                g.dispose();
-                Image image = Image.getInstance(template);
-                float width = clusterPDF.getPageSize().getWidth() - clusterPDF.leftMargin() - clusterPDF.rightMargin();
-                float height = clusterPDF.getPageSize().getHeight() - clusterPDF.topMargin() - clusterPDF.bottomMargin();
-                image.scaleToFit(width, height);
-                clusterPDF.add(image);
-            }
-            clusterPDF.close();
-            writtenSuccessfully = true;
-		} catch (DocumentException | IOException e) {
-			e.printStackTrace();
-            writtenSuccessfully = false;
-		}
-        return writtenSuccessfully;
+        PdfWriter writer = PdfWriter.getInstance(clusterPDF , out);
+        clusterPDF.open();
+        PdfContentByte cb = writer.getDirectContent();
+        for (GeneClusterPicture clusterPicture : clusterPictures) {
+            clusterPDF.newPage();
+            // open pdf for writing
+            PdfTemplate template = cb.createTemplate(clusterPicture.getPageWidth(), clusterPicture.getPageHeight());
+            PdfGraphics2D g = new PdfGraphics2D(template, clusterPicture.getPageWidth(), clusterPicture.getPageHeight());
+            clusterPicture.paint(g);
+            g.dispose();
+            Image image = Image.getInstance(template);
+            float width = clusterPDF.getPageSize().getWidth() - clusterPDF.leftMargin() - clusterPDF.rightMargin();
+            float height = clusterPDF.getPageSize().getHeight() - clusterPDF.topMargin() - clusterPDF.bottomMargin();
+            image.scaleToFit(width, height);
+            clusterPDF.add(image);
+        }
+        /**
+         * Don't close the underlying stream. Would kill zipOutputStream when writing multiple pdfs.
+         */
+        writer.setCloseStream(false);
+        clusterPDF.close();
 	}
+
+    /**
+     * Closes this resource, relinquishing any underlying resources.
+     * This method is invoked automatically on objects managed by the
+     * {@code try}-with-resources statement.
+     * <p/>
+     * <p>While this interface method is declared to throw {@code
+     * Exception}, implementers are <em>strongly</em> encouraged to
+     * declare concrete implementations of the {@code close} method to
+     * throw more specific exceptions, or to throw no exception at all
+     * if the close operation cannot fail.
+     * <p/>
+     * <p><em>Implementers of this interface are also strongly advised
+     * to not have the {@code close} method throw {@link
+     * InterruptedException}.</em>
+     * <p/>
+     * This exception interacts with a thread's interrupted status,
+     * and runtime misbehavior is likely to occur if an {@code
+     * InterruptedException} is {@linkplain Throwable#addSuppressed
+     * suppressed}.
+     * <p/>
+     * More generally, if it would cause problems for an
+     * exception to be suppressed, the {@code AutoCloseable.close}
+     * method should not throw it.
+     * <p/>
+     * <p>Note that unlike the {@link java.io.Closeable#close close}
+     * method of {@link java.io.Closeable}, this {@code close} method
+     * is <em>not</em> required to be idempotent.  In other words,
+     * calling this {@code close} method more than once may have some
+     * visible side effect, unlike {@code Closeable.close} which is
+     * required to have no effect if called more than once.
+     * <p/>
+     * However, implementers of this interface are strongly encouraged
+     * to make their {@code close} methods idempotent.
+     *
+     * @throws java.io.IOException if this resource cannot be closed
+     */
+    @Override
+    public void close() throws IOException {
+        if (out != null)
+            out.close();
+    }
 }

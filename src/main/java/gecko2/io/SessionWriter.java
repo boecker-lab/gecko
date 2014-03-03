@@ -3,7 +3,9 @@ package gecko2.io;
 import gecko2.GeckoInstance;
 import gecko2.algorithm.*;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -42,7 +44,6 @@ public class SessionWriter
 	public static boolean saveSessionToFile(File f) 
 	{
 		GeckoInstance.getInstance().setLastSavedFile(f);
-        ObjectOutputStream o = null;
         boolean returnValue = true;
 
         try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), Charset.forName("UTF-8"))) {

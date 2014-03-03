@@ -2,16 +2,13 @@ package gecko2;
 
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.*;
-import gecko2.exceptions.LinePassedException;
 import gecko2.io.CogFileReader;
 import gecko2.io.GeneClusterResult;
-import gecko2.util.LibraryUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -78,21 +75,6 @@ public class GeneClusterTestUtils {
 
 	    assertTrue("expected:<"+expected.toString()+"> but was:<"+actual.toString()+">", exp.equals(act));
 	}
-
-    public static void loadLibGecko2()
-    {
-        System.err.println("You are running " + System.getProperty("os.arch") + "-Java on " + System.getProperty("os.name"));
-
-        try
-        {
-            LibraryUtils.loadLibrary("libgecko2");
-        }
-        catch (LibraryUtils.PlatformNotSupportedException | IOException e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
 	
 	/**
 	 * Compare two Subsequences
@@ -247,7 +229,6 @@ public class GeneClusterTestUtils {
 	 * @param inputFile the input file
 	 * @return the int[][][] of genomes
 	 * @throws IOException
-	 * @throws LinePassedException
 	 */
 	private static int[][][] readGenomes(CogFileReader reader, File inputFile) throws IOException, ParseException {
 		GeckoInstance.getInstance();
@@ -291,15 +272,15 @@ public class GeneClusterTestUtils {
 					p = new Parameter(3, 6, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").getFile());
 					outFile = new File("src/test/resources/fiveProteobacterD3S6Q2Grouping.txt");
-					genomeGroups = new ArrayList<Set<Integer>>(2);
-					Set<Integer> set1 = new HashSet<Integer>();
+					genomeGroups = new ArrayList<>(2);
+					Set<Integer> set1 = new HashSet<>();
 					set1.add(0);
 					genomeGroups.add(set1);
-					Set<Integer> set2 = new HashSet<Integer>();
+					Set<Integer> set2 = new HashSet<>();
 					set2.add(1);
 					set2.add(2);
 					genomeGroups.add(set2);
-					Set<Integer> set3 = new HashSet<Integer>();
+					Set<Integer> set3 = new HashSet<>();
 					set3.add(3);
 					set3.add(4);
 					genomeGroups.add(set3);

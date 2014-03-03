@@ -3,14 +3,17 @@ package gecko2.io;
 import gecko2.GeckoInstance;
 import gecko2.algorithm.*;
 
-import java.awt.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The class implements a reader for .gck files (session files).
@@ -70,7 +73,7 @@ public class GckFileReader implements GeckoDataReader {
 	 */
 	public Map<Integer, ExternalGeneId> getGeneLabelMap() {
 		return this.geneLabelMap;
-	}
+    }
 
 	/**
 	 * @return the genomes from the input file.
@@ -187,7 +190,7 @@ public class GckFileReader implements GeckoDataReader {
                     ExternalGeneId eId = geneLabelMap.get(Math.abs(newGene.getId()));
                     if (eId == null)
                         geneLabelMap.put(Math.abs(newGene.getId()), new ExternalGeneId(newLabel, Integer.parseInt(split[5])));
-                    else if (eId.equals(newLabel))
+                    else if (!eId.getId().equals(newLabel))
                         throw new ParseException(String.format("Conflicting gene labels %s and %s!", newLabel, eId), 0);
                 }
                 chr.getGenes().add(newGene);
