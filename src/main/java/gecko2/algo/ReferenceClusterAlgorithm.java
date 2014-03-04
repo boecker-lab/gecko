@@ -85,7 +85,7 @@ public class ReferenceClusterAlgorithm {
 					}
 				}
 			genomes[l][m] = help2.umschreiben();
-			}	
+			}
 		}
 		
 		return genomes;
@@ -116,10 +116,31 @@ public class ReferenceClusterAlgorithm {
 	 * @param param the parameters
 	 * @return the gene clusters
 	 */
-	
 	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param) {
 		return computeReferenceClusters(genomes, param, null);
 	}
+
+    private static int[] getSizes(int[][][] genomes) {
+        int[] result = new int[genomes.length];
+        for(int l = 0; l<genomes.length;l++){
+            for(int m = 0; m<genomes[l].length; m++){
+                result[l] += genomes[l][m].length - 2;
+            }
+        }
+        return result;
+    }
+
+    private static void printGenomes(int[][][] genomes) {
+        for(int l = 0; l<genomes.length;l++){
+            for(int m = 0; m<genomes[l].length; m++){
+                for(int x = 0; x<genomes[l][m].length;x++){
+                    System.out.print(genomes[l][m][x] + " ");
+                }
+                System.out.println("");
+            }
+        }
+    }
+
 
 
 	/**
@@ -132,18 +153,28 @@ public class ReferenceClusterAlgorithm {
 	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
-		//genomes = memReducer(genomes,param);
-		
-		for(int l = 0; l<genomes.length;l++){
-			for(int m = 0; m<genomes[l].length; m++){
-				for(int x = 0; x<genomes[l][m].length;x++){
-					System.out.print(genomes[l][m][x] + " ");
-				}
-				System.out.println("");
-			}
-		}
-		
-		GenomeList data;
+        int[] oldSize = getSizes(genomes);
+
+		genomes = memReducer(genomes,param);
+
+        printGenomes(genomes);
+
+        int[] newSize = getSizes(genomes);
+
+        for (int i=0; i<oldSize.length; i++)
+            System.out.println(oldSize[i] +"\t" + newSize[i]);
+
+        System.out.println("");
+        int oldSum = 0;
+        int newSum = 0;
+        for (int i=0; i<oldSize.length; i++){
+            oldSum += oldSize[i];
+            newSum += newSize[i];
+        }
+
+        System.out.println(oldSum +"\t" + newSum);
+
+        GenomeList data;
 		if (param.getAlphabetSize() >= 0)
 			data = new GenomeList(genomes, param.getAlphabetSize());
 		else {

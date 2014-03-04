@@ -144,6 +144,7 @@ public class Gene implements Serializable {
     }
 
     public static int getAlphabetSize() {
+        System.out.println("alphabetSize: " + (geneLabelMap.size() - 1 + geneLabelMap.get(0).getFamilySize()) + " compressed: " + (geneLabelMap.size() - 1));
         return geneLabelMap.size() - 1 + geneLabelMap.get(0).getFamilySize();
     }
 
