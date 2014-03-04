@@ -145,24 +145,24 @@ public class GeneClusterPicture {
 	private static final int NR_ADDITIONAL_GENES = 1;
 
     public GeneClusterPicture(GeneCluster selectedCluster) {
-        this(false, GenomePainting.NameType.ID, selectedCluster, selectedCluster.getDefaultSubSelection(false));
+        this(selectedCluster, selectedCluster.getDefaultSubSelection(false));
     }
 
     /**
      * Default constructor which sets all important global variable.
      */
     public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection) {
-        this(false, GenomePainting.NameType.ID, selectedCluster, subselection);
+        this(selectedCluster, subselection, GenomePainting.NameType.ID, false);
     }
 
 	/**
 	 * The constructor sets all important variables while the variables
 	 * gNames and geneCode depend on the users choice.
-	 * 
-	 * @param gnames true if the genome name shall be replace the number
-	 * @param nameType either id, name or locus_tag
-	 */
-	public GeneClusterPicture(boolean gnames, GenomePainting.NameType nameType, GeneCluster selectedCluster, int[] subselection) {
+	 *
+     * @param nameType either id, name or locus_tag
+     * @param gnames true if the genome name shall be replace the number
+     */
+	public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection, GenomePainting.NameType nameType, boolean gnames) {
 		this.gecko = GeckoInstance.getInstance();
 		this.selectedCluster = selectedCluster;
 		this.subselection = subselection;
