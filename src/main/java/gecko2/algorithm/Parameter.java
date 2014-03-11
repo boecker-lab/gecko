@@ -27,6 +27,18 @@ public class Parameter {
                     throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
             }
         }
+
+        /**
+         * Wrapper method for values() that only returns the currently supported subset of values
+         * @return the supported subset of values
+         */
+        public static OperationMode[] getSupported() {
+            // Support all values
+            return values();
+
+            // Support only a subset of values
+            //return new OperationMode[]{OperationMode.reference};
+        }
     }
 
     public enum ReferenceType {
@@ -61,6 +73,18 @@ public class Parameter {
                 default:
                     throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
             }
+        }
+
+        /**
+         * Wrapper method for values() that only returns the currently supported subset of values
+         * @return the supported subset of values
+         */
+        public static ReferenceType[] getSupported() {
+            // Support all values
+            return values();
+
+            // Support only a subset of values
+            //return new ReferenceType[]{ReferenceType.allAgainstAll, ReferenceType.genome};
         }
     }
 	

@@ -69,7 +69,7 @@ public class StartComputationDialog extends JDialog {
 			}
 		});
 
-		final JComboBox modeCombo = new JComboBox(Parameter.OperationMode.values());
+		final JComboBox modeCombo = new JComboBox(Parameter.OperationMode.getSupported());
 
 		modeCombo.setPreferredSize(new Dimension(190,30));
 
@@ -78,7 +78,7 @@ public class StartComputationDialog extends JDialog {
 		modeCombo.setSelectedIndex(0);
 
         JLabel refLabel = new JLabel("Reference:");
-		refCombo = new JComboBox(Parameter.ReferenceType.values());
+		refCombo = new JComboBox(Parameter.ReferenceType.getSupported());
 		refCombo.setPreferredSize(new Dimension(190, 30));
 		
 		modeCombo.addActionListener(new ActionListener() {
