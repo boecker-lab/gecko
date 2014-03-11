@@ -385,12 +385,14 @@ public class CogFileReaderTest {
 
     @Test
     public void testFileReaderToGenomeIntArray() throws IOException, ParseException{
-        File inputFile = new File(getClass().getResource("/c2.cog").getFile());
+        File inputFile = new File(getClass().getResource("/c.cog").getFile());
 
         CogFileReader reader = new CogFileReader(inputFile);
 
         reader.readData();
 
         int[][][] genomes = Genome.toIntArray(reader.getGenomes());
+
+        Genome.printIntArray(genomes);
     }
 }
