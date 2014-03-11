@@ -50,8 +50,8 @@ public class StartComputationDialog extends JDialog {
 		final JSpinner sSpinner = new JSpinner(new SpinnerNumberModel(7, 0, Integer.MAX_VALUE, 1));
 		sSpinner.setPreferredSize(new Dimension(150,30));
 
-        final JSpinner groupSpinner = new JSpinner(new SpinnerNumberModel(1.1, 0.0, 1.1, 0.1));
-        sSpinner.setPreferredSize(new Dimension(150,30));
+        //final JSpinner groupSpinner = new JSpinner(new SpinnerNumberModel(1.1, 0.0, 1.1, 0.1));
+        //sSpinner.setPreferredSize(new Dimension(150,30));
 		
 		final String[] qValues = new String[ngenomes-1];
 		qValues[qValues.length-1] = "all";
@@ -69,7 +69,7 @@ public class StartComputationDialog extends JDialog {
 			}
 		});
 
-		final JComboBox modeCombo = new JComboBox(Parameter.OperationMode.values());
+		final JComboBox modeCombo = new JComboBox(Parameter.OperationMode.getSupported());
 
 		modeCombo.setPreferredSize(new Dimension(190,30));
 
@@ -78,7 +78,7 @@ public class StartComputationDialog extends JDialog {
 		modeCombo.setSelectedIndex(0);
 
         JLabel refLabel = new JLabel("Reference:");
-		refCombo = new JComboBox(Parameter.ReferenceType.values());
+		refCombo = new JComboBox(Parameter.ReferenceType.getSupported());
 		refCombo.setPreferredSize(new Dimension(190, 30));
 		
 		modeCombo.addActionListener(new ActionListener() {
@@ -148,7 +148,7 @@ public class StartComputationDialog extends JDialog {
 			
 		};
 		
-		EventList<Genome> genomeEventList = new BasicEventList<Genome>();
+		EventList<Genome> genomeEventList = new BasicEventList<>();
 		genomeEventList.addAll(Arrays.asList(GeckoInstance.getInstance().getGenomes()));
 		
 		final JComboBox refGenomeCombo = new JComboBox();
@@ -172,8 +172,8 @@ public class StartComputationDialog extends JDialog {
         p7a.add(new JLabel("Genome Grouping Factor: "));
         gridpanel.add(p7a);
         final JPanel p7b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        p7b.add(groupSpinner);
-        gridpanel.add(p7b);
+        //p7b.add(groupSpinner);
+        //gridpanel.add(p7b);
 		
 		panel.add(gridpanel);
 		
@@ -297,7 +297,7 @@ public class StartComputationDialog extends JDialog {
 						opMode,
 						refType),
 						mergeResultsEnabled,
-                        (Double)groupSpinner.getValue());
+                        1.1);
 			}
 			
 		};

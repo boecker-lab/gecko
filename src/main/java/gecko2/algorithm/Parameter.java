@@ -27,6 +27,10 @@ public class Parameter {
                     throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
             }
         }
+
+        public static OperationMode[] getSupported() {
+            return new OperationMode[]{OperationMode.reference};
+        }
     }
 
     public enum ReferenceType {
@@ -61,6 +65,10 @@ public class Parameter {
                 default:
                     throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
             }
+        }
+
+        public static ReferenceType[] getSupported() {
+            return new ReferenceType[]{ReferenceType.allAgainstAll, ReferenceType.genome};
         }
     }
 	
