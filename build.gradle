@@ -22,6 +22,7 @@ task uberjar(type: Jar) {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
