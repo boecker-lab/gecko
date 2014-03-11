@@ -459,9 +459,9 @@ public class GeckoInstance {
 	}
 	
 	/**
-	 * Computes the gene clusters for the given genomes with the given paramters
+	 * Computes the gene clusters for the given genomes with the given parameters
 	 * @param genomes the genomes
-	 * @param params the paramters
+	 * @param params the parameters
 	 * @return the gene clusters
 	 */
 	public GeneCluster[] computeClustersJava(int[][][] genomes, Parameter params) {
@@ -469,9 +469,9 @@ public class GeckoInstance {
 	}
 	
 	/**
-	 * Computes the gene clusters for the given genomes with the given paramters
+	 * Computes the gene clusters for the given genomes with the given parameters
 	 * @param genomes the genomes
-	 * @param params the paramters
+	 * @param params the parameters
 	 * @param genomeGrouping the grouping of the genomes, only one genome per group is used for quorum and p-value
 	 * @return the gene clusters
 	 */
@@ -480,9 +480,9 @@ public class GeckoInstance {
 	}
 	
 	/**
-	 * Computes the gene clusters for the given genomes with the given paramters
+	 * Computes the gene clusters for the given genomes with the given parameters
 	 * @param genomes the genomes
-	 * @param params the paramters
+	 * @param params the parameters
 	 * @return the gene clusters
 	 */
 	public GeneCluster[] computeClustersLibgecko(int[][][] genomes, Parameter params) {
@@ -490,9 +490,9 @@ public class GeckoInstance {
 	}
 	
 	/**
-	 * Computes the gene clusters for the given genomes with the given paramters
+	 * Computes the gene clusters for the given genomes with the given parameters
 	 * @param genomes the genomes
-	 * @param params the paramters
+	 * @param params the parameters
 	 * @return the gene clusters
 	 */
 	public GeneCluster[] computeClusters(int[][][] genomes, Parameter params) {

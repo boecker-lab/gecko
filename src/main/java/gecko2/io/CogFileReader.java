@@ -297,7 +297,6 @@ public class CogFileReader implements GeckoDataReader {
         for (Genome x : groupedGenomes.values()) {
             this.genomes[i++] = x;
         }
-
 	}
 
     /**
