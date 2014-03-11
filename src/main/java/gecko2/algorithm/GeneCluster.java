@@ -99,8 +99,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		Subsequence[][] bestSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
 		Subsequence[][] allSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
 		for (int i=0; i<refCluster.getAllDeltaLocations().size(); i++){
-			List<Subsequence> allSub = new ArrayList<Subsequence>(refCluster.getDeltaLocations(i).size());
-			List<Subsequence> bestSub = new ArrayList<Subsequence>(refCluster.getDeltaLocations(i).size());
+			List<Subsequence> allSub = new ArrayList<>(refCluster.getDeltaLocations(i).size());
+			List<Subsequence> bestSub = new ArrayList<>(refCluster.getDeltaLocations(i).size());
 			for (DeltaLocation dLoc : refCluster.getDeltaLocations(i)){
 				Subsequence subseq = new Subsequence(dLoc.getL(), dLoc.getR(), dLoc.getChrNr(), dLoc.getDistance(), new BigDecimal(dLoc.getpValue()));
 				if (dLoc.getDistance() <= minDistances[i]){
@@ -398,8 +398,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		GeneCluster[] tmp = Arrays.copyOf(allClusters, allClusters.length);
 		Arrays.sort(tmp);
 		for (GeneCluster geneCluster : tmp) {
-            if (!geneCluster.isLinearConserved())
-                System.out.println("NL: " + geneCluster.getId());
             boolean contained = false;
 			for (Iterator<Integer> it = reducedList.iterator(); it.hasNext() && !contained; ) {
 				int index = it.next();
@@ -576,6 +574,35 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             }
         }
         return map;
+    }
+
+
+    /**
+     * Generates the default/initial sub-selection of cluster occurrences.
+     * @param includeSubOptimalOccurrences if sub-optimal occurrences should also be included
+     * @return an int[] with the index of each cluster occurrence that shall be used.
+     */
+    public int[] getDefaultSubSelection(boolean includeSubOptimalOccurrences) {
+        GeneClusterOccurrence gOcc;
+
+        if (includeSubOptimalOccurrences) {
+            gOcc = getAllOccurrences()[0];
+        }
+        else {
+            gOcc = getOccurrences()[0];
+        }
+
+        int[] subselections = new int[GeckoInstance.getInstance().getGenomes().length];
+
+        for (int i = 0; i < subselections.length; i++) {
+            if (gOcc.getSubsequences()[i].length == 0) {
+                subselections[i] = GeneClusterOccurrence.GENOME_NOT_INCLUDED;
+            }
+            else {
+                subselections[i] = 0;
+            }
+        }
+        return subselections;
     }
 
     /**

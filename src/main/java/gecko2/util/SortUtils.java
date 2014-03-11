@@ -3,7 +3,9 @@ package gecko2.util;
 import gecko2.io.GenomeOccurrence;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 
 public class SortUtils {

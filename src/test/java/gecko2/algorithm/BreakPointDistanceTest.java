@@ -2,7 +2,6 @@ package gecko2.algorithm;
 
 import gecko2.GeckoInstance;
 import gecko2.io.CogFileReader;
-import gecko2.io.CogFileReaderTest;
 import org.junit.Test;
 
 import java.io.File;

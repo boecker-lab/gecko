@@ -37,10 +37,10 @@ public class ReferenceCluster {
 		// We now need a list, that is sorted by the ordering of DeltaLocation
 		for (int i=0; i<dLocLists.size(); i++){
 			ListOfDeltaLocations dLocList = dLocLists.get(i);
-            Set<DeltaLocation> set = new TreeSet<DeltaLocation>();
+            Set<DeltaLocation> set = new TreeSet<>();
             for (DeltaLocation dLoc : dLocList)
                 set.add(new DeltaLocation(dLoc));
-            this.dLocLists.add(new ArrayList<DeltaLocation>(set));
+            this.dLocLists.add(new ArrayList<>(set));
             
             int genomeMinDistance = Integer.MAX_VALUE;
             for (DeltaLocation dLoc : dLocList)

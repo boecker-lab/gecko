@@ -230,7 +230,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		        }
 		        
 		        if (selectedItem.equals("Exclude")) {
-		        	gecko.getGui().getGcSelector().dontShowClusWthSelecGenome(Integer.parseInt(cb.getName()));
+		        	gecko.getGui().getGcSelector().dontShowClusterWithSelectedGenome(Integer.parseInt(cb.getName()));
 		        }
 			}
 		});

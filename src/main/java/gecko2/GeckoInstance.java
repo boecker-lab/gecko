@@ -17,7 +17,6 @@ import java.awt.*;
 import java.io.File;
 import java.util.*;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
@@ -184,7 +183,7 @@ public class GeckoInstance {
 	 */
 	public void addToClusterSelection(int clusterIndex) {
 		if (clusterSelection == null)
-			clusterSelection = new TreeSet<Integer>();
+			clusterSelection = new TreeSet<>();
 		clusterSelection.add(clusterIndex);
 		filterResults();
 	}
@@ -204,7 +203,7 @@ public class GeckoInstance {
 	 */
 	public void addToReducedList(int clusterIndex) {
 		if (reducedList == null)
-			reducedList = new TreeSet<Integer>();
+			reducedList = new TreeSet<>();
 		reducedList.add(clusterIndex);
 		filterResults();
 	}
@@ -216,7 +215,7 @@ public class GeckoInstance {
 	 */
 	public void addToReducedList(SortedSet<Integer> toHide) {
 		if (reducedList == null)
-			reducedList = new TreeSet<Integer>();
+			reducedList = new TreeSet<>();
 		reducedList.addAll(toHide);
 		filterResults();
 	}
@@ -241,7 +240,7 @@ public class GeckoInstance {
 		if (filterString == null)
 			filterString = "";
 		if (clusterSelection == null)
-			clusterSelection = new TreeSet<Integer>();
+			clusterSelection = new TreeSet<>();
 		if (reducedList == null)
 			reducedList = GeneCluster.generateReducedClusterList(clusters);
 		if (filterString.equals("")) {
@@ -460,9 +459,9 @@ public class GeckoInstance {
 	}
 	
 	/**
-	 * Computes the gene clusters for the given genomes with the given paramters
+	 * Computes the gene clusters for the given genomes with the given parameters
 	 * @param genomes the genomes
-	 * @param params the paramters
+	 * @param params the parameters
 	 * @return the gene clusters
 	 */
 	public GeneCluster[] computeClustersJava(int[][][] genomes, Parameter params) {
@@ -470,9 +469,9 @@ public class GeckoInstance {
 	}
 	
 	/**
-	 * Computes the gene clusters for the given genomes with the given paramters
+	 * Computes the gene clusters for the given genomes with the given parameters
 	 * @param genomes the genomes
-	 * @param params the paramters
+	 * @param params the parameters
 	 * @param genomeGrouping the grouping of the genomes, only one genome per group is used for quorum and p-value
 	 * @return the gene clusters
 	 */
@@ -481,9 +480,9 @@ public class GeckoInstance {
 	}
 	
 	/**
-	 * Computes the gene clusters for the given genomes with the given paramters
+	 * Computes the gene clusters for the given genomes with the given parameters
 	 * @param genomes the genomes
-	 * @param params the paramters
+	 * @param params the parameters
 	 * @return the gene clusters
 	 */
 	public GeneCluster[] computeClustersLibgecko(int[][][] genomes, Parameter params) {
@@ -491,9 +490,9 @@ public class GeckoInstance {
 	}
 	
 	/**
-	 * Computes the gene clusters for the given genomes with the given paramters
+	 * Computes the gene clusters for the given genomes with the given parameters
 	 * @param genomes the genomes
-	 * @param params the paramters
+	 * @param params the parameters
 	 * @return the gene clusters
 	 */
 	public GeneCluster[] computeClusters(int[][][] genomes, Parameter params) {
@@ -647,9 +646,9 @@ public class GeckoInstance {
 	public boolean exportResultsToFile(File f, ResultFilter filter, ExportType type) {
 		lastExportedFile = f;
 		filterResults();
-		List<String> genomeNames = new ArrayList<String>(genomes.length);
+		List<String> genomeNames = new ArrayList<>(genomes.length);
 		for (Genome genome : genomes)
 			genomeNames.add(genome.getName());
-		return ResultWriter.exportResultsToFileNEW2(f, getClusterList(filter), genomeNames, type);
+		return ResultWriter.exportResultsToFile(f, getClusterList(filter), genomeNames, type);
 	}
 }

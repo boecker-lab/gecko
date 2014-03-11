@@ -4,7 +4,6 @@ import gecko2.algorithm.ExternalGeneId;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 
-import java.awt.*;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Map;

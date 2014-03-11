@@ -1,18 +1,22 @@
 package gecko2.gui;
 
+import com.itextpdf.text.DocumentException;
 import gecko2.algorithm.GeneCluster;
 import gecko2.gui.GenomePainting.NameType;
 import gecko2.io.GeneClusterToPDFWriter;
-import gecko2.io.ImageWriter;
 import gecko2.util.FileUtils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 /**
@@ -77,11 +81,11 @@ public class GeneClusterExportDialog extends JDialog {
 	
 	/**
 	 * Constructor sets the elements of the dialog.
-	 * 
+	 *
 	 * @param parent the parent frame
 	 */
 	public GeneClusterExportDialog (final Frame parent, GeneCluster cluster, int[] subselection) {
-		
+
 		// Setup the dialog window
 		super(parent,"Export gene cluster");
 		super.setModal(true);
@@ -113,7 +117,6 @@ public class GeneClusterExportDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
 				// set up file chooser
 				JFileChooser fileLocation = new JFileChooser();
 				fileLocation.setName(FILENAME);
@@ -140,7 +143,6 @@ public class GeneClusterExportDialog extends JDialog {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				
 				int status = e.getStateChange();
 				
 				// update preview on select/deselect
@@ -198,7 +200,6 @@ public class GeneClusterExportDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
 				GeneClusterExportDialog.this.setVisible(false);
 			}
 			
@@ -218,29 +219,30 @@ public class GeneClusterExportDialog extends JDialog {
                 // behavior
                 String filename = checkAndFixFileExtension(GeneClusterExportDialog.this.storingLocation.getText());
                 GeneClusterExportDialog.this.storingLocation.setText(filename);
-
                 if (!checkFileExistence(new File(filename))) {
+                    try (FileOutputStream out = new FileOutputStream(new File(GeneClusterExportDialog.this.storingLocation.getText()))) {
+                        if (GeneClusterExportDialog.this.png) {
+                            ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "png", out);
+                            GeneClusterExportDialog.this.setVisible(false);
+                        }
+
+                        // jpg export
+                        if (GeneClusterExportDialog.this.jpg) {
+                            ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "jpg", out);
+                            GeneClusterExportDialog.this.setVisible(false);
+                        }
+
+                        // pdf export
+                        if (GeneClusterExportDialog.this.pdf) {
+                            GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(out);
+                            gcw.write(GeneClusterExportDialog.this.clusterPics);
+                            GeneClusterExportDialog.this.setVisible(false);
+                        }
+                    }  catch (IOException | DocumentException e) {
+                        e.printStackTrace();
+                    }
                     // png export
-                    if (GeneClusterExportDialog.this.png) {
-                        ImageWriter.createPNGPic(GeneClusterExportDialog.this.clusterPics.createImage(), GeneClusterExportDialog.this.storingLocation.getText());
-                        GeneClusterExportDialog.this.setVisible(false);
-                    }
 
-                    // jpg export
-                    if (GeneClusterExportDialog.this.jpg) {
-                        ImageWriter.createJPGPic(GeneClusterExportDialog.this.clusterPics.createImage(), GeneClusterExportDialog.this.storingLocation.getText());
-                        GeneClusterExportDialog.this.setVisible(false);
-                    }
-
-                    // pdf export
-                    if (GeneClusterExportDialog.this.pdf) {
-                        GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(new File(GeneClusterExportDialog.this.storingLocation.getText()),
-                                GeneClusterExportDialog.this.authorName.getText(),
-                                GeneClusterExportDialog.this.clusterPics);
-                        gcw.setOutputFile(GeneClusterExportDialog.this.storingLocation.getText());
-                        gcw.createPDF();
-                        GeneClusterExportDialog.this.setVisible(false);
-                    }
                 }
             }
         });
@@ -276,11 +278,10 @@ public class GeneClusterExportDialog extends JDialog {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				
 				int status = e.getStateChange();
 				
 				if (status == ItemEvent.SELECTED) {
-					
+
 					pdf = false;
 					png = true;
 					jpg = false;
@@ -297,11 +298,10 @@ public class GeneClusterExportDialog extends JDialog {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				
 				int status = e.getStateChange();
 				
 				if (status == ItemEvent.SELECTED) {
-					
+
 					pdf = false;
 					png = false;
 					jpg = true;
@@ -319,11 +319,10 @@ public class GeneClusterExportDialog extends JDialog {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				
 				int status = e.getStateChange();
 				
 				if (status == ItemEvent.SELECTED) {
-					
+
 					pdf = true;
 					png = false;
 					jpg = false;
@@ -454,4 +453,54 @@ public class GeneClusterExportDialog extends JDialog {
 		
 		return absoluteFileFixed;
 	}
+
+    /**
+     * The class implements a simple preview for the pdf file created with the
+     * GeneClusterToPDFWriter.
+     *
+     * @author Hans-Martin Haase <hans-martin dot haase at uni-jena dot de>
+     *
+     */
+    private static class Preview extends JPanel {
+        /**
+         * Random generated serial version UID
+         */
+        private static final long serialVersionUID = -1392501449288707281L;
+
+        /**
+         * Stores the original given picture which was set in the constructor.
+         */
+        private BufferedImage clusterPicture;
+
+        /**
+         * The constructor sets the global variable clusterPicture and sets a basic layout.
+         *
+         * @param toShow BufferdImage from GeneClusterToPDFWriter
+         */
+        public Preview (BufferedImage toShow) {
+            this.setImage(toShow);
+            this.setBackground(Color.WHITE);
+        }
+
+        private void setImage(BufferedImage image) {
+            this.clusterPicture = image;
+            this.setPreferredSize(new Dimension(clusterPicture.getWidth(), clusterPicture.getHeight()));
+        }
+
+        /**
+         * Overwrites the paint method so the the cluster picture is on the Frame.
+         */
+        @Override
+        public void paint(Graphics g) {
+            g.drawImage(this.clusterPicture, 15, 15, null);
+        }
+
+        public void updatePreview(BufferedImage newImage) {
+            setImage(newImage);
+            this.getGraphics().dispose();
+            this.getGraphics().drawImage(this.clusterPicture, 15, 15, null);
+            this.validate();
+            this.repaint();
+        }
+    }
 }

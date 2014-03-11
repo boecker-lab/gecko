@@ -6,8 +6,10 @@ import gecko2.util.SortUtils;
 
 import java.io.*;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -126,7 +128,6 @@ public class CogFileReader implements GeckoDataReader {
 	/**
 	 * This method computes the occurrences of the genes.
 	 *
-	 * @return a ArrayList with the occurrences of the genes
 	 * @throws FileNotFoundException
 	 */
 	public void importGenomesOccs() throws FileNotFoundException	{
@@ -296,7 +297,6 @@ public class CogFileReader implements GeckoDataReader {
         for (Genome x : groupedGenomes.values()) {
             this.genomes[i++] = x;
         }
-
 	}
 
     /**
