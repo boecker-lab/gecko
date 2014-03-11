@@ -14,6 +14,9 @@ A typical Gecko session is divided into three parts: genome selection,
 cluster detection, manual evaluation of predictions. These parts are
 described in the following in more detail.
 
+Gecko2 can either be run in commandline mode, '-h' will give all possible
+parameters. Or it can be used in GUI mode, if started without any
+parameters.
 
 2.1 Data
 
@@ -112,19 +115,22 @@ After completion of computations, results are shown in tabular form
 below the genome browser. The table contains the list of all predicted
 gene clusters, listing the number of genes, the number of included
 genomes, the score of the best occurrence combination (negative
-logarithm of p-value) and a list with the IDs of all involved genomes.
+logarithm of p-value, and negative logarithm of FDR corrected p-value)
+and a list with the IDs of all involved genomes.
+Under the table different filter modes for the results can be choosen.
+Either all gene clusters are shown (showAll), for all overlapping occurrences,
+only the best scoring one is reported (showFiltered), or only selected
+clusters are shown. Clusters can be selected by right clicking on the table columns.
 By default, the gene cluster list is sorted by decreasing score.  A gene
 cluster can be selected with a double-click on the entry -- its best
 occurrence will then be visualized by the genome browser, and details
 about the cluster will be displayed in an information area. Additional
 (and, if enabled by the user, also suboptimal) occurrences can be
-selected from a separate list for median and center gene clusters, or be
-selected with navigation buttons next to the genomes for reference gene
-clusters.
+selected with navigation buttons next to the genomes.
 
 The visualization of a selected gene cluster has been optimized to allow
 for an easy inspection of the gene cluster -- the genome browser allows
-to visualize the neighborhood on each genome, mouseover tooltips provide
+to visualize the neighborhood on each genome, mouse over tooltips provide
 the user with the annotation data available for genes or chromosomes,
 and the information area allows for a more detailed inspection of the
 search result. It is possible to filter for clusters containing
@@ -132,8 +138,13 @@ individual genes or functional gene annotations by typing the respective
 information into the 'Search' field above the genome browser.
 
 The results of a Gecko2 session can be stored in a file with ending
-'.gck'. It may also be useful to copy individual clusters for re-use as
-'fixed cluster' input in an additional run of Gecko2 under reference
-mode.
+'.gck' via 'File'->'Save session'.
+
+Results can be exported via 'File'->'Export results' in different data formats.
+1. A simple <Tab> separated table
+2. A latex table
+3. A pdf with pictures of all clusters (not all pdf viewers will be able to open them)
+4. A zip file with one pdf per cluster
+
 
 
