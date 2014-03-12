@@ -74,54 +74,35 @@ public class Chromosome implements Serializable {
         return result;
     }
 
+    private static int[] toIntArray(List<Gene> genes, boolean addZeros, boolean abs, boolean useReduction) {
+        int array[] = addZeros?new int[genes.size()+2]:new int[genes.size()];
+        final int offset = addZeros?1:0;
+
+        if (addZeros) {
+            array[0] = 0;
+            array[array.length-1] = 0;
+        }
+
+        for (int i=0;i<genes.size();i++) {
+            int geneId = useReduction?genes.get(i).getHomologyId():genes.get(i).getId();
+            array[i+offset] = abs?Math.abs(geneId):geneId;
+        }
+
+        return array;
+    }
+
     public int[] toIntArray(boolean addZeros, boolean abs) {
-		int array[];
-		if (!addZeros) {
-			array = new int[genes.size()];
-			if (abs)
-				for (int i=0;i<array.length;i++) 
-					array[i] = Math.abs(genes.get(i).getId());
-			else
-				for (int i=0;i<array.length;i++) 
-					array[i] = genes.get(i).getId();
-		} else {
-			array = new int[genes.size()+2];
-			array[0] = 0;
-			if (abs)
-				for (int i=1;i<array.length-1;i++) 
-					array[i] = Math.abs(genes.get(i-1).getId());
-			else
-				for (int i=1;i<array.length-1;i++) 
-					array[i] = genes.get(i-1).getId();
-			array[array.length-1]=0;
-		}
-		return array;
+        return toIntArray(genes, addZeros, abs, false);
 	}
+
+    public int[] toReducedIntArray(boolean addZeros) {
+        return toIntArray(genes, addZeros, true, true);
+    }
 	
 	public int[] toRandomIntArray(boolean addZeros, boolean abs) {
-		int array[];
-		List<Gene> tmp = new ArrayList<Gene>(genes);
+		List<Gene> tmp = new ArrayList<>(genes);
 		Collections.shuffle(tmp);
-		if (!addZeros) {
-			array = new int[genes.size()];
-			if (abs)
-				for (int i=0;i<array.length;i++) 
-					array[i] = Math.abs(tmp.get(i).getId());
-			else
-				for (int i=0;i<array.length;i++) 
-					array[i] = tmp.get(i).getId();
-		} else {
-			array = new int[tmp.size()+2];
-			array[0] = 0;
-			if (abs)
-				for (int i=1;i<array.length-1;i++) 
-					array[i] = Math.abs(tmp.get(i-1).getId());
-			else
-				for (int i=1;i<array.length-1;i++) 
-					array[i] = tmp.get(i-1).getId();
-			array[array.length-1]=0;
-		}
-		return array;
+        return toIntArray(tmp, addZeros, abs, false);
 	}
 	
 	public int[] toIntArray() {

@@ -384,15 +384,71 @@ public class CogFileReaderTest {
     }
 
     @Test
-    public void testFileReaderToGenomeIntArray() throws IOException, ParseException{
+    public void testFileReaderToGenomeIntArrayWithoutUnHomologous() throws IOException, ParseException{
+        // Given
         File inputFile = new File(getClass().getResource("/c.cog").getFile());
+        int[][][] expected = new int[][][] {
+                {{0,1,2,3,4,5,6,3,1,0}},
+                {{0,7,4,3,1,8,4,5,4,1,6,9,7,0}},
+                {{0,10,3,5,1,4,11,11,2,4,3,6,1,5,12,0}},
+                {{0,7,7,4,4,2,3,1,12,0},{0,9,1,4,8,5,12,5,0}}
+        };
 
+        // When
         CogFileReader reader = new CogFileReader(inputFile);
-
         reader.readData();
-
+        Gene.setGeneLabelMap(reader.getGeneLabelMap());
         int[][][] genomes = Genome.toIntArray(reader.getGenomes());
 
         Genome.printIntArray(genomes);
+
+        // Then
+        assertArrayEquals(expected, genomes);
+    }
+
+    @Test
+    public void testFileReaderToGenomeIntArrayWithUnHomologous() throws IOException, ParseException{
+        // Given
+        File inputFile = new File(getClass().getResource("/smallReaderTest.cog").getFile());
+        int[][][] expected = new int[][][] {
+                {{0,1,2,3,4,5,6,3,1,0}},
+                {{0,7,4,3,1,8,4,5,4,1,6,9,7,10,11,12,0}},
+                {{0,13,3,5,1,4,14,14,2,4,3,6,1,5,15,0}},
+                {{0,7,7,4,4,2,3,1,15,0},{0,9,1,4,8,5,15,5,16,0}}
+        };
+
+        // When
+        CogFileReader reader = new CogFileReader(inputFile);
+        reader.readData();
+        Gene.setGeneLabelMap(reader.getGeneLabelMap());
+        int[][][] genomes = Genome.toIntArray(reader.getGenomes());
+
+        Genome.printIntArray(genomes);
+
+        // Then
+        assertArrayEquals(expected, genomes);
+    }
+
+    @Test
+    public void testFileReaderToReducedGenomeIntArrayWithUnHomologous() throws IOException, ParseException{
+        // Given
+        File inputFile = new File(getClass().getResource("/smallReaderTest.cog").getFile());
+        int[][][] expected = new int[][][] {
+                {{0,1,2,3,4,5,6,3,1,0}},
+                {{0,7,4,3,1,8,4,5,4,1,6,9,7,10,11,12,0}},
+                {{0,13,3,5,1,4,14,14,2,4,3,6,1,5,15,0}},
+                {{0,7,7,4,4,2,3,1,15,0},{0,9,1,4,8,5,15,5,16,0}}
+        };
+
+        // When
+        CogFileReader reader = new CogFileReader(inputFile);
+        reader.readData();
+        Gene.setGeneLabelMap(reader.getGeneLabelMap());
+        int[][][] genomes = Genome.toReducedIntArray(reader.getGenomes());
+
+        Genome.printIntArray(genomes);
+
+        // Then
+        assertArrayEquals(expected, genomes);
     }
 }

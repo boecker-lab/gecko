@@ -44,11 +44,22 @@ public class Gene implements Serializable {
 
     /**
      * Returns the internal integer id
-     * @return
+     * @return the gene family id
      */
 	public int getId() {
 		return id;
 	}
+
+    /**
+     * Returns the internal integer homology family id, -1 if the gene is in a single gene gene family
+     * @return the id
+     */
+    public int getHomologyId() {
+        if (isUnknown())
+            return -1;
+        else
+            return getId();
+    }
 
     public boolean isUnknown() {
         return Gene.isSingleGeneFamily(id);
