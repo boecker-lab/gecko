@@ -50,6 +50,7 @@ class Chromosome {
         this.R_prime = null;
     }
     
+    
     /**
      * Constructs a new instance of a Chromosome from a List of Integers representing the gene homologies. Assigns a number to the chromosome and appends terminal character 0 to the chromosome. Calculates some additional members of the Chromosome, based on the alphabet size of the whole set of genomes and the parameters of the algorithm.
      *
@@ -106,6 +107,14 @@ class Chromosome {
         this.nextOcc = this.computeNextOcc(alphabetSize);
     }
 
+    private int neg(int gen){
+    	if (gen >= 0){
+    		return gen;
+    	} else {
+    		return 0;
+    	}
+    }
+    
     private int[][] computePOS(int alphabetSize) {
     	//TODO genes[i] not the right position so error
     	
@@ -116,10 +125,10 @@ class Chromosome {
             tmp.add(null);
         }
         for (int i=1; i<=this.size(); i++) {       // genes starts and ends with 0 that is not part of the genome
-        	if (tmp.get(genes[i])==null) {
-        		tmp.set(genes[i], new LinkedList<Integer>());
+        	if (tmp.get(neg(genes[i]))==null) {
+        		tmp.set(neg(genes[i]), new LinkedList<Integer>());
         	}
-        	tmp.get(genes[i]).add(i);
+        	tmp.get(neg(genes[i])).add(i);
         }
         int[][] newPos = new int[alphabetSize+1][];
         for (int i=0; i<=alphabetSize; i++) {
@@ -274,7 +283,7 @@ class Chromosome {
      * @return the IntArray of positions of the character.
      */
     public int[] getPOS(int c) {
-        return pos[c];
+        return pos[neg(c)];
     }
 
     /**
@@ -309,7 +318,7 @@ class Chromosome {
             int d = 1;
 
             for (int j=i-1; j>0 && d<=maxDist+1; j--) {                                 // search for unmarked char left of i
-                if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
+                if (rank.getRank(neg(genes[j])) > rank.getRank(neg(genes[i]))) {  // if unmarked char found
                     if(this.getNUMDiff(j, i, j+1, i) > 0) {                         // if unmarked char found for the 1st time
                         L[i][d] = j;
                         d++;
@@ -414,7 +423,7 @@ class Chromosome {
             int d = 1;
 
                 for (int j=i+1; j<=this.size() && d<=maxDist+1; j++) {                   // search for unmarked char right of i
-                if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
+                if (rank.getRank(neg(genes[j])) > rank.getRank(neg(genes[i]))) {  // if unmarked char found
                     if(this.getNUMDiff(i, j, i, j-1) > 0) {                         // if unmarked char found for the 1st time
                         R[i][d] = j;
                         d++;
@@ -527,10 +536,10 @@ class Chromosome {
     	int maxUpdateRank = (leftBorderForPrimes==1) ? alphabetSize+1 : rank.getRank(geneForPrimes);
     	
     	for(int j=1;j<=this.size();j++){ // Iteriere durch jede Position der aktuellen Sequenz
-			if(rank.getRank(genes[j])<=maxUpdateRank) {
+			if(rank.getRank(neg(genes[j]))<=maxUpdateRank) {
 				for(int p=1; p<=deltaForPrimes+1; p++) {
 					for(int l=this.L[j][p]+1; l<=j; l++) {
-						if(rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
+						if(rank.getRank(neg(genes[l])) <= rank.getRank(neg(genes[j]))) {
 							L_prime[j][p] = l;
 							break;
 						}
@@ -553,10 +562,10 @@ class Chromosome {
     	int maxUpdateRank = (leftBorderForPrimes==1) ? alphabetSize+1 : rank.getRank(geneForPrimes);
     	
     	for(int j=1;j<=this.size();j++){ // Iteriere durch jede Position der aktuellen Sequenz
-			if(rank.getRank(genes[j])<=maxUpdateRank) {
+			if(rank.getRank(neg(genes[j]))<=maxUpdateRank) {
 				for(int p=1; p<=deltaForPrimes+1; p++) {
 					for(int l=this.R[j][p]-1; l>=j; l--) {
-						if(rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
+						if(rank.getRank(neg(genes[l])) <= rank.getRank(neg(genes[j]))) {
 							R_prime[j][p] = l;
 							break;
 						}

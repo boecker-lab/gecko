@@ -1350,7 +1350,7 @@ public class ReferenceClusterTest
 	 * 		contigSpanning: false
 	 *
 	 */
-	@Test
+/*	@Test
 	public void testComputeClustersWithGroupedGenomes()
 	{
 		// def array for computationsub2, sub4
@@ -1412,5 +1412,5 @@ public class ReferenceClusterTest
 				
 		performTest(refCluster, res, PValueComparison.COMPARE_NONE);
 	}
-}
+*/}
 

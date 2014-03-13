@@ -98,7 +98,7 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	
 	public ListOfDeltaLocations getOptimalCopy() {
 		ListOfDeltaLocations newList = new ListOfDeltaLocations();
-		for (DeltaLocation dLoc : deltaLocations)
+ 		for (DeltaLocation dLoc : deltaLocations)
 			if (dLoc.isValid()) {
 				boolean validLoc = true;
 				Iterator<DeltaLocation> newLocIter = newList.iterator();
