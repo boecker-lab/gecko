@@ -101,7 +101,7 @@ class Pattern {
         	IntArray.reset(maxRemDist, -1);
         } else {
         	this.lastChar = c;
-        	this.r = 0;
+        	this.r = r;
         	pSize++;
         	occ[0]++;
         	IntArray.increaseAll(minDist);

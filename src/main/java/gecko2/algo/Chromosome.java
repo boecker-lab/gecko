@@ -347,7 +347,7 @@ class Chromosome {
             int lastOcc = 0;
             for (int j=1; j<=this.size(); j++){
                 if (lastOcc!=0) {                                                       // if c_old has already occurred in the list
-                    if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
+                    if (rank.getRank(neg(genes[j])) < rank.getRank(neg(c_old))) {       // if rank of character smaller than the new rank of c_old
                         for (int l=1; l<=maxDist+1; l++) {                              // test if entries for position i in array L change,
                             if  (this.getL(j, l) < lastOcc) {                            // because c_old is a new mismatch left of i
                                 for (int p=maxDist+1; p>l; p--)
@@ -368,11 +368,11 @@ class Chromosome {
             int[] c_old_L = new int[maxDist+2];
 
             for (int j=1; j<=this.size(); j++) {
-                if (rank.getRank(genes[j]) > rank.getRank(c_old)) {
+                if (rank.getRank(neg(genes[j])) > rank.getRank(neg(c_old))) {
                     int prevOcc = maxDist + 1;          // the sign is at last position per default
 
                     for (int p=1; p<=maxDist+1; p++) {
-                        if (genes[j] == genes[c_old_L[p]]) {    // search for the first entry in the neighbor array
+                        if (genes[j] == genes[neg(c_old_L[p])]) {    // search for the first entry in the neighbor array
                             prevOcc = p;                                        // that has the char chr[j], and store the position in prevOcc
                             break;
                         }
@@ -453,7 +453,7 @@ class Chromosome {
 
             for (int j=this.size(); j>=1; j--){
                 if (lastOcc!=this.size()+1) {                                            // if c_old has already occurred in the list
-                    if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
+                    if (rank.getRank(neg(genes[j])) < rank.getRank(neg(c_old))) {       // if rank of character smaller than the new rank of c_old
                         for (int l=1; l<=maxDist+1; l++) {                              // test if entries for position i in array R change,
                             if  (this.getR(j, l) > lastOcc) {                            // because c_old is a new mismatch left of i
                                 for (int p=maxDist+1; p>l; p--)
@@ -474,11 +474,11 @@ class Chromosome {
             int[] c_old_R = IntArray.newIntArray(maxDist+2, this.size()+1);
 
             for (int j=this.size(); j>=1; j--) {
-                if (rank.getRank(genes[j]) > rank.getRank(c_old)) {
+                if (rank.getRank(neg(genes[j])) > rank.getRank(neg(c_old))) {
                     int prevOcc = maxDist + 1;          // the sign is at last position per default
 
                     for (int p=1; p<=maxDist+1; p++) {
-                        if (genes[j] == genes[c_old_R[p]]) {    // search for the first entry in the neighbor array
+                        if (genes[j] == genes[neg(c_old_R[p])]) {    // search for the first entry in the neighbor array
                             prevOcc = p;                                        // that has the char chr[j], and store the position in prevOcc
                             break;
                         }

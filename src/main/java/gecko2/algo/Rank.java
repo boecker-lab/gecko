@@ -27,7 +27,7 @@ class Rank{
      * @return the value of the character
      */
     public int getRank(int character) {
-        return rank[character];
+        return rank[neg(character)];
     }
 
     /**
@@ -51,6 +51,11 @@ class Rank{
         }
     }
 
+    private int neg(int gen){
+    	if(gen>0) return gen;
+    	else return 0;
+    }
+    
     /**
      * Updates the values of rank based on chr[leftBorder, |chr|].
      * @param chr the chromosome the rank is calculated for.
@@ -67,17 +72,18 @@ class Rank{
             for (i=leftBorder; i<=chr.size(); i++) {                 // Iterate through substrings starting with leftBorder
                 if (chr.getGene(i)!=chr.getGene(leftBorder-1)) {                        // if character is not equal to the character at position leftBorder-1
                 	if (chr.getNUMDiff(leftBorder-1, i, leftBorder-1, i-1) > 0) {   // only update if first occurrence after position i
-                        rank[chr.getGene(i)] = rank[chr.getGene(i)]-1;           // new rank = old rank - 1
-                        maxRank = Math.max(maxRank, rank[chr.getGene(i)]);               // max rank in the interval [leftBorder, i]
+                        rank[neg(chr.getGene(i))] = rank[neg(chr.getGene(i))]-1;           // new rank = old rank - 1
+                        maxRank = Math.max(maxRank, rank[neg(chr.getGene(i))]);               // max rank in the interval [leftBorder, i]
                     }
                 }
                 else {                                      // if first occurrence of character at position leftBorder-1 is found
-                    rank[chr.getGene(i)] = maxRank+1;    // character has maximal rank
+                    rank[neg(chr.getGene(i))] = maxRank+1; // character has maximal rank
+                    if(chr.getGene(i)<0) rank[0]--;
                     break;                                  // update can be stopped, as the rank of all other characters is unchanged
                 }
             }
             if (i==chr.size()+1) {                                      // if character at position leftBorder-1 is not part of the interval
-                rank[chr.getGene(leftBorder-1)] = alphabetSize;      // he is assigned the default rank
+                rank[neg(chr.getGene(leftBorder-1))] = alphabetSize;      // he is assigned the default rank
             }
         }
     }

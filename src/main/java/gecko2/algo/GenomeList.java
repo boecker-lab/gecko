@@ -268,13 +268,18 @@ class GenomeList {
         return rank.isOptimalInterval(chr, lastChar, l, r);
     }
     
+    private int neg(int gen){
+    	if(gen > 0) return gen;
+    	else return 0;
+    }
+    
     int[][] charFrequencies() {
     	int[][] charFreq = new int[genomes.size()][alphabetSize+1];
     	
     	for (int k=0; k<genomes.size(); k++)
     		for (Chromosome chr : genomes.get(k))
     			for (int i=0; i<chr.size()+1; i++)  // Correct for not counted 0 termination
-    				charFreq[k][chr.getGene(i)]++;
+    				charFreq[k][neg(chr.getGene(i))]++;
  
     	return charFreq;
     }

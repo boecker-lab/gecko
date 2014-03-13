@@ -360,7 +360,7 @@ class Statistics {
 			int totalLength) {
 		int totalCharFreq = 0;
 		for (Integer gene : geneContent)
-			totalCharFreq += charFreqs[gene];
+			totalCharFreq += charFreqs[neg(gene)];
 		
 		return ((double)totalCharFreq)/totalLength;
 	}
@@ -372,11 +372,11 @@ class Statistics {
 		int totalFreq = 0;
 		int i=1;
 		for (Integer gene : geneContent){
-			totalFreq += charFreqs[gene];
-			if (charFreqs[gene] <= 0)
+			totalFreq += charFreqs[neg(gene)];
+			if (charFreqs[neg(gene)] <= 0)
 				localCharProb[i] = 0.0;
 			else
-				localCharProb[i] = ((double)charFreqs[gene])/totalFreq;
+				localCharProb[i] = ((double)charFreqs[neg(gene)])/totalFreq;
 			i++;
 		}
 		assert(geneContent.size() + 1 == i);
@@ -384,11 +384,16 @@ class Statistics {
 		return localCharProb;
 	}
 
+	private int neg(int gen){
+		if(gen>0) return gen;
+		else return 0;
+	}
+	
 	private boolean noDLocPossible(List<Integer> geneContent, int maxDelta,
                                    int[] charFreqs) {
 		int nonAppearingGenes = 0;
 		for (Integer gene : geneContent){
-			if (charFreqs[gene] == 0)
+			if (charFreqs[neg(gene)] == 0)
 				nonAppearingGenes++;
 			if (nonAppearingGenes > maxDelta)
 				return true;
