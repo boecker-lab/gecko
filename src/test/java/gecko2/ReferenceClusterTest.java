@@ -56,7 +56,7 @@ public class ReferenceClusterTest
         int genomes[][][] = {{{0, 1, 2, -4, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
 
         Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-        p.setAlphabetSize(4);
+       // p.setAlphabetSize(5);
 
         // Test the java implementation
         GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);

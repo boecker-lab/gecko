@@ -335,8 +335,9 @@ class Statistics {
 			int sizeOfC, PTable pMinusTable, PTable pPlusTable) {
 		double prob = 0.0;
 		Binomial binomial = null;
-		if (probOfC != 1.0)
+		if (probOfC < 1.0) //!=
 			binomial = new Binomial(L, probOfC, random);
+			//Illegal argument (5 1,2 random) <= 0.0
 		
 		for (int d_plus = Math.max(0, d-(sizeOfC-2)); d_plus<=d; d_plus++){
 			if (binomial != null) {

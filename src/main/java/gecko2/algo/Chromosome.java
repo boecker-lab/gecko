@@ -115,16 +115,27 @@ class Chromosome {
     	}
     }
     
+    private int max(int[] gen){
+    	int help = 0;
+    	for(int x= help; x<gen.length; x++){
+    		if(help<gen[x]){
+    			help = x;
+    		}
+    	}
+    	return gen[help];
+    }
+    
     private int[][] computePOS(int alphabetSize) {
     	//TODO genes[i] not the right position so error
     	
+    	//alphabetSize = max(genes);
     	
     	//detectReferenceGeneClusterFromSingleChromosome  
     	List<LinkedList<Integer> > tmp = new ArrayList<>(alphabetSize+1);
         for (int i=0; i<=alphabetSize; i++) {
             tmp.add(null);
         }
-        for (int i=1; i<=this.size(); i++) {       // genes starts and ends with 0 that is not part of the genome
+        for (int i=1; i<this.size(); i++) {       // genes starts and ends with 0 that is not part of the genome
         	if (tmp.get(neg(genes[i]))==null) {
         		tmp.set(neg(genes[i]), new LinkedList<Integer>());
         	}

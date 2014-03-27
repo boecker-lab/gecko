@@ -129,7 +129,7 @@ class Pattern {
         int c = refChr.getGene(i);
         if (refChr.getGene(getLeftBorder() - 1) == c)          // If pattern no longer left maximal
             return false;
-        while (nrOccurrences(neg(refChr.getGene(i + 1))) > 0 || refChr.getGene(i + 1) == c) // expand until the pattern is right maximal
+        while ((i < refChr.size()) && (nrOccurrences(neg(refChr.getGene(i + 1))) > 0 || refChr.getGene(i + 1) == c)) // expand until the pattern is right maximal
             i++;
 
         addToPattern(c, i);

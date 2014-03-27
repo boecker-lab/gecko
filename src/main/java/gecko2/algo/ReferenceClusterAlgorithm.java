@@ -77,6 +77,8 @@ public class ReferenceClusterAlgorithm {
 					} else if(help2.id.isEmpty() != true) {
 						if(help2.id.get(help2.id.size()-1) < 0){
 							help2.id.set(help2.id.size()-1, help2.id.get(help2.id.size()-1)-1);
+						} else if(genomes[l][m][x]<0){
+							help2.anlegen(genomes[l][m][x]);
 						} else {
 							help2.anlegen(-1);
 						}
@@ -121,7 +123,6 @@ public class ReferenceClusterAlgorithm {
 		return computeReferenceClusters(genomes, param, null);
 	}
 
-
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
 	 * @param genomes the genomes
@@ -133,15 +134,6 @@ public class ReferenceClusterAlgorithm {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
 		genomes = memReducer(genomes,param);
-		
-		/*for(int l = 0; l<genomes.length;l++){
-			for(int m = 0; m<genomes[l].length; m++){
-				for(int x = 0; x<genomes[l][m].length;x++){
-					System.out.print(genomes[l][m][x] + " ");
-				}
-				System.out.println("");
-			}
-		}*/
 		
 		GenomeList data;
 		if (param.getAlphabetSize() >= 0)
