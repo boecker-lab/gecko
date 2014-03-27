@@ -180,7 +180,7 @@ class GenomeList {
      * @return the value of the character
      */
     public int getRank(int character) {
-        return rank.getRank(character);
+        return (character >= 0) ? rank.getRank(character) : rank.getRank(0);
     }
     
     public boolean zeroOccs(int refGenomeNr, int refChrNr, int position, boolean searchRefInRef){

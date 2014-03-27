@@ -384,6 +384,10 @@ class Chromosome {
             int d = 1;
 
             for (int j=i-1; j>0 && d<=maxDist+1; j--) {                                 // search for unmarked char left of i
+                if (genes[j] < 0) {
+                    L[i][d] = j;
+                    d++;
+                }
                 if (rank.getRank(neg(genes[j])) > rank.getRank(neg(genes[i]))) {  // if unmarked char found
                     if(this.getNUMDiff(j, i, j+1, i) > 0) {                         // if unmarked char found for the 1st time
                         L[i][d] = j;

@@ -12,13 +12,6 @@ public class ReferenceClusterAlgorithm {
 	private final int nrOfGenomeGroups;
 	private final boolean useGenomeGrouping;
 	
-	/**
-	 * Compute reduced genomes
-	 * @param genomes the genomes
-	 * @param p the parameters
-	 * @return the reduced genomes
-	 */
-	
 	private static class MemRed{
 		ArrayList<Integer> id;
 		ArrayList<Integer> anzahl;
@@ -133,7 +126,7 @@ public class ReferenceClusterAlgorithm {
 	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
-		genomes = memReducer(genomes,param);
+		//genomes = memReducer(genomes,param);
 		
 		GenomeList data;
 		if (param.getAlphabetSize() >= 0)
