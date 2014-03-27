@@ -119,29 +119,82 @@ class Chromosome {
     	int help = 0;
     	for(int x= help; x<gen.length; x++){
     		if(help<gen[x]){
-    			help = x;
+    			help = gen[x];
     		}
     	}
-    	return gen[help];
+    	return help;
+    }
+    
+    class test{
+    	int id;
+    	ArrayList<Integer> pos;
+    	
+    	test(int id){
+    		this.id = id;
+    		this.pos = new ArrayList<Integer>();
+    	}
+    	void add(int x){
+    		this.pos.add(x);
+    	}
     }
     
     private int[][] computePOS(int alphabetSize) {
     	//TODO genes[i] not the right position so error
     	
     	//alphabetSize = max(genes);
-    	
     	//detectReferenceGeneClusterFromSingleChromosome  
-    	List<LinkedList<Integer> > tmp = new ArrayList<>(alphabetSize+1);
-        for (int i=0; i<=alphabetSize; i++) {
+    	//List<LinkedList<Integer> > tmp = new ArrayList<>(alphabetSize+1);
+    	test[] k = new test[alphabetSize+1];
+    	
+    	for(int l=0;l<=alphabetSize;l++){
+    		k[l] = new test(0);
+    	}
+    	
+    	int m = 0;
+    	for (int i=1;i<=this.size();i++){
+    		boolean t = false;
+    		for (int l=0;l<=alphabetSize;l++){
+    			if (genes[i] >= 0){
+    				if(k[l].id == genes[i]){
+    					k[l].pos.add(i);
+    					t = true;
+    				}
+    			} else {
+    				if (k[l].id < 0){
+    					k[l].pos.add(i);
+    					t = true;
+    				}
+    			}
+    		}
+    		if (t != true){
+    			k[m].id = genes[i];
+    			k[m].pos.add(i);
+    			m++;
+    		}
+    	}
+    	
+        /*for (int i=0; i<=alphabetSize; i++) {
             tmp.add(null);
         }
+        
+        
         for (int i=1; i<this.size(); i++) {       // genes starts and ends with 0 that is not part of the genome
-        	if (tmp.get(neg(genes[i]))==null) {
-        		tmp.set(neg(genes[i]), new LinkedList<Integer>());
+        	if (genes[i] >= 0){
+        		if (tmp.get(neg(genes[i]))==null) {
+        			tmp.set(neg(genes[i]), new LinkedList<Integer>());
+        		}
+        		tmp.get(neg(genes[i])).add(i);
         	}
-        	tmp.get(neg(genes[i])).add(i);
-        }
+        }*/
+    	
         int[][] newPos = new int[alphabetSize+1][];
+        for(int i=0;i<=alphabetSize;i++){
+        	newPos[i] = new int[k[i].pos.size()];
+        	for (int l=0;l<k[i].pos.size();l++){
+        		newPos[i][l]=k[i].pos.get(l);
+        	}
+        }
+        /*
         for (int i=0; i<=alphabetSize; i++) {
             if (tmp.get(i) == null) {
                 newPos[i] = new int[0];
@@ -154,14 +207,16 @@ class Chromosome {
                     j++;
                 }
             }
-        }
+        }*/
         return newPos;
     }
-
+    
     private int[] computePrevOcc(int alphabetSize) {
-        int[] occ = new int[alphabetSize + 1];
-        int[] newPrevOcc = new int[this.size() + 2];
+        int[] occ = new int[alphabetSize + 1];//max(this.genes)+1];
+        int[] newPrevOcc = new int[this.size() + 2];//max(this.genes)+1];
 
+        
+        
         for (int i = 1; i <= this.size(); i++) {
         	if(genes[i]>=0){
             	newPrevOcc[i] = occ[genes[i]];
