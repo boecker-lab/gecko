@@ -72,17 +72,17 @@ class GenomeList {
      * @param genomes the lists of Integers.
      */
     GenomeList(int[][][] genomes) {
-        Set<Integer> genes = new HashSet<Integer>();
+        Set<Integer> genes = new HashSet<>();
         genes.add(0);
         int alphSize = 0;
         int i = 0;
-        this.genomes = new ArrayList<Genome>(genomes.length);
+        this.genomes = new ArrayList<>(genomes.length);
         for (int[][] genome : genomes) {
-            List<Chromosome> chromosomes = new ArrayList<Chromosome>(genome.length);
+            List<Chromosome> chromosomes = new ArrayList<>(genome.length);
             int j=0;
             for (int[] chromosome : genome) {
                 for (Integer gene : chromosome) {
-                	if (genes.add(gene))
+                	if (gene >= 0 && genes.add(gene))
                 		alphSize++;
                 }
                 chromosomes.add(new Chromosome(chromosome, j, false));
@@ -172,15 +172,6 @@ class GenomeList {
         this.updateL(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
         this.updateR(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
         this.updateL_R_prime(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
-    }
-
-	/**
-     * Returns the rank value of an character.
-     * @param character the character who's value shall be returned.
-     * @return the value of the character
-     */
-    public int getRank(int character) {
-        return (character >= 0) ? rank.getRank(character) : rank.getRank(0);
     }
     
     public boolean zeroOccs(int refGenomeNr, int refChrNr, int position, boolean searchRefInRef){

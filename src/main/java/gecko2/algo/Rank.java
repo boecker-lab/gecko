@@ -12,6 +12,10 @@ import java.util.Arrays;
  */
 class Rank{
     private final int[] rank;
+    //private final int alphabetSize;
+
+    private final static int DEFAULT_RANK = Integer.MAX_VALUE-1;
+    private final static int MAX_RANK = Integer.MAX_VALUE;
 
     /**
      * Constructs an rank table for an alphabet of size alphabetSize.
@@ -19,34 +23,39 @@ class Rank{
      */
     public Rank(int alphabetSize) {
         rank = new int[alphabetSize+1];
+        //this.alphabetSize = alphabetSize;
     }
 
     /**
      * Returns the rank value of an character.
      * @param character the character who's value shall be returned.
-     * @return the value of the character
+     * @param position the position of the character
+     * @return the rank value of the character
      */
-    public int getRank(int character) {
-        return rank[neg(character)];
+    public int getRank(int character, int position) {
+        return (character >= 0) ? rank[character] : position;
+    }
+
+    public int getCharacterRank(int character) {
+        return (character >= 0) ? rank[character] : DEFAULT_RANK;
     }
 
     /**
      * Computes the rank table based on the chromosome chr.
      * @param chr the chromosome.
-     * @param alphabetSize the size of the alphabet of all compared sequences.
      */
-    void computeRank(Chromosome chr, int alphabetSize){
-        IntArray.reset(rank, alphabetSize);                               // initialise rank table with the default value
-        rank[0] = alphabetSize+1;                            // the terminal characters have character 0 and the highest rank
+    void computeRank(Chromosome chr){
+        IntArray.reset(rank, DEFAULT_RANK);                               // initialise rank table with the default value
+        rank[0] = MAX_RANK;                            // the terminal characters have character 0 and the highest rank
 
         int r=1;
         for (int i=1; i<=chr.size(); i++) {                      // all characters in the chromosome
             if (chr.getGene(i)>=0){
-            	if (rank[chr.getGene(i)]==alphabetSize) {       // who are not already set to a rank
+            	if (rank[chr.getGene(i)]==DEFAULT_RANK) {        // who are not already set to a rank
             		rank[chr.getGene(i)] = r++;                  // get ranked by their first occurrence in the chromosome
             	}
             } else {
-            	
+            	r++;
             }
         }
     }
@@ -64,7 +73,7 @@ class Rank{
      */
     public void updateRank(Chromosome chr, int leftBorder, int alphabetSize){
         if (leftBorder==1) {                                        // if starting to iterate through a new sequence (leftBorder is 1)
-            this.computeRank(chr, alphabetSize);                    // Rank has to be calculated anew
+            this.computeRank(chr);                    // Rank has to be calculated anew
         }
         else {
             int maxRank = 0;
