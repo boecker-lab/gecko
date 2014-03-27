@@ -67,8 +67,8 @@ public class CogFileReader implements GeckoDataReader {
 
     /**
      * genomeList is only used for readData(), to still be able to choose genome occurrences
-     * @param inputFile
-     * @param genomeList
+     * @param inputFile the input file
+     * @param genomeList the list of genomes that will be imported
      */
     public CogFileReader(File inputFile, List<Integer> genomeList) {
         this.inputFile = inputFile;
@@ -467,7 +467,7 @@ public class CogFileReader implements GeckoDataReader {
 
     /**
      * Get the genome occurrences.
-     * @return
+     * @return the genome occurrences
      */
     public List<GenomeOccurrence> getOccs() {
         return occs;

@@ -74,6 +74,15 @@ public class Chromosome implements Serializable {
         return result;
     }
 
+    /**
+     * Returns the int array from the list of genes. Using abs and useReduction at the same time generates
+     * maleformed genomes!
+     * @param genes the list of Gene
+     * @param addZeros if the array should begin and end with 0
+     * @param abs use absolute gene ids, incompatible with useReduction
+     * @param useReduction  reduce genome and alphabet size, incompatible with abs
+     * @return the array of gene ids
+     */
     private static int[] toIntArray(List<Gene> genes, boolean addZeros, boolean abs, boolean useReduction) {
         int array[] = addZeros?new int[genes.size()+2]:new int[genes.size()];
         final int offset = addZeros?1:0;
@@ -84,8 +93,10 @@ public class Chromosome implements Serializable {
         }
 
         for (int i=0;i<genes.size();i++) {
-            int geneId = useReduction?genes.get(i).getHomologyId():genes.get(i).getId();
-            array[i+offset] = abs?Math.abs(geneId):geneId;
+            if (useReduction && genes.get(i).isUnknown())
+                array[i+offset] = -1;
+            else
+                array[i+offset] = abs?Math.abs(genes.get(i).getId()):genes.get(i).getId();
         }
 
         return array;
@@ -103,10 +114,6 @@ public class Chromosome implements Serializable {
 		List<Gene> tmp = new ArrayList<>(genes);
 		Collections.shuffle(tmp);
         return toIntArray(tmp, addZeros, abs, false);
-	}
-	
-	public int[] toIntArray() {
-		return this.toIntArray(false, false);
 	}
 	
 	private Genome getParent() {
