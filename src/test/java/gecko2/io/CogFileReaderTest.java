@@ -409,12 +409,10 @@ public class CogFileReaderTest {
     @Test
     public void testFileReaderToGenomeIntArrayWithUnHomologous() throws IOException, ParseException{
         // Given
-        File inputFile = new File(getClass().getResource("/smallReaderTest.cog").getFile());
+        File inputFile = new File(getClass().getResource("/unHomologueGenes.cog").getFile());
         int[][][] expected = new int[][][] {
-                {{0,1,2,3,4,5,6,3,1,0}},
-                {{0,7,4,3,1,8,4,5,4,1,6,9,7,10,11,12,0}},
-                {{0,13,3,5,1,4,14,14,2,4,3,6,1,5,15,0}},
-                {{0,7,7,4,4,2,3,1,15,0},{0,9,1,4,8,5,15,5,16,0}}
+                {{0,1,2,3,4,5,6,7,8,8,9,0}},
+                {{0,10,7,9,0}}
         };
 
         // When
@@ -423,8 +421,6 @@ public class CogFileReaderTest {
         Gene.setGeneLabelMap(reader.getGeneLabelMap());
         int[][][] genomes = Genome.toIntArray(reader.getGenomes());
 
-        Genome.printIntArray(genomes);
-
         // Then
         assertArrayEquals(expected, genomes);
     }
@@ -432,12 +428,10 @@ public class CogFileReaderTest {
     @Test
     public void testFileReaderToReducedGenomeIntArrayWithUnHomologous() throws IOException, ParseException{
         // Given
-        File inputFile = new File(getClass().getResource("/smallReaderTest.cog").getFile());
+        File inputFile = new File(getClass().getResource("/unHomologueGenes.cog").getFile());
         int[][][] expected = new int[][][] {
-                {{0,1,2,3,4,5,6,3,1,0}},
-                {{0,7,4,3,1,8,4,5,4,1,6,9,7,10,11,12,0}},
-                {{0,13,3,5,1,4,14,14,2,4,3,6,1,5,15,0}},
-                {{0,7,7,4,4,2,3,1,15,0},{0,9,1,4,8,5,15,5,16,0}}
+                {{0,-1,-1,-1,-1,-1,-1,1,2,2,3,0}},
+                {{0,-1,1,3,0}}
         };
 
         // When
