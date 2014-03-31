@@ -187,7 +187,7 @@ public class ReferenceClusterAlgorithm {
             throw new RuntimeException("Number of genomes in param does not equal number of genomes!");
 		
 		genomes.initializeForCalculation(param.getMaximumDelta());
-		List<ReferenceCluster> refClusterList = new ArrayList<ReferenceCluster>();
+		List<ReferenceCluster> refClusterList = new ArrayList<>();
 		
 		int refGenomeCount = 1;
 		if (!param.useSingleReference())

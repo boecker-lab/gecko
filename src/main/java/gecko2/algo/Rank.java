@@ -12,7 +12,6 @@ import java.util.Arrays;
  */
 class Rank{
     private final int[] rank;
-    //private final int alphabetSize;
 
     private final static int DEFAULT_RANK = Integer.MAX_VALUE-1;
     private final static int MAX_RANK = Integer.MAX_VALUE;
@@ -23,20 +22,14 @@ class Rank{
      */
     public Rank(int alphabetSize) {
         rank = new int[alphabetSize+1];
-        //this.alphabetSize = alphabetSize;
     }
 
     /**
      * Returns the rank value of an character.
      * @param character the character who's value shall be returned.
-     * @param position the position of the character
      * @return the rank value of the character
      */
-    public int getRank(int character, int position) {
-        return (character >= 0) ? rank[character] : position;
-    }
-
-    public int getCharacterRank(int character) {
+    public int getRank(int character) {
         return (character >= 0) ? rank[character] : DEFAULT_RANK;
     }
 

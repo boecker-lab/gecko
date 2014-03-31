@@ -51,9 +51,9 @@ class GenomeList {
      */
     GenomeList(int[][][] genomes, int alphabetSize) {
         int i = 0;
-        this.genomes = new ArrayList<Genome>(genomes.length);
+        this.genomes = new ArrayList<>(genomes.length);
         for (int[][] genome : genomes) {
-            List<Chromosome> chromosomes = new ArrayList<Chromosome>(genome.length);
+            List<Chromosome> chromosomes = new ArrayList<>(genome.length);
             int j=0;
             for (int[] chromosome : genome) {
                 chromosomes.add(new Chromosome(chromosome, j, false));
@@ -203,9 +203,9 @@ class GenomeList {
      */
     private void updateL(int refGenomeNr, int i, int maxDist, int c_old) {  //TODO parallel?
         for (int k=0; k<this.size(); k++) {
-            /*if (k==refGenomeNr) {               // TODO really remove? not needed for the reference sequence
+            if (k==refGenomeNr) {               // TODO really remove? not needed for the reference sequence
                     continue;
-            }*/
+            }
 
             for (Chromosome chr: genomes.get(k)) {
                 chr.updateL(rank, i, maxDist, c_old);
