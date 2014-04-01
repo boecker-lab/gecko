@@ -1,24 +1,29 @@
 package gecko2.io;
 
-import gecko2.algorithm.ExternalGeneId;
+import gecko2.algorithm.GeneFamily;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
 public interface GeckoDataReader {
     /**
-     * The method is a getter for the geneLabelMap which contains the relation between external ID
-     * and internal ID from the gene names
+     * The method is a getter for the complete set of gene families
      *
-     * @return the geneLabelMap (HashMap)
+     * @return the gene family set
      */
-    public Map<Integer, ExternalGeneId> getGeneLabelMap();
+    public Set<GeneFamily> getGeneFamilySet();
+
+    /**
+     * A getter for the gene family grouping all genes with no gene family information
+     * @return the unknown gene family
+     */
+    public GeneFamily getUnknownGeneFamily();
 
     /**
      * @return the genomes from the input file.

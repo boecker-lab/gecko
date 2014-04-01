@@ -257,18 +257,6 @@ public class GeckoInstance {
 			for (GeneCluster c : clusters) {
 				c.setMatch(false);
 				
-				// Check if there is a match in the gene label
-				int[] genes = c.getGenes().clone();
-				for (int i=0; i<genes.length; i++)
-                    genes[i] = (Integer) Gene.getIntegerAlphabet().toArray()[genes[i]];
-				String geneString = Arrays.toString(genes);
-				for (String pattern : searchPatterns) {
-					if (geneString.matches(".*[\\[ ,]"+pattern+"[ ,\\]].*")) {
-						c.setMatch(applyFilter(c.getId()));
-						break;
-					}
-				}
-				
 				// Check if there is a match in the genes annotations
 				if (!c.isMatch()) {
 					
@@ -417,7 +405,7 @@ public class GeckoInstance {
     public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
         setMaxLengths(reader.getMaxIdLength(), reader.getMaxNameLength(), reader.getMaxLocusTagLength());
         setClusters(reader.getGeneClusters());
-        Gene.setGeneLabelMap(reader.getGeneLabelMap());
+        Gene.setGeneFamilySet(reader.getGeneFamilySet(), reader.getUnknownGeneFamily());
         setGenomes(reader.getGenomes());
         if (gui != null){
             SwingUtilities.invokeLater(new Runnable() {

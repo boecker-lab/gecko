@@ -122,7 +122,7 @@ public class GeneClusterTestUtils {
 	 */
 	private static void compareGeneClusters(GeneCluster expected, GeneCluster actual, PValueComparison pValueComp) {
 		assertEquals(expected.getId(), actual.getId());
-		assertArrayEquals(expected.getGenes(), actual.getGenes());
+		assertArrayEquals(expected.getGeneFamilies(), actual.getGeneFamilies());
 		assertEquals(expected.getSize(), actual.getSize());
 		assertEquals(expected.isMatch(), actual.isMatch());
 		if (pValueComp != PValueComparison.COMPARE_NONE)

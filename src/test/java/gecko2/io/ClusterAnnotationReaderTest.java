@@ -82,10 +82,10 @@ public class ClusterAnnotationReaderTest {
 					continue;
 				
 				Set<Integer> expGenes = new HashSet<Integer>();
-				for (Integer i : expectedCluster.getGenes())
+				for (Integer i : expectedCluster.getGeneFamilies())
 					expGenes.add(i);
 				Set<Integer> actGenes = new HashSet<Integer>();
-				for (Integer i : actualCluster.getGenes())
+				for (Integer i : actualCluster.getGeneFamilies())
 					actGenes.add(i);
 				if (!expGenes.equals(actGenes))
 					continue;

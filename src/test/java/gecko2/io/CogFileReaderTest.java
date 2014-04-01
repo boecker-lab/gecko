@@ -1,7 +1,7 @@
 package gecko2.io;
 
 import gecko2.algorithm.Chromosome;
-import gecko2.algorithm.ExternalGeneId;
+import gecko2.algorithm.GeneFamily;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class CogFileReaderTest {
 		
 		// using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later 
 		// releases
-		Map<Integer, ExternalGeneId> geneLabelMap = new HashMap<>();
+		Map<Integer, GeneFamily> geneLabelMap = new HashMap<>();
 		Genome[] refGenomes = new Genome[2];
 		
 		int geneID1 = 1;
@@ -42,11 +42,11 @@ public class CogFileReaderTest {
 		int geneID3 = 3;
 		int geneID4 = 4;
 
-        geneLabelMap.put(0, ExternalGeneId.getUnknownGeneID(0));
-		geneLabelMap.put(1, new ExternalGeneId("25", 1));
-		geneLabelMap.put(2, new ExternalGeneId("21", 1));
-		geneLabelMap.put(3, new ExternalGeneId("7", 1));
-		geneLabelMap.put(4, new ExternalGeneId("4", 1));
+        geneLabelMap.put(0, GeneFamily.getUnknownGeneID(0));
+		geneLabelMap.put(1, new GeneFamily("25", 1));
+		geneLabelMap.put(2, new GeneFamily("21", 1));
+		geneLabelMap.put(3, new GeneFamily("7", 1));
+		geneLabelMap.put(4, new GeneFamily("4", 1));
 		
 		
 		List<Gene> genes1 = new ArrayList<>();
@@ -81,7 +81,7 @@ public class CogFileReaderTest {
 		
 		// using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later 
 		// releases
-		Map<Integer, ExternalGeneId> geneLabelMap = new HashMap<>();
+		Map<Integer, GeneFamily> geneLabelMap = new HashMap<>();
 		
 		Genome[] refGenomes = new Genome[4];
 		
@@ -100,19 +100,19 @@ public class CogFileReaderTest {
 		int geneID12 = 12;
 
 		// setup genelabelmap
-        geneLabelMap.put(0, ExternalGeneId.getUnknownGeneID(0));
-		geneLabelMap.put(1, new ExternalGeneId("1", 8));
-		geneLabelMap.put(2, new ExternalGeneId("2", 3));
-		geneLabelMap.put(3, new ExternalGeneId("3", 6));
-		geneLabelMap.put(4, new ExternalGeneId("4", 9));
-		geneLabelMap.put(5, new ExternalGeneId("5", 6));
-		geneLabelMap.put(6, new ExternalGeneId("6", 3));
-		geneLabelMap.put(7, new ExternalGeneId("7", 4));
-		geneLabelMap.put(8, new ExternalGeneId("8", 2));
-		geneLabelMap.put(9, new ExternalGeneId("9", 2));
-		geneLabelMap.put(10, new ExternalGeneId("10", 1));
-		geneLabelMap.put(11, new ExternalGeneId("11", 2));
-		geneLabelMap.put(12, new ExternalGeneId("12", 3));
+        geneLabelMap.put(0, GeneFamily.getUnknownGeneID(0));
+		geneLabelMap.put(1, new GeneFamily("1", 8));
+		geneLabelMap.put(2, new GeneFamily("2", 3));
+		geneLabelMap.put(3, new GeneFamily("3", 6));
+		geneLabelMap.put(4, new GeneFamily("4", 9));
+		geneLabelMap.put(5, new GeneFamily("5", 6));
+		geneLabelMap.put(6, new GeneFamily("6", 3));
+		geneLabelMap.put(7, new GeneFamily("7", 4));
+		geneLabelMap.put(8, new GeneFamily("8", 2));
+		geneLabelMap.put(9, new GeneFamily("9", 2));
+		geneLabelMap.put(10, new GeneFamily("10", 1));
+		geneLabelMap.put(11, new GeneFamily("11", 2));
+		geneLabelMap.put(12, new GeneFamily("12", 3));
 		
 		// build genes
 		// Shorty1
@@ -274,7 +274,7 @@ public class CogFileReaderTest {
 
         // using Integer String[] HashMap for geneLabelMap to have multiple id possibility in later
         // releases
-        Map<Integer, ExternalGeneId> geneLabelMap = new HashMap<>();
+        Map<Integer, GeneFamily> geneLabelMap = new HashMap<>();
         Genome[] refGenomes = new Genome[2];
 
         int geneID1 = 1;
@@ -282,11 +282,11 @@ public class CogFileReaderTest {
         int geneID3 = 3;
         int geneID4 = 4;
 
-        geneLabelMap.put(0, ExternalGeneId.getUnknownGeneID(0));
-        geneLabelMap.put(1, new ExternalGeneId("25", 1));
-        geneLabelMap.put(2, new ExternalGeneId("21", 1));
-        geneLabelMap.put(3, new ExternalGeneId("7", 1));
-        geneLabelMap.put(4, new ExternalGeneId("4", 1));
+        geneLabelMap.put(0, GeneFamily.getUnknownGeneID(0));
+        geneLabelMap.put(1, new GeneFamily("25", 1));
+        geneLabelMap.put(2, new GeneFamily("21", 1));
+        geneLabelMap.put(3, new GeneFamily("7", 1));
+        geneLabelMap.put(4, new GeneFamily("4", 1));
 
 
         List<Gene> genes1 = new ArrayList<>();
@@ -330,20 +330,20 @@ public class CogFileReaderTest {
         assertEquals(reader.getGenomes()[1].getChromosomes().size(), 1);
         assertEquals(reader.getGenomes()[1].getChromosomes().get(0).getGenes().size(), 3);
 
-        Map<Integer, ExternalGeneId> geneLabelMap = reader.getGeneLabelMap();
+        Map<Integer, GeneFamily> geneLabelMap = reader.getGeneLabelMap();
         assertEquals(geneLabelMap.size(), 6);
-        for (ExternalGeneId entry : geneLabelMap.values()) {
-            if (entry.getId().equals("1"))
+        for (GeneFamily entry : geneLabelMap.values()) {
+            if (entry.getExternalId().equals("1"))
                 assertTrue(entry.isSingleGeneFamily());
-            else if (entry.getId().equals("gF1"))
+            else if (entry.getExternalId().equals("gF1"))
                 assertTrue(entry.isSingleGeneFamily());
-            else if (entry.getId().equals("4"))
+            else if (entry.getExternalId().equals("4"))
                 assertFalse(entry.isSingleGeneFamily());
-            else if (entry.getId().equals("5"))
+            else if (entry.getExternalId().equals("5"))
                 assertFalse(entry.isSingleGeneFamily());
-            else if (entry.getId().equals("gF2"))
+            else if (entry.getExternalId().equals("gF2"))
                 assertFalse(entry.isSingleGeneFamily());
-            else if (entry.getId().equals(Gene.UNKNOWN_GENE_ID)) {
+            else if (entry.getExternalId().equals(Gene.UNKNOWN_GENE_ID)) {
                 assertEquals(entry.getFamilySize(), 5);
                 assertTrue(entry.isSingleGeneFamily());
             }
@@ -353,7 +353,7 @@ public class CogFileReaderTest {
     }
 
 
-    private static void testReader(CogFileReader reader, Map<Integer, ExternalGeneId> geneLabelMap, Genome[] refGenomes) {
+    private static void testReader(CogFileReader reader, Map<Integer, GeneFamily> geneLabelMap, Genome[] refGenomes) {
         assertEquals(reader.getGeneLabelMap().size(), geneLabelMap.size());
 
         for( int i = 1; i < reader.getGeneLabelMap().size() + 1; i++) {
@@ -397,7 +397,7 @@ public class CogFileReaderTest {
         // When
         CogFileReader reader = new CogFileReader(inputFile);
         reader.readData();
-        Gene.setGeneLabelMap(reader.getGeneLabelMap());
+        Gene.setGeneFamilySet(reader.getGeneLabelMap());
         int[][][] genomes = Genome.toIntArray(reader.getGenomes());
 
         Genome.printIntArray(genomes);
@@ -418,7 +418,7 @@ public class CogFileReaderTest {
         // When
         CogFileReader reader = new CogFileReader(inputFile);
         reader.readData();
-        Gene.setGeneLabelMap(reader.getGeneLabelMap());
+        Gene.setGeneFamilySet(reader.getGeneFamilySet(), reader.getUnknownGeneFamily());
         int[][][] genomes = Genome.toIntArray(reader.getGenomes());
 
         // Then
@@ -437,7 +437,7 @@ public class CogFileReaderTest {
         // When
         CogFileReader reader = new CogFileReader(inputFile);
         reader.readData();
-        Gene.setGeneLabelMap(reader.getGeneLabelMap());
+        Gene.setGeneFamilySet(reader.getGeneFamilySet(), reader.getUnknownGeneFamily());
         int[][][] genomes = Genome.toReducedIntArray(reader.getGenomes());
 
         Genome.printIntArray(genomes);

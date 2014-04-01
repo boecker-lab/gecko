@@ -194,11 +194,11 @@ public class Genome implements Serializable {
             }
             for (Chromosome chr : g.getChromosomes()) {
                 for (Gene gene : chr.getGenes()) {
-                    alphabetPerGenome[n][Math.abs(gene.getId())]++;
+                    alphabetPerGenome[n][Math.abs(gene.getAlgorithmId())]++;
                     //if (n!=0)
-                    annotations[n][Math.abs(gene.getId())] = gene.getAnnotation();
+                    annotations[n][Math.abs(gene.getAlgorithmId())] = gene.getAnnotation();
                     //else
-                    //annotations[n][Math.abs(gene.getId())] = String.format("%s: %s", chr.getName().substring(24), gene.getAnnotation());
+                    //annotations[n][Math.abs(gene.getExternalId())] = String.format("%s: %s", chr.getName().substring(24), gene.getAnnotation());
                 }
             }
             SortedMap<Integer,Integer> familySizes = new TreeMap<Integer, Integer>();
@@ -243,7 +243,7 @@ public class Genome implements Serializable {
                 continue;
             for (Chromosome chr : g.getChromosomes())
                 for (Gene gene : chr.getGenes())
-                    alphabet[Math.abs(gene.getId())]++;
+                    alphabet[Math.abs(gene.getAlgorithmId())]++;
         }
         SortedMap<Integer,Integer> familySizes = new TreeMap<Integer, Integer>();
         for (int i=1; i<alphabet.length; i++){

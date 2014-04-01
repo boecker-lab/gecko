@@ -96,7 +96,7 @@ public class Chromosome implements Serializable {
             if (useReduction && genes.get(i).isUnknown())
                 array[i+offset] = -1;
             else
-                array[i+offset] = abs?Math.abs(genes.get(i).getId()):genes.get(i).getId();
+                array[i+offset] = abs?genes.get(i).getAlgorithmId():genes.get(i).getAlgorithmId()*genes.get(i).getOrientation().getSign();
         }
 
         return array;

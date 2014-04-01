@@ -210,11 +210,13 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 			genElements[i] = new ArrayList<>();
 			for (Gene g : this.genome.getChromosomes().get(i).getGenes()) {
 				GeneElement element = new GeneElement(g);
-				if (g.getId()<0) element.setOrientation(GeneElement.ORIENTATION_BACKWARDS);
+				if (g.getOrientation().equals(Gene.GeneOrientation.NEGATIVE))
+                    element.setOrientation(GeneElement.ORIENTATION_BACKWARDS);
 				element.addMouseMotionListener(genomebrowsermousedrag);
 				element.addMouseListener(genomebrowsermousedrag);
 				element.addMouseListener(ml);
-				if (g.isUnknown()) element.setUnknown(true);
+				if (g.isUnknown())
+                    element.setUnknown(true);
 				this.genElements[i].add(element);
 			}
 		}
@@ -337,7 +339,7 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 				if (!e.isShiftDown()) {
 					GeneElement el = (GeneElement) e.getSource();
 					if (el.isHighlighted()) {
-						parent.centerCurrentClusterAt(Math.abs(el.getGene().getId()));
+						parent.centerCurrentClusterAt(el.getGene().getGeneFamily());
 					}
 				} else
 					arrangeGeneElements(!flipped);

@@ -1,5 +1,7 @@
 package gecko2.algo;
 
+import gecko2.algorithm.GeneFamily;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -17,8 +19,8 @@ public class ReferenceCluster {
 	private BigDecimal bestCombined_pValueCorrected;
 	private List<Integer> geneContent;
 	private final boolean searchRefInRef;
-	
-	public ReferenceCluster(Pattern refPattern, List<ListOfDeltaLocations> dLocLists, boolean searchRefInRef, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping){
+
+    public ReferenceCluster(Pattern refPattern, List<ListOfDeltaLocations> dLocLists, boolean searchRefInRef, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping){
 		genomeNr = refPattern.getRefGenomeNr();
 		chrNr = refPattern.getRefChromosomeNr();
 		leftBorder = refPattern.getLeftBorder();
@@ -26,7 +28,7 @@ public class ReferenceCluster {
 		size = refPattern.getSize();
 		this.searchRefInRef = searchRefInRef;
 		
-		this.dLocLists = new ArrayList<List<DeltaLocation>>(dLocLists.size());	
+		this.dLocLists = new ArrayList<>(dLocLists.size());
 		int coverCount = 0;
 		int maxD = -1;
 		
@@ -82,6 +84,26 @@ public class ReferenceCluster {
 	public void setGenomeNr(int genomeNr) {
 		this.genomeNr = genomeNr;
 	}
+
+    public int getMaxDistance() {
+        return maxDistance;
+    }
+
+    public int getGenomeNr() {
+        return genomeNr;
+    }
+
+    public int getChrNr() {
+        return chrNr;
+    }
+
+    public int getLeftBorder() {
+        return leftBorder;
+    }
+
+    public int getRightBorder() {
+        return rightBorder;
+    }
 
 	public BigDecimal getBestCombined_pValue() {
 		return bestCombined_pValue;
@@ -149,14 +171,6 @@ public class ReferenceCluster {
 		}
 		return (minDist != Integer.MAX_VALUE) ? minDist : -1;
 	}
-	
-	public int getMaxDistance() {
-		return maxDistance;
-	}
-
-	public int getGenomeNr() {
-		return genomeNr;
-	}
 
 	public boolean areAll_dLocsNested(ReferenceCluster otherCluster) {
 		for (int k=0; k<Math.min(dLocLists.size(), otherCluster.dLocLists.size()); k++)
@@ -193,7 +207,7 @@ public class ReferenceCluster {
 	}
 
 	public void setGeneContent(GenomeList genomes) {
-		geneContent = new ArrayList<Integer>(size);
+		geneContent = new ArrayList<>(size);
 		for (int i=leftBorder; i<=rightBorder && geneContent.size()<size; i++){
 			if (genomes.get(genomeNr).get(chrNr).getPrevOCC(i) < leftBorder){
 				geneContent.add(genomes.get(genomeNr).get(chrNr).getGene(i));

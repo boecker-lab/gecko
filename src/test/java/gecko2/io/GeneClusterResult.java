@@ -180,11 +180,11 @@ public class GeneClusterResult
 				toFile.append("[");
 				
 				// add genes
-	            for (int i = 0; i < cluster.getGenes().length; i++) {    
-	            	if (i != cluster.getGenes().length - 1)
-	                    toFile.append(cluster.getGenes()[i]).append(", ");
+	            for (int i = 0; i < cluster.getGeneFamilies().length; i++) {
+	            	if (i != cluster.getGeneFamilies().length - 1)
+	                    toFile.append(cluster.getGeneFamilies()[i]).append(", ");
 	                else {
-	                    toFile.append(cluster.getGenes()[i]);
+	                    toFile.append(cluster.getGeneFamilies()[i]);
 	                }
 	            }
 	            
