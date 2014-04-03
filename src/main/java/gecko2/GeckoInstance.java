@@ -1,5 +1,6 @@
 package gecko2;
 
+import gecko2.algo.ReferenceCluster;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.*;
 import gecko2.event.DataEvent;
@@ -405,7 +406,7 @@ public class GeckoInstance {
     public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
         setMaxLengths(reader.getMaxIdLength(), reader.getMaxNameLength(), reader.getMaxLocusTagLength());
         setClusters(reader.getGeneClusters());
-        Gene.setGeneFamilySet(reader.getGeneFamilySet(), reader.getUnknownGeneFamily());
+        Gene.setGeneFamilySet(reader.getGeneFamilySet(), reader.getUnknownGeneFamily(), reader.getNumberOfGeneFamiliesWithMultipleGenes());
         setGenomes(reader.getGenomes());
         if (gui != null){
             SwingUtilities.invokeLater(new Runnable() {
@@ -452,7 +453,7 @@ public class GeckoInstance {
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClustersJava(int[][][] genomes, Parameter params) {
+	public static GeneCluster[] computeClustersJava(Genome[] genomes, Parameter params) {
 		return computeClustersJava(genomes, params, null);
 	}
 	
@@ -463,8 +464,13 @@ public class GeckoInstance {
 	 * @param genomeGrouping the grouping of the genomes, only one genome per group is used for quorum and p-value
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClustersJava(int[][][] genomes, Parameter params, List<Set<Integer>> genomeGrouping) {
-		return ReferenceClusterAlgorithm.computeReferenceClusters(genomes, params, genomeGrouping);
+	public static GeneCluster[] computeClustersJava(Genome[] genomes, Parameter params, List<Set<Integer>> genomeGrouping) {
+        int intArray[][][] = Genome.toIntArray(genomes);
+		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping);
+        GeneCluster[] result = new GeneCluster[refCluster.size()];
+        for (int i=0; i<refCluster.size(); i++)
+            result[i] = new GeneCluster(i, refCluster.get(i), genomes);
+        return result;
 	}
 	
 	/**
@@ -473,8 +479,9 @@ public class GeckoInstance {
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClustersLibgecko(int[][][] genomes, Parameter params) {
-		return computeClusters(genomes, params, GeckoInstance.this);
+	public GeneCluster[] computeClustersLibgecko(Genome[] genomes, Parameter params) {
+        int intArray[][][] = Genome.toIntArray(GeckoInstance.this.genomes);
+		return computeClusters(intArray, params, GeckoInstance.this);
 	}
 	
 	/**
@@ -483,7 +490,7 @@ public class GeckoInstance {
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClusters(int[][][] genomes, Parameter params) {
+	public GeneCluster[] computeClusters(Genome[] genomes, Parameter params) {
 		return computeClustersJava(genomes, params);
 		//return computeClustersLibgecko(genomes, params);
 	}
@@ -539,8 +546,6 @@ public class GeckoInstance {
             List<Set<Integer>> genomeGroups = null;
             if (groupingFactor <= 1.0)
                 genomeGroups = BreakPointDistance.groupGenomes(genomes, groupingFactor, false);
-
-            int genomes[][][] = Genome.toIntArray(GeckoInstance.this.genomes);
 			
 			Date before = new Date();
 			GeneCluster[] res = computeClustersJava(genomes, p, genomeGroups);
@@ -565,12 +570,7 @@ public class GeckoInstance {
 			System.err.println("Running in visualization only mode! Cannot compute statistics!");
 			return clusters;
 		}
-		int genomes[][][] = new int[GeckoInstance.this.genomes.length][][];
-		for (int i=0;i<genomes.length;i++) {
-			genomes[i] = new int[GeckoInstance.this.genomes[i].getChromosomes().size()][];
-			for (int j=0;j<genomes[i].length;j++)
-				genomes[i][j] = GeckoInstance.this.genomes[i].getChromosomes().get(j).toIntArray(true, true);
-		}
+		int genomes[][][] = Genome.toIntArray(GeckoInstance.getInstance().getGenomes());
 		int maxPWDelta = 0;
 		int minClusterSize = Integer.MAX_VALUE;
 		int minQuorum = Integer.MAX_VALUE;

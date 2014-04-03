@@ -1,6 +1,7 @@
 package gecko2.algorithm;
 
 import gecko2.GeckoInstance;
+import sun.java2d.xr.MutableInteger;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -75,15 +76,14 @@ public class Chromosome implements Serializable {
     }
 
     /**
-     * Returns the int array from the list of genes. Using abs and useReduction at the same time generates
-     * maleformed genomes!
+     * Returns the int array from the list of genes.
      * @param genes the list of Gene
+     * @param unHomologueGeneFamilyId the first id that is used for un-homologue genes
      * @param addZeros if the array should begin and end with 0
      * @param abs use absolute gene ids, incompatible with useReduction
-     * @param useReduction  reduce genome and alphabet size, incompatible with abs
      * @return the array of gene ids
      */
-    private static int[] toIntArray(List<Gene> genes, boolean addZeros, boolean abs, boolean useReduction) {
+    private static int[] toIntArray(List<Gene> genes, MutableInteger unHomologueGeneFamilyId, boolean addZeros, boolean abs) {
         int array[] = addZeros?new int[genes.size()+2]:new int[genes.size()];
         final int offset = addZeros?1:0;
 
@@ -93,28 +93,48 @@ public class Chromosome implements Serializable {
         }
 
         for (int i=0;i<genes.size();i++) {
-            if (useReduction && genes.get(i).isUnknown())
-                array[i+offset] = -1;
-            else
-                array[i+offset] = abs?genes.get(i).getAlgorithmId():genes.get(i).getAlgorithmId()*genes.get(i).getOrientation().getSign();
+            int family;
+            if (genes.get(i).isUnknown()) {
+                family = unHomologueGeneFamilyId.getValue();
+                unHomologueGeneFamilyId.setValue(family + 1);
+            } else {
+                family = genes.get(i).getAlgorithmId();
+            }
+            array[i+offset] = abs ? family : family * genes.get(i).getOrientation().getSign();
         }
 
         return array;
     }
 
-    public int[] toIntArray(boolean addZeros, boolean abs) {
-        return toIntArray(genes, addZeros, abs, false);
+    /**
+     * Returns the int array for this chromosome. All un-homologue genes will have id -1
+     * @param addZeros if the array should begin and end with 0
+     * @return the array of gene ids
+     */
+    public int[] toReducedIntArray(boolean addZeros) {
+        int array[] = addZeros?new int[genes.size()+2]:new int[genes.size()];
+        final int offset = addZeros?1:0;
+
+        if (addZeros) {
+            array[0] = 0;
+            array[array.length-1] = 0;
+        }
+
+        for (int i=0;i<genes.size();i++) {
+            array[i+offset] = genes.get(i).isUnknown() ? -1 : genes.get(i).getAlgorithmId();
+        }
+        return array;
+    }
+
+    public int[] toIntArray(MutableInteger unHomologueGeneFamilyId, boolean addZeros, boolean abs) {
+        return toIntArray(genes, unHomologueGeneFamilyId, addZeros, abs);
 	}
 
-    public int[] toReducedIntArray(boolean addZeros) {
-        return toIntArray(genes, addZeros, true, true);
+    public int[] toRandomIntArray(MutableInteger unHomologueGeneFamilyId, boolean addZeros, boolean abs) {
+        List<Gene> tmp = new ArrayList<>(genes);
+        Collections.shuffle(tmp);
+        return toIntArray(tmp, unHomologueGeneFamilyId, addZeros, abs);
     }
-	
-	public int[] toRandomIntArray(boolean addZeros, boolean abs) {
-		List<Gene> tmp = new ArrayList<>(genes);
-		Collections.shuffle(tmp);
-        return toIntArray(tmp, addZeros, abs, false);
-	}
 	
 	private Genome getParent() {
 		return parent;

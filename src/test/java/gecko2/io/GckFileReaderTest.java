@@ -1,7 +1,7 @@
 package gecko2.io;
 
-import gecko2.GeneClusterTestUtils;
-import gecko2.algo.ReferenceClusterAlgorithm;
+import gecko2.GeckoInstance;
+import gecko2.testUtils.GeneClusterTestUtils;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 
-import static gecko2.GeneClusterTestUtils.performTest;
+import static gecko2.testUtils.GeneClusterTestUtils.performTest;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -83,7 +83,8 @@ public class GckFileReaderTest {
         assertEquals(cogReader.getMaxNameLength(), gckReader.getMaxNameLength());
 
         assertArrayEquals(cogReader.getGenomes(), gckReader.getGenomes());
-        assertEquals(cogReader.getGeneLabelMap(), gckReader.getGeneLabelMap());
+        assertEquals(cogReader.getGeneFamilySet(), gckReader.getGeneFamilySet());
+        assertEquals(cogReader.getUnknownGeneFamily(), gckReader.getUnknownGeneFamily());
     }
 
     private static void testReadingClusters(File cogInfile, File gckInfile, Parameter p) throws IOException, ParseException {
@@ -101,9 +102,10 @@ public class GckFileReaderTest {
         assertEquals(cogReader.getMaxNameLength(), gckReader.getMaxNameLength());
 
         assertArrayEquals(cogReader.getGenomes(), gckReader.getGenomes());
-        assertEquals(cogReader.getGeneLabelMap(), gckReader.getGeneLabelMap());
+        assertEquals(cogReader.getGeneFamilySet(), gckReader.getGeneFamilySet());
+        assertEquals(cogReader.getUnknownGeneFamily(), gckReader.getUnknownGeneFamily());
 
-        GeneCluster[] computedResult = ReferenceClusterAlgorithm.computeReferenceClusters(Genome.toIntArray(cogReader.getGenomes()), p);
+        GeneCluster[] computedResult = GeckoInstance.getInstance().computeClustersJava(cogReader.getGenomes(), p);
 
         performTest(computedResult, gckReader.getGeneClusters(), GeneClusterTestUtils.PValueComparison.COMPARE_NONE);
     }

@@ -21,6 +21,7 @@ public class CogFileReader implements GeckoDataReader {
 	 */
 	private Set<GeneFamily> geneFamilySet;
     private GeneFamily unknownGeneFamily;
+    private int numberOfGeneFamiliesWithMultipleGenes;
 	
 	/**
 	 * Storing place for the genomes.
@@ -42,7 +43,6 @@ public class CogFileReader implements GeckoDataReader {
      */
     private int maxLocusTagLength;
 
-    private int algorithmId;
     /**
      * The list of genome occurrences. Used for choosing which genome to import.
      */
@@ -119,7 +119,7 @@ public class CogFileReader implements GeckoDataReader {
 			return Integer.toString(newID);
 		} catch (NumberFormatException e) {}
         if (id.equals(""))
-            return Gene.UNKNOWN_GENE_ID;
+            return GeneFamily.UNKNOWN_GENE_ID;
 		
 		return id;
 	}
@@ -226,9 +226,7 @@ public class CogFileReader implements GeckoDataReader {
 		Map<Integer, Genome> groupedGenomes = new HashMap<>();
 		List<Genome> ungroupedGenomes = new ArrayList<>();
 
-
-        this.algorithmId = 1;
-        this.unknownGeneFamily = new GeneFamily(Gene.UNKNOWN_GENE_ID, 0);
+        this.unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();
         /*
             Maps each possible homologue gene (string) id to the gene family of this gene
          */
@@ -278,6 +276,7 @@ public class CogFileReader implements GeckoDataReader {
         }
 
         geneFamilySet = new HashSet<>(geneFamilyMap.values());
+        numberOfGeneFamiliesWithMultipleGenes = GeneFamily.getNumberOfGeneFamiliesWithMultipleGenes();
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()];
 
@@ -351,7 +350,7 @@ public class CogFileReader implements GeckoDataReader {
             GeneFamily geneFamily;
             if (isUnHomologe(singleId)) {
                 geneFamily = this.unknownGeneFamily;
-                geneFamily.addGene(-1);
+                geneFamily.addGene();
             } else {
                 if (!geneFamilyMap.containsKey(singleId)) {
                     geneFamily = new GeneFamily(singleId);
@@ -359,7 +358,7 @@ public class CogFileReader implements GeckoDataReader {
                 }
                 else {
                     geneFamily = geneFamilyMap.get(singleId);
-                    geneFamily.addGene(algorithmId++);
+                    geneFamily.addGene();
                 }
             }
 
@@ -373,7 +372,7 @@ public class CogFileReader implements GeckoDataReader {
     }
 
 	private boolean isUnHomologe(String id) {
-		return id.equals(Gene.UNKNOWN_GENE_ID);
+		return id.equals(GeneFamily.UNKNOWN_GENE_ID);
 	}
 
 	/**
@@ -394,6 +393,16 @@ public class CogFileReader implements GeckoDataReader {
 	 */
 	public Set<GeneFamily> getGeneFamilySet() {
         return geneFamilySet;
+    }
+
+    /**
+     * A getter for the total number of gene families that contain more than 1 gene
+     *
+     * @return the number of gene families that contain more than 1 gene
+     */
+    @Override
+    public int getNumberOfGeneFamiliesWithMultipleGenes() {
+        return numberOfGeneFamiliesWithMultipleGenes;
     }
 
     /**

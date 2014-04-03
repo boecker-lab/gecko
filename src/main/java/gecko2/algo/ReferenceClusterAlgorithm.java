@@ -1,6 +1,5 @@
 package gecko2.algo;
 
-import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Parameter;
 
 import java.util.*;
@@ -12,104 +11,13 @@ public class ReferenceClusterAlgorithm {
 	private final int nrOfGenomeGroups;
 	private final boolean useGenomeGrouping;
 	
-	private static class MemRed{
-		ArrayList<Integer> id;
-		ArrayList<Integer> anzahl;
-		
-		MemRed(){
-			this.anzahl = new ArrayList<Integer>();
-			this.id = new ArrayList<Integer>();
-		}
-		
-		public void anlegen(int x){
-			this.id.add(x);
-			this.anzahl.add(1);
-		}
-		
-		private void hinzufuegen(int x){
-			this.anzahl.set(this.id.indexOf(x), (this.anzahl.get(this.id.indexOf(x))+1));
-		}
-		
-		public void suche(int x){
-			if(this.id.contains(x)){
-				hinzufuegen(x);
-			} else {
-				anlegen(x);
-			}
-		}
-		
-		public int[] umschreiben(){
-			int[] y = new int[this.id.size()];
-			for(int i=0;i<this.id.size();i++){
-				y[i]=this.id.get(i);
-			}
-			
-			return y;
-		}
-	}
-	
-	private static int[][][] memReducer(int[][][] genomes, Parameter p){
-		MemRed help = new MemRed();
-		
-		for(int l = 0; l<genomes.length;l++){
-			for(int m = 0; m<genomes[l].length; m++){
-				for(int x = 0; x<genomes[l][m].length;x++){
-					help.suche(genomes[l][m][x]);
-				}
-			}
-		}
-		
-		
-		
-		for(int l = 0; l<genomes.length;l++){
-			for(int m = 0; m<genomes[l].length; m++){
-				MemRed help2 = new MemRed();
-				for(int x = 0; x<genomes[l][m].length;x++){
-					if(help.anzahl.get(help.id.indexOf(genomes[l][m][x]))>1){
-						help2.anlegen(genomes[l][m][x]);
-					} else if(help2.id.isEmpty() != true) {
-						if(help2.id.get(help2.id.size()-1) < 0){
-							help2.id.set(help2.id.size()-1, help2.id.get(help2.id.size()-1)-1);
-						} else {
-							help2.anlegen(-1);
-						}
-					} else {
-						help2.anlegen(-1);
-					}
-				}
-			genomes[l][m] = help2.umschreiben();
-			}
-		}
-		
-		return genomes;
-	}
-
-	private static int[][][] memSort(int[][][] genomes){
-		int[][][] h;
-		for(int l=0;l<genomes.length;l++){
-			for(int m=0;m<genomes[l].length;m++){
-				MemRed x = new MemRed();
-				for(int n=0;n<genomes[l][m].length;n++){
-					if(genomes[l][m][n]<0){
-						
-					} else {
-						x.anlegen(genomes[l][m][n]);
-					}
-				}
-				genomes[l][m] = x.umschreiben();
-			}
-		}
-		
-		return genomes;
-	}
-	
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
 	 * @param genomes the genomes
 	 * @param param the parameters
 	 * @return the gene clusters
 	 */
-	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param) {
+	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param) {
 		return computeReferenceClusters(genomes, param, null);
 	}
 
@@ -143,7 +51,7 @@ public class ReferenceClusterAlgorithm {
 	 * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
 	 * @return the gene clusters
 	 */
-	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
+	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
 
@@ -168,11 +76,8 @@ public class ReferenceClusterAlgorithm {
 		ReferenceClusterAlgorithm refClusterAlgorithm = new ReferenceClusterAlgorithm(data, algoParameters, genomeGrouping);
 		
 		List<ReferenceCluster> refCluster = refClusterAlgorithm.computeRefClusters();
-		
-		GeneCluster[] result = new GeneCluster[refCluster.size()];
-		for (int i=0; i<refCluster.size(); i++)
-			result[i] = new GeneCluster(i, refCluster.get(i));
-		return result;
+
+        return refCluster;
 	}
 	
     private static boolean checkParameters(AlgorithmParameters param) {

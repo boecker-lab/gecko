@@ -478,7 +478,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 				case 4:
 					return matchingClusters.get(rowIndex).getBestCorrectedScore();
 				case 5:
-
                     Set<GeneFamily> genes = matchingClusters.get(rowIndex).getGeneFamilies();
                     ArrayList<String> knownGenes = new ArrayList<>();
 

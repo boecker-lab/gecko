@@ -25,7 +25,7 @@ public class GckFileReader implements GeckoDataReader {
 	 */
 	private Set<GeneFamily> geneFamilySet;
     private GeneFamily unknownGeneFamily;
-    private int algorithmId;
+    private int numberOfGeneFamiliesWithMultipleGenes;
 	
 	/**
 	 * Storing place for the genomes.
@@ -67,8 +67,19 @@ public class GckFileReader implements GeckoDataReader {
 	 * 
 	 * @return the geneLabelMap (HashMap)
 	 */
+    @Override
 	public Set<GeneFamily> getGeneFamilySet() {
 		return geneFamilySet;
+    }
+
+    /**
+     * A getter for the total number of gene families that contain more than 1 gene
+     *
+     * @return the number of gene families that contain more than 1 gene
+     */
+    @Override
+    public int getNumberOfGeneFamiliesWithMultipleGenes() {
+        return numberOfGeneFamiliesWithMultipleGenes;
     }
 
     /**
@@ -84,6 +95,7 @@ public class GckFileReader implements GeckoDataReader {
     /**
 	 * @return the genomes from the input file.
 	 */
+    @Override
 	public Genome[] getGenomes() {
 		return genomes;
 	}
@@ -91,6 +103,7 @@ public class GckFileReader implements GeckoDataReader {
 	/**
 	 * @return the maxIdLength from the input file
 	 */
+    @Override
 	public int getMaxIdLength() {
 		return maxIdLength;
 	}
@@ -114,6 +127,7 @@ public class GckFileReader implements GeckoDataReader {
     /**
      * @return the gene clusters
      */
+    @Override
     public GeneCluster[] getGeneClusters(){
         return clusters;
     }
@@ -121,11 +135,12 @@ public class GckFileReader implements GeckoDataReader {
     /**
      * Reads all data from the file
      */
+    @Override
     public void readData() throws IOException, ParseException {
         GeckoInstance.getInstance().setLastOpendFile(inputFile);
         try	(BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), Charset.forName("UTF-8"))) {
             Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
-            unknownGeneFamily = new GeneFamily(Gene.UNKNOWN_GENE_ID, 0);
+            unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();
 
             String line = reader.readLine().trim();
             if (!line.equals(SessionWriter.GENOME_SECTION_START))
@@ -143,7 +158,6 @@ public class GckFileReader implements GeckoDataReader {
 
     private void readGenomeData(BufferedReader reader, Map<String, GeneFamily> geneFamilyMap) throws IOException, ParseException {
         List<Genome> genomeList = new ArrayList<>();
-        algorithmId = 1;
         Genome genome = null;
         boolean continueReading = true;
         while(continueReading) {
@@ -174,6 +188,7 @@ public class GckFileReader implements GeckoDataReader {
         }
         genomes = genomeList.toArray(new Genome[genomeList.size()]);
         geneFamilySet = new HashSet<>(geneFamilyMap.values());
+        numberOfGeneFamiliesWithMultipleGenes = GeneFamily.getNumberOfGeneFamiliesWithMultipleGenes();
     }
 
     private Chromosome readChromosome(BufferedReader reader, Genome genome, Map<String, GeneFamily> geneFamilyMap) throws IOException, ParseException {
@@ -189,16 +204,16 @@ public class GckFileReader implements GeckoDataReader {
                 String[] split = line.split(SessionWriter.SEPERATOR);
 
                 GeneFamily geneFamily;
-                if (split[1].equals(Gene.UNKNOWN_GENE_ID)) {
+                if (split[1].equals(GeneFamily.UNKNOWN_GENE_ID)) {
                     geneFamily = this.unknownGeneFamily;
-                    geneFamily.addGene(-1);
+                    geneFamily.addGene();
                 } else {
                     if (!geneFamilyMap.containsKey(split[1])) {
                         geneFamily = new GeneFamily(split[1]);
                         geneFamilyMap.put(split[1], geneFamily);
                     } else {
                         geneFamily = geneFamilyMap.get(split[1]);
-                        geneFamily.addGene(algorithmId++);
+                        geneFamily.addGene();
                     }
                 }
 
@@ -379,7 +394,9 @@ public class GckFileReader implements GeckoDataReader {
 	 */
 	private void handleFailedSessionLoad() {
         genomes = null;
+        unknownGeneFamily = null;
         geneFamilySet = null;
+        numberOfGeneFamiliesWithMultipleGenes = 0;
         clusters = null;
         maxIdLength = 0;
         maxLocusTagLength = 0;

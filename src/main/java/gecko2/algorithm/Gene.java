@@ -10,20 +10,24 @@ import java.util.Set;
 public class Gene implements Serializable {
 	private static final long serialVersionUID = 7903694077854093398L;
 
-    public static final String UNKNOWN_GENE_ID = "0";
-
     private static Set<GeneFamily> geneFamilySet;
     private static GeneFamily unknownGeneFamily;
+    private static int numberOfGeneFamiliesWithMultipleGenes;
     private static Map<GeneFamily, Color> colorMap;
 
     public enum GeneOrientation {
-        NEGATIVE(-1), POSITIVE(1), UNSIGNED(1);
-        final int sign;
-        GeneOrientation(int sign){
+        NEGATIVE(-1, "+"), POSITIVE(1, "-"), UNSIGNED(1, "");
+        private final int sign;
+        private final String encoding;
+        GeneOrientation(int sign, String encoding){
             this.sign = sign;
+            this.encoding = encoding;
         }
         public int getSign(){
             return sign;
+        }
+        public String getEncoding() {
+            return encoding;
         }
     }
 
@@ -32,6 +36,10 @@ public class Gene implements Serializable {
 	private final String annotation;
     private final GeneFamily geneFamily;
     private final GeneOrientation orientation;
+
+    public Gene(GeneFamily geneFamily){
+        this("", geneFamily, GeneOrientation.POSITIVE);
+    }
 
 	public Gene(String name, GeneFamily geneFamily, GeneOrientation orientation) {
 		this(name, geneFamily, orientation, null);
@@ -143,30 +151,29 @@ public class Gene implements Serializable {
         return result;
     }
 
-    public static void setGeneFamilySet(Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily) {
+    public static void setGeneFamilySet(Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily, int numberOfGeneFamiliesWithMultipleGenes) {
         Gene.geneFamilySet = geneFamilySet;
         Gene.unknownGeneFamily = unknownGeneFamily;
+        Gene.numberOfGeneFamiliesWithMultipleGenes = numberOfGeneFamiliesWithMultipleGenes;
         colorMap = null;
     }
 
+    public static Map<String,GeneFamily> getGeneLabelMap() {
+        Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
+        geneFamilyMap.put(unknownGeneFamily.getExternalId(), unknownGeneFamily);
+        for (GeneFamily geneFamily : geneFamilySet)
+            geneFamilyMap.put(geneFamily.getExternalId(), geneFamily);
+        return geneFamilyMap;
+    }
+
     public static int getAlphabetSize() {
-        System.out.println("alphabetSize: " + (geneFamilySet.size() - 1 + unknownGeneFamily.getFamilySize()) + " compressed: " + (geneFamilySet.size() - 1));
-        return geneFamilySet.size() - 1 + unknownGeneFamily.getFamilySize();
+        System.out.println("alphabetSize: " + (geneFamilySet.size() + unknownGeneFamily.getFamilySize()) + " compressed: " + (numberOfGeneFamiliesWithMultipleGenes));
+        return geneFamilySet.size() + unknownGeneFamily.getFamilySize();
     }
 
-    /*public static boolean isUnknownGene(int geneId) {
-        GeneFamily eId = geneFamilySet.get(Math.abs(geneId));
-        return eId != null ? eId.getExternalId().equals(Gene.UNKNOWN_GENE_ID) : true;
+    public static int getNumberOfGeneFamiliesWithMultipleGenes() {
+        return numberOfGeneFamiliesWithMultipleGenes;
     }
-
-    public static boolean isSingleGeneFamily(int geneId) {
-        GeneFamily eId = geneFamilySet.get(Math.abs(geneId));
-        return eId != null ? eId.isSingleGeneFamily() : true;
-    }
-
-    public static Set<Integer> getIntegerAlphabet() {
-        return geneFamilySet.keySet();
-    }*/
 
     private static Map<GeneFamily, Color> getColorMap() {
         if (colorMap == null) {

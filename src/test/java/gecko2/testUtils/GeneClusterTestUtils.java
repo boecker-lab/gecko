@@ -1,9 +1,10 @@
-package gecko2;
+package gecko2.testUtils;
 
-import gecko2.algo.ReferenceClusterAlgorithm;
+import gecko2.GeckoInstance;
+import gecko2.algo.DeltaLocation;
+import gecko2.algo.ReferenceCluster;
 import gecko2.algorithm.*;
 import gecko2.io.CogFileReader;
-import gecko2.io.GeneClusterResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,6 +90,15 @@ public class GeneClusterTestUtils {
 		if (pValueComp != PValueComparison.COMPARE_NONE)
 			assertEqualsBigDecimal(expected.getpValue(), actual.getpValue());
 	}
+
+    private static void compareDeltaLocations(ExpectedDeltaLocationValues[] expected, List<DeltaLocation> actual, PValueComparison pValueComp) {
+        assertEquals(expected.length, actual.size());
+        for (int i=0; i<actual.size(); i++){
+            assertEquals(expected[i], actual.get(i));
+            if (pValueComp != PValueComparison.COMPARE_NONE)
+                assertEquals(expected[i].getpValue(), actual.get(i).getpValue(), 1e-15 * expected[i].getpValue());
+        }
+    }
 	
 	/**
 	 * Compares two GeneClusterOccurrences
@@ -113,16 +123,38 @@ public class GeneClusterTestUtils {
 
 		}	
 	}
-	
-	
-	/**
+
+    /**
+     * Compares the two GeneClusters
+     * @param expected the expected result
+     * @param actual the actual result
+     */
+    private static void compareReferenceCluster(ExpectedReferenceClusterValues expected, ReferenceCluster actual, PValueComparison pValueComp) {
+        assertEquals(expected.getGeneContent(), actual.getGeneContent());
+        assertEquals(expected.getSize(), actual.getSize());
+        if (pValueComp != PValueComparison.COMPARE_NONE)
+            assertEqualsBigDecimal(expected.getBestCombined_pValue(), actual.getBestCombined_pValue());
+        if (pValueComp == PValueComparison.COMPARE_ALL)
+            assertEqualsBigDecimal(expected.getBestCombined_pValueCorrected(), actual.getBestCombined_pValueCorrected());
+        assertArrayEquals(expected.getMinimumDistances(), actual.getMinimumDistances());
+        assertEquals(expected.getGenomeNr(), actual.getGenomeNr());
+        assertEquals(expected.getChrNr(), actual.getChrNr());
+        assertEquals(expected.getCoveredGenomes(), actual.getCoveredGenomes());
+
+        assertEquals(expected.getAllDeltaLocations().length, actual.getAllDeltaLocations().size());
+
+        for (int i = 0; i < actual.getAllDeltaLocations().size(); i++)
+            compareDeltaLocations(expected.getAllDeltaLocations()[i], actual.getDeltaLocations(i), pValueComp);
+    }
+
+    /**
 	 * Compares the two GeneClusters
 	 * @param expected the expected result
 	 * @param actual the actual result
 	 */
 	private static void compareGeneClusters(GeneCluster expected, GeneCluster actual, PValueComparison pValueComp) {
 		assertEquals(expected.getId(), actual.getId());
-		assertArrayEquals(expected.getGeneFamilies(), actual.getGeneFamilies());
+		assertEquals(expected.getGeneFamilies(), actual.getGeneFamilies());
 		assertEquals(expected.getSize(), actual.getSize());
 		assertEquals(expected.isMatch(), actual.isMatch());
 		if (pValueComp != PValueComparison.COMPARE_NONE)
@@ -146,6 +178,23 @@ public class GeneClusterTestUtils {
 			compareOccurrence(expected.getAllOccurrences()[i], actual.getAllOccurrences()[i], pValueComp);
 		}
 	}
+
+    /**
+     * The method tests whether the two input array are equal.
+     *
+     * @param expected expected GeneCluster array
+     * @param actual actual GeneCluster array
+     * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
+     */
+    public static void performTest(ExpectedReferenceClusterValues[] expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
+    {
+        assertEquals(expected.length, actual.size());
+
+        for(int i = 0; i < expected.length; i++)
+        {
+            compareReferenceCluster(expected[i], actual.get(i), pValueComp);
+        }
+    }
 	
 	/**
 	 * The method tests whether the two input array are equal.
@@ -169,15 +218,14 @@ public class GeneClusterTestUtils {
 	}
 	
 	static void automaticGeneClusterTestFromFile(File input, File expected, List<Set<Integer>> genomeGroups, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
-		GeneClusterResult gcr = GeneClusterResult.readResultFile(expected);
+		/*GeneClusterResult gcr = GeneClusterResult.readResultFile(expected);
 
 
         CogFileReader reader = new CogFileReader(input);
         int genomes[][][] = readGenomes(reader, input);
 		
 		Parameter p = gcr.getParameterSet();
-		p.setAlphabetSize(reader.getGeneLabelMap().size() - 1 + reader.getGeneLabelMap().get(0).getFamilySize());
-		
+
 		GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(genomes, p, genomeGroups);
 		
 		performTest(gcr.getCompResult(), javaRes, PValueComparison.COMPARE_ALL);
@@ -187,7 +235,7 @@ public class GeneClusterTestUtils {
 		
 			// Test the java implementation
 			performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-		}
+		}*/
 	}
 			
 	/**
@@ -199,7 +247,7 @@ public class GeneClusterTestUtils {
 	 * @param outputFile the output file
 	 */
 	public static void generateRefClusterFile(File inputCogFile, File outputFile, Parameter p, List<Set<Integer>> genomeGrouping) throws IOException, ParseException {
-		if (outputFile.exists()) {
+		/*if (outputFile.exists()) {
 			System.err.println("Error: File " + outputFile.getAbsolutePath() + " exists already. Delete it manually if you want to continue!");
 			System.exit(1);
 		}
@@ -211,16 +259,14 @@ public class GeneClusterTestUtils {
 		CogFileReader reader = new CogFileReader(inputCogFile);
 		int genomes[][][] = readGenomes(reader, inputCogFile);
 
-		p.setAlphabetSize(reader.getGeneLabelMap().size());
-
-		GeneCluster[] result = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGrouping);
+		GeneCluster[] result = GeckoInstance.getInstance().computeClustersJava(genomes, p, genomeGrouping);
 
 		GeneClusterResult gcResult = new GeneClusterResult(result, p, inputCogFile.getName());
 
 		System.out.println(outputFile.getAbsolutePath());
 		assertTrue(outputFile.createNewFile());
 		
-		gcResult.writeToFile(outputFile);
+		gcResult.writeToFile(outputFile);*/
 	}
 	
 	/**

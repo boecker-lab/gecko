@@ -1,5 +1,7 @@
 package gecko2.algorithm;
 
+import sun.java2d.xr.MutableInteger;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -110,10 +112,11 @@ public class Genome implements Serializable {
      */
     private static int[][][] toIntArray(Genome[] genomes, boolean useMemoryReduction) {
         int genomeArray[][][] = new int[genomes.length][][];
+        MutableInteger unHomologeGeneFamilyId = new MutableInteger(Gene.getNumberOfGeneFamiliesWithMultipleGenes() + 1);
         for (int i=0;i<genomes.length;i++) {
             genomeArray[i] = new int[genomes[i].getChromosomes().size()][];
             for (int j=0;j<genomeArray[i].length;j++)
-                genomeArray[i][j] = useMemoryReduction?genomes[i].getChromosomes().get(j).toReducedIntArray(true):genomes[i].getChromosomes().get(j).toIntArray(true, true);
+                genomeArray[i][j] = useMemoryReduction?genomes[i].getChromosomes().get(j).toReducedIntArray(true):genomes[i].getChromosomes().get(j).toIntArray(unHomologeGeneFamilyId, true, true);
         }
         return genomeArray;
     }

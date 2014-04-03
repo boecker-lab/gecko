@@ -13,20 +13,28 @@ import java.util.Set;
  */
 public interface GeckoDataReader {
     /**
-     * The method is a getter for the complete set of gene families
+     * A getter for the complete set of gene families
      *
      * @return the gene family set
      */
     public Set<GeneFamily> getGeneFamilySet();
 
     /**
+     * A getter for the total number of gene families that contain more than 1 gene
+     *
+     * @return the number of gene families that contain more than 1 gene
+     */
+    public int getNumberOfGeneFamiliesWithMultipleGenes();
+
+    /**
      * A getter for the gene family grouping all genes with no gene family information
+     *
      * @return the unknown gene family
      */
     public GeneFamily getUnknownGeneFamily();
 
     /**
-     * @return the genomes from the input file.
+     * @return the genomes from the input file
      */
     public Genome[] getGenomes();
 
