@@ -50,7 +50,7 @@ public class ClusterAnnotationReaderTest {
 		try {
 			File inputFile = new File(ClusterAnnotationReader.class.getResource("/smallTest.cog").toURI());
             CogFileReader reader = new CogFileReader(inputFile);
-			GeckoInstance.getInstance().setCurrentInputFile(inputFile);
+			GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
 
 			reader.importGenomesOccs();
 

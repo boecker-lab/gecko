@@ -32,7 +32,7 @@ public class GeckoInstance {
 	
 	private boolean libgeckoLoaded;
 	
-	private File currentInputFile; 
+	private File currentWorkingDirectoryOrFile;
 	private Genome[] genomes = null;
 	
 	private GeneCluster[] clusters;
@@ -43,7 +43,6 @@ public class GeckoInstance {
 	
 	private boolean debug = false;
 	private boolean animationEnabled = true;
-	private File lastSavedFile = null, lastOpenedFile = null, lastExportedFile = null;
 	private Parameter lastParameter;
     private Gui gui;
 
@@ -121,28 +120,8 @@ public class GeckoInstance {
 	 * END DataEvents
 	 */
 	
-	public File getLastExportedFile() {
-		return lastExportedFile;
-	}
-	
 	public Parameter getLastParameter() {
 		return lastParameter;
-	}
-
-	public File getLastOpenedFile() {
-		return lastOpenedFile;
-	}
-	
-	public File getLastSavedFile() {
-		return lastSavedFile;
-	}
-	
-	public void setLastOpenedFile(File lastOpenedFile) {
-		this.lastOpenedFile = lastOpenedFile;
-	}
-	
-	public void setLastSavedFile(File lastSavedFile) {
-		this.lastSavedFile = lastSavedFile;
 	}
 	
 	public void setAnimationEnabled(boolean animationEnabled) {
@@ -426,12 +405,12 @@ public class GeckoInstance {
 		return clusters;
 	}
 	
-	public File getCurrentInputFile() {
-		return currentInputFile;
+	public File getCurrentWorkingDirectoryOrFile() {
+		return currentWorkingDirectoryOrFile;
 	}
 
-	public void setCurrentInputFile(File currentInputFile) {
-		this.currentInputFile = currentInputFile;
+	public void setCurrentWorkingDirectoryOrFile(File currentWorkingDirectoryOrFile) {
+		this.currentWorkingDirectoryOrFile = currentWorkingDirectoryOrFile;
 	}
 
 	private GeckoInstance() {
@@ -627,12 +606,8 @@ public class GeckoInstance {
 		return genomes;
 	}
 	
-	public void setLastOpendFile(File lastOpenedFile) {
-		this.lastOpenedFile = lastOpenedFile;
-	}
-	
 	public boolean exportResultsToFile(File f, ResultFilter filter, ExportType type) {
-		lastExportedFile = f;
+        setCurrentWorkingDirectoryOrFile(f);
 		filterResults();
 		List<String> genomeNames = new ArrayList<>(genomes.length);
 		for (Genome genome : genomes)

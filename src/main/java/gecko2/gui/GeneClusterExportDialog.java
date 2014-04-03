@@ -1,6 +1,7 @@
 package gecko2.gui;
 
 import com.itextpdf.text.DocumentException;
+import gecko2.GeckoInstance;
 import gecko2.algorithm.GeneCluster;
 import gecko2.gui.GenomePainting.NameType;
 import gecko2.io.GeneClusterToPDFWriter;
@@ -118,7 +119,7 @@ public class GeneClusterExportDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// set up file chooser
-				JFileChooser fileLocation = new JFileChooser();
+				JFileChooser fileLocation = new JFileChooser(GeckoInstance.getInstance().getCurrentWorkingDirectoryOrFile());
 				fileLocation.setName(FILENAME);
 				fileLocation.addChoosableFileFilter(new FileUtils.GenericFilter("pdf;png;jpg"));
 				fileLocation.setDialogTitle("Select the location to save the file...");

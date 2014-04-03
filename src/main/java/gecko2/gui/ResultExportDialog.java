@@ -43,13 +43,13 @@ public class ResultExportDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				GeckoInstance gecko = GeckoInstance.getInstance();
-				JFileChooser fc = new JFileChooser();
-				if (gecko.getLastExportedFile()!=null)
-					fc.setSelectedFile(gecko.getLastExportedFile());
+				JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
 				int state = fc.showSaveDialog(ResultExportDialog.this);
 				if (state == JFileChooser.APPROVE_OPTION) {
-					if (fc.getSelectedFile() != null)
-						textField.setText(fc.getSelectedFile().getAbsolutePath());
+					if (fc.getSelectedFile() != null) {
+                        textField.setText(fc.getSelectedFile().getAbsolutePath());
+                        gecko.setCurrentWorkingDirectoryOrFile(fc.getSelectedFile());
+                    }
 				}
 			}
 		});

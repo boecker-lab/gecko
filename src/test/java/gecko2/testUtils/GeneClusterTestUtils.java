@@ -278,7 +278,7 @@ public class GeneClusterTestUtils {
 	 */
 	private static int[][][] readGenomes(CogFileReader reader, File inputFile) throws IOException, ParseException {
 		GeckoInstance.getInstance();
-		GeckoInstance.getInstance().setCurrentInputFile(inputFile);
+		GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
         reader.readData();
 
         return Genome.toIntArray(reader.getGenomes());

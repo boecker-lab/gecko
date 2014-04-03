@@ -461,10 +461,8 @@ public class Gui {
 		private static final long serialVersionUID = -7418023194238092616L;
 		
 		public void actionPerformed(ActionEvent e) {
-			final JFileChooser fc = new JFileChooser();
+			final JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("cog;gck"));
-			if (gecko.getLastOpenedFile()!=null)
-				fc.setSelectedFile(gecko.getLastOpenedFile());
 
 			int state = fc.showOpenDialog( null );
 			if (state == JFileChooser.APPROVE_OPTION) {
@@ -473,13 +471,13 @@ public class Gui {
 					closeCurrentSession();
 					// Check what type of file we are opening
 					if (FileUtils.getExtension(fc.getSelectedFile()).equals("cog")) {
-						Gui.this.gecko.setCurrentInputFile(fc.getSelectedFile());
+						gecko.setCurrentWorkingDirectoryOrFile(fc.getSelectedFile());
 						CogFileReader reader = new CogFileReader(fc.getSelectedFile());
 						reader.importGenomesOccs();
 						selectAndImportGenomes(reader);
 					} else {
 						if (FileUtils.getExtension(fc.getSelectedFile()).equals("gck")) {
-                            Gui.this.gecko.setCurrentInputFile(fc.getSelectedFile());
+                            Gui.this.gecko.setCurrentWorkingDirectoryOrFile(fc.getSelectedFile());
                             GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.READING_GENOMES);
 
                             SwingWorker worker = new SwingWorker<Void, Void>() {
@@ -721,24 +719,22 @@ public class Gui {
 	private final Action saveSessionAction = new AbstractAction() {
 		private static final long serialVersionUID = -1530838105061978403L;
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser fc = new JFileChooser();
+			JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
 			
 			for (FileFilter f : fc.getChoosableFileFilters())
 				fc.removeChoosableFileFilter(f);
 			
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("gck"));
-			if (gecko.getLastSavedFile()!=null)
-				fc.setSelectedFile(gecko.getLastSavedFile());
 				
 			for (;;) {
 				int state = fc.showSaveDialog(null);
 				if (state == JFileChooser.APPROVE_OPTION) {
 					File f = fc.getSelectedFile();
 					
-					if (! fc.getFileFilter().accept(fc.getSelectedFile()))
-						f = new File(f.getAbsolutePath() + ".gck");
-					
-					PrintUtils.printDebug("Choosen file to save to: " + f);
+					if (! fc.getFileFilter().accept(fc.getSelectedFile())) {
+                        f = new File(f.getAbsolutePath() + ".gck");
+                        gecko.setCurrentWorkingDirectoryOrFile(f);
+                    }
 					
 					if (f.exists()) {
 						if (f.isDirectory()) {
@@ -773,13 +769,14 @@ public class Gui {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser fc = new JFileChooser();
+			JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
 			
 			for (;;) {	
 				int state = fc.showOpenDialog(null);
 				
 				if (state == JFileChooser.APPROVE_OPTION) {
 					File f = fc.getSelectedFile();
+                    gecko.setCurrentWorkingDirectoryOrFile(f);
 					
 					if (f.exists()) {	
 						if (f.isDirectory()) {
