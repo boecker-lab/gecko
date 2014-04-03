@@ -137,7 +137,7 @@ public class GckFileReader implements GeckoDataReader {
      */
     @Override
     public void readData() throws IOException, ParseException {
-        GeckoInstance.getInstance().setLastOpendFile(inputFile);
+        GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
         try	(BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), Charset.forName("UTF-8"))) {
             Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
             unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();

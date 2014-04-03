@@ -43,7 +43,7 @@ public class SessionWriter
 	 */
 	public static boolean saveSessionToFile(File f) 
 	{
-		GeckoInstance.getInstance().setLastSavedFile(f);
+		GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(f);
         boolean returnValue = true;
 
         try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), Charset.forName("UTF-8"))) {
