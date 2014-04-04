@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
 public class CommandLineExecution {
-    public static void runAlgorithm(CommandLineOptions options, int alphabetSize) {
+    public static void runAlgorithm(CommandLineOptions options) {
         Parameter.ReferenceType refType;
         if (options.getReferenceGenomeName().equals(""))
             refType = Parameter.ReferenceType.allAgainstAll;
@@ -36,7 +36,6 @@ public class CommandLineExecution {
         }
 
         Parameter parameter = new Parameter(options.getMaxDistance(), options.getMinClusterSize(), options.getMinCoveredGenomes(), Parameter.QUORUM_NO_COST, options.getOperationMode(), refType);
-        parameter.setAlphabetSize(alphabetSize);
 
         // compute the clusters
         ExecutorService executor = GeckoInstance.getInstance().performClusterDetection(parameter, false, options.getGenomeGroupingFactor());

@@ -35,13 +35,13 @@ public class ClusterAnnotationReader {
 	private ClusterAnnotationReader(File f, Genome[] genomes) {
 		this.f = f;
 		this.genomes = genomes;
-		this.currentClusters = new ArrayList<GeneCluster>();
+		this.currentClusters = new ArrayList<>();
 		
-		newClusters = new ArrayList<GeneCluster>();
+		newClusters = new ArrayList<>();
 		
-		genomeMap = new HashMap<String,Integer>();
-		chromosomeMap = new HashMap<String,Integer>();
-		genomeIndexMap = new HashMap<Integer,Integer>();
+		genomeMap = new HashMap<>();
+		chromosomeMap = new HashMap<>();
+		genomeIndexMap = new HashMap<>();
 		
 		for (int i=0; i<genomes.length; i++) {
 			for (int j=0; j<genomes[i].getChromosomes().size(); j++){
@@ -174,9 +174,9 @@ public class ClusterAnnotationReader {
 		}
 		
 		Subsequence refSeq = refSeqs.get(0);
-		Set<Integer> refGeneSet = new HashSet<Integer>();
+		Set<GeneFamily> refGeneSet = new HashSet<>();
 		for (int i=refSeq.getStart()-1; i<refSeq.getStop(); i++) {
-			refGeneSet.add(Math.abs(refGenome.getChromosomes().get(refSeq.getChromosome()).getGenes().get(i).getId()));
+			refGeneSet.add(refGenome.getChromosomes().get(refSeq.getChromosome()).getGenes().get(i).getGeneFamily());
 		}
 		
 		Subsequence[][] allSeqs = new Subsequence[genomes.length][];
@@ -194,10 +194,10 @@ public class ClusterAnnotationReader {
 				List<Subsequence> bestOccList = new ArrayList<Subsequence>(allSeqs[i].length);
 				int minDistance = 1000000;
 				for (Subsequence seq : allSeqs[i]) {
-					Set<Integer> additionalGenes = new HashSet<Integer>();
-					Set<Integer> foundGenes = new HashSet<Integer>();
+					Set<GeneFamily> additionalGenes = new HashSet<>();
+					Set<GeneFamily> foundGenes = new HashSet<>();
 					for (int j=seq.getStart()-1; j<seq.getStop(); j++){
-						int geneId = Math.abs(genomes[i].getChromosomes().get(seq.getChromosome()).getGenes().get(j).getId());
+						GeneFamily geneId = genomes[i].getChromosomes().get(seq.getChromosome()).getGenes().get(j).getGeneFamily();
 						if (refGeneSet.contains(geneId))
 							foundGenes.add(geneId);
 						else
@@ -218,14 +218,7 @@ public class ClusterAnnotationReader {
 		}
 		GeneClusterOccurrence[] allOccs = new GeneClusterOccurrence[]{new GeneClusterOccurrence(0, allSeqs, cluster.getBestPValue(), totalDistance, support)};
 		GeneClusterOccurrence[] bestOccs = new GeneClusterOccurrence[]{new GeneClusterOccurrence(0, bestSeqs, cluster.getBestPValue(), totalDistance, support)};
-		
-		int[] genes = new int[refGeneSet.size()];
-		int i=0;
-		for (Integer gene : refGeneSet) {
-			genes[i] = gene;
-			i++;
-		}
-		
-		return new GeneCluster(cluster.getId(), bestOccs, allOccs, genes, cluster.getBestPValue(), cluster.getBestPValueCorrected(), totalDistance, referenceIndex, cluster.getType());
+
+		return new GeneCluster(cluster.getId(), bestOccs, allOccs, refGeneSet, cluster.getBestPValue(), cluster.getBestPValueCorrected(), totalDistance, referenceIndex, cluster.getType());
 	}
 }

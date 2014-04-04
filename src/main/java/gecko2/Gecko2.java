@@ -109,7 +109,7 @@ public class Gecko2 {
 
 
         if (args.length > 1) {
-            CommandLineExecution.runAlgorithm(options, reader.getGeneLabelMap().size());
+            CommandLineExecution.runAlgorithm(options);
         }
 
 	}

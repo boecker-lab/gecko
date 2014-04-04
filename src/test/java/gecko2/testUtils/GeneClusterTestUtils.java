@@ -281,7 +281,7 @@ public class GeneClusterTestUtils {
 		GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
         reader.readData();
 
-        return Genome.toIntArray(reader.getGenomes());
+        return reader.getData().toIntArray();
 	}
 	
 	private enum GenerateTestDataType {

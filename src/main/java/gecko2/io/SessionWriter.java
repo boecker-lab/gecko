@@ -74,7 +74,7 @@ public class SessionWriter
                 out.write(chr.getName());
                 out.newLine();
                 for (Gene gene : chr.getGenes()) {
-                    out.write(gene.getOrientation().getEncoding() + SEPERATOR + gene.getExternalId() + SEPERATOR + gene.getTag() + SEPERATOR + gene.getAnnotation() + SEPERATOR + gene.getName() + SEPERATOR + gene.getFamilySize());
+                    out.write(gene.getOrientation().getEncoding() + SEPERATOR + gene.getExternalId() + SEPERATOR + gene.getTag() + SEPERATOR + gene.getAnnotation() + SEPERATOR + gene.getName() + SEPERATOR + (gene.isUnknown() ? 1 : gene.getFamilySize()));
                     out.newLine();
                 }
                 out.write(CHROMOSOME_END);
@@ -95,7 +95,7 @@ public class SessionWriter
             out.newLine();
             out.write(cluster.getId() + SEPERATOR + cluster.getRefSeqIndex() + SEPERATOR + cluster.getType().getCharMode() + SEPERATOR + cluster.getMinTotalDist() + SEPERATOR + cluster.getBestPValue() + SEPERATOR + cluster.getBestPValueCorrected());
             out.newLine();
-            out.write(cluster.getGeneFamilies().toString());
+            out.write(cluster.getGeneFamilyString());
             out.newLine();
             for (GeneClusterOccurrence occ : cluster.getAllOccurrences()) {
                 out.write(OCC_START);

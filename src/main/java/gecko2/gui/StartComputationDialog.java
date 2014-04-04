@@ -274,7 +274,7 @@ public class StartComputationDialog extends JDialog {
 					Genome[] genomes = new Genome[oldGenomes.length+1];
 					Genome cluster = new Genome();
 					ArrayList<Gene> genes = new ArrayList<>();
-					Map<String, GeneFamily> revIDMap = Gene.getGeneLabelMap();
+					Map<String, GeneFamily> revIDMap = gecko.getGeneLabelMap();
 					for (String id : refClusterField.getText().split(" "))
 						if (id!=null && (!(id.equals("")))) {
 							GeneFamily geneFamily = revIDMap.get(id); //TODO contains strings, should not work!

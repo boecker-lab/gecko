@@ -1,7 +1,7 @@
 package gecko2.algorithm;
 
 import gecko2.GeckoInstance;
-import sun.java2d.xr.MutableInteger;
+import gecko2.algorithm.util.MutableInteger;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

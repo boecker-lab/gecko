@@ -338,13 +338,14 @@ public class CogFileReader implements GeckoDataReader {
             if (singleId.length() > maxIdLength)
                 maxIdLength = singleId.length();
 
-            if (explode.length > 5 && explode[5].length() > maxNameLength)
-                maxNameLength = explode[5].length();
+            if (explode.length > 5 && explode[5].length() > maxLocusTagLength)
+                maxLocusTagLength = explode[5].length();
 
-            if (explode[3].length() > maxLocusTagLength) {
-                maxLocusTagLength = explode[3].length();
-                if (explode.length <= 5 && explode[3].length() > maxNameLength)
-                    maxNameLength = explode[3].length();
+            if (explode[3].length() > maxNameLength) {
+                maxNameLength = explode[3].length();
+
+                if (explode.length <= 5 && explode[3].length() > maxLocusTagLength)
+                    maxLocusTagLength = explode[3].length();
             }
 
             GeneFamily geneFamily;
@@ -364,7 +365,7 @@ public class CogFileReader implements GeckoDataReader {
 
             Gene gene;
             if (explode.length > 5)
-                gene = new Gene(explode[5], explode[3], geneFamily, orientation, explode[4]);
+                gene = new Gene(explode[3], explode[5], geneFamily, orientation, explode[4]);
             else
                 gene = new Gene(explode[3], geneFamily, orientation, explode[4]);
             genes.add(gene);
@@ -445,6 +446,22 @@ public class CogFileReader implements GeckoDataReader {
     @Override
     public GeneCluster[] getGeneClusters() {
         return new GeneCluster[0];
+    }
+
+    /**
+     * @return the complete data
+     */
+    @Override
+    public DataSet getData() {
+        return new DataSet(
+                genomes,
+                maxIdLength,
+                maxNameLength,
+                maxLocusTagLength,
+                geneFamilySet,
+                unknownGeneFamily,
+                numberOfGeneFamiliesWithMultipleGenes
+        );
     }
 
     /**

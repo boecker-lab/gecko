@@ -133,6 +133,23 @@ public class GckFileReader implements GeckoDataReader {
     }
 
     /**
+     * @return the complete data
+     */
+    @Override
+    public DataSet getData() {
+        return new DataSet(
+                genomes,
+                clusters,
+                maxIdLength,
+                maxNameLength,
+                maxLocusTagLength,
+                geneFamilySet,
+                unknownGeneFamily,
+                numberOfGeneFamiliesWithMultipleGenes
+        );
+    }
+
+    /**
      * Reads all data from the file
      */
     @Override
@@ -229,7 +246,7 @@ public class GckFileReader implements GeckoDataReader {
                         orientation = Gene.GeneOrientation.UNSIGNED;
                 }
 
-                Gene newGene = new Gene(split[4], geneFamily, orientation, split[3]);
+                Gene newGene = new Gene(split[4], split[2], geneFamily, orientation, split[3]);
                 maxIdLength = Math.max(maxIdLength, (split[1].length()));
                 maxLocusTagLength = Math.max(maxLocusTagLength, newGene.getTag().length());
                 maxNameLength = Math.max(maxNameLength, newGene.getName().length());

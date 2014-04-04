@@ -5,7 +5,6 @@ import gecko2.io.CogFileReader;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,9 +16,7 @@ public class BreakPointDistanceTest {
 
 	@Test
 	public void shouldGiveDistanceZero() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2, 3, 4, 5, 6, 7}});
-		testChromosomes.add(new int[][]{{1, 2, 3, 4, 5, 6, 7}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2, 3, 4, 5, 6, 7}}, {{1, 2, 3, 4, 5, 6, 7}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, true);
@@ -27,9 +24,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistanceZeroInverse() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2, 3, 4, 5, 6, 7}});
-		testChromosomes.add(new int[][]{{-7, -6, -5, -4, -3, -2, -1}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2, 3, 4, 5, 6, 7}}, {{-7, -6, -5, -4, -3, -2, -1}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, true);
@@ -37,9 +32,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistanceTwo() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2}});
-		testChromosomes.add(new int[][]{{1, 3}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2}}, {{1, 3}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 2},{2, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 2},{2, 0}}, true);
@@ -47,9 +40,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDifferentDistanceWhenSigned() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2}});
-		testChromosomes.add(new int[][]{{2, 1}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2}}, {{2, 1}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 2},{2, 0}}, true);
@@ -57,9 +48,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveSameDistanceWhenSigned() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2}});
-		testChromosomes.add(new int[][]{{-2, -1}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2}}, {{-2, -1}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, true);
@@ -67,9 +56,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistanceTwoInverse() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2}});
-		testChromosomes.add(new int[][]{{-3, -1}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2}}, {{-3, -1}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 2},{2, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 2},{2, 0}}, true);
@@ -77,9 +64,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistanceOne() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 1}});
-		testChromosomes.add(new int[][]{{1, 1, 1}});
+        int[][][] testChromosomes = new int[][][] {{{1, 1}}, {{1, 1, 1}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 1},{1, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 1},{1, 0}}, true);
@@ -87,9 +72,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistanceThree() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{2, 2, 2}});
-		testChromosomes.add(new int[][]{{1, 1}});
+        int[][][] testChromosomes = new int[][][] {{{2, 2, 2}}, {{1, 1}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 3},{3, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 3},{3, 0}}, true);
@@ -97,9 +80,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistancesTwo() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2, 3}});
-		testChromosomes.add(new int[][]{{2, 3, 5}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2, 3}}, {{2, 3, 5}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 2},{2, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 2},{2, 0}}, true);
@@ -107,9 +88,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistanceOneWithTwoChromosomes() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2, 3, 4, 5, 6, 7}});
-		testChromosomes.add(new int[][]{{1, 2, 3, 4}, {5, 6, 7}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2, 3, 4, 5, 6, 7}}, {{1, 2, 3, 4}, {5, 6, 7}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 1},{1, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 1},{1, 0}}, true);
@@ -117,9 +96,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistanceZeroWithTwoChromosomes() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2, 3, 4}, {5, 6, 7}});
-		testChromosomes.add(new int[][]{{1, 2, 3, 4}, {5, 6, 7}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2, 3, 4}, {5, 6, 7}}, {{1, 2, 3, 4}, {5, 6, 7}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, true);
@@ -127,9 +104,7 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistanceZeroWithTwoChromosomesDifferentOrder() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2, 3, 4}, {5, 6, 7}});
-		testChromosomes.add(new int[][]{{5, 6, 7}, {1, 2, 3, 4}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2, 3, 4}, {5, 6, 7}}, {{5, 6, 7}, {1, 2, 3, 4}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 0},{0, 0}}, true);
@@ -138,9 +113,7 @@ public class BreakPointDistanceTest {
 		
 	@Test
 	public void shouldGiveDistanceEleven() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2, 3, 3, 5, 2, 5, 7, 9}});
-		testChromosomes.add(new int[][]{{2, 3, 5, 5, 6, 2, 10, 7, 9, 20}});
+        int[][][] testChromosomes = new int[][][] {{{1, 2, 3, 3, 5, 2, 5, 7, 9}}, {{2, 3, 5, 5, 6, 2, 10, 7, 9, 20}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 11},{11, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 11},{11, 0}}, true);
@@ -148,22 +121,20 @@ public class BreakPointDistanceTest {
 	
 	@Test
 	public void shouldGiveDistanceNine() {
-		List<int[][]> testChromosomes = new ArrayList<int[][]>(2);
-		testChromosomes.add(new int[][]{{1, 2, 3, 5, 5, 2, 5, 7, 9}});
-		testChromosomes.add(new int[][]{{2, 3, -5, -5, 6, 2, 10, -9, -7, 20}});
+		int[][][] testChromosomes = new int[][][] {{{1, 2, 3, 5, 5, 2, 5, 7, 9}}, {{2, 3, -5, -5, 6, 2, 10, -9, -7, 20}}};
 		
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 9},{9, 0}}, false);
 		breakpointDistanceTest(testChromosomes, new int[][]{{0, 11},{11, 0}}, true);
 	}
 
-	private void breakpointDistanceTest(List<int[][]> chromosomes, int[][] expectedDistances, boolean signed) {
+	private void breakpointDistanceTest(int[][][] chromosomes, int[][] expectedDistances, boolean signed) {
 		int[][] breakPointDistances = BreakPointDistance.computeBreakPointDistance(chromosomes, signed);
 		
 		compareResults(expectedDistances, breakPointDistances);
 	}
 	
-	private void breakpointDistanceTest(Genome[] genomes, int[][] expectedDistances, boolean signed) {
-		int[][] breakPointDistances = BreakPointDistance.computeBreakPointDistance(genomes, true, signed);
+	private void breakpointDistanceTest(DataSet data, int[][] expectedDistances, boolean signed) {
+		int[][] breakPointDistances = BreakPointDistance.computeBreakPointDistance(data, true, signed);
 		
 		compareResults(expectedDistances, breakPointDistances);
 	}
@@ -185,9 +156,9 @@ public class BreakPointDistanceTest {
 
         reader.readData();
 
-		Genome[] genomes = reader.getGenomes();
+		DataSet data = reader.getData();
 		
-		breakpointDistanceTest(genomes, new int[][] {{0, 14, 20, 20}, {14, 0, 22, 24},{20, 22, 0, 24},{20, 24, 24, 0}}, false);
+		breakpointDistanceTest(data, new int[][] {{0, 14, 20, 20}, {14, 0, 22, 24},{20, 22, 0, 24},{20, 24, 24, 0}}, false);
 	}
 	
 	@Test
@@ -198,9 +169,9 @@ public class BreakPointDistanceTest {
 
         reader.readData();
 				
-		Genome[] genomes = reader.getGenomes();
+		DataSet data = reader.getData();
 		
-		List<Set<Integer>> cluster = BreakPointDistance.groupGenomes(genomes, 0.7, false);
+		List<Set<Integer>> cluster = BreakPointDistance.groupGenomes(data, 0.7, false);
 		assertEquals(2, cluster.size());
 		
 		assertEquals(3, cluster.get(0).size());
@@ -211,7 +182,7 @@ public class BreakPointDistanceTest {
 		assertEquals(1, cluster.get(1).size());
 		assertTrue(cluster.get(1).contains(2));
 		
-		cluster = BreakPointDistance.groupGenomes(genomes, 0.9, false);
+		cluster = BreakPointDistance.groupGenomes(data, 0.9, false);
 		assertEquals(1, cluster.size());
 		
 		assertEquals(4, cluster.get(0).size());
@@ -220,7 +191,7 @@ public class BreakPointDistanceTest {
 		assertTrue(cluster.get(0).contains(3));
 		assertTrue(cluster.get(0).contains(2));
 		
-		cluster = BreakPointDistance.groupGenomes(genomes, 0.1, false);
+		cluster = BreakPointDistance.groupGenomes(data, 0.1, false);
 		assertEquals(4, cluster.size());
 		
 		assertEquals(1, cluster.get(0).size());

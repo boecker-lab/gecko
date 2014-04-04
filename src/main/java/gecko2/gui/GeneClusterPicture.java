@@ -412,7 +412,7 @@ public class GeneClusterPicture {
 				}
 				else {
 					// fallback if we do not have enough colors defined
-					out = Gene.getGeneColor(geneFamily);
+					out = GeckoInstance.getInstance().getGeneColor(geneFamily);
 				}	
 			}
 		}

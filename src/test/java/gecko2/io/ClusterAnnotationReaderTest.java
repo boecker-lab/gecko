@@ -22,7 +22,7 @@ import static gecko2.testUtils.GeneClusterTestUtils.assertEqualsBigDecimal;
 import static org.junit.Assert.*;
 
 public class ClusterAnnotationReaderTest {
-	private Genome[] genomes = null;
+	private DataSet data = null;
 	
 	@BeforeClass
 	public static void loadLibGecko2()
@@ -55,7 +55,7 @@ public class ClusterAnnotationReaderTest {
 			reader.importGenomesOccs();
 
 			reader.readFileContent();
-			genomes = reader.getGenomes();
+			data = reader.getData();
 		} catch (EOFException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -156,13 +156,13 @@ public class ClusterAnnotationReaderTest {
 	}
 	
 	private void readAnnotationsTest(File annotationFile){
-		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, genomes);
+		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, data.getGenomes());
 		assertNotNull(clusters);
 		assertEquals(12, clusters.size());
 
 		Parameter p = new Parameter(1, 4, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
-		GeneCluster[] res = GeckoInstance.getInstance().computeClusters(genomes, p);
+		GeneCluster[] res = GeckoInstance.computeClustersJava(data, p);
 		
 		GeneCluster[] readClusters = clusters.toArray(new GeneCluster[clusters.size()]);
 		
@@ -180,11 +180,11 @@ public class ClusterAnnotationReaderTest {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, genomes);
+		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, data.getGenomes());
 		assertNotNull(clusters);
 		assertEquals(12, clusters.size());
 		GeckoInstance geckoInstance = GeckoInstance.getInstance();
-		geckoInstance.setGenomes(genomes);
+		geckoInstance.setData(data);
 		GeneCluster[] clusterWithPValue = geckoInstance.computeReferenceStatistics(clusters.toArray(new GeneCluster[clusters.size()]));
 		
 		compareClusters(clusters.toArray(new GeneCluster[clusters.size()]), clusterWithPValue, false);

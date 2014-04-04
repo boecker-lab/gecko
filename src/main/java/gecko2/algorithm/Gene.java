@@ -1,5 +1,7 @@
 package gecko2.algorithm;
 
+import gecko2.GeckoInstance;
+
 import java.awt.*;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -10,13 +12,8 @@ import java.util.Set;
 public class Gene implements Serializable {
 	private static final long serialVersionUID = 7903694077854093398L;
 
-    private static Set<GeneFamily> geneFamilySet;
-    private static GeneFamily unknownGeneFamily;
-    private static int numberOfGeneFamiliesWithMultipleGenes;
-    private static Map<GeneFamily, Color> colorMap;
-
     public enum GeneOrientation {
-        NEGATIVE(-1, "+"), POSITIVE(1, "-"), UNSIGNED(1, "");
+        POSITIVE(1, "+"), NEGATIVE(-1, "-"), UNSIGNED(1, "");
         private final int sign;
         private final String encoding;
         GeneOrientation(int sign, String encoding){
@@ -90,7 +87,7 @@ public class Gene implements Serializable {
     }
 
     public Color getGeneColor() {
-        return Gene.getGeneColor(geneFamily);
+        return GeckoInstance.getInstance().getGeneColor(geneFamily);
     }
 	
 	public String getName() {
@@ -149,45 +146,6 @@ public class Gene implements Serializable {
         result = 31 * result + geneFamily.hashCode();
         result = 31 * result + orientation.hashCode();
         return result;
-    }
-
-    public static void setGeneFamilySet(Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily, int numberOfGeneFamiliesWithMultipleGenes) {
-        Gene.geneFamilySet = geneFamilySet;
-        Gene.unknownGeneFamily = unknownGeneFamily;
-        Gene.numberOfGeneFamiliesWithMultipleGenes = numberOfGeneFamiliesWithMultipleGenes;
-        colorMap = null;
-    }
-
-    public static Map<String,GeneFamily> getGeneLabelMap() {
-        Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
-        geneFamilyMap.put(unknownGeneFamily.getExternalId(), unknownGeneFamily);
-        for (GeneFamily geneFamily : geneFamilySet)
-            geneFamilyMap.put(geneFamily.getExternalId(), geneFamily);
-        return geneFamilyMap;
-    }
-
-    public static int getAlphabetSize() {
-        System.out.println("alphabetSize: " + (geneFamilySet.size() + unknownGeneFamily.getFamilySize()) + " compressed: " + (numberOfGeneFamiliesWithMultipleGenes));
-        return geneFamilySet.size() + unknownGeneFamily.getFamilySize();
-    }
-
-    public static int getNumberOfGeneFamiliesWithMultipleGenes() {
-        return numberOfGeneFamiliesWithMultipleGenes;
-    }
-
-    private static Map<GeneFamily, Color> getColorMap() {
-        if (colorMap == null) {
-            Random r = new Random();
-            colorMap = new HashMap<>();
-            for (GeneFamily geneFamily : geneFamilySet)
-                if (!geneFamily.isSingleGeneFamily())
-                    colorMap.put(geneFamily, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
-        }
-        return colorMap;
-    }
-
-    public static Color getGeneColor(GeneFamily geneFamily) {
-        return getColorMap().get(geneFamily);
     }
 
     public GeneOrientation getOrientation() {

@@ -1,5 +1,6 @@
 package gecko2.io;
 
+import gecko2.algorithm.DataSet;
 import gecko2.algorithm.GeneFamily;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
@@ -57,6 +58,11 @@ public interface GeckoDataReader {
      * @return the gene clusters
      */
     public GeneCluster[] getGeneClusters();
+
+    /**
+     * @return the complete data
+     */
+    public DataSet getData();
 
     /**
      * Reads all data from the file

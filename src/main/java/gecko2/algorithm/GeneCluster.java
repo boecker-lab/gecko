@@ -86,7 +86,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		this.id = id;
 	}
 	
-	public GeneCluster(int id, ReferenceCluster refCluster, Genome[] genomes){
+	public GeneCluster(int id, ReferenceCluster refCluster, DataSet data){
 		this.id = id;
 		this.match = true;
 		this.bestPValue = refCluster.getBestCombined_pValue();
@@ -106,7 +106,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
         geneFamilies = new HashSet<>();
         for (int i=refCluster.getLeftBorder(); i<=refCluster.getRightBorder() && geneFamilies.size()<size; i++){
-            geneFamilies.add(genomes[refCluster.getGenomeNr()].getChromosomes().get(refCluster.getChrNr()).getGenes().get(i).getGeneFamily());
+            geneFamilies.add(data.getGenomes()[refCluster.getGenomeNr()].getChromosomes().get(refCluster.getChrNr()).getGenes().get(i).getGeneFamily());
         }
 
 
@@ -287,6 +287,24 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	public Set<GeneFamily> getGeneFamilies() {
 		return geneFamilies;
 	}
+
+    public String getGeneFamilyString() {
+        int iMax = geneFamilies.size() - 1;
+        if (iMax == -1)
+            return "[]";
+
+        StringBuilder b = new StringBuilder();
+        b.append('[');
+        int i=0;
+        for (GeneFamily geneFamily : geneFamilies) {
+            b.append(geneFamily.getExternalId());
+            if (i++ == iMax)
+                b.append(']');
+            else
+                b.append(", ");
+        }
+        return b.toString();
+    }
 	
 	public int getSize() {
 		return size;

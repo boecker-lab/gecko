@@ -1,6 +1,7 @@
 package gecko2.io;
 
 import gecko2.GeckoInstance;
+import gecko2.algorithm.Chromosome;
 import gecko2.testUtils.GeneClusterTestUtils;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
@@ -82,6 +83,22 @@ public class GckFileReaderTest {
         assertEquals(cogReader.getMaxLocusTagLength(), gckReader.getMaxLocusTagLength());
         assertEquals(cogReader.getMaxNameLength(), gckReader.getMaxNameLength());
 
+        assertEquals(cogReader.getGenomes().length, gckReader.getGenomes().length);
+        for (int i=0; i<cogReader.getGenomes().length; i++) {
+            assertEquals(cogReader.getGenomes()[i].getName(), gckReader.getGenomes()[i].getName());
+
+            assertEquals(cogReader.getGenomes()[i].getChromosomes().size(), gckReader.getGenomes()[i].getChromosomes().size());
+            for (int j=0; j<cogReader.getGenomes()[i].getChromosomes().size(); j++) {
+                Chromosome expectedChromosome = cogReader.getGenomes()[i].getChromosomes().get(j);
+                Chromosome actualChromosome = gckReader.getGenomes()[i].getChromosomes().get(j);
+
+                assertEquals(expectedChromosome.getName(), actualChromosome.getName());
+
+                assertEquals(expectedChromosome.getGenes().size(), actualChromosome.getGenes().size());
+                for (int k=0; k<expectedChromosome.getGenes().size(); k++)
+                    assertEquals(expectedChromosome.getGenes().get(k), actualChromosome.getGenes().get(k));
+            }
+        }
         assertArrayEquals(cogReader.getGenomes(), gckReader.getGenomes());
         assertEquals(cogReader.getGeneFamilySet(), gckReader.getGeneFamilySet());
         assertEquals(cogReader.getUnknownGeneFamily(), gckReader.getUnknownGeneFamily());
@@ -105,7 +122,7 @@ public class GckFileReaderTest {
         assertEquals(cogReader.getGeneFamilySet(), gckReader.getGeneFamilySet());
         assertEquals(cogReader.getUnknownGeneFamily(), gckReader.getUnknownGeneFamily());
 
-        GeneCluster[] computedResult = GeckoInstance.getInstance().computeClustersJava(cogReader.getGenomes(), p);
+        GeneCluster[] computedResult = GeckoInstance.getInstance().computeClustersJava(cogReader.getData(), p);
 
         performTest(computedResult, gckReader.getGeneClusters(), GeneClusterTestUtils.PValueComparison.COMPARE_NONE);
     }

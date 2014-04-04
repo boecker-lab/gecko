@@ -1,5 +1,6 @@
 package gecko2.gui;
 
+import gecko2.GeckoInstance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneFamily;
@@ -255,7 +256,7 @@ public class GenomePainting {
 	}
 
     private static Color getColor(GeneFamily geneFamily) {
-        Color color = Gene.getGeneColor(geneFamily);
+        Color color = GeckoInstance.getInstance().getGeneColor(geneFamily);
         if (color == null)
             return Color.GRAY;
         else

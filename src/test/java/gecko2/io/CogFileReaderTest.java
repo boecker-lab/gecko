@@ -355,8 +355,9 @@ public class CogFileReaderTest {
         // When
         CogFileReader reader = new CogFileReader(inputFile);
         reader.readData();
-        Gene.setGeneFamilySet(reader.getGeneFamilySet(), reader.getUnknownGeneFamily(), reader.getNumberOfGeneFamiliesWithMultipleGenes());
-        int[][][] genomes = Genome.toIntArray(reader.getGenomes());
+        DataSet data = reader.getData();
+
+        int[][][] genomes = data.toIntArray();
 
         // Then
         assertArrayEquals(expected, genomes);
@@ -374,8 +375,9 @@ public class CogFileReaderTest {
         // When
         CogFileReader reader = new CogFileReader(inputFile);
         reader.readData();
-        Gene.setGeneFamilySet(reader.getGeneFamilySet(), reader.getUnknownGeneFamily(), reader.getNumberOfGeneFamiliesWithMultipleGenes());
-        int[][][] genomes = Genome.toIntArray(reader.getGenomes());
+        DataSet data = reader.getData();
+
+        int[][][] genomes = data.toIntArray();
 
         // Then
         assertArrayEquals(expected, genomes);
@@ -393,8 +395,9 @@ public class CogFileReaderTest {
         // When
         CogFileReader reader = new CogFileReader(inputFile);
         reader.readData();
-        Gene.setGeneFamilySet(reader.getGeneFamilySet(), reader.getUnknownGeneFamily(), reader.getNumberOfGeneFamiliesWithMultipleGenes());
-        int[][][] genomes = Genome.toReducedIntArray(reader.getGenomes());
+        DataSet data = reader.getData();
+
+        int[][][] genomes = data.toReducedIntArray();
 
         // Then
         assertArrayEquals(expected, genomes);

@@ -98,7 +98,7 @@ public class Gui {
 		// splits the gui in horizontal half
         JSplitPane vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		vertSplit.setResizeWeight(0.5);
-		this.gecko.setClusters(null);
+		this.gecko.setData(null);
 		vertSplit.setTopComponent(selectorSplitPane);
 		
 		vertSplit.setBottomComponent(gcDisplay);
@@ -434,9 +434,7 @@ public class Gui {
 	}
 
 	public void closeCurrentSession() {
-		gecko.setClusters(null);
-		gecko.setGenomes(null);
-		gcSelector.refresh();
+        gecko.setData(null);
 		mgb.clear();
 	}
 	
