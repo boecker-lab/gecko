@@ -327,8 +327,9 @@ public class GckFileReader implements GeckoDataReader {
             this.genes = new HashSet<>();
             for (String gene : genes) {
                 GeneFamily geneFamily = geneFamilyMap.get(gene.trim());
-                if (geneFamily == null)
-                    throw  new ParseException("No gene family found for key: " + gene.trim(), 0);
+                if (geneFamily == null) {
+                    throw new ParseException("No gene family found for key: " + gene.trim(), 0);
+                }
                 this.genes.add(geneFamilyMap.get(gene.trim()));
             }
         }

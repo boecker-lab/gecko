@@ -53,6 +53,14 @@ public class GckFileReaderTest {
     }
 
     @Test
+    public void readFileWithUnknownGeneInClusters()  throws IOException, ParseException{
+        File cogFile = new File(getClass().getResource("/gckReaderTestUnknownGeneInCluster.cog").getFile());
+        File gckFile = new File(getClass().getResource("/gckReaderTestUnknownGeneInCluster.gck").getFile());
+        Parameter p = new Parameter(1, 4, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        testReadingClusters(cogFile, gckFile, p);
+    }
+
+    @Test
     public void readFileStatisticsClusters()  throws IOException, ParseException{
         File cogFile = new File(getClass().getResource("/statistics.cog").getFile());
         File gckFile = new File(getClass().getResource("/statisticsClusters.gck").getFile());

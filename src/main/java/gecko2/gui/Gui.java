@@ -1,6 +1,7 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
+import gecko2.algorithm.DataSet;
 import gecko2.algorithm.GeneCluster;
 import gecko2.io.ClusterAnnotationReader;
 import gecko2.io.CogFileReader;
@@ -98,7 +99,7 @@ public class Gui {
 		// splits the gui in horizontal half
         JSplitPane vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		vertSplit.setResizeWeight(0.5);
-		this.gecko.setData(null);
+		this.gecko.setData(DataSet.getEmptyDataSet());
 		vertSplit.setTopComponent(selectorSplitPane);
 		
 		vertSplit.setBottomComponent(gcDisplay);
@@ -322,9 +323,11 @@ public class Gui {
 	}
 	
 	public void updateViewscreen() {
-		this.mgb.clear();
-		if (gecko.getGenomes()!=null)
-			this.mgb.addGenomes(gecko.getGenomes());
+        if (mgb != null) {
+            this.mgb.clear();
+            if (gecko.getGenomes() != null)
+                this.mgb.addGenomes(gecko.getGenomes());
+        }
 	}
 	
 	public AbstractMultipleGenomeBrowser getMgb() {
@@ -434,7 +437,7 @@ public class Gui {
 	}
 
 	public void closeCurrentSession() {
-        gecko.setData(null);
+        gecko.setData(DataSet.getEmptyDataSet());
 		mgb.clear();
 	}
 	

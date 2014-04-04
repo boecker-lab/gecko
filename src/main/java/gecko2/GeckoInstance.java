@@ -370,7 +370,7 @@ public class GeckoInstance {
         this.fireDataChanged();
     }
 
-    public void setData(final DataSet data) {
+    public void setData(DataSet data) {
         this.data = data;
         dataUpdated();
     }
@@ -434,6 +434,7 @@ public class GeckoInstance {
 	 */
 	public static GeneCluster[] computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping) {
         int intArray[][][] = data.toIntArray();
+        params.setAlphabetSize(data.getAlphabetSize());
 		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping);
         GeneCluster[] result = new GeneCluster[refCluster.size()];
         for (int i=0; i<refCluster.size(); i++)
@@ -448,6 +449,7 @@ public class GeckoInstance {
 	 */
 	public GeneCluster[] computeClustersLibgecko(Parameter params) {
         int intArray[][][] = data.toIntArray();
+        params.setAlphabetSize(data.getAlphabetSize());
 		return computeClusters(intArray, params, GeckoInstance.this);
 	}
 	
@@ -464,7 +466,6 @@ public class GeckoInstance {
 	public ExecutorService performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
 		lastParameter = p;
-		p.setAlphabetSize(data.getAlphabetSize());
         if (gui != null)
 		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
 		ClusterComputationRunnable clusterComputation = new ClusterComputationRunnable(p, mergeResults, genomeGroupingFactor);

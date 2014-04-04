@@ -24,7 +24,9 @@ public class DataSet {
     private int numberOfGeneFamiliesWithMultipleGenes;
     private Map<GeneFamily, Color> colorMap;
 
-
+    public static DataSet getEmptyDataSet() {
+        return new DataSet(null, null, 0, 0, 0, null, null, 0);
+    }
 
     public DataSet(Genome[] genomes, int maxIdLength, int maxNameLength, int maxLocusTagLength, Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily, int numberOfGeneFamiliesWithMultipleGenes) {
         this(genomes, null, maxIdLength, maxNameLength, maxLocusTagLength, geneFamilySet, unknownGeneFamily, numberOfGeneFamiliesWithMultipleGenes);
