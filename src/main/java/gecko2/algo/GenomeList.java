@@ -203,7 +203,7 @@ class GenomeList {
      */
     private void updateL(int refGenomeNr, int i, int maxDist, int c_old) {  //TODO parallel?
         for (int k=0; k<this.size(); k++) {
-            if (k==refGenomeNr) {               // TODO really remove? not needed for the reference sequence
+            if (k==refGenomeNr) {
                     continue;
             }
 
@@ -246,18 +246,6 @@ class GenomeList {
 		}
 		
 	}
-
-    /**
-     * Tests if the interval [l,r] on the chromosome chr is optimal.
-     * @param chr the chromosome the interval is located on.
-     * @param lastChar the character that was last added to the interval.
-     * @param l the left border of the interval.
-     * @param r the right border of the interval.
-     * @return true if the interval is optimal, else false.
-     */
-    public boolean isOptimalInterval(Chromosome chr, int lastChar, int l, int r) {
-        return rank.isOptimalInterval(chr, lastChar, l, r);
-    }
     
     private int neg(int gen){
     	if(gen > 0) return gen;

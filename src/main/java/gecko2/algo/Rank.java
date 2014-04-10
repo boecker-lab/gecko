@@ -13,8 +13,8 @@ import java.util.Arrays;
 class Rank{
     private final int[] rank;
 
-    private final static int DEFAULT_RANK = Integer.MAX_VALUE-1;
-    private final static int MAX_RANK = Integer.MAX_VALUE;
+    private final int DEFAULT_RANK;
+    private final int MAX_RANK;
 
     /**
      * Constructs an rank table for an alphabet of size alphabetSize.
@@ -22,6 +22,8 @@ class Rank{
      */
     public Rank(int alphabetSize) {
         rank = new int[alphabetSize+1];
+        DEFAULT_RANK = alphabetSize;
+        MAX_RANK = alphabetSize + 1;
     }
 
     /**
@@ -30,7 +32,7 @@ class Rank{
      * @return the rank value of the character
      */
     public int getRank(int character) {
-        return (character >= 0) ? rank[character] : DEFAULT_RANK;
+        return rank[character];
     }
 
     /**
@@ -51,11 +53,6 @@ class Rank{
             	r++;
             }
         }
-    }
-
-    private int neg(int gen){
-    	if(gen>0) return gen;
-    	else return 0;
     }
     
     /**
@@ -88,52 +85,6 @@ class Rank{
                 rank[neg(chr.getGene(leftBorder-1))] = alphabetSize;      // he is assigned the default rank
             }
         }
-    }
-
-    /**
-     * Tests if the interval [l,r] on the chromosome chr is optimal.
-     * @param chr the chromosome the interval is located on.
-     * @param lastChar the character that was last added to the interval.
-     * @param l the left border of the interval.
-     * @param r the right border of the interval.
-     * @return true if the interval is optimal, else false.
-     */
-    public boolean isOptimalInterval(Chromosome chr, int lastChar, int l, int r) {
-        if (rank[chr.getGene(l-1)] <= rank[lastChar])
-            return false;
-
-        if (rank[chr.getGene(r+1)] <= rank[lastChar])
-            return false;
-
-        if (rank[chr.getGene(l)] <= rank[lastChar] && rank[chr.getGene(r)] <= rank[lastChar]) {
-            return rank[chr.getGene(l-1)] != rank[lastChar] && rank[chr.getGene(r+1)] != rank[lastChar];
-        }
-
-        if (rank[chr.getGene(l)] > rank[lastChar] && chr.getNextOCC(l) > r)
-            return false;
-
-        if (rank[chr.getGene(r)] > rank[lastChar] && chr.getPrevOCC(r) < l)
-            return false;
-
-        int l_essent = l-1;
-        int r_essent = r+1;
-        for (int i=l; i<=r && l_essent<l; i++)
-            if (rank[chr.getGene(i)] <= rank[lastChar])
-                l_essent = i;
-
-        for (int i = r; i>=l && r_essent>r; i--)
-            if (rank[chr.getGene(i)] <= rank[lastChar])
-                r_essent = i;
-
-        for (int i=l; i<l_essent; i++)
-            if(chr.getNextOCC(i) > r_essent)
-                return false;
-
-        for (int i=r; i>r_essent; i--)
-            if(chr.getNextOCC(i) < l_essent)
-                return false;
-
-        return true;
     }
 
     @Override public String toString() {
