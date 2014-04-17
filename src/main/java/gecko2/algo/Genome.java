@@ -68,9 +68,11 @@ class Genome implements Iterable<Chromosome> {
      * @return true if the character does not occurre
      */
     boolean noOcc(int c){
-    	for (Chromosome chr: chromosomes)
+    	for (Chromosome chr: chromosomes){
+    		if (c<0) continue;
     		if (chr.getPOS(c).length != 0)
     			return false;
+    	}
     	return true;
     }
     

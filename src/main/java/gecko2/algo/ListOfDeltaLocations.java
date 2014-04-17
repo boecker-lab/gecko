@@ -27,28 +27,32 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 		int chrNr = -1;
 		int[] pos = null;
 		Iterator<DeltaLocation> dLocIt = deltaLocations.iterator();
-		while(dLocIt.hasNext()) {
-			DeltaLocation dLoc = dLocIt.next();
-			if (dLoc.getChrNr() != chrNr) {
-				chrNr = dLoc.getChrNr();
-				pos = genomes.get(dLoc.getGenomeNr()).get(chrNr).getPOS(c);
-			}
+		if (c<0) {
 			
-			if (pos == null)
-				continue;
+		} else {
+			while(dLocIt.hasNext()) {
+				DeltaLocation dLoc = dLocIt.next();
+				if (dLoc.getChrNr() != chrNr) {
+					chrNr = dLoc.getChrNr();
+					pos = genomes.get(dLoc.getGenomeNr()).get(chrNr).getPOS(c);
+				}
+			
+				if (pos == null)
+					continue;
 				
-			int i=0;
-			for (; i<pos.length; i++) {
-				if (dLoc.getL() <= pos[i])
-					break;
-			}
+				int i=0;
+				for (; i<pos.length; i++) {
+					if (dLoc.getL() <= pos[i])
+						break;
+				}
 				
-			if (i<pos.length && dLoc.getR() >= pos[i])
-				dLoc.increaseHitCount();
-			else {
-				dLoc.increaseDistance();
-				if (!dLoc.isInheritableWithoutC(genomes.get(dLoc.getGenomeNr()).get(dLoc.getChrNr()), delta, c)){
-					dLocIt.remove();
+				if (i<pos.length && dLoc.getR() >= pos[i])
+					dLoc.increaseHitCount();
+				else {
+					dLoc.increaseDistance();
+					if (!dLoc.isInheritableWithoutC(genomes.get(dLoc.getGenomeNr()).get(dLoc.getChrNr()), delta, c)){
+						dLocIt.remove();
+					}
 				}
 			}
 		}

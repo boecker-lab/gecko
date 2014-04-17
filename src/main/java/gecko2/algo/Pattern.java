@@ -140,6 +140,7 @@ class Pattern {
     	ListOfDeltaLocations newList = new ListOfDeltaLocations();
     	
     	for (Chromosome chr : genome){
+    		if (character<0) continue;
     		int[] pos = chr.getPOS(character);
     		if (pos.length == 0)
     			continue;

@@ -77,6 +77,7 @@ public class ReferenceClusterTest
                 1,
                 0,
                 Parameter.OperationMode.reference)};
+        
 
         performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
     }
