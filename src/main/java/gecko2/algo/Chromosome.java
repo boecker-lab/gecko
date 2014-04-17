@@ -4,7 +4,6 @@ import gecko2.algo.util.IntArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-//import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -106,7 +105,7 @@ class Chromosome {
         this.prevOcc = this.computePrevOcc(alphabetSize);
         this.nextOcc = this.computeNextOcc(alphabetSize);
     }
-    
+
 /*    private int max(int[] gen){
     	int help = 0;
     	for(int x= help; x<gen.length; x++){
@@ -116,11 +115,11 @@ class Chromosome {
     	}
     	return help;
     }
-*/    
+*/
     class test{
     	int id;
     	ArrayList<Integer> pos;
-    	
+
     	test(int id){
     		this.id = id;
     		this.pos = new ArrayList<Integer>();
@@ -129,7 +128,7 @@ class Chromosome {
     		this.pos.add(x);
     	}
     }
-    
+
     private int[][] computePOS(int alphabetSize) {
     	int maxvalue = 0;
     	
@@ -361,7 +360,7 @@ class Chromosome {
      * @return the IntArray of positions of the character.
      */
     public int[] getPOS(int c) {
-        return pos[c];
+        return (c < 0) ? null : pos[c];
     }
 
     /**
@@ -392,12 +391,10 @@ class Chromosome {
     private void computeL(Rank rank, int maxDist){
         resetL();                                           
         for (int i=1; i<=this.size(); i++) {
-            if (genes[i] < 0)
-                continue;
-
             L[i][0] = i;                                 // no mismatch left of position is the position
             int d = 1;
-            if (genes[i] <0) continue;
+            if (genes[i] <0)
+                continue;
 
             for (int j=i-1; j>0 && d<=maxDist+1; j--) {                                 // search for unmarked char left of i
             	if (genes[j] < 0) {
@@ -438,7 +435,8 @@ class Chromosome {
                     continue;
 
                 if (lastOcc!=0) {                                                       // if c_old has already occurred in the list
-                    if (genes[j]<0 || c_old < 0) continue;
+                    if (c_old < 0)
+                        continue;
                 	if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
 
                         for (int l=1; l<=maxDist+1; l++) {                              // test if entries for position i in array L change,
@@ -524,10 +522,15 @@ class Chromosome {
             R[i][0] = i;                          // first mismatch right of position is the position
             int d = 1;
             
-            if(genes[i]<0) continue;
+            if(genes[i]<0)
+                continue;
             
             for (int j=i+1; j<=this.size() && d<=maxDist+1; j++) {                   // search for unmarked char right of i
-            	if (genes[j]<0 || genes[i]<0) continue;
+            	if (genes[j]<0 ) {
+                    R[i][d] = j;
+                    d++;
+                    continue;
+                }
             	if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
             		if(this.getNUMDiff(i, j, i, j-1) > 0) {                         // if unmarked char found for the 1st time
             			R[i][d] = j;
@@ -557,8 +560,11 @@ class Chromosome {
             int lastOcc = this.size()+1;
 
             for (int j=this.size(); j>=1; j--){
+                if (genes[j] < 0)
+                    continue;
                 if (lastOcc!=this.size()+1) {                                            // if c_old has already occurred in the list
-                    if (genes[j]<0 || c_old<0) continue;
+                    if (c_old<0)
+                        continue;
                 	if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
 
                         for (int l=1; l<=maxDist+1; l++) {                              // test if entries for position i in array R change,
@@ -581,7 +587,9 @@ class Chromosome {
             int[] c_old_R = IntArray.newIntArray(maxDist+2, this.size()+1);
 
             for (int j=this.size(); j>=1; j--) {
-            	if (genes[j]<0 || c_old<0) continue;
+            	if (genes[j]<0 || c_old<0)
+                    continue;
+
                 if (rank.getRank(genes[j]) > rank.getRank(c_old)) {
                     int prevOcc = maxDist + 1;          // the sign is at last position per default
 

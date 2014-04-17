@@ -91,23 +91,13 @@ class Pattern {
      * @param r the new right boarder of the pattern.
      */
     private void addToPattern(int c, int r) {
-        if (neg(c) != 0){
-        	this.lastChar = c;
-        	this.r = r;
-        	pSize++;
-        	occ[c]++;
-        	IntArray.increaseAll(minDist);              // increase minDist to each sequence
-        	minDist[refGenomeNr]--;   // but the reference sequence by 1
-        	IntArray.reset(maxRemDist, -1);
-        } else {
-        	this.lastChar = c;
-        	this.r = r;
-        	pSize++;
-        	occ[0]++;
-        	IntArray.increaseAll(minDist);
-        	minDist[neg(refGenomeNr)]--;
-        	IntArray.reset(maxRemDist, -1);
-        }
+        this.lastChar = c;
+        this.r = r;
+        pSize++;
+        occ[0]++;
+        IntArray.increaseAll(minDist);
+        minDist[refGenomeNr]--;
+        IntArray.reset(maxRemDist, -1);
     }
 
     /**
@@ -115,21 +105,15 @@ class Pattern {
      * @param i the previous right border of pattern that is expanded to the right.
      * @return true if the pattern could be expanded successfully.
      */
-    
-    private int neg(int gen){
-    	if (gen >= 0){
-    		return gen;
-    	} else {
-    		return 0;
-    	}
-    }
     public boolean updateToNextI_ref(int i) {
         if (i > refChr.size())                                 // If end of sequence reached
             return false;
         int c = refChr.getGene(i);
         if (refChr.getGene(getLeftBorder() - 1) == c)          // If pattern no longer left maximal
             return false;
-        while ((i < refChr.size()) && (nrOccurrences(neg(refChr.getGene(i + 1))) > 0 || refChr.getGene(i + 1) == c)) // expand until the pattern is right maximal
+
+        while (i < refChr.size() && refChr.getGene(i + 1) > 0
+                && (nrOccurrences(refChr.getGene(i + 1)) > 0 || refChr.getGene(i + 1) == c)) // expand until the pattern is right maximal
             i++;
 
         addToPattern(c, i);
