@@ -62,21 +62,21 @@ public class ReferenceClusterTest
         GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
-        Subsequence sub1 = new Subsequence(1, 2, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
-        Subsequence sub2 = new Subsequence(2, 4, 0, 1, javaRes[0].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
+        Subsequence sub1 = new Subsequence(1, 2, 0, 1, javaRes[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
+        Subsequence sub2 = new Subsequence(2, 4, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
         Subsequence[][] subsequences = {{sub1},{sub2}};
 
         GeneClusterOccurrence[] bestOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getOccurrences()[0].getBestpValue(), 1, 2)};
         GeneClusterOccurrence[] allOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getAllOccurrences()[0].getBestpValue(), 1, 2)};
 
-        int[] genes1 = {1, 2};
+        int[] genes1 = {2, -1, 1};
         
         
         GeneCluster[] refCluster = {new GeneCluster(0, bestOccurrences, allOccurrences, genes1,
                 javaRes[0].getBestPValue(),
                 javaRes[0].getBestPValueCorrected(),
                 1,
-                0,
+                1,
                 Parameter.OperationMode.reference)};
         
         System.out.println("Erwarteter Cluster: ");
@@ -118,12 +118,8 @@ public class ReferenceClusterTest
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 5, 4, 0}}};
-			
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5};
-			
+
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -153,6 +149,53 @@ public class ReferenceClusterTest
             performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
         }
 	}
+
+
+
+    /**
+     * Method for testing the computeClusters method which is provided by the external library libgecko2
+     *
+     * Parameter set:
+     * 		genomes: 2 (one chromosome)
+     * 		cluster size: 3
+     * 		delta: 0
+     * 		operation mode: r
+     * 		refType: d
+     * 		qtype: QUORUM_NO_COST
+     * 		q (number of genomes where cluster appears): 2
+     * 		contigSpanning: false
+     *
+     */
+    @Test
+    public void testComputeClusters1MemoryReduction()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, 3, -1, 0}}, {{0, 1, 2, 3, -1, 0}}};
+
+        Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+
+        // Test the java implementation
+        GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+
+        // def result (using p values from calculated result)
+        Subsequence sub1 = new Subsequence(1, 3, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
+        Subsequence sub2 = new Subsequence(1, 3, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
+        Subsequence[][] subsequences = {{sub1},{sub2}};
+
+        GeneClusterOccurrence[] bestOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getOccurrences()[0].getBestpValue(), 0, 2)};
+        GeneClusterOccurrence[] allOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getAllOccurrences()[0].getBestpValue(), 0, 2)};
+
+        int[] genes = {1, 2, 3};
+
+        GeneCluster[] refCluster = {new GeneCluster(0, bestOccurrences, allOccurrences, genes,
+                javaRes[0].getBestPValue(),
+                javaRes[0].getBestPValueCorrected(),
+                0,
+                0,
+                Parameter.OperationMode.reference)};
+
+        performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
+    }
 
 
 	/**

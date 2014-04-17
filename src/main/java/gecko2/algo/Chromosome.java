@@ -360,7 +360,7 @@ class Chromosome {
      * @return the IntArray of positions of the character.
      */
     public int[] getPOS(int c) {
-        return (c < 0) ? null : pos[c];
+        return (c < 0) ? new int[0] : pos[c];
     }
 
     /**
