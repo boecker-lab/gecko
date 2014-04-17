@@ -53,7 +53,7 @@ public class ReferenceClusterTest
     public void testMemoryReduction()
     {
         // def array for computation
-        int genomes[][][] = {{{0, 1, 2, -4, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
+        int genomes[][][] = {{{0, 1, 2, -4, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, -1, 3, 0}}};
 
         Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
        // p.setAlphabetSize(5);
@@ -70,7 +70,8 @@ public class ReferenceClusterTest
         GeneClusterOccurrence[] allOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getAllOccurrences()[0].getBestpValue(), 1, 2)};
 
         int[] genes1 = {1, 2};
-
+        
+        
         GeneCluster[] refCluster = {new GeneCluster(0, bestOccurrences, allOccurrences, genes1,
                 javaRes[0].getBestPValue(),
                 javaRes[0].getBestPValueCorrected(),
@@ -78,7 +79,22 @@ public class ReferenceClusterTest
                 0,
                 Parameter.OperationMode.reference)};
         
-
+        System.out.println("Erwarteter Cluster: ");
+        for(int i=0;i<refCluster.length;i++){
+        	int[] gen = refCluster[i].getGenes();
+        	for (int j=0;j<gen.length;j++){
+        		System.out.print(gen[j]+" ");
+        	}
+        	System.out.println("");
+        }
+        System.out.println("angenommener Cluster: ");
+        for(int i=0;i<javaRes.length;i++){
+        	int[] gen = javaRes[i].getGenes();
+        	for(int j=0;j<gen.length;j++){
+        		System.out.print(gen[j]+" ");
+        	}
+        	System.out.println("");
+        }
         performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
     }
 	

@@ -151,8 +151,9 @@ public class ReferenceClusterAlgorithm {
 		List<ReferenceCluster> refCluster = refClusterAlgorithm.computeRefClusters();
 		
 		GeneCluster[] result = new GeneCluster[refCluster.size()];
-		for (int i=0; i<refCluster.size(); i++)
+		for (int i=0; i<refCluster.size(); i++){
 			result[i] = new GeneCluster(i, refCluster.get(i));
+		}
 		return result;
 	}
 	
@@ -311,9 +312,9 @@ public class ReferenceClusterAlgorithm {
 					}
 				}
 				r = pattern.getRightBorder()+1;
-				if (pattern.getLastChar()<0){
+				//if ([r]<0){
 					//r++;
-				}
+				//}
 			}
 		}
 	}

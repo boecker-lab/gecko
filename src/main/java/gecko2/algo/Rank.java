@@ -27,7 +27,7 @@ class Rank{
      * @return the value of the character
      */
     public int getRank(int character) {
-        return rank[neg(character)];
+        return rank[character];
     }
 
     /**
@@ -50,11 +50,6 @@ class Rank{
             }
         }
     }
-
-    private int neg(int gen){
-    	if(gen>0) return gen;
-    	else return 0;
-    }
     
     /**
      * Updates the values of rank based on chr[leftBorder, |chr|].
@@ -63,6 +58,9 @@ class Rank{
      * @param alphabetSize the size of the alphabet of all compared sequences.
      */
     public void updateRank(Chromosome chr, int leftBorder, int alphabetSize){
+    	
+    	
+    	
         if (leftBorder==1) {                                        // if starting to iterate through a new sequence (leftBorder is 1)
             this.computeRank(chr, alphabetSize);                    // Rank has to be calculated anew
         }
@@ -70,20 +68,23 @@ class Rank{
             int maxRank = 0;
             int i;
             for (i=leftBorder; i<=chr.size(); i++) {                 // Iterate through substrings starting with leftBorder
-                if (chr.getGene(i)!=chr.getGene(leftBorder-1)) {                        // if character is not equal to the character at position leftBorder-1
+                if (chr.getGene(i)<0 || chr.getGene(leftBorder-1)<0) continue;
+            	if (chr.getGene(i)!=chr.getGene(leftBorder-1)) {                        // if character is not equal to the character at position leftBorder-1
                 	if (chr.getNUMDiff(leftBorder-1, i, leftBorder-1, i-1) > 0) {   // only update if first occurrence after position i
-                        rank[neg(chr.getGene(i))] = rank[neg(chr.getGene(i))]-1;           // new rank = old rank - 1
-                        maxRank = Math.max(maxRank, rank[neg(chr.getGene(i))]);               // max rank in the interval [leftBorder, i]
+                        rank[chr.getGene(i)] = rank[chr.getGene(i)]-1;           // new rank = old rank - 1
+                        maxRank = Math.max(maxRank, rank[chr.getGene(i)]);               // max rank in the interval [leftBorder, i]
                     }
                 }
                 else {                                      // if first occurrence of character at position leftBorder-1 is found
-                    rank[neg(chr.getGene(i))] = maxRank+1; // character has maximal rank
+                    rank[chr.getGene(i)] = maxRank+1; // character has maximal rank
                     if(chr.getGene(i)<0) rank[0]--;
                     break;                                  // update can be stopped, as the rank of all other characters is unchanged
                 }
             }
-            if (i==chr.size()+1) {                                      // if character at position leftBorder-1 is not part of the interval
-                rank[neg(chr.getGene(leftBorder-1))] = alphabetSize;      // he is assigned the default rank
+            if (chr.getGene(leftBorder-1)<0){
+            	
+            } else if (i==chr.size()+1) {                                      // if character at position leftBorder-1 is not part of the interval
+                rank[chr.getGene(leftBorder-1)] = alphabetSize;      // he is assigned the default rank
             }
         }
     }
