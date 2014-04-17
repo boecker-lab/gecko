@@ -392,7 +392,10 @@ class Chromosome {
     private void computeL(Rank rank, int maxDist){
         resetL();                                           
         for (int i=1; i<=this.size(); i++) {
-            L[i][0] = i;                                 // first mismatch left of position is the position
+            if (genes[i] < 0)
+                continue;
+
+            L[i][0] = i;                                 // no mismatch left of position is the position
             int d = 1;
             if (genes[i] <0) continue;
 
@@ -402,7 +405,7 @@ class Chromosome {
                     d++;
                     continue;
                 }
-            	//if (genes[i] < 0) continue;
+
                 if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
                     if(this.getNUMDiff(j, i, j+1, i) > 0) {                         // if unmarked char found for the 1st time
                         L[i][d] = j;
@@ -431,9 +434,13 @@ class Chromosome {
             
             int lastOcc = 0;
             for (int j=1; j<=this.size(); j++){
+                if (genes[j] < 0)
+                    continue;
+
                 if (lastOcc!=0) {                                                       // if c_old has already occurred in the list
                     if (genes[j]<0 || c_old < 0) continue;
                 	if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
+
                         for (int l=1; l<=maxDist+1; l++) {                              // test if entries for position i in array L change,
                             if  (this.getL(j, l) < lastOcc) {                            // because c_old is a new mismatch left of i
                                 for (int p=maxDist+1; p>l; p--)
@@ -456,16 +463,23 @@ class Chromosome {
             for (int j=1; j<=this.size(); j++) {
             	if (genes[j]<0 || c_old<0) continue;
                 if (rank.getRank(genes[j]) > rank.getRank(c_old)) {
+
                     int prevOcc = maxDist + 1;          // the sign is at last position per default
 
-                    for (int p=1; p<=maxDist+1; p++) {
-                    	if (c_old_L[p]<0) continue;
-                        if (genes[j] == genes[c_old_L[p]]) {    // search for the first entry in the neighbor array
-                            prevOcc = p;                                        // that has the char chr[j], and store the position in prevOcc
+
+                    System.arraycopy(c_old_L, 1, c_old_L, 2, prevOcc - 1);      // shift all entries between position 1 and the old occurrence of c_old
+                    c_old_L[1] = j;
+                } else if (rank.getRank(genes[j]) > rank.getRank(c_old)) {
+                    int prevOcc = maxDist + 1;          // the sign is at last position per default
+
+                    for (int d=1; d<=maxDist+1; d++) {
+                    	if (c_old_L[d]<0) continue;
+                    
+                        if (genes[j] == genes[c_old_L[d]]) {    // search for the first entry in the neighbor array
+                            prevOcc = d;                                        // that has the char chr[j], and store the position in prevOcc
                             break;
                         }
                     }
-
                     System.arraycopy(c_old_L, 1, c_old_L, 2, prevOcc - 1);      // shift all entries between position 1 and the old occurrence of c_old
 
                     c_old_L[1] = j;
@@ -505,8 +519,6 @@ class Chromosome {
      * @param maxDist the maximal possible distance for a valid gene cluster.
      */
     private void computeR(Rank rank, int maxDist){
-        
-    	
     	resetR();
         for (int i=1; i<=this.size(); i++) {
             R[i][0] = i;                          // first mismatch right of position is the position
@@ -514,16 +526,16 @@ class Chromosome {
             
             if(genes[i]<0) continue;
             
-                for (int j=i+1; j<=this.size() && d<=maxDist+1; j++) {                   // search for unmarked char right of i
-                	if (genes[j]<0 || genes[i]<0) continue;
-                	if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
-                    if(this.getNUMDiff(i, j, i, j-1) > 0) {                         // if unmarked char found for the 1st time
-                        R[i][d] = j;
-                        d++;
-                    }
-                }
+            for (int j=i+1; j<=this.size() && d<=maxDist+1; j++) {                   // search for unmarked char right of i
+            	if (genes[j]<0 || genes[i]<0) continue;
+            	if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
+            		if(this.getNUMDiff(i, j, i, j-1) > 0) {                         // if unmarked char found for the 1st time
+            			R[i][d] = j;
+            			d++;
+            		}
+            	}
             }
-        }
+    	}
     }
 
     /**
@@ -548,6 +560,7 @@ class Chromosome {
                 if (lastOcc!=this.size()+1) {                                            // if c_old has already occurred in the list
                     if (genes[j]<0 || c_old<0) continue;
                 	if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
+
                         for (int l=1; l<=maxDist+1; l++) {                              // test if entries for position i in array R change,
                             if  (this.getR(j, l) > lastOcc) {                            // because c_old is a new mismatch left of i
                                 for (int p=maxDist+1; p>l; p--)
@@ -639,12 +652,11 @@ class Chromosome {
     	
     	for(int j=1;j<=this.size();j++){ // Iteriere durch jede Position der aktuellen Sequenz
 			if(genes[j]<0) continue;
-    		if(rank.getRank(genes[j])<=maxUpdateRank) {
-				for(int p=1; p<=deltaForPrimes+1; p++) {
-					for(int l=this.L[j][p]+1; l<=j; l++) {
-						if(genes[l]<0 || genes[j]<0) continue;
-						if(rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
-							L_prime[j][p] = l;
+			if(rank.getRank(genes[j])<=maxUpdateRank) {
+				for(int d=1; d<=deltaForPrimes+1; d++) {
+					for(int l=this.L[j][d]+1; l<=j; l++) {
+						if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
+							L_prime[j][d] = l;
 							break;
 						}
 					}
@@ -674,9 +686,11 @@ class Chromosome {
     	for(int j=1;j<=this.size();j++){ // Iteriere durch jede Position der aktuellen Sequenz
 			if (genes[j]<0) continue;
     		if(rank.getRank(genes[j])<=maxUpdateRank) {
+
 				for(int p=1; p<=deltaForPrimes+1; p++) {
 					for(int l=this.R[j][p]-1; l>=j; l--) {
 						if(genes[l]<0 || genes[j]<0) continue;
+
 						if(rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
 							R_prime[j][p] = l;
 							break;

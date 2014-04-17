@@ -188,7 +188,7 @@ public class ReferenceClusterAlgorithm {
             throw new RuntimeException("Number of genomes in param does not equal number of genomes!");
 		
 		genomes.initializeForCalculation(param.getMaximumDelta());
-		List<ReferenceCluster> refClusterList = new ArrayList<ReferenceCluster>();
+		List<ReferenceCluster> refClusterList = new ArrayList<>();
 		
 		int refGenomeCount = 1;
 		if (!param.useSingleReference())
@@ -239,7 +239,7 @@ public class ReferenceClusterAlgorithm {
 			Pattern pattern = new Pattern(genomes.getAlphabetSize(), genomes.size(), param, referenceGenomeNr, referenceChromosome, l);
 			
 			// Gene does not occure in any other Genome and does not occure in chr[i,...]
-			if (referenceChromosome.getNextOCC(l) > referenceChromosome.size() && genomes.zeroOccs(referenceGenomeNr, referenceChromosome.getNr(), l, param.searchRefInRef()))
+			if (referenceChromosome.getGene(l) < 0 || (referenceChromosome.getNextOCC(l) > referenceChromosome.size() && genomes.zeroOccs(referenceGenomeNr, referenceChromosome.getNr(), l, param.searchRefInRef())))
 				continue;
 			
 			int r = l;

@@ -51,9 +51,9 @@ class GenomeList {
      */
     GenomeList(int[][][] genomes, int alphabetSize) {
         int i = 0;
-        this.genomes = new ArrayList<Genome>(genomes.length);
+        this.genomes = new ArrayList<>(genomes.length);
         for (int[][] genome : genomes) {
-            List<Chromosome> chromosomes = new ArrayList<Chromosome>(genome.length);
+            List<Chromosome> chromosomes = new ArrayList<>(genome.length);
             int j=0;
             for (int[] chromosome : genome) {
                 chromosomes.add(new Chromosome(chromosome, j, false));
@@ -72,17 +72,17 @@ class GenomeList {
      * @param genomes the lists of Integers.
      */
     GenomeList(int[][][] genomes) {
-        Set<Integer> genes = new HashSet<Integer>();
+        Set<Integer> genes = new HashSet<>();
         genes.add(0);
         int alphSize = 0;
         int i = 0;
-        this.genomes = new ArrayList<Genome>(genomes.length);
+        this.genomes = new ArrayList<>(genomes.length);
         for (int[][] genome : genomes) {
-            List<Chromosome> chromosomes = new ArrayList<Chromosome>(genome.length);
+            List<Chromosome> chromosomes = new ArrayList<>(genome.length);
             int j=0;
             for (int[] chromosome : genome) {
                 for (Integer gene : chromosome) {
-                	if (genes.add(gene))
+                	if (gene >= 0 && genes.add(gene))
                 		alphSize++;
                 }
                 chromosomes.add(new Chromosome(chromosome, j, false));
@@ -173,15 +173,6 @@ class GenomeList {
         this.updateR(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
         this.updateL_R_prime(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
     }
-
-	/**
-     * Returns the rank value of an character.
-     * @param character the character who's value shall be returned.
-     * @return the value of the character
-     */
-    public int getRank(int character) {
-        return (character >= 0) ? rank.getRank(character) : rank.getRank(0);
-    }
     
     public boolean zeroOccs(int refGenomeNr, int refChrNr, int position, boolean searchRefInRef){
     	int c = genomes.get(refGenomeNr).get(refChrNr).getGene(position);
@@ -212,9 +203,9 @@ class GenomeList {
      */
     private void updateL(int refGenomeNr, int i, int maxDist, int c_old) {  //TODO parallel?
         for (int k=0; k<this.size(); k++) {
-            /*if (k==refGenomeNr) {               // TODO really remove? not needed for the reference sequence
+            if (k==refGenomeNr) {
                     continue;
-            }*/
+            }
 
             for (Chromosome chr: genomes.get(k)) {
                 chr.updateL(rank, i, maxDist, c_old);
@@ -255,18 +246,6 @@ class GenomeList {
 		}
 		
 	}
-
-    /**
-     * Tests if the interval [l,r] on the chromosome chr is optimal.
-     * @param chr the chromosome the interval is located on.
-     * @param lastChar the character that was last added to the interval.
-     * @param l the left border of the interval.
-     * @param r the right border of the interval.
-     * @return true if the interval is optimal, else false.
-     */
-    public boolean isOptimalInterval(Chromosome chr, int lastChar, int l, int r) {
-        return rank.isOptimalInterval(chr, lastChar, l, r);
-    }
     
     private int neg(int gen){
     	if(gen > 0) return gen;
