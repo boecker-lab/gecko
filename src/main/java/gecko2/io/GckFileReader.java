@@ -166,7 +166,7 @@ public class GckFileReader implements GeckoDataReader {
             line = reader.readLine().trim();
             if (!line.startsWith(SessionWriter.CLUSTER_SECTION_START))
                 throw new ParseException("Malformed cluster section start: " + line, 0);
-            readClusterData(reader, geneFamilyMap);
+            readClusterData(reader, geneFamilyMap, unknownGeneFamily);
         } catch (IOException | ParseException e) {
             handleFailedSessionLoad();
             throw e;
@@ -257,7 +257,7 @@ public class GckFileReader implements GeckoDataReader {
         return chr;
     }
 
-    private void readClusterData(BufferedReader reader, Map<String, GeneFamily> geneFamilyMap) throws IOException, ParseException {
+    private void readClusterData(BufferedReader reader, Map<String, GeneFamily> geneFamilyMap, GeneFamily unknownGeneFamily) throws IOException, ParseException {
         List<GeneCluster> clusterList = new ArrayList<>();
         GeneClusterBuilder builder = null;
         boolean continueReading = true;
@@ -267,7 +267,7 @@ public class GckFileReader implements GeckoDataReader {
                 case SessionWriter.CLUSTER_START:
                     if (builder != null)
                         throw new ParseException("Cluster not closed before new cluster start.", 0);
-                    builder = new GeneClusterBuilder(reader, geneFamilyMap);
+                    builder = new GeneClusterBuilder(reader, geneFamilyMap, unknownGeneFamily);
                     builder.readGenes(reader);
                     break;
                 case SessionWriter.OCC_START:
@@ -294,18 +294,19 @@ public class GckFileReader implements GeckoDataReader {
     }
 
     private static class GeneClusterBuilder {
-        int id;
-        int refSeqIndex;
-        Parameter.OperationMode mode;
-        int minTotalDistance;
-        BigDecimal pValue;
-        BigDecimal pValueCorr;
+        final int id;
+        final int refSeqIndex;
+        final Parameter.OperationMode mode;
+        final int minTotalDistance;
+        final BigDecimal pValue;
+        final BigDecimal pValueCorr;
         Set<GeneFamily> genes;
         List<GeneClusterOccurrence> bestOccList;
         List<GeneClusterOccurrence> allOccList;
-        Map<String, GeneFamily> geneFamilyMap;
+        private final Map<String, GeneFamily> geneFamilyMap;
+        private final GeneFamily unknownGeneFamily;
 
-        GeneClusterBuilder(BufferedReader reader, Map<String, GeneFamily> geneFamilyMap) throws IOException, ParseException {
+        GeneClusterBuilder(BufferedReader reader, Map<String, GeneFamily> geneFamilyMap, GeneFamily unknownGeneFamily) throws IOException, ParseException {
             String line = reader.readLine().trim();
             String[] clusterInfo = line.split(SessionWriter.SEPERATOR);
 
@@ -319,6 +320,7 @@ public class GckFileReader implements GeckoDataReader {
             pValue = new BigDecimal(clusterInfo[4]);
             pValueCorr = new BigDecimal(clusterInfo[5]);
             this.geneFamilyMap = geneFamilyMap;
+            this.unknownGeneFamily = unknownGeneFamily;
         }
 
         void readGenes(BufferedReader reader) throws IOException, ParseException {
@@ -326,11 +328,16 @@ public class GckFileReader implements GeckoDataReader {
             String[] genes = line.substring(1, line.length()-1).split(",");
             this.genes = new HashSet<>();
             for (String gene : genes) {
-                GeneFamily geneFamily = geneFamilyMap.get(gene.trim());
-                if (geneFamily == null) {
-                    throw new ParseException("No gene family found for key: " + gene.trim(), 0);
+                GeneFamily geneFamily;
+                if (gene.trim().equals(GeneFamily.UNKNOWN_GENE_ID)) {
+                    geneFamily = unknownGeneFamily;
+                } else {
+                    geneFamily = geneFamilyMap.get(gene.trim());
+                    if (geneFamily == null) {
+                        throw new ParseException("No gene family found for key: " + gene.trim(), 0);
+                    }
                 }
-                this.genes.add(geneFamilyMap.get(gene.trim()));
+                this.genes.add(geneFamily);
             }
         }
 
