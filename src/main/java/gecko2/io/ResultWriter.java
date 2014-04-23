@@ -435,15 +435,15 @@ public class ResultWriter {
 
             writer.write("General statistics:\n");
 
-            List<List<Integer>> distancesPerGenome = new ArrayList<List<Integer>>(genomeNames.size());
-            List<List<Integer>> clusterSizesPerGenome = new ArrayList<List<Integer>>(genomeNames.size());
-            List<List<Integer>> conservedGenesPerGenome = new ArrayList<List<Integer>>(genomeNames.size());
-            List<Set<Integer>> conservedGenes = new ArrayList<Set<Integer>>(genomeNames.size());
+            List<List<Integer>> distancesPerGenome = new ArrayList<>(genomeNames.size());
+            List<List<Integer>> clusterSizesPerGenome = new ArrayList<>(genomeNames.size());
+            List<List<Integer>> conservedGenesPerGenome = new ArrayList<>(genomeNames.size());
+            List<Set<GeneFamily>> conservedGenes = new ArrayList<>(genomeNames.size());
             for (String genomeName : genomeNames) {
                 distancesPerGenome.add(new ArrayList<Integer>());
                 clusterSizesPerGenome.add(new ArrayList<Integer>());
                 conservedGenesPerGenome.add(new ArrayList<Integer>());
-                conservedGenes.add(new HashSet<Integer>());
+                conservedGenes.add(new HashSet<GeneFamily>());
             }
             int[] totalConservedGenes = new int[genomeNames.size()];
 
@@ -457,36 +457,36 @@ public class ResultWriter {
                 GeneCluster cluster = clusters.get(c);
                 GeneClusterOutput clusterData = cluster.generateGeneClusterOutput(false);
 
-                Set<Integer> refSet = new HashSet<>();
-                List<List<Integer>> refGenes = clusterData.getIntervals().get(clusterData.getRefSeq());
+                Set<GeneFamily> refSet = new HashSet<>();
+                List<List<Gene>> refGenes = clusterData.getIntervals().get(clusterData.getRefSeq());
 
-                for (List<Integer> geneList : refGenes)
-                    for (Integer gene : geneList)
-                        refSet.add(Math.abs(gene));
+                for (List<Gene> geneList : refGenes)
+                    for (Gene gene : geneList)
+                        refSet.add(gene.getGeneFamily());
 
                 for (int i=0; i<genomeNames.size(); i++){
                     if (clusterData.getChromosomes().get(i) == null) {
-                        conservedGenesPerGenome.get(i).add(-1);
+                        conservedGenesPerGenome.get(i).add(null);
                         continue;
                     }
-                    Set<Integer> notContained = new HashSet<>() ;
+                    Set<GeneFamily> notContained = new HashSet<>() ;
                     int missingGenes = clusterData.getDistances()[i];
-                    for (List<Integer> genes : clusterData.getIntervals().get(i)) {
-                        for (Integer gene: genes) {
-                            int absGene = Math.abs(gene);
-                            if (!refSet.contains(absGene)) {
-                                if (!notContained.contains(absGene)) {
+                    for (List<Gene> genes : clusterData.getIntervals().get(i)) {
+                        for (Gene gene: genes) {
+                            GeneFamily geneFamily = gene.getGeneFamily();
+                            if (!refSet.contains(geneFamily)) {
+                                if (!notContained.contains(geneFamily)) {
                                     missingGenes--;
-                                    notContained.add(absGene);
+                                    notContained.add(geneFamily);
                                 }
                             }
-                            if (i!=clusterData.getRefSeq() && refSet.contains(absGene)) {
-                                if (!conservedGenes.get(i).contains(absGene)) {
-                                    conservedGenes.get(i).add(absGene);
+                            if (i!=clusterData.getRefSeq() && refSet.contains(geneFamily)) {
+                                if (!conservedGenes.get(i).contains(geneFamily)) {
+                                    conservedGenes.get(i).add(geneFamily);
                                     totalConservedGenes[i]++;
                                 }
-                                if (!conservedGenes.get(clusterData.getRefSeq()).contains(absGene)) {
-                                    conservedGenes.get(clusterData.getRefSeq()).add(absGene);
+                                if (!conservedGenes.get(clusterData.getRefSeq()).contains(geneFamily)) {
+                                    conservedGenes.get(clusterData.getRefSeq()).add(geneFamily);
                                     totalConservedGenes[clusterData.getRefSeq()]++;
                                 }
                             }
@@ -630,11 +630,11 @@ public class ResultWriter {
 					int[] borders = clusterData.getIntervalBorders().get(i).get(j);
 					writer.write(String.format("[%d,%d]\t", borders[0], borders[1]));
 							
-					for (Integer gene : clusterData.getIntervals().get(i).get(j))
-						if (gene >= 0)
-							writer.write(String.format("%d>  ", gene));
+					for (Gene gene : clusterData.getIntervals().get(i).get(j))
+						if (gene.getOrientation().equals(Gene.GeneOrientation.POSITIVE))
+							writer.write(String.format("%s>  ", gene.getExternalId()));
 						else
-							writer.write(String.format("<%d  ", Math.abs(gene)));
+							writer.write(String.format("<%s  ", gene.getExternalId()));
 					writer.write("\n");
 				}
 			}

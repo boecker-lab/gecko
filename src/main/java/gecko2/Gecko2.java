@@ -104,9 +104,10 @@ public class Gecko2 {
             Gui.startUp();
         }
 
-        if (reader != null)
+        if (reader != null) {
+            GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(infile);
             GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
-
+        }
 
         if (args.length > 1) {
             CommandLineExecution.runAlgorithm(options);

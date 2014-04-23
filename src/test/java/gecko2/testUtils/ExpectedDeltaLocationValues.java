@@ -45,4 +45,44 @@ public class ExpectedDeltaLocationValues {
     public double getpValue() {
         return pValue;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ExpectedDeltaLocationValues that = (ExpectedDeltaLocationValues) o;
+
+        if (chrNr != that.chrNr) return false;
+        if (distance != that.distance) return false;
+        if (l != that.l) return false;
+        if (Double.compare(that.pValue, pValue) != 0) return false;
+        if (r != that.r) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = chrNr;
+        result = 31 * result + l;
+        result = 31 * result + r;
+        result = 31 * result + distance;
+        temp = Double.doubleToLongBits(pValue);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ExpectedDeltaLocationValues{" +
+                "chrNr=" + chrNr +
+                ", l=" + l +
+                ", r=" + r +
+                ", distance=" + distance +
+                ", pValue=" + pValue +
+                '}';
+    }
 }

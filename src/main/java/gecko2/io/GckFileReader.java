@@ -1,6 +1,5 @@
 package gecko2.io;
 
-import gecko2.GeckoInstance;
 import gecko2.algorithm.*;
 
 import java.io.BufferedReader;
@@ -154,7 +153,6 @@ public class GckFileReader implements GeckoDataReader {
      */
     @Override
     public void readData() throws IOException, ParseException {
-        GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
         try	(BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), Charset.forName("UTF-8"))) {
             Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
             unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();

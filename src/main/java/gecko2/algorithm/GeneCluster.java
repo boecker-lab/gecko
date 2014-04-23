@@ -105,7 +105,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		}
 
         geneFamilies = new HashSet<>();
-        for (int i=refCluster.getLeftBorder()-1; i<refCluster.getRightBorder() && geneFamilies.size()<size; i++){
+        for (int i=refCluster.getLeftBorder()-1; i<refCluster.getRightBorder() && geneFamilies.size()<refCluster.getSize(); i++){
             geneFamilies.add(data.getGenomes()[refCluster.getGenomeNr()].getChromosomes().get(refCluster.getChrNr()).getGenes().get(i).getGeneFamily());
         }
 
@@ -380,15 +380,15 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		
 		builder.annotations(newAnnotations);
 		
-		List<List<List<Integer>>> intervals = new ArrayList<>(tempIntervals.size());
+		List<List<List<Gene>>> intervals = new ArrayList<>(tempIntervals.size());
 		for (List<Gene[]> oldIntervalsPerGenome : tempIntervals) {
 			if (oldIntervalsPerGenome != null) {
-				List<List<Integer>> newIntevalsPerGenome = new ArrayList<>(oldIntervalsPerGenome.size());
+				List<List<Gene>> newIntevalsPerGenome = new ArrayList<>(oldIntervalsPerGenome.size());
 				for (Gene[] genes : oldIntervalsPerGenome) {
-					List<Integer> interval = new ArrayList<>(genes.length);
+					List<Gene> interval = new ArrayList<>(genes.length);
 					for (Gene gene : genes) {
 						//String[] geneLabel = GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(gene.getExternalId()));
-						interval.add(gene.getAlgorithmId());// >= 0 ? geneLabel : -geneLabel);
+						interval.add(gene);// >= 0 ? geneLabel : -geneLabel);
 					}
 					newIntevalsPerGenome.add(interval);
 				}
@@ -741,4 +741,16 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		
 		return resultList;
 	}
+
+    @Override
+    public String toString() {
+        return "GeneCluster{" +
+                "id=" + id +
+                ", geneFamilies=" + getGeneFamilyString() +
+                ", size=" + size +
+                ", bestPValue=" + bestPValue +
+                ", minTotalDist=" + minTotalDist +
+                ", refSeqIndex=" + refSeqIndex +
+                '}';
+    }
 }

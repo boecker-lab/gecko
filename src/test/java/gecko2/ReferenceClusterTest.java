@@ -45,41 +45,6 @@ public class ReferenceClusterTest
         }
 	}
 
-    @Test
-    public void testMemoryReduction()
-    {
-        // def array for computation
-        int genomes[][][] = {{{0, 1, 2, -4, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
-
-        Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-
-        // def result (using p values from calculated result)
-        ExpectedDeltaLocationValues dLoc1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
-        ExpectedDeltaLocationValues dLoc2 = new ExpectedDeltaLocationValues(0, 2, 4, 1);
-
-        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1},{dLoc2}};
-
-        List<Integer> genes1 = Arrays.asList(1, 2);
-        int[] minimumDistances = new int[]{0, 1};
-
-        ExpectedReferenceClusterValues[] referenceClusterValues = {
-                new ExpectedReferenceClusterValues(
-                        genes1,
-                        minimumDistances,
-                        0,
-                        0,
-                        2,
-                        expectedDeltaLocationValues
-                )
-        } ;
-
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
-    }
-	
-	
 	/**
 	 * Method for testing the computeClusters method which is provided by the external library libgecko2
 	 * 
@@ -214,9 +179,6 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}, {{0, 1, 2, 5, 4, 0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6};
-
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
@@ -250,7 +212,7 @@ public class ReferenceClusterTest
                         genes2,
                         minimumDistances2,
                         0,
-                        0,
+                        1,
                         2,
                         expectedDeltaLocationValues2
                 )
@@ -416,7 +378,7 @@ public class ReferenceClusterTest
                         genes2,
                         minimumDistances2,
                         0,
-                        0,
+                        1,
                         2,
                         expectedDeltaLocationValues2),
                 new ExpectedReferenceClusterValues(
@@ -488,7 +450,7 @@ public class ReferenceClusterTest
                         genes2,
                         minimumDistances2,
                         0,
-                        0,
+                        1,
                         2,
                         expectedDeltaLocationValues2
                 )
@@ -571,7 +533,7 @@ public class ReferenceClusterTest
                         genes2,
                         minimumDistances2,
                         0,
-                        0,
+                        1,
                         2,
                         expectedDeltaLocationValues2),
                 new ExpectedReferenceClusterValues(
@@ -585,7 +547,7 @@ public class ReferenceClusterTest
                         genes4,
                         minimumDistances4,
                         1,
-                        0,
+                        1,
                         2,
                         expectedDeltaLocationValues4
                 )
@@ -682,10 +644,10 @@ public class ReferenceClusterTest
 
         // def result 2
         ExpectedDeltaLocationValues dLoc2_1 = new ExpectedDeltaLocationValues(0, 4, 6, 1);
-        ExpectedDeltaLocationValues dLoc2_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
+        ExpectedDeltaLocationValues dLoc2_2 = new ExpectedDeltaLocationValues(0, 2, 4, 1);
         ExpectedDeltaLocationValues dLoc2_3 = new ExpectedDeltaLocationValues(0, 3, 6, 0);
         List<Integer> genes2 = Arrays.asList(1, 2, 5, 7);
-        int[] minimumDistances2 = new int[]{1, 0, 0};
+        int[] minimumDistances2 = new int[]{1, 1, 0};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues2 = {{dLoc2_1},{dLoc2_2}, {dLoc2_3}};
 
@@ -805,7 +767,7 @@ public class ReferenceClusterTest
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 4, 6, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
         List<Integer> genes1 = Arrays.asList(1, 2, 5);
-        int[] minimumDistances = new int[]{0, 0, 0};
+        int[] minimumDistances = new int[]{0, 0, -1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}, {}};
 
@@ -813,7 +775,7 @@ public class ReferenceClusterTest
                 new ExpectedReferenceClusterValues(
                         genes1,
                         minimumDistances,
-                        0,
+                        1,
                         0,
                         2,
                         expectedDeltaLocationValues
@@ -853,7 +815,7 @@ public class ReferenceClusterTest
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 3, 5, 0);
         List<Integer> genes1 = Arrays.asList(1, 2, 5);
-        int[] minimumDistances = new int[]{0, 0, 0};
+        int[] minimumDistances = new int[]{-1, 0, 0};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{},{dLoc1_1}, {dLoc1_2}};
 
@@ -861,7 +823,7 @@ public class ReferenceClusterTest
                 new ExpectedReferenceClusterValues(
                         genes1,
                         minimumDistances,
-                        0,
+                        1,
                         0,
                         2,
                         expectedDeltaLocationValues
@@ -1075,7 +1037,7 @@ public class ReferenceClusterTest
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 4, 5, 0);
         List<Integer> genes1 = Arrays.asList(1, 2);
-        int[] minimumDistances = new int[]{0, 0};
+        int[] minimumDistances = new int[]{0, -1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1, dLoc1_2}, {}};
 
@@ -1123,7 +1085,7 @@ public class ReferenceClusterTest
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 5, 6, 1);
         List<Integer> genes1 = Arrays.asList(1, 2, 3);
-        int[] minimumDistances = new int[]{1, 0};
+        int[] minimumDistances = new int[]{1, -1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1, dLoc1_2}, {}};
 
@@ -1240,7 +1202,7 @@ public class ReferenceClusterTest
         ExpectedDeltaLocationValues dLoc2_1 = new ExpectedDeltaLocationValues(0, 4, 5, 0);
         ExpectedDeltaLocationValues dLoc2_2 = new ExpectedDeltaLocationValues(0, 6, 7, 0);
         List<Integer> genes2 = Arrays.asList(8, 9);
-        int[] minimumDistances2 = new int[]{0, 0, 0};
+        int[] minimumDistances2 = new int[]{0, 0, -1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues2 = {{dLoc2_1},{dLoc2_2}, {}};
 

@@ -92,7 +92,7 @@ public class ReferenceClusterDistanceMatrixTest {
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 4, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 5, 1);
         List<Integer> genes1 = Arrays.asList(1, 2, 4, 5);
-        int[] minimumDistances1 = new int[]{0, 1, 0};
+        int[] minimumDistances1 = new int[]{0, 1, -1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_2},{}};
 
@@ -152,7 +152,7 @@ public class ReferenceClusterDistanceMatrixTest {
         ExpectedDeltaLocationValues dLoc2_1 = new ExpectedDeltaLocationValues(0, 1, 7, 0);
         ExpectedDeltaLocationValues dLoc2_2 = new ExpectedDeltaLocationValues(0, 1, 8, 3);
         List<Integer> genes2 = Arrays.asList(1, 2, 3, 4, 5, 10, 11);
-        int[] minimumDistances2 = new int[]{0, 0, 3};
+        int[] minimumDistances2 = new int[]{0, -1, 3};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues2 = {{dLoc2_1},{},{dLoc2_2}};
 
@@ -228,7 +228,7 @@ public class ReferenceClusterDistanceMatrixTest {
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 4, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 3, 1);
         List<Integer> genes1 = Arrays.asList(1, 2, 3, 4);
-        int[] minimumDistances1 = new int[]{0, 0, 1};
+        int[] minimumDistances1 = new int[]{0, -1, 1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{},{dLoc1_2}};
 
@@ -263,7 +263,7 @@ public class ReferenceClusterDistanceMatrixTest {
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 3, 2);
         List<Integer> genes1 = Arrays.asList(1, 2, 3);
-        int[] minimumDistances1 = new int[]{0, 2,0};
+        int[] minimumDistances1 = new int[]{0, 2, -1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_2},{}};
 

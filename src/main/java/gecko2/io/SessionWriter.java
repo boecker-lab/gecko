@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.Arrays;
 
 
 /**
@@ -43,7 +42,6 @@ public class SessionWriter
 	 */
 	public static boolean saveSessionToFile(File f) 
 	{
-		GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(f);
         boolean returnValue = true;
 
         try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), Charset.forName("UTF-8"))) {

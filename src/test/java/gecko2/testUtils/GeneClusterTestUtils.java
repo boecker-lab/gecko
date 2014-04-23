@@ -94,7 +94,10 @@ public class GeneClusterTestUtils {
     private static void compareDeltaLocations(ExpectedDeltaLocationValues[] expected, List<DeltaLocation> actual, PValueComparison pValueComp) {
         assertEquals(expected.length, actual.size());
         for (int i=0; i<actual.size(); i++){
-            assertEquals(expected[i], actual.get(i));
+            assertEquals(expected[i].getChrNr(), actual.get(i).getChrNr());
+            assertEquals(expected[i].getL(), actual.get(i).getL());
+            assertEquals(expected[i].getR(), actual.get(i).getR());
+            assertEquals(expected[i].getDistance(), actual.get(i).getDistance());
             if (pValueComp != PValueComparison.COMPARE_NONE)
                 assertEquals(expected[i].getpValue(), actual.get(i).getpValue(), 1e-15 * expected[i].getpValue());
         }
@@ -130,7 +133,8 @@ public class GeneClusterTestUtils {
      * @param actual the actual result
      */
     private static void compareReferenceCluster(ExpectedReferenceClusterValues expected, ReferenceCluster actual, PValueComparison pValueComp) {
-        assertEquals(expected.getGeneContent(), actual.getGeneContent());
+        assertEquals(expected.getGeneContent().size(), actual.getGeneContent().size());
+        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent()));
         assertEquals(expected.getSize(), actual.getSize());
         if (pValueComp != PValueComparison.COMPARE_NONE)
             assertEqualsBigDecimal(expected.getBestCombined_pValue(), actual.getBestCombined_pValue());
