@@ -660,9 +660,8 @@ public class ResultWriter {
 			Gene[][] annotation = entry.getValue();
 			for (int i=0; i<annotation.length; i++) {
 				if (0==i)
-					writer.write(String.format("%d:", entry.getKey()));
+					writer.write(String.format("%s:", entry.getKey().getExternalId()));
 				for (int j=0; j<annotation[i].length; j++){
-					
 					String chrNo;
 					if (annotation[i].length <= 1)
 						chrNo = String.valueOf(i+1);

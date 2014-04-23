@@ -375,6 +375,11 @@ public class GeckoInstance {
         dataUpdated();
     }
 
+
+    public DataSet getData() {
+        return data;
+    }
+
     public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
         setData(reader.getData());
         if (gui != null){
@@ -488,10 +493,6 @@ public class GeckoInstance {
 		private final Parameter p;
 		private final boolean mergeResults;
         private final double groupingFactor;
-		
-		public ClusterComputationRunnable(Parameter p){
-			this(p, false, -1.0);
-		}
 		
 		public ClusterComputationRunnable(Parameter p, boolean mergeResults, double groupingFactor) {
 			this.p = p;

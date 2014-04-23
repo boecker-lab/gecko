@@ -784,9 +784,9 @@ public class Gui {
 							JOptionPane.showMessageDialog(mainframe, "You cannot choose a directory", "Error", JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
-						
+
 						GeckoInstance geckoInstance = GeckoInstance.getInstance();
-						List<GeneCluster> newCluster = ClusterAnnotationReader.readClusterAnnotations(f, geckoInstance.getGenomes());
+						List<GeneCluster> newCluster = ClusterAnnotationReader.readClusterAnnotations(f, geckoInstance.getData());
 						
 						if (newCluster == null)
 							JOptionPane.showMessageDialog(mainframe, "An error occured while reading the annotations!", "Error", JOptionPane.ERROR_MESSAGE);

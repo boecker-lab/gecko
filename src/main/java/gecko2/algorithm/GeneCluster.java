@@ -105,7 +105,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		}
 
         geneFamilies = new HashSet<>();
-        for (int i=refCluster.getLeftBorder(); i<=refCluster.getRightBorder() && geneFamilies.size()<size; i++){
+        for (int i=refCluster.getLeftBorder()-1; i<refCluster.getRightBorder() && geneFamilies.size()<size; i++){
             geneFamilies.add(data.getGenomes()[refCluster.getGenomeNr()].getChromosomes().get(refCluster.getChrNr()).getGenes().get(i).getGeneFamily());
         }
 

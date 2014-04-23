@@ -24,27 +24,6 @@ import static org.junit.Assert.*;
 public class ClusterAnnotationReaderTest {
 	private DataSet data = null;
 	
-	@BeforeClass
-	public static void loadLibGecko2()
-	{
-		System.err.println("You are running " + System.getProperty("os.arch") + "-Java on " + System.getProperty("os.name"));
-		
-		try 
-		{
-			LibraryUtils.loadLibrary("libgecko2");	
-		} 
-		catch (PlatformNotSupportedException e) 
-		{
-			e.printStackTrace();
-			System.exit(1);
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
-	
 	@Before
 	public void setUp() {
 		try {
@@ -52,24 +31,17 @@ public class ClusterAnnotationReaderTest {
             CogFileReader reader = new CogFileReader(inputFile);
 			GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
 
-			reader.importGenomesOccs();
+			reader.readData();
 
-			reader.readFileContent();
 			data = reader.getData();
-		} catch (EOFException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
+		} catch (IOException | ParseException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	private void compareClusters(GeneCluster[] expected, GeneCluster[] actual, boolean comparePValues){
 		assertEquals(expected.length, actual.length);
-		for (GeneCluster actualCluster : actual){
+		for (GeneCluster actualCluster : actual) {
 			boolean match = false;
 			
 			for (GeneCluster expectedCluster: expected) {
@@ -129,7 +101,7 @@ public class ClusterAnnotationReaderTest {
 					}
 				}	
 			}
-			assertTrue(String.format("No matching cluster for %s found!", Arrays.toString(actual)), match);
+			assertTrue(String.format("No matching cluster for %s found!", actualCluster.toString()), match);
 		}
 	}
 	
@@ -156,7 +128,7 @@ public class ClusterAnnotationReaderTest {
 	}
 	
 	private void readAnnotationsTest(File annotationFile){
-		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, data.getGenomes());
+		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, data);
 		assertNotNull(clusters);
 		assertEquals(12, clusters.size());
 
@@ -180,7 +152,7 @@ public class ClusterAnnotationReaderTest {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, data.getGenomes());
+		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, data);
 		assertNotNull(clusters);
 		assertEquals(12, clusters.size());
 		GeckoInstance geckoInstance = GeckoInstance.getInstance();

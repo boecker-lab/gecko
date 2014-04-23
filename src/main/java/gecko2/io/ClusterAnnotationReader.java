@@ -113,7 +113,7 @@ public class ClusterAnnotationReader {
 		} else
 			return null;
 	}
-	
+
 	private boolean parseNextOccurrence(String line, Map<Genome, List<Subsequence> > subseqs) {
 		Matcher m = clusterOccurrencePattern.matcher(line);
 		if (m.matches()) {
@@ -140,7 +140,7 @@ public class ClusterAnnotationReader {
 				System.err.println(String.format("Expected %d, got %d!", oldInternalIndex, genomeMap.get(genomeName)));
 				return false;
 			}
-			
+
 			Subsequence subseq =  new Subsequence(occStart, occEnd, chromNr, 0, BigDecimal.ZERO);
 			if (subseqs.containsKey(genome))
 				subseqs.get(genome).add(subseq);
@@ -155,71 +155,56 @@ public class ClusterAnnotationReader {
 	}
 
     private static class GeneClusterBuilder {
-        DataSet data;
-
-
+        final DataSet data;
+        final Map<Integer, Integer> genomeIndexMap;
         final int id;
-        final int refSeqIndex;
+        final int refSeqIndexUnmapped;
+        Integer refSeqIndex;
         final Parameter.OperationMode mode;
-        int minTotalDistance;
         final BigDecimal pValue;
         final BigDecimal pValueCorr;
-        Set<GeneFamily> genes;
-        List<GeneClusterOccurrence> bestOccList;
-        List<GeneClusterOccurrence> allOccList;
 
-        public GeneClusterBuilder(int id, BigDecimal pValue, BigDecimal pValueCorr, int refSeqIndex, DataSet data, Map<Integer, Integer> genomeIndexMap) {
-            this. id = id;
+        int minTotalDistance;
+        Set<GeneFamily> genes;
+        GeneClusterOccurrence[] bestOccs;
+        GeneClusterOccurrence[] allOccs;
+
+        public GeneClusterBuilder(int id, BigDecimal pValue, BigDecimal pValueCorr, int refSeqIndex, DataSet data, Map<Integer, Integer> genomeIndexMap) throws ParseException{
+            this.id = id;
             this.mode = Parameter.OperationMode.reference;
             this.data = data;
             this.pValue = pValue;
             this.pValueCorr = pValueCorr;
-            this.refSeqIndex = refSeqIndex;
-        }
-
-        void readGenes(BufferedReader reader) throws IOException, ParseException {
-            String line = reader.readLine().trim();
-            String[] genes = line.substring(1, line.length()-1).split(",");
-            this.genes = new HashSet<>();
-            for (String gene : genes) {
-                GeneFamily geneFamily;
-                if (gene.trim().equals(GeneFamily.UNKNOWN_GENE_ID)) {
-                    geneFamily = data.getUnknownGeneFamily();
-                } else {
-                    geneFamily = geneFamilyMap.get(gene.trim());
-                    if (geneFamily == null) {
-                        throw new ParseException("No gene family found for key: " + gene.trim(), 0);
-                    }
-                }
-                this.genes.add(geneFamily);
-            }
+            this.genomeIndexMap = genomeIndexMap;
+            this.refSeqIndexUnmapped = refSeqIndex;
         }
 
         public void completeCluster(Map<Genome, List<Subsequence>> subseqs) throws ParseException {
-            if (refSeqIndex >= data.getGenomes().length) {
+            if (refSeqIndexUnmapped >= data.getGenomes().length) {
                 throw new ParseException("RefSeqNr not in genomes!", 0);
             }
-            Integer referenceIndex = genomeIndexMap.get(refSeqIndex);
-            if (referenceIndex == null) {
+            this.refSeqIndex = genomeIndexMap.get(refSeqIndexUnmapped);
+            if (this.refSeqIndex == null) {
                 throw new ParseException("No index for reference sequence found!", 0);
             }
-            Genome refGenome = data.getGenomes()[referenceIndex];
+
+            Genome refGenome = data.getGenomes()[refSeqIndex];
             List<Subsequence> refSeqs = subseqs.get(refGenome);
             if (refSeqs == null) {
                 throw new ParseException("No reference sequence found!", 0);
             }
 
             Subsequence refSeq = refSeqs.get(0);
-            Set<GeneFamily> refGeneSet = new HashSet<>();
-            for (int i=refSeq.getStart()-1; i<refSeq.getStop(); i++) {
-                refGeneSet.add(refGenome.getChromosomes().get(refSeq.getChromosome()).getGenes().get(i).getGeneFamily());
+            genes = new HashSet<>();
+            for (int i = refSeq.getStart() - 1; i < refSeq.getStop(); i++) {
+                genes.add(refGenome.getChromosomes().get(refSeq.getChromosome()).getGenes().get(i).getGeneFamily());
             }
 
             Subsequence[][] allSeqs = new Subsequence[data.getGenomes().length][];
             Subsequence[][] bestSeqs = new Subsequence[data.getGenomes().length][];
             int support = 0;
-            int totalDistance = 0;
-            for (int i=0; i<data.getGenomes().length; i++){
+            minTotalDistance = 0;
+            for (int i = 0; i < data.getGenomes().length; i++) {
                 List<Subsequence> seqs = subseqs.get(data.getGenomes()[i]);
                 if (seqs == null) {
                     allSeqs[i] = new Subsequence[]{};
@@ -232,14 +217,14 @@ public class ClusterAnnotationReader {
                     for (Subsequence seq : allSeqs[i]) {
                         Set<GeneFamily> additionalGenes = new HashSet<>();
                         Set<GeneFamily> foundGenes = new HashSet<>();
-                        for (int j=seq.getStart()-1; j<seq.getStop(); j++){
+                        for (int j = seq.getStart() - 1; j < seq.getStop(); j++) {
                             GeneFamily geneId = data.getGenomes()[i].getChromosomes().get(seq.getChromosome()).getGenes().get(j).getGeneFamily();
-                            if (refGeneSet.contains(geneId))
+                            if (genes.contains(geneId))
                                 foundGenes.add(geneId);
                             else
                                 additionalGenes.add(geneId);
                         }
-                        int distance = additionalGenes.size() + refGeneSet.size() - foundGenes.size();
+                        int distance = additionalGenes.size() + genes.size() - foundGenes.size();
                         seq.setDist(distance);
                         if (distance < minDistance) {
                             bestOccList.clear();
@@ -249,23 +234,21 @@ public class ClusterAnnotationReader {
                             bestOccList.add(seq);
                     }
                     bestSeqs[i] = bestOccList.toArray(new Subsequence[bestOccList.size()]);
-                    totalDistance += minDistance;
+                    minTotalDistance += minDistance;
                 }
             }
-            GeneClusterOccurrence[] allOccs = new GeneClusterOccurrence[]{new GeneClusterOccurrence(0, allSeqs, builder.getBestPValue(), totalDistance, support)};
-            GeneClusterOccurrence[] bestOccs = new GeneClusterOccurrence[]{new GeneClusterOccurrence(0, bestSeqs, builder.getBestPValue(), totalDistance, support)};
-
-            return new GeneCluster(builder.getId(), bestOccs, allOccs, refGeneSet, builder.getBestPValue(), builder.getBestPValueCorrected(), totalDistance, referenceIndex, builder.getType());
+            allOccs = new GeneClusterOccurrence[]{new GeneClusterOccurrence(0, allSeqs, pValue, minTotalDistance, support)};
+            bestOccs = new GeneClusterOccurrence[]{new GeneClusterOccurrence(0, bestSeqs, pValue, minTotalDistance, support)};
         }
 
-        GeneCluster build() throws ParseException{
+        GeneCluster build() throws ParseException {
             if (genes == null)
                 throw new ParseException("Missing genes when trying to complete cluster!", 0);
-            if (allOccList == null || bestOccList == null)
+            if (allOccs == null || bestOccs == null)
                 throw new ParseException("Missing occs when trying to complete cluster!", 0);
             return new GeneCluster(id,
-                    bestOccList.toArray(new GeneClusterOccurrence[bestOccList.size()]),
-                    allOccList.toArray(new GeneClusterOccurrence[allOccList.size()]),
+                    bestOccs,
+                    allOccs,
                     genes,
                     pValue,
                     pValueCorr,
@@ -273,4 +256,5 @@ public class ClusterAnnotationReader {
                     refSeqIndex,
                     mode);
         }
+    }
 }
