@@ -102,6 +102,18 @@ public class GeneClusterTestUtils {
                 assertEquals(expected[i].getpValue(), actual.get(i).getpValue(), 1e-15 * expected[i].getpValue());
         }
     }
+
+    private static void compareDeltaLocations(List<DeltaLocation> expected, List<DeltaLocation> actual, PValueComparison pValueComp) {
+        assertEquals(expected.size(), actual.size());
+        for (int i=0; i<actual.size(); i++){
+            assertEquals(expected.get(i).getChrNr(), actual.get(i).getChrNr());
+            assertEquals(expected.get(i).getL(), actual.get(i).getL());
+            assertEquals(expected.get(i).getR(), actual.get(i).getR());
+            assertEquals(expected.get(i).getDistance(), actual.get(i).getDistance());
+            if (pValueComp != PValueComparison.COMPARE_NONE)
+                assertEquals(expected.get(i).getpValue(), actual.get(i).getpValue(), 1e-15 * expected.get(i).getpValue());
+        }
+    }
 	
 	/**
 	 * Compares two GeneClusterOccurrences
@@ -134,7 +146,7 @@ public class GeneClusterTestUtils {
      */
     private static void compareReferenceCluster(ExpectedReferenceClusterValues expected, ReferenceCluster actual, PValueComparison pValueComp) {
         assertEquals(expected.getGeneContent().size(), actual.getGeneContent().size());
-        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent()));
+        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent().size()));
         assertEquals(expected.getSize(), actual.getSize());
         if (pValueComp != PValueComparison.COMPARE_NONE)
             assertEqualsBigDecimal(expected.getBestCombined_pValue(), actual.getBestCombined_pValue());
@@ -149,6 +161,30 @@ public class GeneClusterTestUtils {
 
         for (int i = 0; i < actual.getAllDeltaLocations().size(); i++)
             compareDeltaLocations(expected.getAllDeltaLocations()[i], actual.getDeltaLocations(i), pValueComp);
+    }
+
+    /**
+     * Compares the two GeneClusters
+     * @param expected the expected result
+     * @param actual the actual result
+     */
+    private static void compareReferenceCluster(ReferenceCluster expected, ReferenceCluster actual, PValueComparison pValueComp) {
+        assertEquals(expected.getGeneContent().size(), actual.getGeneContent().size());
+        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent().size()));
+        assertEquals(expected.getSize(), actual.getSize());
+        if (pValueComp != PValueComparison.COMPARE_NONE)
+            assertEqualsBigDecimal(expected.getBestCombined_pValue(), actual.getBestCombined_pValue());
+        if (pValueComp == PValueComparison.COMPARE_ALL)
+            assertEqualsBigDecimal(expected.getBestCombined_pValueCorrected(), actual.getBestCombined_pValueCorrected());
+        assertArrayEquals(expected.getMinimumDistances(), actual.getMinimumDistances());
+        assertEquals(expected.getGenomeNr(), actual.getGenomeNr());
+        assertEquals(expected.getChrNr(), actual.getChrNr());
+        assertEquals(expected.getCoveredGenomes(), actual.getCoveredGenomes());
+
+        assertEquals(expected.getAllDeltaLocations().size(), actual.getAllDeltaLocations().size());
+
+        for (int i = 0; i < actual.getAllDeltaLocations().size(); i++)
+            compareDeltaLocations(expected.getDeltaLocations(i), actual.getDeltaLocations(i), pValueComp);
     }
 
     /**
@@ -197,6 +233,23 @@ public class GeneClusterTestUtils {
         for(int i = 0; i < expected.length; i++)
         {
             compareReferenceCluster(expected[i], actual.get(i), pValueComp);
+        }
+    }
+
+    /**
+     * The method tests whether the two input array are equal.
+     *
+     * @param expected expected GeneCluster array
+     * @param actual actual GeneCluster array
+     * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
+     */
+    public static void performTest(List<ReferenceCluster> expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
+    {
+        assertEquals(expected.size(), actual.size());
+
+        for(int i = 0; i < expected.size(); i++)
+        {
+            compareReferenceCluster(expected.get(i), actual.get(i), pValueComp);
         }
     }
 	

@@ -1143,14 +1143,14 @@ public class ReferenceClusterTest
 		Parameter maxQuorumParamters = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
 		// result of computation
-		//GeneCluster[] maxQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, maxQuorumParamters);
+		List<ReferenceCluster> maxQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, maxQuorumParamters);
 
 		Parameter noQuorumParameters = new Parameter(0, 3, 0, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
 		// result of computation
-		//GeneCluster[] noQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, noQuorumParameters);
+		List<ReferenceCluster> noQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, noQuorumParameters);
 
-		//performTest(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
+		performTest(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
 	}
 
 	/**
