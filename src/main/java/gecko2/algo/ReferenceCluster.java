@@ -7,9 +7,9 @@ import java.util.*;
 
 public class ReferenceCluster {
 	private int genomeNr;
-	private final int chrNr;
-	private final int leftBorder;
-	private final int rightBorder;
+	private int chrNr;
+	private int leftBorder;
+	private int rightBorder;
 	private final int size;
 	private int coveredGenomes;
 	private int coveredGenomeGroups;
@@ -81,8 +81,12 @@ public class ReferenceCluster {
 		return size;
 	}
 	
-	public void setGenomeNr(int genomeNr) {
-		this.genomeNr = genomeNr;
+	public void changeReferenceOccurrence(DeltaLocation newRefOcc)
+    {
+		this.genomeNr = newRefOcc.getGenomeNr();
+        this.chrNr = newRefOcc.getChrNr();
+        this.leftBorder = newRefOcc.getL();
+        this.rightBorder = newRefOcc.getR();
 	}
 
     public int getMaxDistance() {

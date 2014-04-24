@@ -288,10 +288,10 @@ public class GeneClusterTestUtils {
 		performTest(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_ALL);
 		
 		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
-			GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(actualData, settings.p);
+			//GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(actualData, settings.p);
 		
 			// Test the java implementation
-			performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
+			//performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		}
 	}
 			
@@ -312,6 +312,7 @@ public class GeneClusterTestUtils {
 
         GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(data, settings.p, settings.genomeGroups);
         data.setClusters(javaRes);
+        System.out.println(javaRes.length);
 
         assertTrue(settings.resultOutputFile.createNewFile());
         DataSetWriter.saveDataSetToFile(data, settings.resultOutputFile);
@@ -320,9 +321,9 @@ public class GeneClusterTestUtils {
 	public static void main(String[] args)
 	{
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q2Grouping();
-        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
-        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
+        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
         try{
 			generateRefClusterFile(testType);
 		} catch (IOException | ParseException e) {

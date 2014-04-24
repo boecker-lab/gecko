@@ -95,14 +95,14 @@ public class ReferenceClusterTestSettings {
     public static ReferenceClusterTestSettings statisticsDataD5S8Q10FixedRef() {
         ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
         settings.p = new Parameter(
-                3,
-                6,
-                4,
+                5,
+                8,
+                10,
                 Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
-                Parameter.ReferenceType.allAgainstAll
+                Parameter.ReferenceType.genome
         );
-        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/statisticsData.cog").getFile());
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/statistics.cog").getFile());
 
         settings.expectedResultFile = null;
         if (GeneClusterTestUtils.class.getResource("/statisticsDataD5S8Q10FixedRef.gck") != null)
