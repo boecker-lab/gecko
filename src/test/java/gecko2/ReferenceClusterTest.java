@@ -57,6 +57,7 @@ public class ReferenceClusterTest
 
         Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
        // p.setAlphabetSize(5);
+        genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 
         // Test the java implementation
         GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -114,12 +115,14 @@ public class ReferenceClusterTest
 	 * 
 	 */
 	@Test
-	public void testComputeClusters1() 
+	public void testComputeClusters1_MemRed_Auto() 
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 5, 4, 0}}};
 
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -197,6 +200,70 @@ public class ReferenceClusterTest
         performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
     }
 
+	/**
+	 * Method for testing the computeClusters method which is provided by the external library libgecko2
+	 *
+	 * Parameter set:
+	 * 		genomes: 2 (one chromosome)
+	 * 		cluster size: 3
+	 * 		delta: 1
+	 * 		operation mode: r
+	 * 		refType: d
+	 * 		qtype: QUORUM_NO_COST
+	 * 		q (number of genomes where cluster appears): 2
+	 * 		contigSpanning: false
+	 *
+	 */
+	@Test
+	public void testComputeClusters2_Auto()
+	{
+		// def array for computation
+		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 6, 5, 4, 0}}};
+
+		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
+		
+		// Test the java implementation
+		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+
+		// def result (using p values from calculated result)
+		Subsequence sub1 = new Subsequence(1, 3, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
+		Subsequence sub2 = new Subsequence(1, 4, 0, 1, javaRes[0].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
+		Subsequence[][] subsequences = {{sub1},{sub2}};
+
+		GeneClusterOccurrence[] bestOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getOccurrences()[0].getBestpValue(), 1, 2)};
+		GeneClusterOccurrence[] allOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getAllOccurrences()[0].getBestpValue(), 1, 2)};
+
+		int[] genes1 = {1, 2, 5};
+
+		Subsequence sub3 = new Subsequence(1, 3, 0, 1, javaRes[1].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
+		Subsequence sub4 = new Subsequence(1, 4, 0, 0, javaRes[1].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
+		Subsequence[][] subsequences2 = {{sub3},{sub4}};
+
+		GeneClusterOccurrence[] bestOccurrences2 = {new GeneClusterOccurrence(0, subsequences2, javaRes[1].getOccurrences()[0].getBestpValue(), 1, 2)};
+		GeneClusterOccurrence[] allOccurrences2 = {new GeneClusterOccurrence(0, subsequences2, javaRes[1].getAllOccurrences()[0].getBestpValue(), 1, 2)};
+
+		int[] genes2 = {1, 2, 6, 5};
+
+		GeneCluster[] refCluster = {new GeneCluster(0, bestOccurrences, allOccurrences, genes1,
+									javaRes[0].getBestPValue(),
+									javaRes[0].getBestPValueCorrected(),
+									1,
+									0,
+									Parameter.OperationMode.reference),
+									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes2,
+									javaRes[1].getBestPValue(),
+									javaRes[1].getBestPValueCorrected(),
+									1,
+									1,
+									Parameter.OperationMode.reference)};
+
+		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
+
+
+	}
+
 
 	/**
 	 * Method for testing the computeClusters method which is provided by the external library libgecko2
@@ -213,13 +280,12 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters2()
+	public void testComputeClusters2_memReducer_manu()
 	{
 		// def array for computation
-		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 6, 5, 4, 0}}};
+		int genomes[][][] = {{{0, 1, 2, 5, -1, 0}}, {{0, 1, 2, -1, 5, -1, 0}}};
 
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(3);
 
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -258,11 +324,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 
 	}
 
@@ -283,7 +344,7 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters3()
+	public void testComputeClusters3_memReducer_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}, {{0, 1, 2, 5, 4, 0}}};
@@ -292,8 +353,8 @@ public class ReferenceClusterTest
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6};
 
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -330,11 +391,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 	/**
@@ -466,17 +522,15 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters4()
+	public void testComputeClusters4_memReducer_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 8, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 7, 5, 4, 0}}};
 
 		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -526,11 +580,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 
@@ -549,17 +598,14 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters5()
+	public void testComputeClusters5_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 8, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 5, 4, 0}, {0,11, 10, 7, 2, 1, 5, 0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -596,11 +642,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 
@@ -619,17 +660,15 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters6()
+	public void testComputeClusters6_auto()
 	{
 		// def array for computationsub2, sub4
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 10, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 8, 5, 4, 0}, {0, 7, 11, 11, 2, 1, 12, 5, 0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,12};
-
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
+		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -693,11 +732,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 
@@ -717,17 +751,14 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters7()
+	public void testComputeClusters7_auto()
 	{
 		// def array for computationsub2, sub4
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11, 6, 7, 0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-
 		Parameter p = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -754,11 +785,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 
@@ -778,17 +804,14 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters8()
+	public void testComputeClusters8_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
-
 		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -829,11 +852,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 
@@ -852,17 +870,15 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters9()
+	public void testComputeClusters9_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -903,11 +919,7 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
+        
 	}
 
 
@@ -926,17 +938,15 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters10()
+	public void testComputeClusters10_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
-
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
+		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -961,11 +971,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 
@@ -984,17 +989,15 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters11()
+	public void testComputeClusters11_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 7, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11,0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
-
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
+		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -1019,11 +1022,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 
@@ -1041,17 +1039,14 @@ public class ReferenceClusterTest
 	 * 		contigSpanning: false
 	 */
 	@Test
-	public void testComputeClusters12()
+	public void testComputeClusters12_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 7, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11,0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
-
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -1093,10 +1088,7 @@ public class ReferenceClusterTest
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
         // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
+        
 	}
 
 	/**
@@ -1113,17 +1105,15 @@ public class ReferenceClusterTest
 	 * 		contigSpanning: false
 	 */
 	@Test
-	public void testComputeClusters13()
+	public void testComputeClusters13_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 0}}, {{0, 1, 2, 0}}};
 
-		// def parameters
-		int[] geneLabelMap = {1, 2};
-
 		Parameter p = new Parameter(1, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
+		
 		// Test the java implementation
 		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -1146,11 +1136,6 @@ public class ReferenceClusterTest
 
 		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 	/**
@@ -1168,17 +1153,15 @@ public class ReferenceClusterTest
 	 *
 	 */
 	@Test
-	public void testComputeClusters14()
+	public void testComputeClusters14_auto()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 3, 0}}, {{0, 1, 2, 0}}, {{0, 2, 3, 0}}};
-
-		// def parameters
-		int[] geneLabelMap = {1, 2, 3};
-
+		
 		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(geneLabelMap.length);
 
+		genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
+		
 		/// Test the java implementation
         GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
@@ -1214,11 +1197,6 @@ public class ReferenceClusterTest
 
         performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
 
-        // test the c library
-        if (libGeckoLoaded) {
-            GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);
-            performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-        }
 	}
 
 	/**

@@ -48,7 +48,7 @@ public class ReferenceClusterAlgorithm {
 		}
 	}
 	
-	private static int[][][] memReducer(int[][][] genomes, Parameter p){
+	public static int[][][] memReducer(int[][][] genomes, Parameter p){
 		MemRed help = new MemRed();
 		
 		for(int l = 0; l<genomes.length;l++){
@@ -86,25 +86,6 @@ public class ReferenceClusterAlgorithm {
 		return genomes;
 	}
 
-	private static int[][][] memSort(int[][][] genomes){
-		int[][][] h;
-		for(int l=0;l<genomes.length;l++){
-			for(int m=0;m<genomes[l].length;m++){
-				MemRed x = new MemRed();
-				for(int n=0;n<genomes[l][m].length;n++){
-					if(genomes[l][m][n]<0){
-						
-					} else {
-						x.anlegen(genomes[l][m][n]);
-					}
-				}
-				genomes[l][m] = x.umschreiben();
-			}
-		}
-		
-		return genomes;
-	}
-	
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
 	 * @param genomes the genomes
