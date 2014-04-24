@@ -1,5 +1,6 @@
 package gecko2;
 
+import gecko2.algorithm.DataSet;
 import gecko2.gui.Gui;
 import gecko2.io.CogFileReader;
 import gecko2.io.GckFileReader;
@@ -81,9 +82,13 @@ public class Gecko2 {
             infile = new File(args[0]);
         }
 
-        GeckoDataReader reader = null;
+        if (args.length <= 1 || options.useGui()) {
+            Gui.startUp();
+        }
+
         if (infile != null) {
             String extension = infile.getPath().substring(infile.getPath().lastIndexOf(".") + 1);
+            GeckoDataReader reader = null;
 
             if (extension.equals("gck")) {
                 reader = new GckFileReader(infile);
@@ -94,19 +99,12 @@ public class Gecko2 {
                 return;
             }
             try {
-                reader.readData();
+                DataSet data = reader.readData();
+                GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(infile);
+                GeckoInstance.getInstance().setGeckoInstanceData(data);
             } catch (IOException | ParseException e) {
                 e.printStackTrace();
             }
-        }
-
-        if (args.length <= 1 || options.useGui()) {
-            Gui.startUp();
-        }
-
-        if (reader != null) {
-            GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(infile);
-            GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
         }
 
         if (args.length > 1) {

@@ -57,9 +57,9 @@ public class CogFileReaderTest {
 
         CogFileReader reader = new CogFileReader(inputFile);
 			
-        reader.readData();
+        DataSet data = reader.readData();
 
-        testReader(reader, geneFamilySet, unknownGeneFamily, refGenomes);
+        testReader(data, geneFamilySet, unknownGeneFamily, refGenomes);
 	}
 	
 	@Test
@@ -222,9 +222,9 @@ public class CogFileReaderTest {
 
         CogFileReader reader = new CogFileReader(inputFile);
 
-        reader.readData();
+        DataSet data = reader.readData();
 
-        testReader(reader, geneFamilySet, unknownGeneFamily, refGenomes);
+        testReader(data, geneFamilySet, unknownGeneFamily, refGenomes);
 	}
 
     /**
@@ -264,9 +264,9 @@ public class CogFileReaderTest {
 
         CogFileReader reader = new CogFileReader(inputFile);
 
-        reader.readData();
+        DataSet data = reader.readData();
 
-        testReader(reader, geneFamilySet, unknownGeneFamily, refGenomes);
+        testReader(data, geneFamilySet, unknownGeneFamily, refGenomes);
     }
 
     @Test
@@ -275,17 +275,17 @@ public class CogFileReaderTest {
 
         CogFileReader reader = new CogFileReader(inputFile);
 
-        reader.readData();
+        DataSet data = reader.readData();
 
-        assertEquals(2, reader.getGenomes().length);
-        assertEquals(1, reader.getGenomes()[0].getChromosomes().size());
-        assertEquals(10, reader.getGenomes()[0].getChromosomes().get(0).getGenes().size());
+        assertEquals(2, data.getGenomes().length);
+        assertEquals(1, data.getGenomes()[0].getChromosomes().size());
+        assertEquals(10, data.getGenomes()[0].getChromosomes().get(0).getGenes().size());
 
-        assertEquals(1, reader.getGenomes()[1].getChromosomes().size());
-        assertEquals(3, reader.getGenomes()[1].getChromosomes().get(0).getGenes().size());
+        assertEquals(1, data.getGenomes()[1].getChromosomes().size());
+        assertEquals(3, data.getGenomes()[1].getChromosomes().get(0).getGenes().size());
 
-        Set<GeneFamily> geneFamilySet = reader.getGeneFamilySet();
-        GeneFamily unknownGeneFamily = reader.getUnknownGeneFamily();
+        Set<GeneFamily> geneFamilySet = data.getGeneFamilySet();
+        GeneFamily unknownGeneFamily = data.getUnknownGeneFamily();
 
         assertEquals(5, unknownGeneFamily.getFamilySize());
         assertEquals(5, geneFamilySet.size());
@@ -306,21 +306,21 @@ public class CogFileReaderTest {
     }
 
 
-    private static void testReader(CogFileReader reader, Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily, Genome[] refGenomes) {
-        assertEquals(geneFamilySet, reader.getGeneFamilySet());
-        assertEquals(unknownGeneFamily, reader.getUnknownGeneFamily());
+    private static void testReader(DataSet readDataSet, Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily, Genome[] refGenomes) {
+        assertEquals(geneFamilySet, readDataSet.getGeneFamilySet());
+        assertEquals(unknownGeneFamily, readDataSet.getUnknownGeneFamily());
         Map<GeneFamily, Integer> algorithmIdMap = new HashMap<>();
 
-        for( int j = 0; j < reader.getGenomes().length; j++) {
-            assertEquals(refGenomes[j].getName(), reader.getGenomes()[j].getName());
+        for( int j = 0; j < readDataSet.getGenomes().length; j++) {
+            assertEquals(refGenomes[j].getName(), readDataSet.getGenomes()[j].getName());
             for (int k = 0; k < refGenomes[j].getChromosomes().size(); k++) {
-                assertEquals(refGenomes[j].getChromosomes().get(k).getName(), reader.getGenomes()[j].getChromosomes().get(k).getName());
+                assertEquals(refGenomes[j].getChromosomes().get(k).getName(), readDataSet.getGenomes()[j].getChromosomes().get(k).getName());
 
                 int p = 0;
 
                 for (int i=0; i<refGenomes[j].getChromosomes().get(k).getGenes().size(); i++){
                     Gene expectedGene = refGenomes[j].getChromosomes().get(k).getGenes().get(i);
-                    Gene actualGene = reader.getGenomes()[j].getChromosomes().get(k).getGenes().get(i);
+                    Gene actualGene = readDataSet.getGenomes()[j].getChromosomes().get(k).getGenes().get(i);
 
                     assertEquals(expectedGene.getAnnotation(), actualGene.getAnnotation());
                     assertEquals(expectedGene.getExternalId(), actualGene.getExternalId());
@@ -354,8 +354,7 @@ public class CogFileReaderTest {
 
         // When
         CogFileReader reader = new CogFileReader(inputFile);
-        reader.readData();
-        DataSet data = reader.getData();
+        DataSet data = reader.readData();
 
         int[][][] genomes = data.toIntArray();
 
@@ -374,8 +373,7 @@ public class CogFileReaderTest {
 
         // When
         CogFileReader reader = new CogFileReader(inputFile);
-        reader.readData();
-        DataSet data = reader.getData();
+        DataSet data = reader.readData();
 
         int[][][] genomes = data.toIntArray();
 
@@ -394,8 +392,7 @@ public class CogFileReaderTest {
 
         // When
         CogFileReader reader = new CogFileReader(inputFile);
-        reader.readData();
-        DataSet data = reader.getData();
+        DataSet data = reader.readData();
 
         int[][][] genomes = data.toReducedIntArray();
 

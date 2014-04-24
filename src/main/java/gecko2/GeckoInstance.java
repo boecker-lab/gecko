@@ -370,18 +370,12 @@ public class GeckoInstance {
         this.fireDataChanged();
     }
 
-    public void setData(DataSet data) {
-        this.data = data;
-        dataUpdated();
-    }
-
-
     public DataSet getData() {
         return data;
     }
 
-    public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
-        setData(reader.getData());
+    public void setGeckoInstanceData(final DataSet data) {
+        this.data = data;
         if (gui != null){
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -452,7 +446,7 @@ public class GeckoInstance {
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClustersLibgecko(Parameter params) {
+	public GeneCluster[] computeClustersLibgecko(DataSet data, Parameter params) {
         int intArray[][][] = data.toIntArray();
         params.setAlphabetSize(data.getAlphabetSize());
 		return computeClusters(intArray, params, GeckoInstance.this);
@@ -465,7 +459,7 @@ public class GeckoInstance {
 	 */
 	public GeneCluster[] computeClusters(Parameter params) {
 		return computeClustersJava(data, params);
-		//return computeClustersLibgecko(genomes, params);
+		//return computeClustersLibgecko(data, params);
 	}
 	
 	public ExecutorService performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {

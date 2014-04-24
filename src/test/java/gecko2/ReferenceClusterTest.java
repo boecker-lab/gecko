@@ -1,11 +1,13 @@
 package gecko2;
 
 import gecko2.testUtils.ExpectedReferenceClusterValues;
+import gecko2.testUtils.GeneClusterTestUtils;
 import gecko2.testUtils.GeneClusterTestUtils.PValueComparison;
 import gecko2.testUtils.ExpectedDeltaLocationValues;
 import gecko2.algo.ReferenceCluster;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.Parameter;
+import gecko2.testUtils.ReferenceClusterTestSettings;
 import gecko2.util.LibraryUtils;
 import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import org.junit.BeforeClass;
@@ -18,6 +20,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.zip.DataFormatException;
 
+import static gecko2.testUtils.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
 import static gecko2.testUtils.GeneClusterTestUtils.performTest;
 
 /**
@@ -1105,32 +1108,15 @@ public class ReferenceClusterTest
 
 	@Test
 	public void fiveProteobacterReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
-		File inputFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacter.cog").toURI());
-		File resultFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacterD3S6Q4.txt").toURI());
-
-		//automaticGeneClusterTestFromFile(inputFile, resultFile, libGeckoLoaded);
+        ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
+		automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
 	}
 
 	@Test
 	public void fiveProteobacterReferenceClusterTestWithGrouping() throws URISyntaxException, IOException, DataFormatException, ParseException {
-		File inputFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacter.cog").toURI());
-		File resultFile = new File(ReferenceClusterTest.class.getResource("/fiveProteobacterD3S6Q2Grouping.txt").toURI());
+        ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterD3S6Q2Grouping();
 
-		// def genome groups, grouping genomes 2 and 3 and 4 and 5
-		List<Set<Integer>> genomeGroups = new ArrayList<>(2);
-		Set<Integer> set1 = new HashSet<>();
-		set1.add(0);
-		genomeGroups.add(set1);
-		Set<Integer> set2 = new HashSet<>();
-		set2.add(1);
-		set2.add(2);
-		genomeGroups.add(set2);
-		Set<Integer> set3 = new HashSet<>();
-		set3.add(3);
-		set3.add(4);
-		genomeGroups.add(set3);
-
-		//automaticGeneClusterTestFromFile(inputFile, resultFile, genomeGroups, libGeckoLoaded);
+		automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
 	}
 
 	@Test

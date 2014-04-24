@@ -1,6 +1,5 @@
 package gecko2.io;
 
-import gecko2.GeckoInstance;
 import gecko2.algorithm.*;
 
 import java.io.BufferedWriter;
@@ -17,7 +16,7 @@ import java.nio.file.Files;
  * @author Hans-Martin Haase <hans-martin dot haase at uni-jena dot de>
  * @version 0.03
  */
-public class SessionWriter
+public class DataSetWriter
 {
 
     final static String SEPERATOR = "\t";
@@ -40,15 +39,15 @@ public class SessionWriter
 	 * Saves the current gecko session to a given file
 	 * @param f The file to write to
 	 */
-	public static boolean saveSessionToFile(File f) 
+	public static boolean saveDataSetToFile(DataSet data, File f)
 	{
         boolean returnValue = true;
 
         try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), Charset.forName("UTF-8"))) {
         //try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(f)); ObjectOutputStream out = xstream.createObjectOutputStream(zos)) {
         //    zos.putNextEntry(new ZipEntry(f.getName()));
-            writeGenomes(out, GeckoInstance.getInstance().getGenomes());
-            writeClusters(out, GeckoInstance.getInstance().getClusters());
+            writeGenomes(out, data.getGenomes());
+            writeClusters(out, data.getClusters());
 
         }
         catch (IOException e) {

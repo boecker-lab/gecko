@@ -220,7 +220,7 @@ public class CogFileReader implements GeckoDataReader {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public void readFileContent() throws IOException, ParseException{
+	public DataSet readFileContent() throws IOException, ParseException{
         SortUtils.resortGenomeOccurencesByStart(occs);
 
 		Map<Integer, Genome> groupedGenomes = new HashMap<>();
@@ -288,6 +288,16 @@ public class CogFileReader implements GeckoDataReader {
         for (Genome x : groupedGenomes.values()) {
             this.genomes[i++] = x;
         }
+
+        return new DataSet(
+                genomes,
+                maxIdLength,
+                maxNameLength,
+                maxLocusTagLength,
+                geneFamilySet,
+                unknownGeneFamily,
+                numberOfGeneFamiliesWithMultipleGenes
+        );
 	}
 
     /**
@@ -376,94 +386,6 @@ public class CogFileReader implements GeckoDataReader {
 		return id.equals(GeneFamily.UNKNOWN_GENE_ID);
 	}
 
-	/**
-	 * The method is the getter for the genomes.
-	 * 
-	 * @return an array of Genome objects
-	 */
-	public Genome[] getGenomes()
-	{
-		return this.genomes;
-	}
-	
-	/**
-	 * The method is a getter for the geneLabelMap which contains the relation between external ID
-	 * and internal ID from the gene names
-	 * 
-	 * @return the geneLabelMap (HashMap)
-	 */
-	public Set<GeneFamily> getGeneFamilySet() {
-        return geneFamilySet;
-    }
-
-    /**
-     * A getter for the total number of gene families that contain more than 1 gene
-     *
-     * @return the number of gene families that contain more than 1 gene
-     */
-    @Override
-    public int getNumberOfGeneFamiliesWithMultipleGenes() {
-        return numberOfGeneFamiliesWithMultipleGenes;
-    }
-
-    /**
-     * A getter for the gene family grouping all genes with no gene family information
-     * @return the unknown gene family
-     */
-    public GeneFamily getUnknownGeneFamily() {
-        return unknownGeneFamily;
-    }
-	
-	/**
-	 * The method returns the length of the longest id
-	 * 
-	 * @return length of the longest id
-	 */
-	public int getMaxIdLength() {
-		return this.maxIdLength;
-	}
-
-    /**
-     * @return the maxNameLength from the input file
-     */
-    @Override
-    public int getMaxNameLength() {
-        return maxNameLength;
-    }
-
-    /**
-     * @return the maxLocusTagLength from the input file
-     */
-    @Override
-    public int getMaxLocusTagLength() {
-        return maxLocusTagLength;
-    }
-
-    /**
-     * Always returns an empty GeneCluster[]. .cog files don't contain gene cluster data.
-     * @return the gene clusters
-     */
-    @Override
-    public GeneCluster[] getGeneClusters() {
-        return new GeneCluster[0];
-    }
-
-    /**
-     * @return the complete data
-     */
-    @Override
-    public DataSet getData() {
-        return new DataSet(
-                genomes,
-                maxIdLength,
-                maxNameLength,
-                maxLocusTagLength,
-                geneFamilySet,
-                unknownGeneFamily,
-                numberOfGeneFamiliesWithMultipleGenes
-        );
-    }
-
     /**
      * Reads all data from the file
      *
@@ -471,7 +393,7 @@ public class CogFileReader implements GeckoDataReader {
      * @throws java.text.ParseException if the file format is wrong
      */
     @Override
-    public void readData() throws IOException, ParseException {
+    public DataSet readData() throws IOException, ParseException {
         // Read all occs
         importGenomesOccs();
 
@@ -486,7 +408,7 @@ public class CogFileReader implements GeckoDataReader {
         }
 
         // Import the genomes
-        readFileContent();
+        return readFileContent();
     }
 
     /**
@@ -495,15 +417,5 @@ public class CogFileReader implements GeckoDataReader {
      */
     public List<GenomeOccurrence> getOccs() {
         return occs;
-    }
-
-    private static class IntId{
-        int id;
-        int size;
-
-        IntId(int id) {
-            this.id = Math.abs(id);
-            this.size = 1;
-        }
     }
 }

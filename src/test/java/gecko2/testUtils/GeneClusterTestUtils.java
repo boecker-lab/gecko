@@ -5,6 +5,9 @@ import gecko2.algo.DeltaLocation;
 import gecko2.algo.ReferenceCluster;
 import gecko2.algorithm.*;
 import gecko2.io.CogFileReader;
+import gecko2.io.DataSetWriter;
+import gecko2.io.GckFileReader;
+import gecko2.io.GeckoDataReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,7 +149,7 @@ public class GeneClusterTestUtils {
      */
     private static void compareReferenceCluster(ExpectedReferenceClusterValues expected, ReferenceCluster actual, PValueComparison pValueComp) {
         assertEquals(expected.getGeneContent().size(), actual.getGeneContent().size());
-        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent().size()));
+        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent()));
         assertEquals(expected.getSize(), actual.getSize());
         if (pValueComp != PValueComparison.COMPARE_NONE)
             assertEqualsBigDecimal(expected.getBestCombined_pValue(), actual.getBestCombined_pValue());
@@ -270,133 +273,58 @@ public class GeneClusterTestUtils {
 		}
 	}
 	
-	static void automaticGeneClusterTestFromFile(File input, File expected, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
-		automaticGeneClusterTestFromFile(input, expected, null, libGeckoLoaded);
-	}
-	
-	static void automaticGeneClusterTestFromFile(File input, File expected, List<Set<Integer>> genomeGroups, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
-		/*GeneClusterResult gcr = GeneClusterResult.readResultFile(expected);
+	static public void automaticGeneClusterTestFromFile(ReferenceClusterTestSettings settings, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
+        assertNotNull(settings.expectedResultFile);
+        GeckoDataReader resultReader = new GckFileReader(settings.expectedResultFile);
+        DataSet expectedData = resultReader.readData();
 
 
-        CogFileReader reader = new CogFileReader(input);
-        int genomes[][][] = readGenomes(reader, input);
-		
-		Parameter p = gcr.getParameterSet();
+        CogFileReader reader = new CogFileReader(settings.dataFile);
+        DataSet actualData = reader.readData();
 
-		GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(genomes, p, genomeGroups);
+		GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(actualData, settings.p, settings.genomeGroups);
+        actualData.setClusters(javaRes);
 		
-		performTest(gcr.getCompResult(), javaRes, PValueComparison.COMPARE_ALL);
+		performTest(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_ALL);
 		
-		if (libGeckoLoaded && p.getDelta() >= 0 && genomeGroups == null){
-			GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(genomes, p);	
+		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
+			GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(actualData, settings.p);
 		
 			// Test the java implementation
 			performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-		}*/
+		}
 	}
 			
 	/**
 	 * The method launches computeCluster for a given parameter set and 
 	 * genomes from a .cog file and writes the result to a the given outputFile 
-	 * 
-	 * @param inputCogFile File object to the input file
-	 * @param p Parameter set
-	 * @param outputFile the output file
+	 *
 	 */
-	public static void generateRefClusterFile(File inputCogFile, File outputFile, Parameter p, List<Set<Integer>> genomeGrouping) throws IOException, ParseException {
-		/*if (outputFile.exists()) {
-			System.err.println("Error: File " + outputFile.getAbsolutePath() + " exists already. Delete it manually if you want to continue!");
+	public static void generateRefClusterFile(ReferenceClusterTestSettings settings) throws IOException, ParseException {
+		if (settings.resultOutputFile.exists()) {
+			System.err.println("Error: File " + settings.resultOutputFile.getAbsolutePath() + " exists already. Delete it manually if you want to continue!");
 			System.exit(1);
 		}
-		
-		// Load the native library for the computeClusters run
-		ReferenceClusterTest.loadLibGecko2();
-		
-			// generate the Genome array from the input file
-		CogFileReader reader = new CogFileReader(inputCogFile);
-		int genomes[][][] = readGenomes(reader, inputCogFile);
 
-		GeneCluster[] result = GeckoInstance.getInstance().computeClustersJava(genomes, p, genomeGrouping);
+		// generate the Genome array from the input file
+        CogFileReader reader = new CogFileReader(settings.dataFile);
+        DataSet data = reader.readData();
 
-		GeneClusterResult gcResult = new GeneClusterResult(result, p, inputCogFile.getName());
+        GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(data, settings.p, settings.genomeGroups);
+        data.setClusters(javaRes);
 
-		System.out.println(outputFile.getAbsolutePath());
-		assertTrue(outputFile.createNewFile());
-		
-		gcResult.writeToFile(outputFile);*/
-	}
-	
-	/**
-	 * Reads the genomes from the inputFile, using the reader
-	 * @param reader the file reader
-	 * @param inputFile the input file
-	 * @return the int[][][] of genomes
-	 * @throws IOException
-	 */
-	private static int[][][] readGenomes(CogFileReader reader, File inputFile) throws IOException, ParseException {
-		GeckoInstance.getInstance();
-		GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
-        reader.readData();
-
-        return reader.getData().toIntArray();
-	}
-	
-	private enum GenerateTestDataType {
-		fiveProteobacterDeltaTable,
-		fiveProteobacterD3S6Q4,
-		fiveProteobacterD3S6Q2Grouping,
-		statisticsDataD5S8Q10FixedRef
+        assertTrue(settings.resultOutputFile.createNewFile());
+        DataSetWriter.saveDataSetToFile(data, settings.resultOutputFile);
 	}
 	
 	public static void main(String[] args)
 	{
-		GenerateTestDataType testType = GenerateTestDataType.fiveProteobacterD3S6Q2Grouping;
-		try {
-			List<Set<Integer>> genomeGroups = null;
-			Parameter p = null;
-			File inCogFile = null;
-			File outFile = null;
-			
-			switch (testType) {
-				case fiveProteobacterDeltaTable:
-					int[][] deltaArray = {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}};
-					p = new Parameter(deltaArray, 4, 4, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").getFile());
-					outFile = new File("src/test/resources/fiveProteobacterDeltaTable.txt");
-					break;
-					
-				case fiveProteobacterD3S6Q4:
-					p = new Parameter(3, 6, 4, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").getFile());
-					outFile = new File("src/test/resources/fiveProteobacterD3S6Q4.txt");
-					break;
-					
-				case fiveProteobacterD3S6Q2Grouping:
-					p = new Parameter(3, 6, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-					inCogFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").getFile());
-					outFile = new File("src/test/resources/fiveProteobacterD3S6Q2Grouping.txt");
-					genomeGroups = new ArrayList<>(2);
-					Set<Integer> set1 = new HashSet<>();
-					set1.add(0);
-					genomeGroups.add(set1);
-					Set<Integer> set2 = new HashSet<>();
-					set2.add(1);
-					set2.add(2);
-					genomeGroups.add(set2);
-					Set<Integer> set3 = new HashSet<>();
-					set3.add(3);
-					set3.add(4);
-					genomeGroups.add(set3);
-					break;
-					
-				case statisticsDataD5S8Q10FixedRef:
-					p = new Parameter(5, 8, 10, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-					inCogFile = new File(GeneClusterTestUtils.class.getResource("/statisticsData.cog").getFile());
-					outFile = new File("src/test/resources/statisticsDataD5S8Q10FixedRef.txt");
-					break;
-			}
-			
-			generateRefClusterFile(inCogFile, outFile, p, genomeGroups);
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q2Grouping();
+        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
+        try{
+			generateRefClusterFile(testType);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}

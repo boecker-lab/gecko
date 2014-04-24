@@ -5,10 +5,9 @@ import gecko2.algorithm.DataSet;
 import gecko2.algorithm.GeneCluster;
 import gecko2.io.ClusterAnnotationReader;
 import gecko2.io.CogFileReader;
+import gecko2.io.DataSetWriter;
 import gecko2.io.GckFileReader;
-import gecko2.io.SessionWriter;
 import gecko2.util.FileUtils;
-import gecko2.util.PrintUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -99,7 +98,7 @@ public class Gui {
 		// splits the gui in horizontal half
         JSplitPane vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		vertSplit.setResizeWeight(0.5);
-		this.gecko.setData(DataSet.getEmptyDataSet());
+		this.gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
 		vertSplit.setTopComponent(selectorSplitPane);
 		
 		vertSplit.setBottomComponent(gcDisplay);
@@ -437,7 +436,7 @@ public class Gui {
 	}
 
 	public void closeCurrentSession() {
-        gecko.setData(DataSet.getEmptyDataSet());
+        gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
 		mgb.clear();
 	}
 	
@@ -483,10 +482,11 @@ public class Gui {
 
                             SwingWorker worker = new SwingWorker<Void, Void>() {
                                 GckFileReader reader = new GckFileReader(fc.getSelectedFile());
+                                DataSet data;
                                 @Override
                                 protected Void doInBackground() {
                                     try{
-                                        reader.readData();
+                                        data = reader.readData();
                                     } catch (final IOException e) {
                                         EventQueue.invokeLater(new Runnable() {
                                             public void run() {
@@ -518,7 +518,7 @@ public class Gui {
                                     } catch (InterruptedException | ExecutionException e) {
                                         e.printStackTrace();
                                     }
-                                    GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
+                                    GeckoInstance.getInstance().setGeckoInstanceData(data);
                                 }
                             };
 
@@ -753,7 +753,7 @@ public class Gui {
 							continue;
 					}
 					
-					if (! SessionWriter.saveSessionToFile(f))
+					if (! DataSetWriter.saveDataSetToFile(gecko.getData(), f))
 						JOptionPane.showMessageDialog(mainframe, "An error occured while writing the file!", "Error", JOptionPane.ERROR_MESSAGE);
 					
 					break;

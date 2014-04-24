@@ -2,7 +2,7 @@ package gecko2;
 
 import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
-import gecko2.io.SessionWriter;
+import gecko2.io.DataSetWriter;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +51,6 @@ public class CommandLineExecution {
             options.getOutfile().delete();
 
         // Save session
-        SessionWriter.saveSessionToFile(options.getOutfile());
+        DataSetWriter.saveDataSetToFile(GeckoInstance.getInstance().getData(), options.getOutfile());
     }
 }

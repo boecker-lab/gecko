@@ -154,9 +154,7 @@ public class BreakPointDistanceTest {
         CogFileReader reader = new CogFileReader(inputFile);
         GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
 
-        reader.readData();
-
-		DataSet data = reader.getData();
+		DataSet data = reader.readData();
 		
 		breakpointDistanceTest(data, new int[][] {{0, 14, 20, 20}, {14, 0, 22, 24},{20, 22, 0, 24},{20, 24, 24, 0}}, false);
 	}
@@ -167,9 +165,7 @@ public class BreakPointDistanceTest {
         CogFileReader reader = new CogFileReader(inputFile);
 		GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
 
-        reader.readData();
-				
-		DataSet data = reader.getData();
+		DataSet data = reader.readData();
 		
 		List<Set<Integer>> cluster = BreakPointDistance.groupGenomes(data, 0.7, false);
 		assertEquals(2, cluster.size());

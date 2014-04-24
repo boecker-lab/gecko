@@ -31,9 +31,7 @@ public class ClusterAnnotationReaderTest {
             CogFileReader reader = new CogFileReader(inputFile);
 			GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(inputFile);
 
-			reader.readData();
-
-			data = reader.getData();
+			data = reader.readData();
 		} catch (IOException | ParseException | URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -156,7 +154,7 @@ public class ClusterAnnotationReaderTest {
 		assertNotNull(clusters);
 		assertEquals(12, clusters.size());
 		GeckoInstance geckoInstance = GeckoInstance.getInstance();
-		geckoInstance.setData(data);
+		geckoInstance.setGeckoInstanceData(data);
 		GeneCluster[] clusterWithPValue = geckoInstance.computeReferenceStatistics(clusters.toArray(new GeneCluster[clusters.size()]));
 		
 		compareClusters(clusters.toArray(new GeneCluster[clusters.size()]), clusterWithPValue, false);

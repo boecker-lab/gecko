@@ -1,11 +1,8 @@
 package gecko2.io;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.Chromosome;
+import gecko2.algorithm.*;
 import gecko2.testUtils.GeneClusterTestUtils;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.Genome;
-import gecko2.algorithm.Parameter;
 import org.junit.Test;
 
 import java.io.File;
@@ -79,26 +76,26 @@ public class GckFileReaderTest {
     }
 
     private static void testReadingDataWithoutClusters(File cogInfile, File gckInfile) throws IOException, ParseException {
-        CogFileReader cogReader = new CogFileReader(cogInfile);
+        CogFileReader cogFileReader = new CogFileReader(cogInfile);
 
-        cogReader.readData();
+        DataSet expectedData = cogFileReader.readData();
 
-        GckFileReader gckReader = new GckFileReader(gckInfile);
+        GckFileReader gckFileReader = new GckFileReader(gckInfile);
 
-        gckReader.readData();
+        DataSet actualData = gckFileReader.readData();
 
-        assertEquals(cogReader.getMaxIdLength(), gckReader.getMaxIdLength());
-        assertEquals(cogReader.getMaxLocusTagLength(), gckReader.getMaxLocusTagLength());
-        assertEquals(cogReader.getMaxNameLength(), gckReader.getMaxNameLength());
+        assertEquals(expectedData.getMaxIdLength(), actualData.getMaxIdLength());
+        assertEquals(expectedData.getMaxLocusTagLength(), actualData.getMaxLocusTagLength());
+        assertEquals(expectedData.getMaxNameLength(), actualData.getMaxNameLength());
 
-        assertEquals(cogReader.getGenomes().length, gckReader.getGenomes().length);
-        for (int i=0; i<cogReader.getGenomes().length; i++) {
-            assertEquals(cogReader.getGenomes()[i].getName(), gckReader.getGenomes()[i].getName());
+        assertEquals(expectedData.getGenomes().length, actualData.getGenomes().length);
+        for (int i=0; i<expectedData.getGenomes().length; i++) {
+            assertEquals(expectedData.getGenomes()[i].getName(), actualData.getGenomes()[i].getName());
 
-            assertEquals(cogReader.getGenomes()[i].getChromosomes().size(), gckReader.getGenomes()[i].getChromosomes().size());
-            for (int j=0; j<cogReader.getGenomes()[i].getChromosomes().size(); j++) {
-                Chromosome expectedChromosome = cogReader.getGenomes()[i].getChromosomes().get(j);
-                Chromosome actualChromosome = gckReader.getGenomes()[i].getChromosomes().get(j);
+            assertEquals(expectedData.getGenomes()[i].getChromosomes().size(), actualData.getGenomes()[i].getChromosomes().size());
+            for (int j=0; j<expectedData.getGenomes()[i].getChromosomes().size(); j++) {
+                Chromosome expectedChromosome = expectedData.getGenomes()[i].getChromosomes().get(j);
+                Chromosome actualChromosome = actualData.getGenomes()[i].getChromosomes().get(j);
 
                 assertEquals(expectedChromosome.getName(), actualChromosome.getName());
 
@@ -107,31 +104,31 @@ public class GckFileReaderTest {
                     assertEquals(expectedChromosome.getGenes().get(k), actualChromosome.getGenes().get(k));
             }
         }
-        assertArrayEquals(cogReader.getGenomes(), gckReader.getGenomes());
-        assertEquals(cogReader.getGeneFamilySet(), gckReader.getGeneFamilySet());
-        assertEquals(cogReader.getUnknownGeneFamily(), gckReader.getUnknownGeneFamily());
+        assertArrayEquals(expectedData.getGenomes(), actualData.getGenomes());
+        assertEquals(expectedData.getGeneFamilySet(), actualData.getGeneFamilySet());
+        assertEquals(expectedData.getUnknownGeneFamily(), actualData.getUnknownGeneFamily());
     }
 
     private static void testReadingClusters(File cogInfile, File gckInfile, Parameter p) throws IOException, ParseException {
-        CogFileReader cogReader = new CogFileReader(cogInfile);
+        CogFileReader cogFileReader = new CogFileReader(cogInfile);
 
-        cogReader.readData();
+        DataSet expectedData = cogFileReader.readData();
 
-        GckFileReader gckReader = new GckFileReader(gckInfile);
+        GckFileReader gckFileReader = new GckFileReader(gckInfile);
 
-        gckReader.readData();
+        DataSet actualData = gckFileReader.readData();
 
         // Assert successful genome reading
-        assertEquals(cogReader.getMaxIdLength(), gckReader.getMaxIdLength());
-        assertEquals(cogReader.getMaxLocusTagLength(), gckReader.getMaxLocusTagLength());
-        assertEquals(cogReader.getMaxNameLength(), gckReader.getMaxNameLength());
+        assertEquals(expectedData.getMaxIdLength(), actualData.getMaxIdLength());
+        assertEquals(expectedData.getMaxLocusTagLength(), actualData.getMaxLocusTagLength());
+        assertEquals(expectedData.getMaxNameLength(), actualData.getMaxNameLength());
 
-        assertArrayEquals(cogReader.getGenomes(), gckReader.getGenomes());
-        assertEquals(cogReader.getGeneFamilySet(), gckReader.getGeneFamilySet());
-        assertEquals(cogReader.getUnknownGeneFamily(), gckReader.getUnknownGeneFamily());
+        assertArrayEquals(expectedData.getGenomes(), actualData.getGenomes());
+        assertEquals(expectedData.getGeneFamilySet(), actualData.getGeneFamilySet());
+        assertEquals(expectedData.getUnknownGeneFamily(), actualData.getUnknownGeneFamily());
 
-        GeneCluster[] computedResult = GeckoInstance.getInstance().computeClustersJava(cogReader.getData(), p);
+        GeneCluster[] computedResult = GeckoInstance.getInstance().computeClustersJava(expectedData, p);
 
-        performTest(computedResult, gckReader.getGeneClusters(), GeneClusterTestUtils.PValueComparison.COMPARE_NONE);
+        performTest(computedResult, actualData.getClusters(), GeneClusterTestUtils.PValueComparison.COMPARE_NONE);
     }
 }
