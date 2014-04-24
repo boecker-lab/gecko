@@ -1,19 +1,17 @@
 package gecko2;
 
-import gecko2.testUtils.ExpectedReferenceClusterValues;
-import gecko2.testUtils.GeneClusterTestUtils;
-import gecko2.testUtils.GeneClusterTestUtils.PValueComparison;
-import gecko2.testUtils.ExpectedDeltaLocationValues;
 import gecko2.algo.ReferenceCluster;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.Parameter;
+import gecko2.testUtils.ExpectedDeltaLocationValues;
+import gecko2.testUtils.ExpectedReferenceClusterValues;
+import gecko2.testUtils.GeneClusterTestUtils.PValueComparison;
 import gecko2.testUtils.ReferenceClusterTestSettings;
 import gecko2.util.LibraryUtils;
 import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;

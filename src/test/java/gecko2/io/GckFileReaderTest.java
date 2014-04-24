@@ -1,7 +1,10 @@
 package gecko2.io;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.*;
+import gecko2.algorithm.Chromosome;
+import gecko2.algorithm.DataSet;
+import gecko2.algorithm.GeneCluster;
+import gecko2.algorithm.Parameter;
 import gecko2.testUtils.GeneClusterTestUtils;
 import org.junit.Test;
 

@@ -9,7 +9,6 @@ import java.text.ParseException;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 /**
  * JUnit test for the new class InputFileReader.

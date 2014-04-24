@@ -3,21 +3,21 @@ package gecko2.testUtils;
 import gecko2.GeckoInstance;
 import gecko2.algo.DeltaLocation;
 import gecko2.algo.ReferenceCluster;
-import gecko2.algorithm.*;
+import gecko2.algorithm.DataSet;
+import gecko2.algorithm.GeneCluster;
+import gecko2.algorithm.GeneClusterOccurrence;
+import gecko2.algorithm.Subsequence;
 import gecko2.io.CogFileReader;
 import gecko2.io.DataSetWriter;
 import gecko2.io.GckFileReader;
 import gecko2.io.GeckoDataReader;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.DataFormatException;
 
 import static org.junit.Assert.*;
@@ -173,7 +173,7 @@ public class GeneClusterTestUtils {
      */
     private static void compareReferenceCluster(ReferenceCluster expected, ReferenceCluster actual, PValueComparison pValueComp) {
         assertEquals(expected.getGeneContent().size(), actual.getGeneContent().size());
-        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent().size()));
+        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent()));
         assertEquals(expected.getSize(), actual.getSize());
         if (pValueComp != PValueComparison.COMPARE_NONE)
             assertEqualsBigDecimal(expected.getBestCombined_pValue(), actual.getBestCombined_pValue());
@@ -282,7 +282,7 @@ public class GeneClusterTestUtils {
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet actualData = reader.readData();
 
-		GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(actualData, settings.p, settings.genomeGroups);
+		GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups);
         actualData.setClusters(javaRes);
 		
 		performTest(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_ALL);
@@ -310,7 +310,7 @@ public class GeneClusterTestUtils {
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet data = reader.readData();
 
-        GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(data, settings.p, settings.genomeGroups);
+        GeneCluster[] javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups);
         data.setClusters(javaRes);
 
         assertTrue(settings.resultOutputFile.createNewFile());

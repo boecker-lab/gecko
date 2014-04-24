@@ -8,7 +8,6 @@ import gecko2.event.DataListener;
 import gecko2.gui.GenomePainting;
 import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
-import gecko2.io.GeckoDataReader;
 import gecko2.io.ResultWriter;
 import gecko2.io.ResultWriter.ExportType;
 

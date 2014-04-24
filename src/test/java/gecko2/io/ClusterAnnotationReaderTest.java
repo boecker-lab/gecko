@@ -2,18 +2,13 @@ package gecko2.io;
 
 import gecko2.GeckoInstance;
 import gecko2.algorithm.*;
-import gecko2.util.LibraryUtils;
-import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

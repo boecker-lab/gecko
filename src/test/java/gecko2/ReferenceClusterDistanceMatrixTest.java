@@ -1,23 +1,21 @@
 package gecko2;
 
 import gecko2.algo.ReferenceCluster;
+import gecko2.algo.ReferenceClusterAlgorithm;
+import gecko2.algorithm.Parameter;
 import gecko2.testUtils.ExpectedDeltaLocationValues;
 import gecko2.testUtils.ExpectedReferenceClusterValues;
 import gecko2.testUtils.GeneClusterTestUtils.PValueComparison;
-import gecko2.algo.ReferenceClusterAlgorithm;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.Parameter;
-import gecko2.algorithm.Subsequence;
+import gecko2.testUtils.ReferenceClusterTestSettings;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.DataFormatException;
 
+import static gecko2.testUtils.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
 import static gecko2.testUtils.GeneClusterTestUtils.performTest;
 
 public class ReferenceClusterDistanceMatrixTest {
@@ -194,10 +192,9 @@ public class ReferenceClusterDistanceMatrixTest {
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 4, 1);
         List<Integer> genes1 = Arrays.asList(1, 2, 3);
-        int[] minimumDistances1 = new int[]{0, 1, 0};
+        int[] minimumDistances1 = new int[]{0, 1, -1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_2},{}};
-
 
         ExpectedReferenceClusterValues[] referenceClusterValues = {
                 new ExpectedReferenceClusterValues(
@@ -209,6 +206,8 @@ public class ReferenceClusterDistanceMatrixTest {
                         expectedDeltaLocationValues1
                 )
         };
+
+        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 	
 	@Test
@@ -303,21 +302,20 @@ public class ReferenceClusterDistanceMatrixTest {
 		Parameter p_deltaTable = new Parameter(deltaTable, 4, genomes.length-1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 			
 		// Test the java implementation
-		//GeneCluster[] deltaTableRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p_deltaTable);
-		//GeneCluster[] res = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		List<ReferenceCluster> deltaTableRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p_deltaTable);
+        List<ReferenceCluster> res = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 		
 		// def result (using p values from calculated result)
 		
-		//performTest(deltaTableRes, res, PValueComparison.COMPARE_NONE);
+		performTest(deltaTableRes, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	
 	
 	@Test
 	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws IOException, DataFormatException, ParseException {
-		File inputFile = new File(getClass().getResource("/fiveProteobacter.cog").getFile());
-		File resultFile = new File(getClass().getResource("/fiveProteobacterDeltaTable.txt").getFile());
-		
-		//automaticGeneClusterTestFromFile(inputFile, resultFile, false);
+        ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
+
+        automaticGeneClusterTestFromFile(settings, false);
 	}
 }

@@ -1,7 +1,5 @@
 package gecko2.algo;
 
-import gecko2.algorithm.GeneFamily;
-
 import java.math.BigDecimal;
 import java.util.*;
 

@@ -1,7 +1,5 @@
 package gecko2.testUtils;
 
-import gecko2.testUtils.ExpectedDeltaLocationValues;
-
 import java.math.BigDecimal;
 import java.util.List;
 

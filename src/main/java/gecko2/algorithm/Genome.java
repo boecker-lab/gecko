@@ -1,7 +1,9 @@
 package gecko2.algorithm;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 public class Genome implements Serializable {

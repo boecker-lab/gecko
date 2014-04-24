@@ -4,10 +4,6 @@ import gecko2.GeckoInstance;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 public class Gene implements Serializable {
 	private static final long serialVersionUID = 7903694077854093398L;

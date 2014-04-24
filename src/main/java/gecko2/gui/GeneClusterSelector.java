@@ -2,7 +2,10 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 import gecko2.GeckoInstance.ResultFilter;
-import gecko2.algorithm.*;
+import gecko2.algorithm.GeneCluster;
+import gecko2.algorithm.GeneClusterOccurrence;
+import gecko2.algorithm.GeneFamily;
+import gecko2.algorithm.Parameter;
 import gecko2.event.ClusterSelectionEvent;
 import gecko2.event.ClusterSelectionListener;
 import gecko2.event.LocationSelectionEvent;
