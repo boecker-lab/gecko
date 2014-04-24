@@ -287,7 +287,7 @@ public class GeneClusterTestUtils {
 					break;
 					
 				case statisticsDataD5S8Q10FixedRef:
-					p = new Parameter(5, 8, 10, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+					p = new Parameter(5, 8, 10, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 					inCogFile = new File(GeneClusterTestUtils.class.getResource("/statisticsData.cog").getFile());
 					outFile = new File("src/test/resources/statisticsDataD5S8Q10FixedRef.txt");
 					break;
