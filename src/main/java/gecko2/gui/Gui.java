@@ -98,7 +98,6 @@ public class Gui {
 		// splits the gui in horizontal half
         JSplitPane vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		vertSplit.setResizeWeight(0.5);
-		this.gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
 		vertSplit.setTopComponent(selectorSplitPane);
 		
 		vertSplit.setBottomComponent(gcDisplay);
@@ -111,8 +110,7 @@ public class Gui {
 		menubar.add(menuFile);
 		menubar.add(menuView);
 		menubar.add(menuAbout);
-		
-				
+
 		mgb = new MultipleGenomesBrowser();
 		
 		
@@ -249,8 +247,6 @@ public class Gui {
 		p.add(searchField, BorderLayout.CENTER);
 		toolbar.add(p);
 		
-		// END TEST
-		
 		// Add components to Frame
 		JPanel northpanel = new JPanel();
 		northpanel.setLayout(new GridLayout(1, 1));
@@ -303,6 +299,9 @@ public class Gui {
 		mainframe.addKeyListener(mgb.getWheelListener());
 		mainframe.setIconImage(createImageIcon("images/gecko2_a_small.png").getImage());
 		mainframe.setVisible(true);
+
+        // Update data
+        gecko.setGeckoInstanceData();
 	}
 	
 	public void setInfobarText(String text) {
@@ -410,7 +409,7 @@ public class Gui {
 	}
 	
 	public void changeMode(Mode mode) {
-		switch (mode) {
+        switch (mode) {
 			case COMPUTING:
 				changeMode("Computing gene clusters...", false, true, false, false);
 				break;

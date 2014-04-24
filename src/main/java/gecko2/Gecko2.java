@@ -72,6 +72,7 @@ public class Gecko2 {
         }
 
         GeckoInstance instance = GeckoInstance.getInstance();
+        instance.setGeckoInstanceData(DataSet.getEmptyDataSet());
         instance.setLibgeckoLoaded(libgeckoLoaded);
 
         /*

@@ -332,4 +332,32 @@ public class DataSet {
     public Color getGeneColor(GeneFamily geneFamily) {
         return getColorMap().get(geneFamily);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DataSet dataSet = (DataSet) o;
+
+        if (numberOfGeneFamiliesWithMultipleGenes != dataSet.numberOfGeneFamiliesWithMultipleGenes) return false;
+        if (!Arrays.equals(clusters, dataSet.clusters)) return false;
+        if (geneFamilySet != null ? !geneFamilySet.equals(dataSet.geneFamilySet) : dataSet.geneFamilySet != null)
+            return false;
+        if (!Arrays.equals(genomes, dataSet.genomes)) return false;
+        if (unknownGeneFamily != null ? !unknownGeneFamily.equals(dataSet.unknownGeneFamily) : dataSet.unknownGeneFamily != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = genomes != null ? Arrays.hashCode(genomes) : 0;
+        result = 31 * result + (clusters != null ? Arrays.hashCode(clusters) : 0);
+        result = 31 * result + (geneFamilySet != null ? geneFamilySet.hashCode() : 0);
+        result = 31 * result + (unknownGeneFamily != null ? unknownGeneFamily.hashCode() : 0);
+        result = 31 * result + numberOfGeneFamiliesWithMultipleGenes;
+        return result;
+    }
 }

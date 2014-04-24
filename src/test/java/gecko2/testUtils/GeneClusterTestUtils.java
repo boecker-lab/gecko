@@ -312,7 +312,6 @@ public class GeneClusterTestUtils {
 
         GeneCluster[] javaRes = GeckoInstance.getInstance().computeClustersJava(data, settings.p, settings.genomeGroups);
         data.setClusters(javaRes);
-        System.out.println(javaRes.length);
 
         assertTrue(settings.resultOutputFile.createNewFile());
         DataSetWriter.saveDataSetToFile(data, settings.resultOutputFile);

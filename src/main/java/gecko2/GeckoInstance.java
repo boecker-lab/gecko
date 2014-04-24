@@ -374,6 +374,10 @@ public class GeckoInstance {
         return data;
     }
 
+    public void setGeckoInstanceData(){
+        setGeckoInstanceData(this.data);
+    }
+
     public void setGeckoInstanceData(final DataSet data) {
         this.data = data;
         if (gui != null){
@@ -382,7 +386,10 @@ public class GeckoInstance {
                 public void run() {
                     gui.updateViewscreen();
                     gui.updategcSelector();
-                    gui.changeMode(Gui.Mode.SESSION_IDLE);
+                    if (data.equals(DataSet.getEmptyDataSet()))
+                        gui.changeMode(Gui.Mode.NO_SESSION);
+                    else
+                        gui.changeMode(Gui.Mode.SESSION_IDLE);
                 }
             });
         }
