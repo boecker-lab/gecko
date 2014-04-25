@@ -391,8 +391,7 @@ public class Gui {
 				
 		importGenomesAction.setEnabled(importGenomes);
 		
-		if (gecko.isLibgeckoLoaded())
-			startComputation.setEnabled(clusterBrowserActive);
+        startComputation.setEnabled(clusterBrowserActive);
 		clearSelectionAction.setEnabled(clusterBrowserActive);
 		saveSessionAction.setEnabled(clusterBrowserActive);
 		if (clusterBrowserActive) {
