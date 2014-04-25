@@ -53,47 +53,30 @@ public class ReferenceClusterTest
         int genomes[][][] = {{{0, 1, 2, -1, -1, -1, -1, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
 
         Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-       // p.setAlphabetSize(5);
-        genomes = ReferenceClusterAlgorithm.memReducer(genomes, p);
 
         // Test the java implementation
-        GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
-        Subsequence sub1 = new Subsequence(1, 2, 0, 1, javaRes[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
-        Subsequence sub2 = new Subsequence(2, 4, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
-        Subsequence[][] subsequences = {{sub1},{sub2}};
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
+        List<Integer> genes1 = Arrays.asList(-1, 1, 2);
+        int[] minimumDistances = new int[]{1, 0};
 
-        GeneClusterOccurrence[] bestOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getOccurrences()[0].getBestpValue(), 1, 2)};
-        GeneClusterOccurrence[] allOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getAllOccurrences()[0].getBestpValue(), 1, 2)};
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
 
-        int[] genes1 = {2, -1, 1};
-        
-        
-        GeneCluster[] refCluster = {new GeneCluster(0, bestOccurrences, allOccurrences, genes1,
-                javaRes[0].getBestPValue(),
-                javaRes[0].getBestPValueCorrected(),
-                1,
-                1,
-                Parameter.OperationMode.reference)};
-        
-        System.out.println("Erwarteter Cluster: ");
-        for(int i=0;i<refCluster.length;i++){
-        	int[] gen = refCluster[i].getGenes();
-        	for (int j=0;j<gen.length;j++){
-        		System.out.print(gen[j]+" ");
-        	}
-        	System.out.println("");
-        }
-        System.out.println("angenommener Cluster: ");
-        for(int i=0;i<javaRes.length;i++){
-        	int[] gen = javaRes[i].getGenes();
-        	for(int j=0;j<gen.length;j++){
-        		System.out.print(gen[j]+" ");
-        	}
-        	System.out.println("");
-        }
-        performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances,
+                        1,
+                        0,
+                        2,
+                        expectedDeltaLocationValues
+                )
+        };
+
+        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
     }
 	
 	
@@ -118,7 +101,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 5, 4, 0}}};
 			
 		// def parameters
-			
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
@@ -168,29 +150,32 @@ public class ReferenceClusterTest
         // def array for computation
         int genomes[][][] = {{{0, 1, 2, 3, -1, 0}}, {{0, 1, 2, 3, -1, 0}}};
 
+// def parameters
         Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
-        GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
-        Subsequence sub1 = new Subsequence(1, 3, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
-        Subsequence sub2 = new Subsequence(1, 3, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
-        Subsequence[][] subsequences = {{sub1},{sub2}};
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
+        List<Integer> genes1 = Arrays.asList(1, 2, 3);
+        int[] minimumDistances = new int[]{0, 0};
 
-        GeneClusterOccurrence[] bestOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getOccurrences()[0].getBestpValue(), 0, 2)};
-        GeneClusterOccurrence[] allOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getAllOccurrences()[0].getBestpValue(), 0, 2)};
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
 
-        int[] genes = {1, 2, 3};
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances,
+                        0,
+                        0,
+                        2,
+                        expectedDeltaLocationValues
+                )
+        };
 
-        GeneCluster[] refCluster = {new GeneCluster(0, bestOccurrences, allOccurrences, genes,
-                javaRes[0].getBestPValue(),
-                javaRes[0].getBestPValueCorrected(),
-                0,
-                0,
-                Parameter.OperationMode.reference)};
-
-        performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
+        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
     }
 
 	/**
@@ -276,46 +261,46 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, -1, 0}}, {{0, 1, 2, -1, 5, -1, 0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
-		// Test the java implementation
-		GeneCluster[] javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+        // Test the java implementation
+        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
-		// def result (using p values from calculated result)
-		Subsequence sub1 = new Subsequence(1, 3, 0, 0, javaRes[0].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
-		Subsequence sub2 = new Subsequence(1, 4, 0, 1, javaRes[0].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
-		Subsequence[][] subsequences = {{sub1},{sub2}};
+        // def result 1
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 4, 1);
+        List<Integer> genes1 = Arrays.asList(1, 2, 5);
+        int[] minimumDistances1 = new int[]{0, 1};
 
-		GeneClusterOccurrence[] bestOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getOccurrences()[0].getBestpValue(), 1, 2)};
-		GeneClusterOccurrence[] allOccurrences = {new GeneClusterOccurrence(0, subsequences, javaRes[0].getAllOccurrences()[0].getBestpValue(), 1, 2)};
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_2}};
 
-		int[] genes1 = {1, 2, 5};
+        // def result 2
+        ExpectedDeltaLocationValues dLoc2_1 = new ExpectedDeltaLocationValues(0, 1, 3, 1);
+        ExpectedDeltaLocationValues dLoc2_2 = new ExpectedDeltaLocationValues(0, 1, 4, 0);
+        List<Integer> genes2 = Arrays.asList(1, 2, 5, 6);
+        int[] minimumDistances2 = new int[]{1, 0};
 
-		Subsequence sub3 = new Subsequence(1, 3, 0, 1, javaRes[1].getAllOccurrences()[0].getSubsequences()[0][0].getpValue());
-		Subsequence sub4 = new Subsequence(1, 4, 0, 0, javaRes[1].getAllOccurrences()[0].getSubsequences()[1][0].getpValue());
-		Subsequence[][] subsequences2 = {{sub3},{sub4}};
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues2 = {{dLoc2_1},{dLoc2_2}};
 
-		GeneClusterOccurrence[] bestOccurrences2 = {new GeneClusterOccurrence(0, subsequences2, javaRes[1].getOccurrences()[0].getBestpValue(), 1, 2)};
-		GeneClusterOccurrence[] allOccurrences2 = {new GeneClusterOccurrence(0, subsequences2, javaRes[1].getAllOccurrences()[0].getBestpValue(), 1, 2)};
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances1,
+                        0,
+                        0,
+                        2,
+                        expectedDeltaLocationValues1),
+                new ExpectedReferenceClusterValues(
+                        genes2,
+                        minimumDistances2,
+                        1,
+                        0,
+                        2,
+                        expectedDeltaLocationValues2
+                )
+        };
 
-		int[] genes2 = {1, 2, 6, 5};
-
-		GeneCluster[] refCluster = {new GeneCluster(0, bestOccurrences, allOccurrences, genes1,
-									javaRes[0].getBestPValue(),
-									javaRes[0].getBestPValueCorrected(),
-									1,
-									0,
-									Parameter.OperationMode.reference),
-									new GeneCluster(1, bestOccurrences2, allOccurrences2, genes2,
-									javaRes[1].getBestPValue(),
-									javaRes[1].getBestPValueCorrected(),
-									1,
-									1,
-									Parameter.OperationMode.reference)};
-
-		performTest(refCluster, javaRes, PValueComparison.COMPARE_NONE);
-
-
+        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
 
