@@ -5,6 +5,7 @@ import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.Parameter;
 import gecko2.testUtils.ExpectedDeltaLocationValues;
 import gecko2.testUtils.ExpectedReferenceClusterValues;
+import gecko2.testUtils.GeneClusterTestUtils;
 import gecko2.testUtils.GeneClusterTestUtils.PValueComparison;
 import gecko2.testUtils.ReferenceClusterTestSettings;
 import gecko2.util.LibraryUtils;
@@ -19,7 +20,7 @@ import java.util.*;
 import java.util.zip.DataFormatException;
 
 import static gecko2.testUtils.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
-import static gecko2.testUtils.GeneClusterTestUtils.performTest;
+import static gecko2.testUtils.GeneClusterTestUtils.compareReferenceClusters;
 
 /**
  * The class tests the computeClusters algorithm from the Gecko2 program
@@ -54,9 +55,6 @@ public class ReferenceClusterTest
 
         Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
@@ -76,7 +74,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
     }
 
 	@Test
@@ -87,9 +85,6 @@ public class ReferenceClusterTest
 			
 		// def parameters
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -110,7 +105,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
     @Test
@@ -121,9 +116,6 @@ public class ReferenceClusterTest
 
         // def parameters
         Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -144,7 +136,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
     }
 
 	@Test
@@ -154,9 +146,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 6, 5, 4, 0}}};
 
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -192,7 +181,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -202,9 +191,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 3, -1, 0}}, {{0, 1, 2, -1, 3, -1, 0}}};
 
         Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -240,7 +226,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -250,9 +236,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}, {{0, 1, 2, 5, 4, 0}}};
 
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -288,7 +271,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -298,9 +281,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 4, 0}}, {{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}};
 
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -322,7 +302,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -332,9 +312,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 4, 0}}, {{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}};
 
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -356,7 +333,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -366,9 +343,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 8, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 7, 5, 4, 0}}};
 
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -420,7 +394,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -430,9 +404,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 8, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 5, 4, 0}, {0,11, 10, 7, 2, 1, 5, 0}}};
 
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -470,7 +441,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -480,9 +451,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 10, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 8, 5, 4, 0}, {0, 7, 11, 11, 2, 1, 12, 5, 0}}};
 
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -552,7 +520,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -562,9 +530,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11, 6, 7, 0}}};
 
 		Parameter p = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -586,7 +551,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -597,9 +562,6 @@ public class ReferenceClusterTest
 
 		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 4, 6, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
@@ -636,7 +598,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -647,9 +609,6 @@ public class ReferenceClusterTest
 
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 4, 6, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
@@ -686,7 +645,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -696,9 +655,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 4, 6, 0);
@@ -719,7 +675,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -729,9 +685,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 7, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11,0}}};
 
 		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
@@ -752,7 +705,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -762,9 +715,6 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 7, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11,0}}};
 
 		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 4, 7, 0);
@@ -802,7 +752,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -813,9 +763,6 @@ public class ReferenceClusterTest
 
 		// def parameters
 		Parameter p = new Parameter(1, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
@@ -836,7 +783,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -847,9 +794,6 @@ public class ReferenceClusterTest
 
 		// def parameters
 		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -885,7 +829,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -896,9 +840,6 @@ public class ReferenceClusterTest
 
 		// def parameters
 		Parameter p = new Parameter(0, 2, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
@@ -919,7 +860,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -930,9 +871,6 @@ public class ReferenceClusterTest
 
 		// def parameters
 		Parameter p = new Parameter(1, 3, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -953,7 +891,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	@Test
@@ -986,7 +924,7 @@ public class ReferenceClusterTest
 		// result of computation
 		List<ReferenceCluster> noQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, noQuorumParameters);
 
-		performTest(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
+		compareReferenceClusters(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
 	}
 
 	@Test
@@ -1007,9 +945,6 @@ public class ReferenceClusterTest
 
 		// def parameters
 		Parameter p = new Parameter(0, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
@@ -1046,7 +981,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 }
 

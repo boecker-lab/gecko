@@ -3,10 +3,8 @@ package gecko2.testUtils;
 import gecko2.GeckoInstance;
 import gecko2.algo.DeltaLocation;
 import gecko2.algo.ReferenceCluster;
-import gecko2.algorithm.DataSet;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.Subsequence;
+import gecko2.algo.ReferenceClusterAlgorithm;
+import gecko2.algorithm.*;
 import gecko2.io.CogFileReader;
 import gecko2.io.DataSetWriter;
 import gecko2.io.GckFileReader;
@@ -31,8 +29,15 @@ import static org.junit.Assert.*;
  *
  */
 public class GeneClusterTestUtils {
-	
-	public enum PValueComparison {
+
+    public static void performTest(Parameter p, int[][][] genomes, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
+        // Test the java implementation
+        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+
+        compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
+    }
+
+    public enum PValueComparison {
 		COMPARE_ALL,
 		COMPARE_UNCORRECTED,
 		COMPARE_NONE
@@ -229,7 +234,7 @@ public class GeneClusterTestUtils {
      * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
      */
-    public static void performTest(ExpectedReferenceClusterValues[] expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
+    public static void compareReferenceClusters(ExpectedReferenceClusterValues[] expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
     {
         assertEquals(expected.length, actual.size());
 
@@ -246,7 +251,7 @@ public class GeneClusterTestUtils {
      * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
      */
-    public static void performTest(List<ReferenceCluster> expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
+    public static void compareReferenceClusters(List<ReferenceCluster> expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
     {
         assertEquals(expected.size(), actual.size());
 
@@ -263,7 +268,7 @@ public class GeneClusterTestUtils {
 	 * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
 	 */
-	public static void performTest(GeneCluster[] expected, GeneCluster[] actual, PValueComparison pValueComp)
+	public static void compareGeneClusters(GeneCluster[] expected, GeneCluster[] actual, PValueComparison pValueComp)
 	{
 		assertEquals(expected.length, actual.length);
 		
@@ -285,13 +290,13 @@ public class GeneClusterTestUtils {
 		GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups);
         actualData.setClusters(javaRes);
 		
-		performTest(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_ALL);
+		compareGeneClusters(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_ALL);
 		
 		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
 			//GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(actualData, settings.p);
 		
 			// Test the java implementation
-			//performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
+			//compareReferenceClusters(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		}
 	}
 			

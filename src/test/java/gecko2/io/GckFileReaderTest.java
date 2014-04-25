@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 
-import static gecko2.testUtils.GeneClusterTestUtils.performTest;
+import static gecko2.testUtils.GeneClusterTestUtils.compareGeneClusters;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -132,6 +132,6 @@ public class GckFileReaderTest {
 
         GeneCluster[] computedResult = GeckoInstance.getInstance().computeClustersJava(expectedData, p);
 
-        performTest(computedResult, actualData.getClusters(), GeneClusterTestUtils.PValueComparison.COMPARE_NONE);
+        compareGeneClusters(computedResult, actualData.getClusters(), GeneClusterTestUtils.PValueComparison.COMPARE_NONE);
     }
 }
