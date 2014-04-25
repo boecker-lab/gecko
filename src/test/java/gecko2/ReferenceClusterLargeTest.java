@@ -1,5 +1,6 @@
 package gecko2;
 
+import gecko2.testUtils.ReferenceClusterTestSettings;
 import gecko2.util.LibraryUtils;
 import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import org.junit.BeforeClass;
@@ -9,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.zip.DataFormatException;
+
+import static gecko2.testUtils.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
 
 public class ReferenceClusterLargeTest {
     private static boolean libGeckoLoaded = false;
@@ -29,9 +32,8 @@ public class ReferenceClusterLargeTest {
 	
 	@Test
 	public void statisticDataReferenceClusterTest() throws IOException, DataFormatException, ParseException {
-		File inputFile = new File(getClass().getResource("/statistics.cog").getFile());
-		File resultFile = new File(getClass().getResource("/statisticsDataD5S8Q10FixedRef.txt").getFile());
-		
-		//automaticGeneClusterTestFromFile(inputFile, resultFile, libGeckoLoaded);
+        ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
+
+        automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
 	}
 }
