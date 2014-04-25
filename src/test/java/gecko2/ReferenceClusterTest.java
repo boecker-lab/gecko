@@ -78,22 +78,7 @@ public class ReferenceClusterTest
 
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
     }
-	
-	
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 * 
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 * 
-	 */
+
 	@Test
 	public void testComputeClusters1() 
 	{
@@ -128,29 +113,13 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-
-    /**
-     * Method for testing the computeClusters method which is provided by the external library libgecko2
-     *
-     * Parameter set:
-     * 		genomes: 2 (one chromosome)
-     * 		cluster size: 3
-     * 		delta: 0
-     * 		operation mode: r
-     * 		refType: d
-     * 		qtype: QUORUM_NO_COST
-     * 		q (number of genomes where cluster appears): 2
-     * 		contigSpanning: false
-     *
-     */
     @Test
-    public void testComputeClusters1MemoryReduction()
+    public void testComputeClusters1_memoryReduction()
     {
         // def array for computation
         int genomes[][][] = {{{0, 1, 2, 3, -1, 0}}, {{0, 1, 2, 3, -1, 0}}};
 
-// def parameters
+        // def parameters
         Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
@@ -178,20 +147,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
     }
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters2()
 	{
@@ -240,26 +195,11 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
-	public void testComputeClusters2_memReducer_manu()
+	public void testComputeClusters2_memoryReduction()
 	{
 		// def array for computation
-		int genomes[][][] = {{{0, 1, 2, 5, -1, 0}}, {{0, 1, 2, -1, 5, -1, 0}}};
+		int genomes[][][] = {{{0, 1, 2, 3, -1, 0}}, {{0, 1, 2, -1, 3, -1, 0}}};
 
         Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
@@ -269,7 +209,7 @@ public class ReferenceClusterTest
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 4, 1);
-        List<Integer> genes1 = Arrays.asList(1, 2, 5);
+        List<Integer> genes1 = Arrays.asList(1, 2, 3);
         int[] minimumDistances1 = new int[]{0, 1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_2}};
@@ -277,7 +217,7 @@ public class ReferenceClusterTest
         // def result 2
         ExpectedDeltaLocationValues dLoc2_1 = new ExpectedDeltaLocationValues(0, 1, 3, 1);
         ExpectedDeltaLocationValues dLoc2_2 = new ExpectedDeltaLocationValues(0, 1, 4, 0);
-        List<Integer> genes2 = Arrays.asList(1, 2, 5, 6);
+        List<Integer> genes2 = Arrays.asList(-1, 1, 2, 3);
         int[] minimumDistances2 = new int[]{1, 0};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues2 = {{dLoc2_1},{dLoc2_2}};
@@ -303,22 +243,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters3()
 	{
@@ -367,19 +291,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 */
 	@Test
 	public void testComputeClusters3InvertedGenomes()
 	{
@@ -414,20 +325,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: g
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters3WithInvertedGenomesSingleRef()
 	{
@@ -462,20 +359,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters4()
 	{
@@ -540,21 +423,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters5()
 	{
@@ -605,21 +473,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: dsub2, sub4
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters6()
 	{
@@ -702,22 +555,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 3
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters7()
 	{
@@ -752,22 +589,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 3
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters8()
 	{
@@ -818,21 +639,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2 (cluster isn't contained in genome 3)
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters9()
 	{
@@ -883,21 +689,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2 (cluster isn't contained in genome 3)
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters10()
 	{
@@ -931,21 +722,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2 (cluster isn't contained in genome 1)
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters11()
 	{
@@ -979,20 +755,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2 (cluster isn't contained in genome 3)
-	 * 		contigSpanning: false
-	 */
 	@Test
 	public void testComputeClusters12()
 	{
@@ -1043,19 +805,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 2
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 */
 	@Test
 	public void testComputeClusters13()
 	{
@@ -1090,20 +839,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters14()
 	{
@@ -1153,20 +888,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClustersRefInRef()
 	{
@@ -1201,20 +922,6 @@ public class ReferenceClusterTest
         performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClustersRefInRefWithErrors()
 	{
@@ -1282,20 +989,6 @@ public class ReferenceClusterTest
 		performTest(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 3
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClustersWithGroupedGenomes()
 	{
