@@ -347,8 +347,22 @@ public class GeckoInstance {
 	
 	public void setClusters(GeneCluster[] clusters) {
 		this.data.setClusters(clusters);
-        this.dataUpdated();
+        handleUpdatedClusterResults();
 	}
+
+    private void handleUpdatedClusterResults() {
+        if (GeckoInstance.this.gui != null) {
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
+                    GeckoInstance.this.clusterSelection = null;
+                    GeckoInstance.this.filterString = null;
+                    GeckoInstance.this.gui.getGcSelector().refresh();
+                    GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
+                }
+            });
+        }
+    }
 
     private void dataUpdated() {
         this.reducedList = null;
@@ -439,6 +453,7 @@ public class GeckoInstance {
 	 */
 	public static GeneCluster[] computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping) {
         int intArray[][][] = data.toIntArray();
+        DataSet.printIntArray(intArray);
         params.setAlphabetSize(data.getAlphabetSize());
 		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping);
         GeneCluster[] result = new GeneCluster[refCluster.size()];
@@ -479,15 +494,6 @@ public class GeckoInstance {
         return executor;
 	}
 	
-	void handleUpdatedClusterResults(GeneCluster[] geneClusters) {
-        this.setClusters(geneClusters);
-		this.reducedList = GeneCluster.generateReducedClusterList(this.getClusters());
-		this.clusterSelection = null;
-		this.filterString = null;
-		gui.getGcSelector().refresh();
-		gui.changeMode(Gui.Mode.SESSION_IDLE);
-	}
-	
 	private class ClusterComputationRunnable implements Runnable {
 
 		private final Parameter p;
@@ -522,13 +528,7 @@ public class GeckoInstance {
                 geneClusters = GeneCluster.mergeResults(GeckoInstance.this.getClusters(), res);
 			else
                 geneClusters = res;
-            if (gui != null) {
-			    EventQueue.invokeLater(new Runnable() {
-				    public void run() {
-					    GeckoInstance.this.handleUpdatedClusterResults(geneClusters);
-				    }
-			    });
-            }
+            GeckoInstance.this.setClusters(geneClusters);
 		}
 	}
 	

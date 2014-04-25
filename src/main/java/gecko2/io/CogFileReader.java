@@ -58,6 +58,11 @@ public class CogFileReader implements GeckoDataReader {
      * The input File
      */
     private final File inputFile;
+
+    /**
+     * The list of indices of the genomes that will be imported.
+     * ! Starting with 1, not with 0!
+     */
     private final List<Integer> genomeList;
 	
 	public CogFileReader(File inputFile) {
@@ -67,7 +72,7 @@ public class CogFileReader implements GeckoDataReader {
     /**
      * genomeList is only used for readData(), to still be able to choose genome occurrences
      * @param inputFile the input file
-     * @param genomeList the list of genomes that will be imported
+     * @param genomeList the list of genomes that will be imported. 1 is the first genome, not 0!
      */
     public CogFileReader(File inputFile, List<Integer> genomeList) {
         this.inputFile = inputFile;
@@ -400,7 +405,7 @@ public class CogFileReader implements GeckoDataReader {
         // Choose genomes to import
         if (genomeList != null){
             for (Integer selectedGenome : genomeList) {
-                occs.get(selectedGenome).setFlagged(true);
+                occs.get(selectedGenome-1).setFlagged(true);
             }
         } else {
             for (GenomeOccurrence occ : occs)
