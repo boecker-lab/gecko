@@ -274,12 +274,12 @@ public class StartComputationDialog extends JDialog {
 					Genome[] genomes = new Genome[oldGenomes.length+1];
 					Genome cluster = new Genome();
 					ArrayList<Gene> genes = new ArrayList<>();
-					Map<ExternalGeneId, Integer> revIDMap = Gene.getInverseGeneLabelMap();
+					Map<String, GeneFamily> revIDMap = gecko.getGeneLabelMap();
 					for (String id : refClusterField.getText().split(" "))
 						if (id!=null && (!(id.equals("")))) {
-							Integer iid = revIDMap.get(Integer.parseInt(id)); //TODO contains strings, should not work!
-							if (iid!=null)
-								genes.add(new Gene("", iid));
+							GeneFamily geneFamily = revIDMap.get(id); //TODO contains strings, should not work!
+							if (geneFamily!=null)
+								genes.add(new Gene(geneFamily));
 						}
 					cluster.getChromosomes().add(new Chromosome("Reference cluster", genes, cluster));
 					genomes[0] = cluster;

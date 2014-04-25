@@ -86,7 +86,7 @@ public class GeneElement extends JPanel implements Adjustable {
 	private void updateElement() {
 		this.geneColor = gene.getGeneColor();
 		// Update Orientation
-		if (gene.getId()<0)
+		if (gene.getOrientation().getSign()<0)
 			this.orientation = ORIENTATION_BACKWARDS;
 		else
 			this.orientation = ORIENTATION_FORWARD;

@@ -2,9 +2,9 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 import gecko2.GeckoInstance.ResultFilter;
-import gecko2.algorithm.Gene;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.GeneClusterOccurrence;
+import gecko2.algorithm.GeneFamily;
 import gecko2.algorithm.Parameter;
 import gecko2.event.ClusterSelectionEvent;
 import gecko2.event.ClusterSelectionListener;
@@ -23,6 +23,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
 
 public class GeneClusterSelector extends JPanel implements ClipboardOwner {
@@ -180,8 +181,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
                 GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
                 StringBuilder geneIDs = new StringBuilder();
 
-                for (int geneID : gc.getGenes()) {
-                    geneIDs.append(Gene.getIntegerAlphabet().toArray()[geneID]).append(" ");
+                for (GeneFamily geneFamily : gc.getGeneFamilies()) {
+                    geneIDs.append(geneFamily.getAlgorithmId()).append(" ");
                 }
 
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(geneIDs.toString()), GeneClusterSelector.this);
@@ -472,7 +473,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 				case 0:
 					return matchingClusters.get(rowIndex).getId();
 				case 1:
-					return matchingClusters.get(rowIndex).getGenes().length;
+					return matchingClusters.get(rowIndex).getGeneFamilies().size();
 				case 2:
 					return matchingClusters.get(rowIndex).getSize();
 				case 3:
@@ -480,13 +481,12 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 				case 4:
 					return matchingClusters.get(rowIndex).getBestCorrectedScore();
 				case 5:
-
-                    int[] genes = matchingClusters.get(rowIndex).getGenes();
+                    Set<GeneFamily> genes = matchingClusters.get(rowIndex).getGeneFamilies();
                     ArrayList<String> knownGenes = new ArrayList<>();
 
-                    for (int g : genes)	{
-                        if (!Gene.isUnknownGene(g)) {
-                            knownGenes.add(Gene.getExternalId(g));
+                    for (GeneFamily g : genes)	{
+                        if (!g.isSingleGeneFamily()) {
+                            knownGenes.add(g.getExternalId());
                         }
                     }
 

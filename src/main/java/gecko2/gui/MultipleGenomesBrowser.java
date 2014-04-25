@@ -415,7 +415,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	}
 
 	@Override
-	public void centerCurrentClusterAt(int geneID) {
+	public void centerCurrentClusterAt(GeneFamily geneFamily) {
 		int[] subselections 		= lastLocationEvent.getsubselection();
 		GeneClusterOccurrence gOcc 	= lastLocationEvent.getgOcc();
 		
@@ -430,9 +430,9 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			List<Chromosome> genes = gecko.getGenomes()[i].getChromosomes();
 			Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 			for (int j=s.getStart()-1;j<s.getStop();j++) {
-				if (Math.abs(genes.get(s.getChromosome()).getGenes().get(j).getId())==geneID) {
+				if (genes.get(s.getChromosome()).getGenes().get(j).getGeneFamily().equals(geneFamily)) {
 					positions[i] = j;
-					if (genes.get(s.getChromosome()).getGenes().get(j).getId()<0) 
+					if (genes.get(s.getChromosome()).getGenes().get(j).getOrientation().equals(Gene.GeneOrientation.NEGATIVE))
 						minus.add(i);
 					else
 						plus.add(i);

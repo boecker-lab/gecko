@@ -1,5 +1,6 @@
 package gecko2;
 
+import gecko2.algo.ReferenceCluster;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.*;
 import gecko2.event.DataEvent;
@@ -7,7 +8,6 @@ import gecko2.event.DataListener;
 import gecko2.gui.GenomePainting;
 import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
-import gecko2.io.GeckoDataReader;
 import gecko2.io.ResultWriter;
 import gecko2.io.ResultWriter.ExportType;
 
@@ -24,17 +24,17 @@ import java.util.regex.Pattern;
 public class GeckoInstance {
 	private static GeckoInstance instance;
 
+    private DataSet data;
+
     private native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
-	
-	public enum ResultFilter {showAll, showFiltered, showSelected}
+
+    public enum ResultFilter {showAll, showFiltered, showSelected}
 	
 	private boolean libgeckoLoaded;
 	
-	private File currentInputFile; 
-	private Genome[] genomes = null;
-	
-	private GeneCluster[] clusters;
+	private File currentWorkingDirectoryOrFile;
+
 	private SortedSet<Integer> clusterSelection;
 	private ResultFilter filterSelection = ResultFilter.showAll;
 	private SortedSet<Integer> reducedList;
@@ -42,7 +42,6 @@ public class GeckoInstance {
 	
 	private boolean debug = false;
 	private boolean animationEnabled = true;
-	private File lastSavedFile = null, lastOpenedFile = null, lastExportedFile = null;
 	private Parameter lastParameter;
     private Gui gui;
 
@@ -54,25 +53,9 @@ public class GeckoInstance {
     private final static int MIN_GENEELEMENT_HIGHT = 9;
 
     private int maxGeneNameLength = Integer.MAX_VALUE;
-	private int maxIdLength;
-    private int maxNameLength;
-    private int maxLocusTagLength;
 
     private final EventListenerList eventListener = new EventListenerList();
 	
-	/**
-	 * Setter for the variable maxIdLength which is the length of the
-	 * longest appearing id.
-	 * 
-	 * @param idLength longest id length
-	 */
-	public void setMaxLengths(int idLength, int nameLength, int locusTagLength)
-	{
-		this.maxIdLength = idLength;
-        this.maxNameLength = nameLength;
-        this.maxLocusTagLength = locusTagLength;
-	}
-
     /**
      * Setter for the upper bound of the maximum gene name length.
      * @param maxGeneNameLength the maximum gene name length.
@@ -90,9 +73,9 @@ public class GeckoInstance {
 	{
         int maxLength;
         switch (nameType) {
-            case ID: maxLength = maxIdLength; break;
-            case NAME: maxLength =  maxNameLength; break;
-            case LOCUS_TAG:maxLength =  maxLocusTagLength; break;
+            case ID: maxLength = data.getMaxIdLength(); break;
+            case NAME: maxLength =  data.getMaxNameLength(); break;
+            case LOCUS_TAG:maxLength =  data.getMaxLocusTagLength(); break;
             default:
                 return -1;
         }
@@ -120,28 +103,8 @@ public class GeckoInstance {
 	 * END DataEvents
 	 */
 	
-	public File getLastExportedFile() {
-		return lastExportedFile;
-	}
-	
 	public Parameter getLastParameter() {
 		return lastParameter;
-	}
-
-	public File getLastOpenedFile() {
-		return lastOpenedFile;
-	}
-	
-	public File getLastSavedFile() {
-		return lastSavedFile;
-	}
-	
-	public void setLastOpenedFile(File lastOpenedFile) {
-		this.lastOpenedFile = lastOpenedFile;
-	}
-	
-	public void setLastSavedFile(File lastSavedFile) {
-		this.lastSavedFile = lastSavedFile;
 	}
 	
 	public void setAnimationEnabled(boolean animationEnabled) {
@@ -162,7 +125,7 @@ public class GeckoInstance {
 
 	public synchronized StartComputationDialog getStartComputationDialog() {
 		if (scd==null)
-			scd = new StartComputationDialog(genomes.length);
+			scd = new StartComputationDialog(data.getGenomes().length);
 		return scd;
 	}
 	
@@ -236,15 +199,15 @@ public class GeckoInstance {
 	 * Filter the results with the last filter string
 	 */
 	private void filterResults() {
-		if (clusters==null) return;
+		if (data.getClusters()==null) return;
 		if (filterString == null)
 			filterString = "";
 		if (clusterSelection == null)
 			clusterSelection = new TreeSet<>();
 		if (reducedList == null)
-			reducedList = GeneCluster.generateReducedClusterList(clusters);
+			reducedList = GeneCluster.generateReducedClusterList(data.getClusters());
 		if (filterString.equals("")) {
-			for (GeneCluster c : clusters) {
+			for (GeneCluster c : data.getClusters()) {
 				c.setMatch(false);
 				c.setMatch(applyFilter(c.getId()));
 			}
@@ -254,20 +217,8 @@ public class GeckoInstance {
 			for (int i=0; i<searchPatterns.length; i++) 
 				searchPatterns[i] = Pattern.quote(searchPatterns[i].toLowerCase());
 
-			for (GeneCluster c : clusters) {
+			for (GeneCluster c : data.getClusters()) {
 				c.setMatch(false);
-				
-				// Check if there is a match in the gene label
-				int[] genes = c.getGenes().clone();
-				for (int i=0; i<genes.length; i++)
-                    genes[i] = (Integer) Gene.getIntegerAlphabet().toArray()[genes[i]];
-				String geneString = Arrays.toString(genes);
-				for (String pattern : searchPatterns) {
-					if (geneString.matches(".*[\\[ ,]"+pattern+"[ ,\\]].*")) {
-						c.setMatch(applyFilter(c.getId()));
-						break;
-					}
-				}
 				
 				// Check if there is a match in the genes annotations
 				if (!c.isMatch()) {
@@ -277,7 +228,7 @@ public class GeckoInstance {
 						for (int genome=0; genome<gOcc.getSubsequences().length; genome++) {
 							Subsequence[] subseqs = gOcc.getSubsequences()[genome];
 							for (Subsequence s : subseqs) {
-								for (Gene g : genomes[genome].getSubsequence(s)) {
+								for (Gene g : data.getGenomes()[genome].getSubsequence(s)) {
 									for (String pattern: searchPatterns)
 										if (g.getSummary().toLowerCase().matches(".*"+pattern+".*")) {
 											c.setMatch(applyFilter(c.getId()));
@@ -334,18 +285,25 @@ public class GeckoInstance {
 	 * @return the list of gene clusters
 	 */
 	private List<GeneCluster> getClusterList(ResultFilter filter) {
-		ArrayList<GeneCluster> result = new ArrayList<>(clusters.length);
+		ArrayList<GeneCluster> result = new ArrayList<>(data.getClusters().length);
 		
-		for (int i=0; i<clusters.length; i++) {
+		for (int i=0; i<data.getClusters().length; i++) {
 			if (applyFilter(i, filter))
-				result.add(clusters[i]);
+				result.add(data.getClusters()[i]);
 		}
 		
 		result.trimToSize();
 		return result;		
 	}
-	
-	
+
+    public Color getGeneColor(GeneFamily geneFamily) {
+        return data.getGeneColor(geneFamily);
+    }
+
+    public Map<String, GeneFamily> getGeneLabelMap() {
+        return data.getGeneLabelMap();
+    }
+
 	public int getGeneElementHight() {
 		return geneElementHight;
 	}
@@ -383,70 +341,93 @@ public class GeckoInstance {
 	}
 	
 	public void setGenomes(Genome[] genomes) {
-		this.genomes = genomes;
+        this.data.setGenomes(genomes);
+        dataUpdated();
+	}
+	
+	public void setClusters(GeneCluster[] clusters) {
+		this.data.setClusters(clusters);
+        handleUpdatedClusterResults();
+	}
+
+    private void handleUpdatedClusterResults() {
+        if (GeckoInstance.this.gui != null) {
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
+                    GeckoInstance.this.clusterSelection = null;
+                    GeckoInstance.this.filterString = null;
+                    GeckoInstance.this.gui.getGcSelector().refresh();
+                    GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
+                }
+            });
+        }
+    }
+
+    private void dataUpdated() {
+        this.reducedList = null;
         if (this.gui != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (GeckoInstance.this.genomes != null)
-                        scd = new StartComputationDialog(GeckoInstance.this.genomes.length);
+                    if (data.getGenomes() != null)
+                        scd = new StartComputationDialog(data.getGenomes().length);
                     else
                         scd = null;
                     gui.updateViewscreen();
+                    gui.getGcSelector().refresh();
                 }
             });
         } else
             scd = null;
-		this.fireDataChanged();
-	}
-	
-	public void setClusters(GeneCluster[] clusters) {
-		this.clusters = clusters;
-        this.reducedList = null;
-		
-		if (gui != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    gui.getGcSelector().refresh();
-                }
-            });
-        }
-	}
+        this.fireDataChanged();
+    }
 
-    public void setGeckoInstanceFromReader(final GeckoDataReader reader) {
-        setMaxLengths(reader.getMaxIdLength(), reader.getMaxNameLength(), reader.getMaxLocusTagLength());
-        setClusters(reader.getGeneClusters());
-        Gene.setGeneLabelMap(reader.getGeneLabelMap());
-        setGenomes(reader.getGenomes());
-        if (gui != null){
-            SwingUtilities.invokeLater(new Runnable() {
+    public DataSet getData() {
+        return data;
+    }
+
+    public void setGeckoInstanceData(){
+        setGeckoInstanceData(this.data);
+    }
+
+    public void setGeckoInstanceData(final DataSet data) {
+        this.data = data;
+        if (gui != null) {
+            Runnable updateGui = new Runnable() {
                 @Override
                 public void run() {
                     gui.updateViewscreen();
                     gui.updategcSelector();
-                    gui.changeMode(Gui.Mode.SESSION_IDLE);
+                    if (data.equals(DataSet.getEmptyDataSet()))
+                        gui.changeMode(Gui.Mode.NO_SESSION);
+                    else
+                        gui.changeMode(Gui.Mode.SESSION_IDLE);
                 }
-            });
-        }
+            };
 
-        GeckoInstance.getInstance().fireDataChanged();
+            if (SwingUtilities.isEventDispatchThread())
+                updateGui.run();
+            else
+                SwingUtilities.invokeLater(updateGui);
+
+            dataUpdated();
+        }
     }
 	
 	public GeneCluster[] getClusters() {
-		return clusters;
+		return data.getClusters();
 	}
 	
-	public File getCurrentInputFile() {
-		return currentInputFile;
+	public File getCurrentWorkingDirectoryOrFile() {
+		return currentWorkingDirectoryOrFile;
 	}
 
-	public void setCurrentInputFile(File currentInputFile) {
-		this.currentInputFile = currentInputFile;
+	public void setCurrentWorkingDirectoryOrFile(File currentWorkingDirectoryOrFile) {
+		this.currentWorkingDirectoryOrFile = currentWorkingDirectoryOrFile;
 	}
 
 	private GeckoInstance() {
-		this.clusters = new GeneCluster[0];
 		this.setGeneElementHight(DEFAULT_GENE_HIGHT);
 		ToolTipManager.sharedInstance().setInitialDelay(0);
 	}
@@ -460,50 +441,56 @@ public class GeckoInstance {
 	
 	/**
 	 * Computes the gene clusters for the given genomes with the given parameters
-	 * @param genomes the genomes
+	 * @param data the data
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClustersJava(int[][][] genomes, Parameter params) {
-		return computeClustersJava(genomes, params, null);
+	public static GeneCluster[] computeClustersJava(DataSet data, Parameter params) {
+		return computeClustersJava(data, params, null);
 	}
 	
 	/**
 	 * Computes the gene clusters for the given genomes with the given parameters
-	 * @param genomes the genomes
+	 * @param data the data
 	 * @param params the parameters
 	 * @param genomeGrouping the grouping of the genomes, only one genome per group is used for quorum and p-value
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClustersJava(int[][][] genomes, Parameter params, List<Set<Integer>> genomeGrouping) {
-		return ReferenceClusterAlgorithm.computeReferenceClusters(genomes, params, genomeGrouping);
+	public static GeneCluster[] computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping) {
+        int intArray[][][] = data.toIntArray();
+        DataSet.printIntArray(intArray);
+        params.setAlphabetSize(data.getAlphabetSize());
+		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping);
+        GeneCluster[] result = new GeneCluster[refCluster.size()];
+        for (int i=0; i<refCluster.size(); i++)
+            result[i] = new GeneCluster(i, refCluster.get(i), data);
+        return result;
 	}
 	
 	/**
 	 * Computes the gene clusters for the given genomes with the given parameters
-	 * @param genomes the genomes
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClustersLibgecko(int[][][] genomes, Parameter params) {
-		return computeClusters(genomes, params, GeckoInstance.this);
+	public GeneCluster[] computeClustersLibgecko(DataSet data, Parameter params) {
+        int intArray[][][] = data.toIntArray();
+        params.setAlphabetSize(data.getAlphabetSize());
+		return computeClusters(intArray, params, GeckoInstance.this);
 	}
 	
 	/**
 	 * Computes the gene clusters for the given genomes with the given parameters
-	 * @param genomes the genomes
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClusters(int[][][] genomes, Parameter params) {
-		return computeClustersJava(genomes, params);
-		//return computeClustersLibgecko(genomes, params);
+	public GeneCluster[] computeClusters(Parameter params) {
+		return computeClustersJava(data, params);
+		//return computeClustersLibgecko(data, params);
 	}
 	
 	public ExecutorService performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
 		lastParameter = p;
-		p.setAlphabetSize(Gene.getAlphabetSize());
         if (gui != null)
 		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
 		ClusterComputationRunnable clusterComputation = new ClusterComputationRunnable(p, mergeResults, genomeGroupingFactor);
@@ -512,26 +499,11 @@ public class GeckoInstance {
         return executor;
 	}
 	
-	void handleUpdatedClusterResults() {
-		if (this.clusters==null) {
-			this.clusters = new GeneCluster[0];
-		}
-		this.reducedList = GeneCluster.generateReducedClusterList(this.clusters);
-		this.clusterSelection = null;
-		this.filterString = null;
-		gui.getGcSelector().refresh();
-		gui.changeMode(Gui.Mode.SESSION_IDLE);
-	}
-	
 	private class ClusterComputationRunnable implements Runnable {
 
 		private final Parameter p;
 		private final boolean mergeResults;
         private final double groupingFactor;
-		
-		public ClusterComputationRunnable(Parameter p){
-			this(p, false, -1.0);
-		}
 		
 		public ClusterComputationRunnable(Parameter p, boolean mergeResults, double groupingFactor) {
 			this.p = p;
@@ -550,25 +522,18 @@ public class GeckoInstance {
 			// during the JNI<->JAVA phase
             List<Set<Integer>> genomeGroups = null;
             if (groupingFactor <= 1.0)
-                genomeGroups = BreakPointDistance.groupGenomes(genomes, groupingFactor, false);
-
-            int genomes[][][] = Genome.toIntArray(GeckoInstance.this.genomes);
+                genomeGroups = BreakPointDistance.groupGenomes(data, groupingFactor, false);
 			
 			Date before = new Date();
-			GeneCluster[] res = computeClustersJava(genomes, p, genomeGroups);
+			GeneCluster[] res = computeClustersJava(data, p, genomeGroups);
 			Date after = new Date();
 			System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
-			if (mergeResults)				
-				GeckoInstance.this.clusters = GeneCluster.mergeResults(GeckoInstance.this.clusters, res);
+            final GeneCluster[] geneClusters;
+			if (mergeResults)
+                geneClusters = GeneCluster.mergeResults(GeckoInstance.this.getClusters(), res);
 			else
-				GeckoInstance.this.clusters = res;
-            if (gui != null) {
-			    EventQueue.invokeLater(new Runnable() {
-				    public void run() {
-					    GeckoInstance.this.handleUpdatedClusterResults();
-				    }
-			    });
-            }
+                geneClusters = res;
+            GeckoInstance.this.setClusters(geneClusters);
 		}
 	}
 	
@@ -577,12 +542,7 @@ public class GeckoInstance {
 			System.err.println("Running in visualization only mode! Cannot compute statistics!");
 			return clusters;
 		}
-		int genomes[][][] = new int[GeckoInstance.this.genomes.length][][];
-		for (int i=0;i<genomes.length;i++) {
-			genomes[i] = new int[GeckoInstance.this.genomes[i].getChromosomes().size()][];
-			for (int j=0;j<genomes[i].length;j++)
-				genomes[i][j] = GeckoInstance.this.genomes[i].getChromosomes().get(j).toIntArray(true, true);
-		}
+		int genomes[][][] = data.toIntArray();
 		int maxPWDelta = 0;
 		int minClusterSize = Integer.MAX_VALUE;
 		int minQuorum = Integer.MAX_VALUE;
@@ -593,7 +553,7 @@ public class GeckoInstance {
 		}
 		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.length));
 		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(Gene.getAlphabetSize());
+		p.setAlphabetSize(data.getAlphabetSize());
 		return this.computeReferenceStatistics(genomes, p, clusters, this);
 	}
 	
@@ -636,18 +596,14 @@ public class GeckoInstance {
 	}
 	
 	public Genome[] getGenomes() {
-		return genomes;
-	}
-	
-	public void setLastOpendFile(File lastOpenedFile) {
-		this.lastOpenedFile = lastOpenedFile;
+		return data.getGenomes();
 	}
 	
 	public boolean exportResultsToFile(File f, ResultFilter filter, ExportType type) {
-		lastExportedFile = f;
+        setCurrentWorkingDirectoryOrFile(f);
 		filterResults();
-		List<String> genomeNames = new ArrayList<>(genomes.length);
-		for (Genome genome : genomes)
+		List<String> genomeNames = new ArrayList<>(data.getGenomes().length);
+		for (Genome genome : data.getGenomes())
 			genomeNames.add(genome.getName());
 		return ResultWriter.exportResultsToFile(f, getClusterList(filter), genomeNames, type);
 	}

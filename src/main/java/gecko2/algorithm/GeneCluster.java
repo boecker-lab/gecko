@@ -19,7 +19,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	private static final long serialVersionUID = -5371037483783752995L;
 
 	private int id;
-	private final int[] genes;
+	private final Set<GeneFamily> geneFamilies;
 	private int size;
 	private boolean match;
 	private final BigDecimal bestPValue;
@@ -30,11 +30,22 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	private final Parameter.OperationMode type;
 	// The index of the subsequence containing the reference genecluster
 	private final int refSeqIndex;
-	
-	public GeneCluster(int id, 
+
+    /**
+     * Wrapper constructor for the c library
+     * @param id
+     * @param bestOccurrences
+     * @param allOccurrences
+     * @param geneFamilies
+     * @param bestPValue
+     * @param bestPValueCorrected
+     * @param minTotalDist
+     * @param refSeqIndex
+     * @param type
+     */
+	/*public GeneCluster(int id,
 			GeneClusterOccurrence[] bestOccurrences, 
-			GeneClusterOccurrence[] allOccurrences, 
-			int[] genes, 
+			GeneClusterOccurrence[] allOccurrences,
 			double bestPValueBase,
 			int bestPValueExp,
 			double bestPValueCorrectedBase,
@@ -43,14 +54,14 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 			int refSeqIndex,
 			char type) 
 	{
-		this(id, bestOccurrences, allOccurrences, genes, (new BigDecimal(bestPValueBase)).scaleByPowerOfTen(bestPValueExp), (new BigDecimal(bestPValueCorrectedBase)).scaleByPowerOfTen(bestPValueCorrectedExp), minTotalDist, refSeqIndex, Parameter.OperationMode.getOperationModeFromChar(type));
-	}
+		this(id, bestOccurrences, allOccurrences, (new BigDecimal(bestPValueBase)).scaleByPowerOfTen(bestPValueExp), (new BigDecimal(bestPValueCorrectedBase)).scaleByPowerOfTen(bestPValueCorrectedExp), minTotalDist, refSeqIndex, Parameter.OperationMode.getOperationModeFromChar(type));
+	}*/
 		
 	public GeneCluster(int id, 
 			GeneClusterOccurrence[] bestOccurrences, 
-			GeneClusterOccurrence[] allOccurrences, 
-			int[] genes, 
-			BigDecimal bestPValue, 
+			GeneClusterOccurrence[] allOccurrences,
+            Set<GeneFamily> geneFamilies,
+            BigDecimal bestPValue,
 			BigDecimal bestPValueCorrected,
 			int minTotalDist, 
 			int refSeqIndex,
@@ -62,30 +73,27 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		if (allOccurrences!=null && allOccurrences.length!=0)
 			for (Subsequence[] subSeqs : allOccurrences[0].getSubsequences())
 				if (subSeqs.length>0) size++;
-		
+
 		this.bestPValue = bestPValue;
 		this.bestPValueCorrected = bestPValueCorrected;
 		this.bestOccurrences = bestOccurrences;
 		this.allOccurrences = allOccurrences;
+        this.geneFamilies = new HashSet<>(geneFamilies);
 		this.refSeqIndex = refSeqIndex;
 		this.minTotalDist = minTotalDist;
 		this.type = type;
 
-		this.genes = genes;
 		this.id = id;
 	}
 	
-	public GeneCluster(int id, ReferenceCluster refCluster){
+	public GeneCluster(int id, ReferenceCluster refCluster, DataSet data){
 		this.id = id;
 		this.match = true;
 		this.bestPValue = refCluster.getBestCombined_pValue();
 		this.bestPValueCorrected = refCluster.getBestCombined_pValueCorrected();
 		this.refSeqIndex = refCluster.getGenomeNr();
 		this.type = Parameter.OperationMode.reference;
-		this.genes = new int[refCluster.getGeneContent().size()];
-		for (int i=0; i<refCluster.getGeneContent().size(); i++)
-			genes[i] = refCluster.getGeneContent().get(i);
-		
+
 		this.size = 0;
 		this.minTotalDist = 0;
 		int[] minDistances = refCluster.getMinimumDistances();
@@ -95,6 +103,12 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				this.minTotalDist += dist;
 			}
 		}
+
+        geneFamilies = new HashSet<>();
+        for (int i=refCluster.getLeftBorder()-1; i<refCluster.getRightBorder() && geneFamilies.size()<refCluster.getSize(); i++){
+            geneFamilies.add(data.getGenomes()[refCluster.getGenomeNr()].getChromosomes().get(refCluster.getChrNr()).getGenes().get(i).getGeneFamily());
+        }
+
 
 		Subsequence[][] bestSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
 		Subsequence[][] allSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
@@ -270,9 +284,27 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		this.id = id;
 	}
 		
-	public int[] getGenes() {
-		return genes;
+	public Set<GeneFamily> getGeneFamilies() {
+		return geneFamilies;
 	}
+
+    public String getGeneFamilyString() {
+        int iMax = geneFamilies.size() - 1;
+        if (iMax == -1)
+            return "[]";
+
+        StringBuilder b = new StringBuilder();
+        b.append('[');
+        int i=0;
+        for (GeneFamily geneFamily : geneFamilies) {
+            b.append(geneFamily.getExternalId());
+            if (i++ == iMax)
+                b.append(']');
+            else
+                b.append(", ");
+        }
+        return b.toString();
+    }
 	
 	public int getSize() {
 		return size;
@@ -340,23 +372,23 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 			}
 		}
 		builder.chromosomes(chromosomes);
-		Map<Integer, Gene[][]> annotations = generateAnnotations(occ);
+		Map<GeneFamily, Gene[][]> annotations = generateAnnotations(occ);
 		
-		Map<Integer, Gene[][]> newAnnotations = new HashMap<>();
-		for (Map.Entry<Integer, Gene[][]> entry : annotations.entrySet())
-			newAnnotations.put(Math.abs(entry.getKey()), entry.getValue());
+		Map<GeneFamily, Gene[][]> newAnnotations = new HashMap<>();
+		for (Map.Entry<GeneFamily, Gene[][]> entry : annotations.entrySet())
+			newAnnotations.put(entry.getKey(), entry.getValue());
 		
 		builder.annotations(newAnnotations);
 		
-		List<List<List<Integer>>> intervals = new ArrayList<>(tempIntervals.size());
+		List<List<List<Gene>>> intervals = new ArrayList<>(tempIntervals.size());
 		for (List<Gene[]> oldIntervalsPerGenome : tempIntervals) {
 			if (oldIntervalsPerGenome != null) {
-				List<List<Integer>> newIntevalsPerGenome = new ArrayList<>(oldIntervalsPerGenome.size());
+				List<List<Gene>> newIntevalsPerGenome = new ArrayList<>(oldIntervalsPerGenome.size());
 				for (Gene[] genes : oldIntervalsPerGenome) {
-					List<Integer> interval = new ArrayList<>(genes.length);
+					List<Gene> interval = new ArrayList<>(genes.length);
 					for (Gene gene : genes) {
-						//String[] geneLabel = GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(gene.getId()));
-						interval.add(gene.getId());// >= 0 ? geneLabel : -geneLabel);
+						//String[] geneLabel = GeckoInstance.getInstance().getGenLabelMap().get(Math.abs(gene.getExternalId()));
+						interval.add(gene);// >= 0 ? geneLabel : -geneLabel);
 					}
 					newIntevalsPerGenome.add(interval);
 				}
@@ -511,13 +543,13 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
      * a gene with that id does not occur in the subsequence (that is refered by the GeneCluster)
      * of that genome.
      */
-    public Map<Integer, Gene[]> generateAnnotations(GeneClusterOccurrence gOcc, int[] subselection) {
+    public Map<GeneFamily, Gene[]> generateAnnotations(GeneClusterOccurrence gOcc, int[] subselection) {
         GeckoInstance instance = GeckoInstance.getInstance();
 
         Subsequence[][] subsequences = gOcc.getSubsequences();
-        HashMap<Integer, Gene[]> map = new HashMap<>();
-        for (int gene : genes) {
-            if (!Gene.isUnknownGene(gene))
+        HashMap<GeneFamily, Gene[]> map = new HashMap<>();
+        for (GeneFamily gene : geneFamilies) {
+            if (!gene.isSingleGeneFamily())
                 map.put(gene, new Gene[subsequences.length]);
         }
         for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
@@ -528,8 +560,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             Chromosome chromosome = instance.getGenomes()[seqnum].getChromosomes().get(subseq.getChromosome());
             for (int i=subseq.getStart()-1; i<subseq.getStop(); i++) {
                 Gene gene = chromosome.getGenes().get(i);
-                if (map.containsKey(Math.abs(gene.getId()))) {
-                    Gene[] g = map.get(Math.abs(gene.getId()));
+                if (map.containsKey(gene.getGeneFamily())) {
+                    Gene[] g = map.get(gene.getGeneFamily());
                     if (g[seqnum]==null) g[seqnum]=gene;
                 }
             }
@@ -537,26 +569,26 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return map;
     }
 
-    public static int getMaximumIdLength(Map<Integer, Gene[]> annotations) {
+    public static int getMaximumIdLength(Map<GeneFamily, Gene[]> annotations) {
         int maxIdLength = -1;
 
-        for (Integer geneId : annotations.keySet())
-            if (Gene.getExternalId(geneId).length() > maxIdLength)
-                maxIdLength = Gene.getExternalId(geneId).length();
+        for (GeneFamily geneFamily : annotations.keySet())
+            if (geneFamily.getExternalId().length() > maxIdLength)
+                maxIdLength = geneFamily.getExternalId().length();
 
         return maxIdLength;
     }
 
-    public Map<Integer, Gene[][]> generateAnnotations(GeneClusterOccurrence gOcc) {
+    public Map<GeneFamily, Gene[][]> generateAnnotations(GeneClusterOccurrence gOcc) {
         GeckoInstance instance = GeckoInstance.getInstance();
         Subsequence[][] subsequences = gOcc.getSubsequences();
-        HashMap<Integer, Gene[][]> map = new HashMap<>();
-        for (int gene : genes) {
-            if (!Gene.isUnknownGene(gene)) {
+        HashMap<GeneFamily, Gene[][]> map = new HashMap<>();
+        for (GeneFamily geneFamily : geneFamilies) {
+            if (!geneFamily.isSingleGeneFamily()) {
                 Gene[][] geneArray = new Gene[subsequences.length][];
                 for (int i=0; i<subsequences.length; i++)
                     geneArray[i] = new Gene[subsequences[i].length];
-                map.put(gene, geneArray);
+                map.put(geneFamily, geneArray);
             }
         }
         for (int seqnum=0; seqnum<subsequences.length; seqnum++) {
@@ -565,8 +597,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
                 Chromosome chromosome = instance.getGenomes()[seqnum].getChromosomes().get(subseq.getChromosome());
                 for (int j=subseq.getStart()-1; j<subseq.getStop(); j++) {
                     Gene gene = chromosome.getGenes().get(j);
-                    if (map.containsKey(Math.abs(gene.getId()))) {
-                        Gene[][] g = map.get(Math.abs(gene.getId()));
+                    if (map.containsKey(gene.getGeneFamily())) {
+                        Gene[][] g = map.get(gene.getGeneFamily());
                         if (g[seqnum][i]==null)
                             g[seqnum][i] = gene;
                     }
@@ -655,7 +687,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
                 Gene firstGene = chromosome.getGenes().get(subseq.getStart()-1);
                 for (int j=subseq.getStart(); j<subseq.getStop() && isLinear; j++) {
                     Gene gene = chromosome.getGenes().get(j);
-                    if (Integer.signum(firstGene.getId()) != Integer.signum(gene.getId()) && !gene.isUnknown()) {
+                    if (firstGene.getOrientation() != gene.getOrientation() && !gene.isUnknown()) {
                         isLinear = false;
                     }
                 }
@@ -709,4 +741,16 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		
 		return resultList;
 	}
+
+    @Override
+    public String toString() {
+        return "GeneCluster{" +
+                "id=" + id +
+                ", geneFamilies=" + getGeneFamilyString() +
+                ", size=" + size +
+                ", bestPValue=" + bestPValue +
+                ", minTotalDist=" + minTotalDist +
+                ", refSeqIndex=" + refSeqIndex +
+                '}';
+    }
 }
