@@ -1,8 +1,9 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
-import gecko2.io.GenomeOccurrence;
+import gecko2.algorithm.DataSet;
 import gecko2.io.CogFileReader;
+import gecko2.io.GenomeOccurrence;
 import gecko2.util.SortUtils;
 
 import javax.swing.*;
@@ -27,6 +28,7 @@ public class GenomeSelector extends JDialog {
 
 	private static final long serialVersionUID = -8491964493540715101L;
     private final CogFileReader reader;
+    private DataSet data;
 	private final List<GenomeOccurrence> occs;
 	private final short[] borders;
 	private int highID =0;
@@ -52,7 +54,7 @@ public class GenomeSelector extends JDialog {
 		recomputeBorders();
 		// Create the color map for the initial singleton groups
 		rand = new Random();
-        HashMap<Integer, Color> colorMap = new HashMap<Integer, Color>();
+        HashMap<Integer, Color> colorMap = new HashMap<>();
 		for (GenomeOccurrence occ : occs) {
 			if (!colorMap.containsKey(occ.getGroup()))
 				colorMap.put(occ.getGroup(), getRandomColor());
@@ -142,7 +144,7 @@ public class GenomeSelector extends JDialog {
                     @Override
                     protected Void doInBackground() {
                         try {
-                            reader.readFileContent();
+                            data = reader.readFileContent();
                         } catch (IOException e) {
                             EventQueue.invokeLater(new Runnable() {
                                 public void run() {
@@ -172,7 +174,7 @@ public class GenomeSelector extends JDialog {
                         } catch (InterruptedException | ExecutionException e) {
                             e.printStackTrace();
                         }
-                        GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
+                        GeckoInstance.getInstance().setGeckoInstanceData(data);
                     }
                 };
                 worker.execute();
@@ -226,7 +228,7 @@ public class GenomeSelector extends JDialog {
 			private static final long serialVersionUID = -6309595381945331217L;
 
 			public void actionPerformed(ActionEvent e) {
-				Stack<Integer> touchedGroups = new Stack<Integer>();
+				Stack<Integer> touchedGroups = new Stack<>();
 				for (int row : table.getSelectedRows()) {
 					if (occs.get(row).getGroup()!=0) touchedGroups.push(occs.get(row).getGroup());
 					occs.get(row).setGroup(0);

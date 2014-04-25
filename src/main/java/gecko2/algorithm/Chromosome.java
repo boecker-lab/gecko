@@ -1,6 +1,7 @@
 package gecko2.algorithm;
 
 import gecko2.GeckoInstance;
+import gecko2.algorithm.util.MutableInteger;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -74,59 +75,66 @@ public class Chromosome implements Serializable {
         return result;
     }
 
-    public int[] toIntArray(boolean addZeros, boolean abs) {
-		int array[];
-		if (!addZeros) {
-			array = new int[genes.size()];
-			if (abs)
-				for (int i=0;i<array.length;i++) 
-					array[i] = Math.abs(genes.get(i).getId());
-			else
-				for (int i=0;i<array.length;i++) 
-					array[i] = genes.get(i).getId();
-		} else {
-			array = new int[genes.size()+2];
-			array[0] = 0;
-			if (abs)
-				for (int i=1;i<array.length-1;i++) 
-					array[i] = Math.abs(genes.get(i-1).getId());
-			else
-				for (int i=1;i<array.length-1;i++) 
-					array[i] = genes.get(i-1).getId();
-			array[array.length-1]=0;
-		}
-		return array;
+    /**
+     * Returns the int array from the list of genes.
+     * @param genes the list of Gene
+     * @param unHomologueGeneFamilyId the first id that is used for un-homologue genes
+     * @param addZeros if the array should begin and end with 0
+     * @param abs use absolute gene ids, incompatible with useReduction
+     * @return the array of gene ids
+     */
+    private static int[] toIntArray(List<Gene> genes, MutableInteger unHomologueGeneFamilyId, boolean addZeros, boolean abs) {
+        int array[] = addZeros?new int[genes.size()+2]:new int[genes.size()];
+        final int offset = addZeros?1:0;
+
+        if (addZeros) {
+            array[0] = 0;
+            array[array.length-1] = 0;
+        }
+
+        for (int i=0;i<genes.size();i++) {
+            int family;
+            if (genes.get(i).isUnknown()) {
+                family = unHomologueGeneFamilyId.getValue();
+                unHomologueGeneFamilyId.setValue(family + 1);
+            } else {
+                family = genes.get(i).getAlgorithmId();
+            }
+            array[i+offset] = abs ? family : family * genes.get(i).getOrientation().getSign();
+        }
+
+        return array;
+    }
+
+    /**
+     * Returns the int array for this chromosome. All un-homologue genes will have id -1
+     * @param addZeros if the array should begin and end with 0
+     * @return the array of gene ids
+     */
+    public int[] toReducedIntArray(boolean addZeros) {
+        int array[] = addZeros?new int[genes.size()+2]:new int[genes.size()];
+        final int offset = addZeros?1:0;
+
+        if (addZeros) {
+            array[0] = 0;
+            array[array.length-1] = 0;
+        }
+
+        for (int i=0;i<genes.size();i++) {
+            array[i+offset] = genes.get(i).isUnknown() ? -1 : genes.get(i).getAlgorithmId();
+        }
+        return array;
+    }
+
+    public int[] toIntArray(MutableInteger unHomologueGeneFamilyId, boolean addZeros, boolean abs) {
+        return toIntArray(genes, unHomologueGeneFamilyId, addZeros, abs);
 	}
-	
-	public int[] toRandomIntArray(boolean addZeros, boolean abs) {
-		int array[];
-		List<Gene> tmp = new ArrayList<Gene>(genes);
-		Collections.shuffle(tmp);
-		if (!addZeros) {
-			array = new int[genes.size()];
-			if (abs)
-				for (int i=0;i<array.length;i++) 
-					array[i] = Math.abs(tmp.get(i).getId());
-			else
-				for (int i=0;i<array.length;i++) 
-					array[i] = tmp.get(i).getId();
-		} else {
-			array = new int[tmp.size()+2];
-			array[0] = 0;
-			if (abs)
-				for (int i=1;i<array.length-1;i++) 
-					array[i] = Math.abs(tmp.get(i-1).getId());
-			else
-				for (int i=1;i<array.length-1;i++) 
-					array[i] = tmp.get(i-1).getId();
-			array[array.length-1]=0;
-		}
-		return array;
-	}
-	
-	public int[] toIntArray() {
-		return this.toIntArray(false, false);
-	}
+
+    public int[] toRandomIntArray(MutableInteger unHomologueGeneFamilyId, boolean addZeros, boolean abs) {
+        List<Gene> tmp = new ArrayList<>(genes);
+        Collections.shuffle(tmp);
+        return toIntArray(tmp, unHomologueGeneFamilyId, addZeros, abs);
+    }
 	
 	private Genome getParent() {
 		return parent;

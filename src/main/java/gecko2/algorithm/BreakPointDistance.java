@@ -4,35 +4,25 @@ import java.util.*;
 
 public class BreakPointDistance {
 	
-	public static void breakPointDistance(Genome[] genomes, boolean signed) {
-		breakPointDistance(genomes, signed, false);
+	public static void breakPointDistance(DataSet data, boolean signed) {
+		breakPointDistance(data, signed, false);
 	}
 	
-	public static void breakPointDistanceRandom(Genome[] genomes, boolean signed) {
-		breakPointDistance(genomes, signed, true);
+	public static void breakPointDistanceRandom(DataSet data, boolean signed) {
+		breakPointDistance(data, signed, true);
 	}
 	
-	public static int[][] computeBreakPointDistance(Genome[] genomes, boolean signed, boolean random) {
-		List<int[][]> chromosomes = new ArrayList<int[][]>(genomes.length);
-		for (Genome g: genomes){
-			int[][] chromArray = new int[g.getChromosomes().size()][];
-			for (int i=0; i<g.getChromosomes().size(); i++){
-				if (random)
-					chromArray[i] = g.getChromosomes().get(i).toRandomIntArray(false, false);
-				else
-					chromArray[i] = g.getChromosomes().get(i).toIntArray(false, false);
-			}
-			chromosomes.add(chromArray);
-		}
-		return computeBreakPointDistance(chromosomes, signed);
+	public static int[][] computeBreakPointDistance(DataSet data, boolean signed, boolean random) {
+		int[][][] genomes = random ? data.toSignedRandomIntArray() : data.toSignedIntArray();
+		return computeBreakPointDistance(genomes, signed);
 	}
 	
-	public static int[][] computeBreakPointDistance(List<int[][]> genomes, boolean signed) {
-		int[][] result = new int[genomes.size()][genomes.size()];
+	public static int[][] computeBreakPointDistance(int[][][] genomes, boolean signed) {
+		int[][] result = new int[genomes.length][genomes.length];
 		
-		List<BreakPointVector> breakPointVectors = new ArrayList<BreakPointVector> (genomes.size());
-		for (int i=0; i<genomes.size(); i++) {
-			BreakPointVector currentVector = new BreakPointVector(genomes.get(i), signed);
+		List<BreakPointVector> breakPointVectors = new ArrayList<> (genomes.length);
+		for (int i=0; i<genomes.length; i++) {
+			BreakPointVector currentVector = new BreakPointVector(genomes[i], signed);
 
 			breakPointVectors.add(currentVector);
 			
@@ -47,31 +37,31 @@ public class BreakPointDistance {
 		return result;
 	}
 	
-	public static void groupGenomes(Genome[] genomes, double minThreshold, double maxThreshold, double stepSize, boolean signed){
-		int[][] distances = computeBreakPointDistance(genomes, signed, false);
+	public static void groupGenomes(DataSet data, double minThreshold, double maxThreshold, double stepSize, boolean signed){
+		int[][] distances = computeBreakPointDistance(data, signed, false);
 		
 		System.out.print("[");
-		for (int i=0; i<genomes.length; i++){
-			System.out.print(genomes[i].getName());
-			if (i!=genomes.length-1)
+		for (int i=0; i<data.getGenomes().length; i++){
+			System.out.print(data.getGenomes()[i].getName());
+			if (i!=data.getGenomes().length-1)
 				System.out.print(", ");
 		}
 		System.out.println("]");
 		
 		for (double d=minThreshold; d<maxThreshold; d+=stepSize) {
 			System.out.println("Threshold: " + d);
-			System.out.println(groupGenomes(distances, genomes, d));
+			System.out.println(groupGenomes(distances, data, d));
 		}
 	}
 	
-	public static List<Set<Integer>> groupGenomes(Genome[] genomes, double threshold, boolean signed){
-		int[][] distances = computeBreakPointDistance(genomes, signed, false);
-		return groupGenomes(distances, genomes, threshold);
+	public static List<Set<Integer>> groupGenomes(DataSet data, double threshold, boolean signed){
+		int[][] distances = computeBreakPointDistance(data, signed, false);
+		return groupGenomes(distances, data, threshold);
 	}
 	
-	private static void breakPointDistance(Genome[] genomes, boolean signed, boolean random) {
-		int[][] result = computeBreakPointDistance(genomes, signed, random);
-		printBreakPointDistanceArray(result, genomes);
+	private static void breakPointDistance(DataSet data, boolean signed, boolean random) {
+		int[][] result = computeBreakPointDistance(data, signed, random);
+		printBreakPointDistanceArray(result, data.getGenomes());
 	}
 	
 	static void printBreakPointDistanceColumn(int[][] distances, Genome[] genomes) {
@@ -101,11 +91,11 @@ public class BreakPointDistance {
 		}
 	}
 	
-	static List<Set<Integer>> groupGenomes(int[][] d, Genome[] genomes, double threshold) {
-		double[][] distances = normalizeDistances(d, genomes);
+	static List<Set<Integer>> groupGenomes(int[][] d, DataSet data, double threshold) {
+		double[][] distances = normalizeDistances(d, data.getGenomes());
 		
 		List<Set<Integer>> cluster = new ArrayList<Set<Integer>>();
-		int[] setIndex = new int[genomes.length];
+		int[] setIndex = new int[data.getGenomes().length];
 		for (int i=0; i<distances.length; i++){
 			boolean added = false;
 			for (int j=0; j<i; j++){

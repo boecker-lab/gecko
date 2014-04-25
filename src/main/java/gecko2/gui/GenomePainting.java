@@ -3,6 +3,7 @@ package gecko2.gui;
 import gecko2.GeckoInstance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
+import gecko2.algorithm.GeneFamily;
 import gecko2.algorithm.Genome;
 
 import javax.swing.*;
@@ -40,18 +41,7 @@ public class GenomePainting {
         }
     }
 
-    public enum GeneOrientation {LEFT, RIGHT, NONE;
-
-        public static GeneOrientation getOrientationFromGeneId(int geneId) {
-            if (geneId < 0)
-                return LEFT;
-            if (geneId > 0)
-                return RIGHT;
-            return NONE;
-        }
-    }
-	
-	/**
+    /**
 	 * Paints the header of the genome.
 	 * @param g the Graphics
 	 * @param text the genome name or number
@@ -122,7 +112,7 @@ public class GenomePainting {
 
     /**
      * Paints one gene, the gene text is automatically generated from the gene id, the gecko gene label map and the nameType,
-     * the orientation is generated from the gene id (id < 0 = LEFT, id > 0 = RIGHT)
+     * the orientation is generated from the gene id (id < 0 = NEGATIVE, id > 0 = POSITIVE)
      * @param g the Graphics
      * @param gene the gene
      * @param nameType the type of name information that shall be used
@@ -137,7 +127,7 @@ public class GenomePainting {
      * @return the x coordinate after the painting
      */
     public static int paintGene(Graphics g, Gene gene, NameType nameType, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
-        return paintGene(g, gene, nameType, GeneOrientation.getOrientationFromGeneId(gene.getId()), backgroundColor, color, x, y, width, height, hgap, vgap);
+        return paintGene(g, gene, nameType, gene.getOrientation(), backgroundColor, color, x, y, width, height, hgap, vgap);
     }
 
     /**
@@ -145,7 +135,7 @@ public class GenomePainting {
      * @param g the Graphics
      * @param gene the gene
      * @param nameType the type of name information that shall be used
-     *  @param orientation the orientation of the gene, LEFT, RIGHT, or NONE
+     *  @param orientation the orientation of the gene, NEGATIVE, POSITIVE, or UNSIGNED
      * @param backgroundColor the color of the background
      * @param color the color of the gene arrow
      * @param x the x coordinate
@@ -156,7 +146,7 @@ public class GenomePainting {
      * @param vgap the vertical gap size
      * @return the x coordinate after the painting
      */
-    public static int paintGene(Graphics g, Gene gene, NameType nameType, GeneOrientation orientation, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
+    public static int paintGene(Graphics g, Gene gene, NameType nameType, Gene.GeneOrientation orientation, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
         String name = "";
         switch (nameType) {
             case ID: name = gene.getExternalId();
@@ -184,7 +174,7 @@ public class GenomePainting {
 	  * @param vgap the vertical gap size
 	  * @return the x coordinate after the painting
 	  */
-	public static int paintGene(Graphics g, GeneOrientation geneOrientation, Color backgroundColor, Color color, String text, int x, int y, int width, int height, int hgap, int vgap) {
+	public static int paintGene(Graphics g, Gene.GeneOrientation geneOrientation, Color backgroundColor, Color color, String text, int x, int y, int width, int height, int hgap, int vgap) {
 		g.setColor(color);
 		
 		int returnX = x + width + 2 * hgap;
@@ -200,7 +190,7 @@ public class GenomePainting {
 		x += hgap;
 		
 		// check the id the first time to know whether we have to paint the triangle to the left side
-		if (geneOrientation == GeneOrientation.LEFT) {
+		if (geneOrientation == Gene.GeneOrientation.NEGATIVE) {
 			int xPoints[] = {x , x + ARROWSIZE, x + width, x + width, x + ARROWSIZE};
 			int yPoints[] = {y + (height / 2), y + height, y + height, y, y};
 			g.fillPolygon(xPoints, yPoints, 5);
@@ -209,14 +199,14 @@ public class GenomePainting {
 		}
 		
 		// check the id to know whether we have to paint the triangle to the right side
-		if (geneOrientation == GeneOrientation.RIGHT) {
+		if (geneOrientation == Gene.GeneOrientation.POSITIVE) {
 			int xPoints[] = {x , x + width - ARROWSIZE, x + width, x + width - ARROWSIZE, x};
 			int yPoints[] = {y + height, y + height,y + (height / 2), y, y};
 			g.fillPolygon(xPoints, yPoints, 5);
 		}
 
         // check the id to know whether we have to paint no triangle
-        if (geneOrientation == GeneOrientation.NONE) {
+        if (geneOrientation == Gene.GeneOrientation.UNSIGNED) {
             int xPoints[] = {x , x + width, x + width, x};
             int yPoints[] = {y + height, y + height, y, y};
             g.fillPolygon(xPoints, yPoints, 4);
@@ -262,11 +252,11 @@ public class GenomePainting {
     }
 	
 	private static Color getColor(Gene gene) {
-        return getColor(gene.getId());
+        return getColor(gene.getGeneFamily());
 	}
 
-    private static Color getColor(int geneId) {
-        Color color = Gene.getGeneColor(geneId);
+    private static Color getColor(GeneFamily geneFamily) {
+        Color color = GeckoInstance.getInstance().getGeneColor(geneFamily);
         if (color == null)
             return Color.GRAY;
         else
@@ -412,12 +402,12 @@ public class GenomePainting {
 	}
 
     public static class GeneIcon implements Icon {
-        private final int geneId;
+        private final GeneFamily geneFamily;
         private final int width;
         private final int height;
 
-        public GeneIcon(int geneId, int width, int height) {
-            this.geneId = geneId;
+        public GeneIcon(GeneFamily geneFamily, int width, int height) {
+            this.geneFamily = geneFamily;
             this.width = width;
             this.height = height;
         }
@@ -429,7 +419,7 @@ public class GenomePainting {
          */
         @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
-            paintGene(g, GeneOrientation.NONE, Color.WHITE, getColor(geneId), Gene.getExternalId(geneId), x, y, width, height, 0, 0);
+            paintGene(g, Gene.GeneOrientation.UNSIGNED, Color.WHITE, getColor(geneFamily), geneFamily.getExternalId(), x, y, width, height, 0, 0);
         }
 
         /**

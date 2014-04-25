@@ -26,7 +26,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     private static final Font boldFont = new JLabel().getFont().deriveFont(Font.BOLD);
 
 	private final JPanel masterPanel;
-	private final JPanel flowpanel;
+	private final JPanel flowPanel;
 	private GeneCluster cluster;
 	private GeneClusterOccurrence gOcc;
 
@@ -40,7 +40,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
     private List<Gene> geneList;
     private List<Integer> genomeIndexInGeneList;
-    private Map<Integer, Integer> geneIdAtTablePosition;
+    private Map<Integer, GeneFamily> geneIdAtTablePosition;
 
     // local?
     private final JTable chromosomeNameTable;
@@ -52,13 +52,13 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 	private static final String GENES_TITLE = "Genes in this Cluster:";
 	
 	public GeneClusterDisplay() {
-		flowpanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		masterPanel = new JPanel();		
 		masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
 		masterPanel.setBackground(Color.WHITE);
-		flowpanel.setBackground(masterPanel.getBackground());
-		flowpanel.add(masterPanel);
-		this.setViewportView(flowpanel);
+		flowPanel.setBackground(masterPanel.getBackground());
+		flowPanel.add(masterPanel);
+		this.setViewportView(flowPanel);
 
         chromosomeNameTable = new JTable(new ChromsomeNameTableModel());
         chromosomeNameTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -81,17 +81,21 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         annotationTableColumnModel.getColumn(1).setMaxWidth(50); // Index
         annotationTableColumnModel.getColumn(2).setPreferredWidth(200);
 
-        subsequences = new ArrayList<Subsequence>();
-        chromosomes = new ArrayList<Chromosome>();
-        genomeIndexMapping = new ArrayList<Integer>();
-        genomeIndexBackmap = new HashMap<Integer, Integer>();
-
-        geneList = new ArrayList<Gene>();
-        genomeIndexInGeneList = new ArrayList<Integer>();
-        geneIdAtTablePosition = new HashMap<Integer, Integer>();
+        reset();
 
 		update();
 	}
+
+    private void reset() {
+        subsequences = new ArrayList<>();
+        chromosomes = new ArrayList<>();
+        genomeIndexMapping = new ArrayList<>();
+        genomeIndexBackmap = new HashMap<>();
+
+        geneList = new ArrayList<>();
+        genomeIndexInGeneList = new ArrayList<>();
+        geneIdAtTablePosition = new HashMap<>();
+    }
 
 	@Override
 	public void selectionChanged(ClusterSelectionEvent e) {
@@ -103,19 +107,13 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
 		this.cluster = l.getSelection();
 
-        subsequences = new ArrayList<Subsequence>();
-        chromosomes = new ArrayList<Chromosome>();
-        genomeIndexMapping = new ArrayList<Integer>();
-        genomeIndexBackmap = new HashMap<Integer, Integer>();
-        geneList = new ArrayList<Gene>();
-        genomeIndexInGeneList = new ArrayList<Integer>();
-        geneIdAtTablePosition = new HashMap<Integer, Integer>();
+        reset();
 
 		if (this.cluster!=null) {
 			int[] subselections = l.getsubselection();
             this.gOcc = l.getgOcc();
 
-            Map<Integer, Gene[]> annotations = l.getSelection().generateAnnotations(l.getgOcc(),
+            Map<GeneFamily, Gene[]> annotations = l.getSelection().generateAnnotations(l.getgOcc(),
                     l.getsubselection());
 
             setMaxLengthStringWidth(GeneCluster.getMaximumIdLength(annotations));
@@ -268,8 +266,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         return cpanel;
     }
 
-    private void setAnnotationData(Map<Integer, Gene[]> annotations) {
-        for (Map.Entry<Integer, Gene[]> entry : annotations.entrySet()) {
+    private void setAnnotationData(Map<GeneFamily, Gene[]> annotations) {
+        for (Map.Entry<GeneFamily, Gene[]> entry : annotations.entrySet()) {
             geneIdAtTablePosition.put(geneList.size(), entry.getKey());
             Gene[] genes = entry.getValue();
 
@@ -333,7 +331,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         private static final long serialVersionUID = -3306238610287868813L;
 
-        private final Class<?>[] columns = {Integer.class, NumberInRectangle.NumberIcon.class, String.class};
+        private final Class<?>[] columns = {GeneFamily.class, NumberInRectangle.NumberIcon.class, String.class};
 
         @Override
         public int getRowCount() {
@@ -390,8 +388,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         @Override
         public void setValue(Object value) {
-            if (value instanceof Integer) {
-                GenomePainting.GeneIcon icon = new GenomePainting.GeneIcon((Integer)value, geneWidth, GeckoInstance.DEFAULT_GENE_HIGHT);
+            if (value instanceof GeneFamily) {
+                GenomePainting.GeneIcon icon = new GenomePainting.GeneIcon((GeneFamily)value, geneWidth, GeckoInstance.DEFAULT_GENE_HIGHT);
                 setIcon(icon);
             } else
                 setIcon(null);

@@ -1,14 +1,12 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.Gene;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.Genome;
-import gecko2.algorithm.Subsequence;
+import gecko2.algorithm.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class implements methods to paint parts of a genome.
@@ -132,7 +130,7 @@ public class GeneClusterPicture {
 	/**
 	 * New color mapping with the gene id.
 	 */
-	private final HashMap<Integer, Color> newColorMap = new HashMap<Integer, Color>();
+	private final Map<GeneFamily, Color> newColorMap = new HashMap<>();
 	
 	/**
 	 * Current position in the geneColor array.
@@ -143,29 +141,32 @@ public class GeneClusterPicture {
 	 * The number of additional genes that is shown on each side of the longest cluster occurrence.
 	 */
 	private static final int NR_ADDITIONAL_GENES = 1;
-	
+
+    public GeneClusterPicture(GeneCluster selectedCluster) {
+        this(selectedCluster, selectedCluster.getDefaultSubSelection(false));
+    }
+
+    /**
+     * Default constructor which sets all important global variable.
+     */
+    public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection) {
+        this(selectedCluster, subselection, GenomePainting.NameType.ID, false);
+    }
+
 	/**
 	 * The constructor sets all important variables while the variables
 	 * gNames and geneCode depend on the users choice.
-	 * 
-	 * @param gnames true if the genome name shall be replace the number
-	 * @param nameType either id, name or locus_tag
-	 */
-	public GeneClusterPicture(boolean gnames, GenomePainting.NameType nameType, GeneCluster selectedCluster, int[] subselection) {
-		
+	 *
+     * @param nameType either id, name or locus_tag
+     * @param gnames true if the genome name shall be replace the number
+     */
+	public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection, GenomePainting.NameType nameType, boolean gnames) {
 		this.gecko = GeckoInstance.getInstance();
 		this.selectedCluster = selectedCluster;
 		this.subselection = subselection;
 		this.genomes = gecko.getGenomes();
 		this.gNames = gnames;
 		this.setNameType(nameType);
-	}
-	
-	/**
-	 * Default constructor which sets all important global variable.
-	 */
-	public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection) {
-		this(false, GenomePainting.NameType.ID, selectedCluster, subselection);
 	}
 	
 	/**
@@ -320,7 +321,7 @@ public class GeneClusterPicture {
 	 * @return the new x coordinate behind the gene
 	 */
 	private int paintGene(Graphics g, Gene gene, boolean partOfCluster, int x, int y) {
-		Color currentColor = getColor(Math.abs(gene.getId()));
+		Color currentColor = getColor(gene.getGeneFamily());
 		
 		return GenomePainting.paintGene(g, gene, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
 	}
@@ -387,31 +388,31 @@ public class GeneClusterPicture {
 	
 	/**
 	 * The method takes a color from the array geneColors and associate the color with a 
-	 * given gene ID (colorID) and returns the color. If the id already exists just the 
+	 * given gene family and returns the color. If the id already exists just the
 	 * color will be returned without any new association.
 	 * 
-	 * @param colorID gene ID
+	 * @param geneFamily the gene family
 	 * @return returns the color for the gene element of the given gene ID
 	 */
-	private Color getColor(int colorID) {
+	private Color getColor(GeneFamily geneFamily) {
 		Color out;
 		
-		if (Gene.isSingleGeneFamily(colorID)) {
+		if (geneFamily.isSingleGeneFamily()) {
 			out = Color.GRAY;
 		}
 		else {
-			if (newColorMap.containsKey(colorID)) {
-				out = newColorMap.get(colorID);
+			if (newColorMap.containsKey(geneFamily)) {
+				out = newColorMap.get(geneFamily);
 			}
 			else {		
 				if (colorPos < geneColors.length) {
 					out = geneColors[colorPos];
-					newColorMap.put(colorID, out);
+					newColorMap.put(geneFamily, out);
 					colorPos++;
 				}
 				else {
 					// fallback if we do not have enough colors defined
-					out = Gene.getGeneColor(colorID);
+					out = GeckoInstance.getInstance().getGeneColor(geneFamily);
 				}	
 			}
 		}

@@ -5,9 +5,9 @@ import java.util.*;
 
 public class ReferenceCluster {
 	private int genomeNr;
-	private final int chrNr;
-	private final int leftBorder;
-	private final int rightBorder;
+	private int chrNr;
+	private int leftBorder;
+	private int rightBorder;
 	private final int size;
 	private int coveredGenomes;
 	private int coveredGenomeGroups;
@@ -17,8 +17,8 @@ public class ReferenceCluster {
 	private BigDecimal bestCombined_pValueCorrected;
 	private List<Integer> geneContent;
 	private final boolean searchRefInRef;
-	
-	public ReferenceCluster(Pattern refPattern, List<ListOfDeltaLocations> dLocLists, boolean searchRefInRef, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping){
+
+    public ReferenceCluster(Pattern refPattern, List<ListOfDeltaLocations> dLocLists, boolean searchRefInRef, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping){
 		genomeNr = refPattern.getRefGenomeNr();
 		chrNr = refPattern.getRefChromosomeNr();
 		leftBorder = refPattern.getLeftBorder();
@@ -26,7 +26,7 @@ public class ReferenceCluster {
 		size = refPattern.getSize();
 		this.searchRefInRef = searchRefInRef;
 		
-		this.dLocLists = new ArrayList<List<DeltaLocation>>(dLocLists.size());	
+		this.dLocLists = new ArrayList<>(dLocLists.size());
 		int coverCount = 0;
 		int maxD = -1;
 		
@@ -37,10 +37,10 @@ public class ReferenceCluster {
 		// We now need a list, that is sorted by the ordering of DeltaLocation
 		for (int i=0; i<dLocLists.size(); i++){
 			ListOfDeltaLocations dLocList = dLocLists.get(i);
-            Set<DeltaLocation> set = new TreeSet<DeltaLocation>();
+            Set<DeltaLocation> set = new TreeSet<>();
             for (DeltaLocation dLoc : dLocList)
                 set.add(new DeltaLocation(dLoc));
-            this.dLocLists.add(new ArrayList<DeltaLocation>(set));
+            this.dLocLists.add(new ArrayList<>(set));
             
             int genomeMinDistance = Integer.MAX_VALUE;
             for (DeltaLocation dLoc : dLocList)
@@ -79,9 +79,33 @@ public class ReferenceCluster {
 		return size;
 	}
 	
-	public void setGenomeNr(int genomeNr) {
-		this.genomeNr = genomeNr;
+	public void changeReferenceOccurrence(DeltaLocation newRefOcc)
+    {
+		this.genomeNr = newRefOcc.getGenomeNr();
+        this.chrNr = newRefOcc.getChrNr();
+        this.leftBorder = newRefOcc.getL();
+        this.rightBorder = newRefOcc.getR();
 	}
+
+    public int getMaxDistance() {
+        return maxDistance;
+    }
+
+    public int getGenomeNr() {
+        return genomeNr;
+    }
+
+    public int getChrNr() {
+        return chrNr;
+    }
+
+    public int getLeftBorder() {
+        return leftBorder;
+    }
+
+    public int getRightBorder() {
+        return rightBorder;
+    }
 
 	public BigDecimal getBestCombined_pValue() {
 		return bestCombined_pValue;
@@ -149,14 +173,6 @@ public class ReferenceCluster {
 		}
 		return (minDist != Integer.MAX_VALUE) ? minDist : -1;
 	}
-	
-	public int getMaxDistance() {
-		return maxDistance;
-	}
-
-	public int getGenomeNr() {
-		return genomeNr;
-	}
 
 	public boolean areAll_dLocsNested(ReferenceCluster otherCluster) {
 		for (int k=0; k<Math.min(dLocLists.size(), otherCluster.dLocLists.size()); k++)
@@ -193,7 +209,7 @@ public class ReferenceCluster {
 	}
 
 	public void setGeneContent(GenomeList genomes) {
-		geneContent = new ArrayList<Integer>(size);
+		geneContent = new ArrayList<>(size);
 		for (int i=leftBorder; i<=rightBorder && geneContent.size()<size; i++){
 			if (genomes.get(genomeNr).get(chrNr).getPrevOCC(i) < leftBorder){
 				geneContent.add(genomes.get(genomeNr).get(chrNr).getGene(i));

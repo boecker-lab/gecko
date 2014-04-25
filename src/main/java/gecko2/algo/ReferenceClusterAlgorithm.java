@@ -1,6 +1,5 @@
 package gecko2.algo;
 
-import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Parameter;
 
 import java.util.*;
@@ -92,10 +91,32 @@ public class ReferenceClusterAlgorithm {
 	 * @param param the parameters
 	 * @return the gene clusters
 	 */
-	
-	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param) {
+	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param) {
 		return computeReferenceClusters(genomes, param, null);
 	}
+
+    private static int[] getSizes(int[][][] genomes) {
+        int[] result = new int[genomes.length];
+        for(int l = 0; l<genomes.length;l++){
+            for(int m = 0; m<genomes[l].length; m++){
+                result[l] += genomes[l][m].length - 2;
+            }
+        }
+        return result;
+    }
+
+    private static void printGenomes(int[][][] genomes) {
+        for(int l = 0; l<genomes.length;l++){
+            for(int m = 0; m<genomes[l].length; m++){
+                for(int x = 0; x<genomes[l][m].length;x++){
+                    System.out.print(genomes[l][m][x] + " ");
+                }
+                System.out.println("");
+            }
+        }
+    }
+
+
 
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
@@ -104,12 +125,11 @@ public class ReferenceClusterAlgorithm {
 	 * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
 	 * @return the gene clusters
 	 */
-	public static GeneCluster[] computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
+	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
-		//genomes = memReducer(genomes,param);
-		
-		GenomeList data;
+
+        GenomeList data;
 		if (param.getAlphabetSize() >= 0)
 			data = new GenomeList(genomes, param.getAlphabetSize());
 		else {
@@ -130,12 +150,8 @@ public class ReferenceClusterAlgorithm {
 		ReferenceClusterAlgorithm refClusterAlgorithm = new ReferenceClusterAlgorithm(data, algoParameters, genomeGrouping);
 		
 		List<ReferenceCluster> refCluster = refClusterAlgorithm.computeRefClusters();
-		
-		GeneCluster[] result = new GeneCluster[refCluster.size()];
-		for (int i=0; i<refCluster.size(); i++){
-			result[i] = new GeneCluster(i, refCluster.get(i));
-		}
-		return result;
+
+        return refCluster;
 	}
 	
     private static boolean checkParameters(AlgorithmParameters param) {
@@ -293,9 +309,6 @@ public class ReferenceClusterAlgorithm {
 					}
 				}
 				r = pattern.getRightBorder()+1;
-				//if ([r]<0){
-					//r++;
-				//}
 			}
 		}
 	}

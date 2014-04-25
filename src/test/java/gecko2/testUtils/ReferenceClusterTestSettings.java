@@ -1,0 +1,115 @@
+package gecko2.testUtils;
+
+import gecko2.algorithm.Parameter;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * @author Sascha Winter (sascha.winter@uni-jena.de)
+ */
+public class ReferenceClusterTestSettings {
+    Parameter p;
+    File dataFile;
+    File expectedResultFile;
+    File resultOutputFile;
+    List<Set<Integer>> genomeGroups;
+
+    public static ReferenceClusterTestSettings fiveProteobacterDeltaTable() {
+        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
+        settings.p = new Parameter(
+                new int[][]{{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}},
+                4,
+                4,
+                Parameter.QUORUM_NO_COST,
+                Parameter.OperationMode.reference,
+                Parameter.ReferenceType.allAgainstAll
+        );
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").getFile());
+
+        settings.expectedResultFile = null;
+        if (GeneClusterTestUtils.class.getResource("/fiveProteobacterDeltaTable.gck") != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacterDeltaTable.gck").getFile());
+
+        settings.resultOutputFile = new File("src/test/resources/fiveProteobacterDeltaTable.gck");
+        settings.genomeGroups = null;
+        return settings;
+    }
+
+    public static ReferenceClusterTestSettings fiveProteobacterD3S6Q4() {
+        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
+        settings.p = new Parameter(
+                3,
+                6,
+                4,
+                Parameter.QUORUM_NO_COST,
+                Parameter.OperationMode.reference,
+                Parameter.ReferenceType.allAgainstAll
+        );
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").getFile());
+
+        settings.expectedResultFile = null;
+        if (GeneClusterTestUtils.class.getResource("/fiveProteobacterD3S6Q4.gck") != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacterD3S6Q4.gck").getFile());
+
+        settings.resultOutputFile = new File("src/test/resources/fiveProteobacterD3S6Q4.gck");
+        settings.genomeGroups = null;
+        return settings;
+    }
+
+    public static ReferenceClusterTestSettings fiveProteobacterD3S6Q2Grouping() {
+        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
+        settings.p = new Parameter(
+                3,
+                6,
+                2,
+                Parameter.QUORUM_NO_COST,
+                Parameter.OperationMode.reference,
+                Parameter.ReferenceType.allAgainstAll
+        );
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacter.cog").getFile());
+
+        settings.expectedResultFile = null;
+        if (GeneClusterTestUtils.class.getResource("/fiveProteobacterD3S6Q2Grouping.gck") != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/fiveProteobacterD3S6Q2Grouping.gck").getFile());
+
+        settings.resultOutputFile = new File("src/test/resources/fiveProteobacterD3S6Q2Grouping.gck");
+        settings.genomeGroups = new ArrayList<>(3);
+        Set<Integer> set1 = new HashSet<>();
+        set1.add(0);
+        settings.genomeGroups.add(set1);
+        Set<Integer> set2 = new HashSet<>();
+        set2.add(1);
+        set2.add(2);
+        settings.genomeGroups.add(set2);
+        Set<Integer> set3 = new HashSet<>();
+        set3.add(3);
+        set3.add(4);
+        settings.genomeGroups.add(set3);
+        return settings;
+    }
+
+    public static ReferenceClusterTestSettings statisticsDataD5S8Q10FixedRef() {
+        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
+        settings.p = new Parameter(
+                5,
+                8,
+                10,
+                Parameter.QUORUM_NO_COST,
+                Parameter.OperationMode.reference,
+                Parameter.ReferenceType.genome
+        );
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/statistics.cog").getFile());
+
+        settings.expectedResultFile = null;
+        if (GeneClusterTestUtils.class.getResource("/statisticsDataD5S8Q10FixedRef.gck") != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/statisticsDataD5S8Q10FixedRef.gck").getFile());
+
+        settings.resultOutputFile = new File("src/test/resources/statisticsDataD5S8Q10FixedRef.gck");
+        settings.genomeGroups = null;
+        return settings;
+    }
+}
