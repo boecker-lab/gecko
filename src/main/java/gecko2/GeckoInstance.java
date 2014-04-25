@@ -393,19 +393,22 @@ public class GeckoInstance {
 
     public void setGeckoInstanceData(final DataSet data) {
         this.data = data;
-        if (gui != null){
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    gui.updateViewscreen();
-                    gui.updategcSelector();
-                    if (data.equals(DataSet.getEmptyDataSet()))
-                        gui.changeMode(Gui.Mode.NO_SESSION);
-                    else
-                        gui.changeMode(Gui.Mode.SESSION_IDLE);
-                }
-            });
-        }
+        Runnable updateGui = new Runnable() {
+            @Override
+            public void run() {
+                gui.updateViewscreen();
+                gui.updategcSelector();
+                if (data.equals(DataSet.getEmptyDataSet()))
+                    gui.changeMode(Gui.Mode.NO_SESSION);
+                else
+                    gui.changeMode(Gui.Mode.SESSION_IDLE);
+            }
+        };
+
+        if (SwingUtilities.isEventDispatchThread())
+            updateGui.run();
+        else
+            SwingUtilities.invokeLater(updateGui);
 
         dataUpdated();
     }
