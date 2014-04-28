@@ -11,6 +11,11 @@ jar {
     }
 }
 
+test {
+    testLogging.showStandardStreams = true
+    ignoreFailures = true
+}
+
 task uberjar(type: Jar) {
     from files(sourceSets.main.output.classesDir)
     from files(sourceSets.main.output.resourcesDir)
