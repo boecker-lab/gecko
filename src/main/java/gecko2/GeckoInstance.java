@@ -458,7 +458,7 @@ public class GeckoInstance {
 	 */
 	public static GeneCluster[] computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping) {
         int intArray[][][] = data.toIntArray();
-        DataSet.printIntArray(intArray);
+
         params.setAlphabetSize(data.getAlphabetSize());
 		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping);
         GeneCluster[] result = new GeneCluster[refCluster.size()];
