@@ -107,19 +107,15 @@ class Chromosome {
     }
 
     private int[][] computePOS(int alphabetSize) {
-    	//TODO genes[i] not the right position so error
-    	
-    	
-    	//detectReferenceGeneClusterFromSingleChromosome  
-    	List<LinkedList<Integer> > tmp = new ArrayList<>(alphabetSize+1);
+        List<LinkedList<Integer> > tmp = new ArrayList<>(alphabetSize+1);
         for (int i=0; i<=alphabetSize; i++) {
             tmp.add(null);
         }
         for (int i=1; i<=this.size(); i++) {       // genes starts and ends with 0 that is not part of the genome
-        	if (tmp.get(genes[i])==null) {
-        		tmp.set(genes[i], new LinkedList<Integer>());
-        	}
-        	tmp.get(genes[i]).add(i);
+            if (tmp.get(genes[i])==null) {
+                tmp.set(genes[i], new LinkedList<Integer>());
+            }
+            tmp.get(genes[i]).add(i);
         }
         int[][] newPos = new int[alphabetSize+1][];
         for (int i=0; i<=alphabetSize; i++) {
@@ -143,12 +139,8 @@ class Chromosome {
         int[] newPrevOcc = new int[this.size() + 2];
 
         for (int i = 1; i <= this.size(); i++) {
-        	if(genes[i]>=0){
-            	newPrevOcc[i] = occ[genes[i]];
-            	occ[genes[i]] = i;
-        	} else {
-        		
-        	}
+            newPrevOcc[i] = occ[genes[i]];
+            occ[genes[i]] = i;
         }
 
         return newPrevOcc;
@@ -159,12 +151,8 @@ class Chromosome {
         int[] newNextOcc = IntArray.newIntArray(this.size() + 2, this.size() + 1);
 
         for (int i = this.size() + 1; i >= 1; i--) {
-        	if(genes[i]>=0){
-        		newNextOcc[i] = occ[genes[i]];
-        		occ[genes[i]] = i;
-        	} else {
-        		//mal schauen
-        	}
+            newNextOcc[i] = occ[genes[i]];
+            occ[genes[i]] = i;
         }
 
         return newNextOcc;

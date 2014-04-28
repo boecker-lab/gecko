@@ -41,12 +41,8 @@ class Rank{
 
         int r=1;
         for (int i=1; i<=chr.size(); i++) {                      // all characters in the chromosome
-            if (chr.getGene(i)>=0){
-            	if (rank[chr.getGene(i)]==alphabetSize) {       // who are not already set to a rank
-            		rank[chr.getGene(i)] = r++;                  // get ranked by their first occurrence in the chromosome
-            	}
-            } else {
-            	
+            if (rank[chr.getGene(i)]==alphabetSize) {       // who are not already set to a rank
+                rank[chr.getGene(i)] = r++;                  // get ranked by their first occurrence in the chromosome
             }
         }
     }
