@@ -14,15 +14,18 @@ public class ReferenceClusterAlgorithm {
 	private static class MemRed{
 		ArrayList<Integer> id;
 		ArrayList<Integer> anzahl;
+		ArrayList<Integer> newId;
 		
 		MemRed(){
 			this.anzahl = new ArrayList<Integer>();
 			this.id = new ArrayList<Integer>();
+			this.newId = new ArrayList<Integer>();
 		}
 		
 		public void anlegen(int x){
 			this.id.add(x);
 			this.anzahl.add(1);
+			this.newId.add(0);
 		}
 		
 		private void hinzufuegen(int x){
@@ -30,10 +33,16 @@ public class ReferenceClusterAlgorithm {
 		}
 		
 		public void suche(int x){
-			if(this.id.contains(x)){
-				hinzufuegen(x);
+			if (x > 0){
+				if(this.id.contains(x)){
+					hinzufuegen(x);
+				} else {
+					anlegen(x);
+				}
 			} else {
-				anlegen(x);
+				if (this.id.contains(x) != true){
+					anlegen(x);
+				}
 			}
 		}
 		
@@ -47,7 +56,7 @@ public class ReferenceClusterAlgorithm {
 		}
 	}
 	
-	public static int[][][] memReducer(int[][][] genomes, Parameter p){
+	public static void /*int[][][]*/ memReducer(int[][][] genomes, Parameter p, List<Integer> genes1){
 		MemRed help = new MemRed();
 		
 		for(int l = 0; l<genomes.length;l++){
@@ -58,31 +67,51 @@ public class ReferenceClusterAlgorithm {
 			}
 		}
 		
-		
+		int count = 1;
 		
 		for(int l = 0; l<genomes.length;l++){
 			for(int m = 0; m<genomes[l].length; m++){
 				MemRed help2 = new MemRed();
 				for(int x = 0; x<genomes[l][m].length;x++){
-					if(help.anzahl.get(help.id.indexOf(genomes[l][m][x]))>1){
-						help2.anlegen(genomes[l][m][x]);
+					int k = help.id.indexOf(genomes[l][m][x]);
+					if(help.anzahl.get(k)>1){
+						if (help.newId.get(k) == 0){
+							help.newId.set(k, count);
+							count++;
+						}
+						help2.anlegen(help.newId.get(k));
 					} else if(help2.id.isEmpty() != true) {
-						if(help2.id.get(help2.id.size()-1) < 0){
+						if(genomes[l][m][x]==0){
+							help2.anlegen(0);
+						} else if(help2.id.get(help2.id.size()-1) < 0){
 							help2.id.set(help2.id.size()-1, help2.id.get(help2.id.size()-1)-1);
-						} else if(genomes[l][m][x]<0){
-							help2.anlegen(genomes[l][m][x]);
 						} else {
 							help2.anlegen(-1);
 						}
 					} else {
-						help2.anlegen(-1);
+						help2.anlegen(0);
 					}
 				}
 			genomes[l][m] = help2.umschreiben();
 			}	
 		}
 		
-		return genomes;
+		for (int l=0;l<genes1.size();l++){
+			int index = help.id.indexOf(genes1.get(l));
+			if (help.anzahl.get(index)>1){
+				if(help.newId.get(index) == 0){
+					genes1.set(l, count);
+					count++;
+				} else if (genes1.get(l)>0){
+					genes1.set(l, help.newId.get(index));
+				} else {
+				}
+			} else {
+				genes1.set(l, -1);
+			}
+		}
+		
+		//return genomes;
 	}
 
 	/**

@@ -61,6 +61,8 @@ public class ReferenceClusterTest
         List<Integer> genes1 = Arrays.asList(-1, 1, 2);
         int[] minimumDistances = new int[]{1, 0};
 
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
+        
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
 
         ExpectedReferenceClusterValues[] referenceClusterValues = {
@@ -73,6 +75,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
     }
@@ -104,6 +108,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -135,6 +141,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
     }
@@ -180,6 +188,9 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues2
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes2);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -225,6 +236,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues2
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -270,7 +283,10 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues2
                 )
         };
-
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes2);
+        
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
@@ -301,6 +317,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -332,6 +350,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -393,6 +413,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues3
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -440,6 +462,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues2
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -519,6 +543,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues4
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -550,6 +576,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -597,6 +625,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues2
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -644,6 +674,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues2
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -674,6 +706,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -704,6 +738,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -751,6 +787,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues2
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -782,6 +820,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -828,6 +868,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues2
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -859,6 +901,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -890,6 +934,8 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
@@ -980,6 +1026,9 @@ public class ReferenceClusterTest
                         expectedDeltaLocationValues2
                 )
         };
+        
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes1);
+        ReferenceClusterAlgorithm.memReducer(genomes, p, genes2);
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
