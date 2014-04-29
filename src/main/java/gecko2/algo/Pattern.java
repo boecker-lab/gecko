@@ -109,7 +109,7 @@ class Pattern {
         if (i > refChr.size())                                 // If end of sequence reached
             return false;
         int c = refChr.getGene(i);
-        if (refChr.getGene(getLeftBorder() - 1) == c)          // If pattern no longer left maximal
+        if (c >= 0 && refChr.getGene(getLeftBorder() - 1) == c)          // If pattern no longer left maximal
             return false;
 
         while (i < refChr.size() && refChr.getGene(i + 1) > 0
@@ -144,6 +144,9 @@ class Pattern {
                         if (dRight > 1 && chr.getR(charPos, dRight) == chr.getR(charPos, dRight - 1))
                             break;
 
+                        int leftBorder = chr.getL(charPos, dLeft);
+                        int rightBorder = chr.getR(charPos, dRight);
+
                         if (dRight > 1)  // Teste ob neues unmarkiertes Zeichen R[dRight-1] schon im Intervall vorkommt
                             if (chr.getPrevOCC(chr.getR(charPos, dRight - 1)) < Math.max(1, chr.getL(charPos, dLeft)))
                             	interveningChars++;
@@ -153,26 +156,26 @@ class Pattern {
                             break;
 
                         // test maximality
-                        if (chr.getNextOCC(chr.getL(charPos, dLeft)) < chr.getR(charPos, dRight))
+                        if (chr.getNextOCC(leftBorder) < rightBorder)
                             break;
 
-                        if (chr.getPrevOCC(chr.getR(charPos, dRight)) > chr.getL(charPos, dLeft))
+                        if (chr.getPrevOCC(rightBorder) > leftBorder)
                             continue;
 
                         // test compactness
-                        if (chr.getNUMDiff(chr.getL(charPos, dLeft) + 1, chr.getR(charPos, dRight) - 1, chr.getL_prime(charPos, dLeft), chr.getR_prime(charPos, dRight)) != 0)
+                        if (chr.getNUMDiff(leftBorder + 1, rightBorder - 1, chr.getL_prime(charPos, dLeft), chr.getR_prime(charPos, dRight)) != 0)
                             continue;
 
-                        int charSetSize = chr.getNUM(chr.getL(charPos, dLeft) + 1, chr.getR(charPos, dRight) - 1);
+                        int charSetSize = chr.getNUM(leftBorder + 1, rightBorder - 1);
                         int missingChars =  pSize - charSetSize + interveningChars;
                         int dist = missingChars + interveningChars;
 
                         assert (dist >= 0);
 
                         if (dist <= param.getMaximumDelta() && interveningChars <= param.getMaximumInsertions() && missingChars <= param.getMaximumDeletions()) {
-                            assert (chr.getR(charPos, dRight) - 1 <= chr.size());
+                            assert (rightBorder - 1 <= chr.size());
 
-                            DeltaLocation newDeltaLoc = new DeltaLocation(genome.getNr(), chr.getNr(), chr.getL(charPos, dLeft) + 1, chr.getR(charPos, dRight) - 1, dist, missingChars, interveningChars, charSetSize, charSetSize - interveningChars, !param.useDeltaTable());
+                            DeltaLocation newDeltaLoc = new DeltaLocation(genome.getNr(), chr.getNr(), leftBorder + 1, rightBorder - 1, dist, missingChars, interveningChars, charSetSize, charSetSize - interveningChars, !param.useDeltaTable());
                             newList.insertDeltaLocation(newDeltaLoc);
                         }
                     }

@@ -49,8 +49,6 @@ class Rank{
             	if (rank[chr.getGene(i)]==DEFAULT_RANK) {        // who are not already set to a rank
             		rank[chr.getGene(i)] = r++;                  // get ranked by their first occurrence in the chromosome
             	}
-            } else {
-            	r++;
             }
         }
     }
@@ -62,9 +60,6 @@ class Rank{
      * @param alphabetSize the size of the alphabet of all compared sequences.
      */
     public void updateRank(Chromosome chr, int leftBorder, int alphabetSize){
-    	
-    	
-    	
         if (leftBorder==1) {                                        // if starting to iterate through a new sequence (leftBorder is 1)
             this.computeRank(chr);                    // Rank has to be calculated anew
         }

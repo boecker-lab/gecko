@@ -225,9 +225,9 @@ class GenomeList {
      */
     private void updateR(int refGenomeNr, int i, int maxDist, int c_old){
         for (int k=0; k<this.size(); k++) {
-            /*if (k==refGenomeNr) {               // not needed for the reference sequence
+            if (k==refGenomeNr) {               // not needed for the reference sequence
                     continue;
-            }*/
+            }
 
             for (Chromosome chr: genomes.get(k)) {
                 chr.updateR(rank, i, maxDist, c_old);
