@@ -814,27 +814,25 @@ public class Gui {
 		importGenomesAction.putValue(Action.NAME, "Open session or genome file...");
 		importGenomesAction.putValue(Action.SHORT_DESCRIPTION, "Open...");	
 		importGenomesAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileopen.png"));
-		importGenomesAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileopen_large.png"));
+		importGenomesAction.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/fileopen_large.png"));
 		importGenomesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		startComputation.putValue(Action.NAME, "Start computation...");
 		startComputation.putValue(Action.SHORT_DESCRIPTION, "Start computation...");
 		startComputation.putValue(Action.SMALL_ICON, createImageIcon("images/player_play.png"));
-		startComputation.putValue(Action.SMALL_ICON, createImageIcon("images/player_play_large.png"));
+		startComputation.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/player_play_large.png"));
 		startComputation.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		startComputation.setEnabled(false);
 		
 		saveSessionAction.putValue(Action.NAME, "Save session...");
 		saveSessionAction.putValue(Action.SHORT_DESCRIPTION, "Save session...");
 		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave.png"));
-		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave_large.png"));
+		saveSessionAction.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/filesave_large.png"));
 		saveSessionAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		saveSessionAction.setEnabled(false);
 		
 		exportResultsAction.putValue(Action.NAME, "Export results...");
 		exportResultsAction.putValue(Action.SHORT_DESCRIPTION, "Export results...");
-		exportResultsAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileexport_large.png"));
-		exportResultsAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileexport_large.png"));
 		exportResultsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		saveSessionAction.setEnabled(false);
@@ -845,16 +843,16 @@ public class Gui {
 		
 		clearSelectionAction.putValue(Action.SHORT_DESCRIPTION, "Clear selection");
 		clearSelectionAction.putValue(Action.SMALL_ICON, createImageIcon("images/cancel.png"));
-		clearSelectionAction.putValue(Action.SMALL_ICON, createImageIcon("images/cancel_large.png"));
+		clearSelectionAction.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/cancel_large.png"));
 		zoomIn.putValue(Action.NAME, "Zoom in");
 		zoomIn.putValue(Action.SHORT_DESCRIPTION, "Zoom in");
 		zoomIn.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag+.png"));
-		zoomIn.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag+_large.png"));
+		zoomIn.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/viewmag+_large.png"));
 		zoomIn.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		zoomOut.putValue(Action.NAME, "Zoom out");
 		zoomOut.putValue(Action.SHORT_DESCRIPTION, "Zoom out");
 		zoomOut.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag-.png"));
-		zoomOut.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag-_large.png"));
+		zoomOut.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/viewmag-_large.png"));
 		zoomOut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_MINUS,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
 		exitAction.putValue(Action.NAME, "Exit");
