@@ -169,6 +169,10 @@ public class GeneClusterPicture {
 		this.setNameType(nameType);
 	}
 	
+    private int[] getSubselection() {
+        return subselection;
+    }
+
 	/**
 	 * This method find the genome with the longest sequence in the cluster.
 	 */
@@ -226,13 +230,16 @@ public class GeneClusterPicture {
 		
 		for (int i = 0; i < gecko.getGenomes().length; i++) {	
 			if (this.selectedCluster.getOccurrences()[0].getSubsequences()[i].length > 0) {			
-				if (gecko.getGenomes()[i].getName().length() > maxGenomeNameLength)				
+                if (getSubselection()[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                    continue;
+
+				if (gecko.getGenomes()[i].getName().length() > maxGenomeNameLength)
 					maxGenomeNameLength = (byte) gecko.getGenomes()[i].getName().length();
-								
-				if (this.selectedCluster.getOccurrences()[0].getSubsequences()[i][subselection[i]].isValid()) {					
-					int start = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][subselection[i]].getStart();
-					int stop = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][subselection[i]].getStop();
-					int chrom = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][subselection[i]].getChromosome();
+
+				if (this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]].isValid()) {
+					int start = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]].getStart();
+					int stop = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]].getStop();
+					int chrom = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]].getChromosome();
 					
 					for (int k = start -1; k < stop; k++) {
 						if (stop-start+1 > maxSubseqLength)
@@ -340,8 +347,8 @@ public class GeneClusterPicture {
 		
 		for (int i = 0; i < this.genomes.length; i++) {
 			// if the length is 0 the genome isn't contained in the cluster
-			if (this.selectedCluster.getOccurrences()[0].getSubsequences()[i].length != 0) {
-				Subsequence subsequence = selectedCluster.getOccurrences()[0].getSubsequences()[i][subselection[i]];
+			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
+				Subsequence subsequence = selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]];
 				int x = 2;
 				
 				x = paintGenomeHeader(g, i, x, y);
