@@ -10,6 +10,7 @@ import java.util.Map;
  * @author swinter
  */
 public class GeneClusterOutput {
+    private final int id;
 	private final BigDecimal pValue;
 	private final int refSeq;
 	private final int[] distances; 
@@ -30,7 +31,12 @@ public class GeneClusterOutput {
 	private final List<List<String>> chromosomes;
 	private final int[] nrOfOccurrences;
 
-	public static class Builder {
+    public int getId() {
+        return id;
+    }
+
+    public static class Builder {
+        private final int id;
 		private final int nrOfSequences;
 		
 		private BigDecimal pValue;
@@ -43,8 +49,9 @@ public class GeneClusterOutput {
 
 		private int[] nrOfOccurrences;
 		
-		public Builder (int nrOfSequences) {
+		public Builder (int nrOfSequences, int id) {
 			this.nrOfSequences = nrOfSequences;
+            this.id = id;
 			
 			distances = new int[this.nrOfSequences];
 			Arrays.fill(distances, 0);
@@ -94,6 +101,7 @@ public class GeneClusterOutput {
 	}
 	
 	private GeneClusterOutput(Builder builder) {
+        id = builder.id;
 		pValue = builder.pValue;
 		refSeq = builder.refSeq;
 		distances = Arrays.copyOf(builder.distances, builder.distances.length);

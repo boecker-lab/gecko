@@ -329,7 +329,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		else
 			occ = this.getAllOccurrences()[0];
 		
-		GeneClusterOutput.Builder builder = new GeneClusterOutput.Builder(occ.getSubsequences().length);
+		GeneClusterOutput.Builder builder = new GeneClusterOutput.Builder(occ.getSubsequences().length, this.id);
 		builder.pValue(this.getBestPValue());
 		builder.refSeq(this.getRefSeqIndex());
 
@@ -426,10 +426,11 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 */
 	private static SortedSet<Integer> generateSimilarityReducedClusterList(GeneCluster[] allClusters) {
 		SortedSet<Integer> reducedList = new TreeSet<>();
+        Map<Integer, Set<Integer>> FilteredClusters = new HashMap<>();
 		
-		GeneCluster[] tmp = Arrays.copyOf(allClusters, allClusters.length);
-		Arrays.sort(tmp);
-		for (GeneCluster geneCluster : tmp) {
+		GeneCluster[] geneClustersCopy = Arrays.copyOf(allClusters, allClusters.length);
+		Arrays.sort(geneClustersCopy);
+		for (GeneCluster geneCluster : geneClustersCopy) {
             boolean contained = false;
 			for (Iterator<Integer> it = reducedList.iterator(); it.hasNext() && !contained; ) {
 				int index = it.next();
@@ -437,7 +438,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				assert(cluster.getId() == index);
 				if (geneCluster.isSimilar(cluster)) { // if similar
 					int compare = geneCluster.bestPValue.compareTo(cluster.bestPValue);
-					if (compare > 0)// if similar, but worse then the previously inserted cluster
+					if (compare > 0) // if similar, but worse then the previously inserted cluster
 						contained = true;
 					else if (compare == 0){
 						if (geneCluster.size < cluster.size)
@@ -503,33 +504,33 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * Returns the tags of the gene in the reference occurrence
 	 * @return the tags of the gene in the reference occurrence
 	 */
-	public String getReferenceTags() {
+	public String getReferenceGeneNames() {
 		Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
 		Genome genome = GeckoInstance.getInstance().getGenomes()[getRefSeqIndex()];
-		List<String> tags = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		for (int index = seq.getStart()-1; index < seq.getStop(); index++){
-			String newTag = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getTag();
+			String newName = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getName();
 			boolean merged = false;
-			for (int i=0; i<tags.size(); i++) {
-				String tag = tags.get(i);
-				if (newTag.length() > 3 && tag.length() > 3 && newTag.substring(0, 3).equals(tag.substring(0,3))) {
-					String mergedTag = tag.concat(newTag.substring(3));
-					tags.set(i, mergedTag);
+			for (int i=0; i<names.size(); i++) {
+				String name = names.get(i);
+				if (newName.length() > 3 && name.length() > 3 && newName.substring(0, 3).equals(name.substring(0, 3))) {
+					String mergedTag = name.concat(newName.substring(3));
+					names.set(i, mergedTag);
 					merged = true;
 					break;
 				}
 			}
 			if (! merged)
-				tags.add(newTag);
+				names.add(newName);
 		}
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
-		for (String tag : tags){
+		for (String name : names){
 			if (! first)
 				builder.append(", ");
 			else
 				first = false;
-			builder.append(tag);
+			builder.append(name);
 		}
 		return builder.toString();
 	}
