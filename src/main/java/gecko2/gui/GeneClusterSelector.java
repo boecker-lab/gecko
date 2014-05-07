@@ -199,7 +199,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		menuItem.addActionListener(new ActionListener()	{
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(popUp.getUIClassID());
 				GeckoInstance.getInstance().addToClusterSelection((Integer)table.getValueAt(table.getSelectedRow(), 0));				
 			}
 		});
