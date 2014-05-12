@@ -111,7 +111,7 @@ class Statistics {
 	}
 	
 	private void fdrCorrection(List<ReferenceCluster> clusters) {
-		List<ReferenceCluster> sortedList = new ArrayList<ReferenceCluster>(clusters);
+		List<ReferenceCluster> sortedList = new ArrayList<>(clusters);
 		Collections.sort(sortedList, new Comparator<ReferenceCluster>() {
 			@Override
 			public int compare(ReferenceCluster o1, ReferenceCluster o2) {
