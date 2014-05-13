@@ -138,6 +138,7 @@ public class ReferenceClusterAlgorithm {
 		if (param.searchRefInRef())
 			genomes.appendCopyOfReferenceGenome(referenceGenomeNr, param);
 		
+		
 		for (Chromosome referenceChromosome : genomes.get(referenceGenomeNr)){
 			detectReferenceGeneClusterFromSingleChromosome(referenceGenomeNr, referenceChromosome, refClusterList);
 		}
