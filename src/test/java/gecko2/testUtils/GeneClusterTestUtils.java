@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.DataFormatException;
 
 import static org.junit.Assert.*;
@@ -23,8 +24,12 @@ import static org.junit.Assert.*;
 public class GeneClusterTestUtils {
 
     public static void performTest(Parameter p, int[][][] genomes, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
+        performTest(p, genomes, null, expectedReferenceClusters);
+    }
+
+    public static void performTest(Parameter p, int[][][] genomes, List<Set<Integer>> genomeGroups, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
         // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
         compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
         
         DataSet.printIntArray(genomes);
@@ -38,7 +43,7 @@ public class GeneClusterTestUtils {
         for (ExpectedReferenceClusterValues cluster : expectedReferenceClusters)
             System.out.println(cluster.getGeneContent());
 
-        List<ReferenceCluster> reducedRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+        List<ReferenceCluster> reducedRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
         compareReferenceClusters(expectedReferenceClusters, reducedRes, PValueComparison.COMPARE_NONE);
     }
 

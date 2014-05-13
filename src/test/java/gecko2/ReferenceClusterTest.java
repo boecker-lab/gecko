@@ -932,7 +932,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+        GeneClusterTestUtils.performTest(p, genomes, genomeGroups, referenceClusterValues);
 	}
 }
 
