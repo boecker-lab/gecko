@@ -94,7 +94,8 @@ class Pattern {
         this.lastChar = c;
         this.r = r;
         pSize++;
-        occ[0]++;
+        if (c>=0)
+            occ[c]++;
         IntArray.increaseAll(minDist);
         minDist[refGenomeNr]--;
         IntArray.reset(maxRemDist, -1);
