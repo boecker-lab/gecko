@@ -60,7 +60,6 @@ class Rank{
      * @param alphabetSize the size of the alphabet of all compared sequences.
      */
     public void updateRank(Chromosome chr, int leftBorder, int alphabetSize){
-    	//TODO wrong Rank 
         if (leftBorder==1) {                                        // if starting to iterate through a new sequence (leftBorder is 1)
             this.computeRank(chr);                    // Rank has to be calculated anew
         }

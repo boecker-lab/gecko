@@ -546,9 +546,9 @@ class Chromosome {
         return R[pos][diff];
     }
     
-    public void updateL_R_prime(Rank rank, int i, int maxDist, int c_old, int alphabetSize) {
+    public void updateL_R_prime(Rank rank, int leftBorder, int maxDist, int c_old, int alphabetSize) {
     	this.rank = rank;
-    	this.leftBorderForPrimes = i;
+    	this.leftBorderForPrimes = leftBorder;
     	this.deltaForPrimes = maxDist;
     	this.geneForPrimes = c_old;
     	this.alphabetSize = alphabetSize;
@@ -568,13 +568,14 @@ class Chromosome {
     	
     	int maxUpdateRank = 1;
     	if (geneForPrimes<0){
-    		
+    		maxUpdateRank = alphabetSize;
     	} else {
     		maxUpdateRank = (leftBorderForPrimes==1) ? alphabetSize+1 : rank.getRank(geneForPrimes);
     	}
     	
     	for(int j=1;j<=this.size();j++){ // Iteriere durch jede Position der aktuellen Sequenz
-			if(genes[j]<0) continue;
+			if(genes[j]<0)
+                continue;
 			if(rank.getRank(genes[j])<=maxUpdateRank) {
 				for(int d=1; d<=deltaForPrimes+1; d++) {
 					for(int l=this.L[j][d]+1; l<=j; l++) {
@@ -602,7 +603,7 @@ class Chromosome {
     	
     	int maxUpdateRank = 1;
     	if (geneForPrimes<0){
-    		
+    		maxUpdateRank = alphabetSize;
     	} else {
     		maxUpdateRank = (leftBorderForPrimes==1) ? alphabetSize+1 : rank.getRank(geneForPrimes);
     	}

@@ -24,14 +24,14 @@ public class GeneClusterTestUtils {
 
     public static void performTest(Parameter p, int[][][] genomes, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
         // Test the java implementation
-/*        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
         compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
         
         DataSet.printIntArray(genomes);
         for (ExpectedReferenceClusterValues cluster : expectedReferenceClusters)
             System.out.println(cluster.getGeneContent());
 
-*/        MemoryReduction.memReducer(genomes, expectedReferenceClusters);
+       MemoryReduction.memReducer(genomes, expectedReferenceClusters);
         
         System.out.println();
         DataSet.printIntArray(genomes);
