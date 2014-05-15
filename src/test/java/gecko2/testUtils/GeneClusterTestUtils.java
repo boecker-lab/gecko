@@ -292,7 +292,7 @@ public class GeneClusterTestUtils {
 		}
 	}
 	
-	static public void automaticGeneClusterTestFromFile(ReferenceClusterTestSettings settings, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
+	public static void automaticGeneClusterTestFromFile(ReferenceClusterTestSettings settings, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
         // Expected Results
         assertNotNull(settings.expectedResultFile);
         GeckoDataReader resultReader = new GckFileReader(settings.expectedResultFile);
@@ -345,6 +345,15 @@ public class GeneClusterTestUtils {
         assertTrue(settings.resultOutputFile.createNewFile());
         DataSetWriter.saveDataSetToFile(data, settings.resultOutputFile);
 	}
+
+    public static void performanceTest(ReferenceClusterTestSettings settings, boolean useMemoryReduction) throws IOException, DataFormatException, ParseException {
+        // Test unreduced
+        CogFileReader reader = new CogFileReader(settings.dataFile);
+        DataSet actualData = reader.readData();
+
+        GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction);
+        actualData.setClusters(javaRes);
+    }
 	
 	public static void main(String[] args)
 	{
@@ -354,8 +363,9 @@ public class GeneClusterTestUtils {
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
         try{
-			generateRefClusterFile(testType);
-		} catch (IOException | ParseException e) {
+			//generateRefClusterFile(testType);
+            performanceTest(testType, false);
+		} catch (IOException | ParseException | DataFormatException e) {
 			e.printStackTrace();
 		}
 	}
