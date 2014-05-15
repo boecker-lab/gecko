@@ -246,16 +246,22 @@ class GenomeList {
 		}
 		
 	}
-    
-    
+
+    /**
+     * Returns the frequencies of all different genes for each genome.
+     * charFrequency[i][0] contains the number of singleton genes in genome i
+     * @return
+     */
     int[][] charFrequencies() {
     	int[][] charFreq = new int[genomes.size()][alphabetSize+1];
     	
     	for (int k=0; k<genomes.size(); k++)
     		for (Chromosome chr : genomes.get(k))
-    			for (int i=0; i<chr.size()+1; i++){  // Correct for not counted 0 termination
-    				if (chr.getGene(i)<0) continue;
-    				charFreq[k][chr.getGene(i)]++;
+    			for (int i=1; i<chr.size()+1; i++){  // Correct for not counted 0 termination
+    				if (chr.getGene(i)<0)
+                        charFreq[k][0]++;
+                    else
+    				    charFreq[k][chr.getGene(i)]++;
     			}
  
     	return charFreq;

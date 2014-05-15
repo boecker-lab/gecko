@@ -87,6 +87,8 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	}
 
 	public boolean valid_dLocContainsCharacter(int c, GenomeList genomes) {
+        if (c < 0)
+            return false;
 		for (DeltaLocation dLoc : deltaLocations){
 			if (dLoc.isValid()){
 				for (int l=dLoc.getL(); l<=dLoc.getR(); l++)

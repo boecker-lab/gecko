@@ -845,9 +845,17 @@ public class ReferenceClusterTest
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
+    @Test
+    public void memoryReductionFromFileTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
+        ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
+
+        automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
+    }
+
 	@Test
 	public void fiveProteobacterReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
+
 		automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
 	}
 

@@ -148,8 +148,8 @@ public class DataSet {
      * @param genomeSizeDelta The maximum deviation form the genomeSize for a genome to be reported
      */
     private void printGenomeStatistics(int genomeSize, int genomeSizeDelta) {
-        int[][] alphabetPerGenome = new int[genomes.length][getAlphabetSize() + 1];
-        String[][] annotations = new String[genomes.length][getAlphabetSize() + 1];
+        int[][] alphabetPerGenome = new int[genomes.length][getCompleteAlphabetSize() + 1];
+        String[][] annotations = new String[genomes.length][getCompleteAlphabetSize() + 1];
 
         SortedMap<Integer,Integer> summedFamilySizes = new TreeMap<>();
         int nrReportedGenomes = 0;
@@ -208,7 +208,7 @@ public class DataSet {
         System.out.println();
 
         // generate complete family sizes and print it
-        int[] alphabet = new int[getAlphabetSize() + 1];
+        int[] alphabet = new int[getCompleteAlphabetSize() + 1];
         for (Genome g : genomes){
             if (genomeSize != -1 && (g.getTotalGeneNumber() < genomeSize-genomeSizeDelta || g.getTotalGeneNumber() > genomeSize + genomeSizeDelta))
                 continue;
@@ -301,10 +301,6 @@ public class DataSet {
         return unknownGeneFamily;
     }
 
-    public int getNumberOfGeneFamiliesWithMultipleGenes() {
-        return numberOfGeneFamiliesWithMultipleGenes;
-    }
-
     public Map<String,GeneFamily> getGeneLabelMap() {
         Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
         geneFamilyMap.put(unknownGeneFamily.getExternalId(), unknownGeneFamily);
@@ -313,9 +309,13 @@ public class DataSet {
         return geneFamilyMap;
     }
 
-    public int getAlphabetSize() {
+    public int getCompleteAlphabetSize() {
         System.out.println("alphabetSize: " + (geneFamilySet.size() + unknownGeneFamily.getFamilySize()) + " compressed: " + (numberOfGeneFamiliesWithMultipleGenes));
         return geneFamilySet.size() + unknownGeneFamily.getFamilySize();
+    }
+
+    public int getReducedAlphabetSize() {
+        return numberOfGeneFamiliesWithMultipleGenes;
     }
 
     private Map<GeneFamily, Color> getColorMap() {

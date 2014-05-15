@@ -111,7 +111,7 @@ class Statistics {
 	}
 	
 	private void fdrCorrection(List<ReferenceCluster> clusters) {
-		List<ReferenceCluster> sortedList = new ArrayList<ReferenceCluster>(clusters);
+		List<ReferenceCluster> sortedList = new ArrayList<>(clusters);
 		Collections.sort(sortedList, new Comparator<ReferenceCluster>() {
 			@Override
 			public int compare(ReferenceCluster o1, ReferenceCluster o2) {
@@ -273,8 +273,8 @@ class Statistics {
 	}
 
 	private void computeSinglePValuesForGenome(int genomeNr, int maxClusterSize, int[] charFrequencies){
-		double[] globalProbabilityForDifferenCharHits = computeGlobalProbabilityForDifferentCharHits(genomes.getAlphabetSize()+1, charFrequencies);
-		PTable pPlusTable = new PTable(genomes.getAlphabetSize(), maxClusterSize, delta, globalProbabilityForDifferenCharHits, random);
+		double[] globalProbabilityForDifferentCharHits = computeGlobalProbabilityForDifferentCharHits(genomes.getAlphabetSize()+1, charFrequencies);
+		PTable pPlusTable = new PTable(genomes.getAlphabetSize(), maxClusterSize, delta, globalProbabilityForDifferentCharHits, random);
 		
 		for (ReferenceCluster cluster : refCluster){
 			if (cluster.getDeltaLocations(genomeNr).isEmpty()){
@@ -338,7 +338,7 @@ class Statistics {
 		if (probOfC < 1.0) //!=
 			binomial = new Binomial(L, probOfC, random);
 			//Illegal argument (5 1,2 random) <= 0.0
-		
+
 		for (int d_plus = Math.max(0, d-(sizeOfC-2)); d_plus<=d; d_plus++){
 			if (binomial != null) {
 				for (int l=0; l<=L; l++){
@@ -389,7 +389,7 @@ class Statistics {
 		if(gen>0) return gen;
 		else return 0;
 	}
-	
+
 	private boolean noDLocPossible(List<Integer> geneContent, int maxDelta,
                                    int[] charFreqs) {
 		int nonAppearingGenes = 0;
