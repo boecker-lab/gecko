@@ -290,10 +290,10 @@ public class ReferenceClusterDistanceMatrixTest {
 	
 	
 	
-	@Test
+/*	@Test
 	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
 
         automaticGeneClusterTestFromFile(settings, false);
 	}
-}
+*/}

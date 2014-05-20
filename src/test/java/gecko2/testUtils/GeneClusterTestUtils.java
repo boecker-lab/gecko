@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,22 +30,53 @@ public class GeneClusterTestUtils {
 
     public static void performTest(Parameter p, int[][][] genomes, List<Set<Integer>> genomeGroups, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
         // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
-        compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
+    	int k = 20;
+        long[][] start = new long [2][k];
+        long[][] stop = new long [2][k];
+        for(int i=0;i<k;i++){
+        	start[0][i] = System.currentTimeMillis();
+        	List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
+        	compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
+        	stop[0][i] = System.currentTimeMillis();
+        }
+        int sum = 0;
+        long[] erg = new long [k];
+        for(int i=0;i<k;i++){
+        	erg[i] = stop[0][i]-start[0][i];
+        	sum += erg[i];
+        }
+        sum/=k;
+        Arrays.sort(erg);
+        System.out.println("ohne Speicher red");
+        System.out.println("	arith. Mittelwert; " + sum);
+        System.out.println("	median Mittelwert; " + erg[k/2-1]);
         
-        DataSet.printIntArray(genomes);
-        for (ExpectedReferenceClusterValues cluster : expectedReferenceClusters)
-            System.out.println(cluster.getGeneContent());
+        //DataSet.printIntArray(genomes);
+        //for (ExpectedReferenceClusterValues cluster : expectedReferenceClusters)
+        //    System.out.println(cluster.getGeneContent());
 
         MemoryReduction.memReducer(genomes, expectedReferenceClusters);
         
-        System.out.println();
-        DataSet.printIntArray(genomes);
-        for (ExpectedReferenceClusterValues cluster : expectedReferenceClusters)
-            System.out.println(cluster.getGeneContent());
-
-        List<ReferenceCluster> reducedRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
-        compareReferenceClusters(expectedReferenceClusters, reducedRes, PValueComparison.COMPARE_NONE);
+        //System.out.println();
+        //DataSet.printIntArray(genomes);
+        //for (ExpectedReferenceClusterValues cluster : expectedReferenceClusters)
+        //    System.out.println(cluster.getGeneContent());
+        for(int i=0;i<k;i++){
+        	start[1][i] = System.currentTimeMillis();
+        	List<ReferenceCluster> reducedRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
+        	compareReferenceClusters(expectedReferenceClusters, reducedRes, PValueComparison.COMPARE_NONE);
+        	stop[1][i] = System.currentTimeMillis();
+        }
+        for(int i=0;i<k;i++){
+        	erg[i] = stop[1][i]-start[1][i];
+        	sum += erg[i];
+        }
+        sum/=k;
+        Arrays.sort(erg);
+        System.out.println("mit Speicher red");
+        System.out.println("	arith. Mittelwert; " + sum);
+        System.out.println("	median Mittelwert; " + erg[k/2-1]);
+        System.out.println("");
     }
 
     public enum PValueComparison {

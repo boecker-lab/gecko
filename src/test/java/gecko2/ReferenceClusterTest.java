@@ -852,7 +852,7 @@ public class ReferenceClusterTest
         automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
     }
 
-	@Test
+/*	@Test
 	public void fiveProteobacterReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
 
@@ -865,7 +865,7 @@ public class ReferenceClusterTest
 
 		automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
 	}
-
+*/
 	@Test
 	public void testQuorumParamterJava()
 	{

@@ -103,9 +103,9 @@ public class ReferenceClusterAlgorithm {
 	}
 	
 	private List<ReferenceCluster> computeRefClusters(){
-		System.out.println("Computing Gene Clusters!");
+		//System.out.println("Computing Gene Clusters!");
 		
-		long startTime = System.nanoTime();
+		//long startTime = System.nanoTime();
 		
         if (param.getNrOfGenomes() != genomes.size())
             throw new RuntimeException("Number of genomes in param does not equal number of genomes!");
@@ -119,17 +119,17 @@ public class ReferenceClusterAlgorithm {
 		for (int i=0; i<refGenomeCount; i++)
 			detectReferenceGeneClusterFromSingleGenome(i, refClusterList);
 		
-		long calcTime = System.nanoTime();		
-		System.out.println("Doing Statistics!");
+		//long calcTime = System.nanoTime();		
+		//System.out.println("Doing Statistics!");
 		
 		for (ReferenceCluster cluster : refClusterList)
 			cluster.setGeneContent(genomes);
 		
 		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping);
 		
-		long statTime = System.nanoTime();
-		System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));
-		System.out.println(String.format("Statistics: %fs",(statTime - calcTime)/1.0E09));
+		//long statTime = System.nanoTime();
+		//System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));
+		//System.out.println(String.format("Statistics: %fs",(statTime - calcTime)/1.0E09));
 		
 		return refClusterList;
 	}
