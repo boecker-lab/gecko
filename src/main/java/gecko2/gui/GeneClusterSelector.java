@@ -57,8 +57,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
             }
         });
 
-        JComboBox selectionComboBox;
-		selectionComboBox = new JComboBox(ResultFilter.values());
+        JComboBox<ResultFilter> selectionComboBox = new JComboBox<>(ResultFilter.values());
 		selectionComboBox.setVisible(true);
 		
 		selectionComboBox.addActionListener(new ActionListener() {			
@@ -418,9 +417,9 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		private final String[] columnNames = {"ID", "#Genes", "#Genomes", "Score", "C-Score", "Genes"};
 		private final GeckoInstance instance;
 		
-		private ArrayList<GeneCluster> matchingClusters;
-		private final ArrayList<Integer> exclude = new ArrayList<Integer>();
-		private final ArrayList<Integer> include = new ArrayList<Integer>();
+		private java.util.List<GeneCluster> matchingClusters;
+		private final java.util.List<Integer> exclude = new ArrayList<>();
+		private final java.util.List<Integer> include = new ArrayList<>();
 		
 		public void refreshMachingClusters() {
 			
@@ -435,7 +434,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			}
 		}
 		
-		public ArrayList<GeneCluster> getMatchingClusters()	{
+		public java.util.List<GeneCluster> getMatchingClusters()	{
 			return matchingClusters;
 		}
 		
