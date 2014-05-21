@@ -23,6 +23,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -45,7 +46,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 
 	
 	public GeneClusterSelector() {
-		
 		this.setLayout(new BorderLayout());
 		JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		showSuboptimalCheckBox = new JCheckBox("show suboptimal hits");
@@ -64,7 +64,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
 				ResultFilter selection = (ResultFilter)((JComboBox)e.getSource()).getSelectedItem();
 				GeckoInstance.getInstance().filterBy(selection);
 			}
@@ -307,7 +306,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		
 	public void refresh() {
 		table.clearSelection();
-		model.refreshMachingClusters();
+		model.refreshMatchingClusters();
 		model.fireTableDataChanged();
 		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
 		TableCellRenderer r = table.getDefaultRenderer(String.class);
@@ -325,13 +324,12 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 	}
 
 	/**
-	 * This method make the method removeGenomeFromSelection from the class 
+	 * This method makes the method removeGenomeFromSelection from the class
 	 * GeneClusterSelectorModel visible for the user.
 	 * 
 	 * @param genomeToReset genome to remove from the filtered view
 	 */
 	public void resetGenome(int genomeToReset) {
-		
 		table.clearSelection();
 		model.removeGenomeFromSelection(genomeToReset);
 		model.fireTableDataChanged();
@@ -340,27 +338,23 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		int maxWidth = 0;
 		
 		for (int i = 0; i < model.getRowCount(); i++) {
-			
 			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
 			
 			if (width > maxWidth) {
-				
 				maxWidth = width;
 			}
 		}
 		
 		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
-		
 	}
 	
 	/**
-	 * This method make the method showClustersWithSelectedGenome from the class 
+	 * This method makes the method showClustersWithSelectedGenome from the class
 	 * GeneClusterSelectorModel visible for the user.
 	 * 
 	 * @param genomeToAddToFilter the index of the genome that is added to the filter
 	 */
-	public void showOnlyClusWthSelecGenome(int genomeToAddToFilter) {
-		
+	public void showOnlyClusterWithSelectedGenome(int genomeToAddToFilter) {
 		table.clearSelection();
 		model.showClustersWithSelectedGenome(genomeToAddToFilter);
 		model.fireTableDataChanged();
@@ -369,11 +363,9 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		int maxWidth = 0;
 		
 		for (int i = 0; i < model.getRowCount(); i++) {
-			
 			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
 			
 			if (width > maxWidth) {
-				
 				maxWidth = width;
 			}
 		}
@@ -388,7 +380,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 	 * @param genomeToRemove genome to add to the filter
 	 */
 	public void dontShowClusterWithSelectedGenome(int genomeToRemove) {
-		
 		table.clearSelection();
 		model.showClustersWithoutSelectedGenome(genomeToRemove);
 		model.fireTableDataChanged();
@@ -397,11 +388,9 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		int maxWidth = 0;
 		
 		for (int i = 0; i < model.getRowCount(); i++) {
-			
 			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
 			
 			if (width > maxWidth) {
-				
 				maxWidth = width;
 			}
 		}
@@ -418,10 +407,10 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		private final GeckoInstance instance;
 		
 		private java.util.List<GeneCluster> matchingClusters;
-		private final java.util.List<Integer> exclude = new ArrayList<>();
-		private final java.util.List<Integer> include = new ArrayList<>();
+		private final Set<Integer> exclude = new HashSet<>();
+		private final Set<Integer> include = new HashSet<>();
 		
-		public void refreshMachingClusters() {
+		public void refreshMatchingClusters() {
 			
 			matchingClusters.clear();
 
@@ -441,7 +430,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		
 		public GeneClusterSelectorModel() {
 			this.instance = GeckoInstance.getInstance();
-			matchingClusters = new ArrayList<GeneCluster>();
+			matchingClusters = new ArrayList<>();
 		}
 
         @Override
@@ -509,7 +498,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		 */
 		protected void removeGenomeFromSelection(int toRemove) {
 			
-			this.refreshMachingClusters();
+			this.refreshMatchingClusters();
 			
 			if (this.include.contains(toRemove)) {
 				include.remove(toRemove);
@@ -520,7 +509,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			}
 			
 			Object[] includeHelper = this.include.toArray();
-			Object[] excludeHelper = this.exclude.toArray();			
+			Object[] excludeHelper = this.exclude.toArray();
 			
 			this.exclude.clear();
 			this.include.clear();
@@ -539,12 +528,12 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		
 		/**
 		 * This method filters the matching clusters array list. It sorts out all
-		 * clusters which does not contain the given genome.
+		 * clusters which do not contain the given genome.
 		 * 
 		 * @param genomeToAddToFilter id of the genome to keep in clusters
 		 */
 		protected void showClustersWithSelectedGenome(int genomeToAddToFilter) {
-			ArrayList<GeneCluster> tmp = new ArrayList<GeneCluster>();
+			ArrayList<GeneCluster> tmp = new ArrayList<>();
 			
 			if (this.exclude.contains(genomeToAddToFilter)) {
 				this.removeGenomeFromSelection(genomeToAddToFilter);
@@ -569,22 +558,22 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		
 		/**
 		 * This method filters the matching clusters array list. It sorts out all
-		 * clusters which does contain the given genome.
+		 * clusters which do contain the given genome.
 		 * 
-		 * @param genomeToRemoveFromClusSelec id of the genome to sort out (number)
+		 * @param genomeToRemoveFromClusterSelection id of the genome to sort out (number)
 		 */
-		protected void showClustersWithoutSelectedGenome(int genomeToRemoveFromClusSelec) {
-			ArrayList<GeneCluster> tmp = new ArrayList<GeneCluster>();
+		protected void showClustersWithoutSelectedGenome(int genomeToRemoveFromClusterSelection) {
+			ArrayList<GeneCluster> tmp = new ArrayList<>();
 			
-			if (this.include.contains(genomeToRemoveFromClusSelec)) {
-				this.removeGenomeFromSelection(genomeToRemoveFromClusSelec);
+			if (this.include.contains(genomeToRemoveFromClusterSelection)) {
+				this.removeGenomeFromSelection(genomeToRemoveFromClusterSelection);
 			}
 			
 			for (GeneCluster g : this.matchingClusters) {
 				for (GeneClusterOccurrence k : g.getAllOccurrences()) {
-					for (int i = 0; i < k.getSubsequences()[genomeToRemoveFromClusSelec].length; i++) {
+					for (int i = 0; i < k.getSubsequences()[genomeToRemoveFromClusterSelection].length; i++) {
 						// If a genome is not in the cluster start is greater then stop
-						if (k.getSubsequences()[genomeToRemoveFromClusSelec][i].getStart() < k.getSubsequences()[genomeToRemoveFromClusSelec][i].getStop()) {
+						if (k.getSubsequences()[genomeToRemoveFromClusterSelection][i].getStart() < k.getSubsequences()[genomeToRemoveFromClusterSelection][i].getStop()) {
 							tmp.add(g);
 							break;
 						}
@@ -593,7 +582,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			}
 			
 			this.matchingClusters.removeAll(tmp);
-			this.exclude.add(genomeToRemoveFromClusSelec);
+			this.exclude.add(genomeToRemoveFromClusterSelection);
 		}
 	}
 	

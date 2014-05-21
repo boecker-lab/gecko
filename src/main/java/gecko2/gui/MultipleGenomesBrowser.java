@@ -226,7 +226,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		        }
 		        
 		        if (selectedItem.equals("Include")) {
-		        	gecko.getGui().getGcSelector().showOnlyClusWthSelecGenome(Integer.parseInt(cb.getName()));
+		        	gecko.getGui().getGcSelector().showOnlyClusterWithSelectedGenome(Integer.parseInt(cb.getName()));
 		        }
 		        
 		        if (selectedItem.equals("Exclude")) {
