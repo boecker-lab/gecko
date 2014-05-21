@@ -1,13 +1,13 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
+import gecko2.algorithm.DataSet;
 import gecko2.algorithm.GeneCluster;
 import gecko2.io.ClusterAnnotationReader;
 import gecko2.io.CogFileReader;
+import gecko2.io.DataSetWriter;
 import gecko2.io.GckFileReader;
-import gecko2.io.SessionWriter;
 import gecko2.util.FileUtils;
-import gecko2.util.PrintUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -98,7 +98,6 @@ public class Gui {
 		// splits the gui in horizontal half
         JSplitPane vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		vertSplit.setResizeWeight(0.5);
-		this.gecko.setClusters(null);
 		vertSplit.setTopComponent(selectorSplitPane);
 		
 		vertSplit.setBottomComponent(gcDisplay);
@@ -111,8 +110,7 @@ public class Gui {
 		menubar.add(menuFile);
 		menubar.add(menuView);
 		menubar.add(menuAbout);
-		
-				
+
 		mgb = new MultipleGenomesBrowser();
 		
 		
@@ -249,8 +247,6 @@ public class Gui {
 		p.add(searchField, BorderLayout.CENTER);
 		toolbar.add(p);
 		
-		// END TEST
-		
 		// Add components to Frame
 		JPanel northpanel = new JPanel();
 		northpanel.setLayout(new GridLayout(1, 1));
@@ -303,6 +299,9 @@ public class Gui {
 		mainframe.addKeyListener(mgb.getWheelListener());
 		mainframe.setIconImage(createImageIcon("images/gecko2_a_small.png").getImage());
 		mainframe.setVisible(true);
+
+        // Update data
+        gecko.setGeckoInstanceData();
 	}
 	
 	public void setInfobarText(String text) {
@@ -322,9 +321,11 @@ public class Gui {
 	}
 	
 	public void updateViewscreen() {
-		this.mgb.clear();
-		if (gecko.getGenomes()!=null)
-			this.mgb.addGenomes(gecko.getGenomes());
+        if (mgb != null) {
+            this.mgb.clear();
+            if (gecko.getGenomes() != null)
+                this.mgb.addGenomes(gecko.getGenomes());
+        }
 	}
 	
 	public AbstractMultipleGenomeBrowser getMgb() {
@@ -390,8 +391,7 @@ public class Gui {
 				
 		importGenomesAction.setEnabled(importGenomes);
 		
-		if (gecko.isLibgeckoLoaded())
-			startComputation.setEnabled(clusterBrowserActive);
+        startComputation.setEnabled(clusterBrowserActive);
 		clearSelectionAction.setEnabled(clusterBrowserActive);
 		saveSessionAction.setEnabled(clusterBrowserActive);
 		if (clusterBrowserActive) {
@@ -408,7 +408,7 @@ public class Gui {
 	}
 	
 	public void changeMode(Mode mode) {
-		switch (mode) {
+        switch (mode) {
 			case COMPUTING:
 				changeMode("Computing gene clusters...", false, true, false, false);
 				break;
@@ -434,9 +434,7 @@ public class Gui {
 	}
 
 	public void closeCurrentSession() {
-		gecko.setClusters(null);
-		gecko.setGenomes(null);
-		gcSelector.refresh();
+        gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
 		mgb.clear();
 	}
 	
@@ -461,10 +459,8 @@ public class Gui {
 		private static final long serialVersionUID = -7418023194238092616L;
 		
 		public void actionPerformed(ActionEvent e) {
-			final JFileChooser fc = new JFileChooser();
+			final JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("cog;gck"));
-			if (gecko.getLastOpenedFile()!=null)
-				fc.setSelectedFile(gecko.getLastOpenedFile());
 
 			int state = fc.showOpenDialog( null );
 			if (state == JFileChooser.APPROVE_OPTION) {
@@ -473,21 +469,22 @@ public class Gui {
 					closeCurrentSession();
 					// Check what type of file we are opening
 					if (FileUtils.getExtension(fc.getSelectedFile()).equals("cog")) {
-						Gui.this.gecko.setCurrentInputFile(fc.getSelectedFile());
+						gecko.setCurrentWorkingDirectoryOrFile(fc.getSelectedFile());
 						CogFileReader reader = new CogFileReader(fc.getSelectedFile());
 						reader.importGenomesOccs();
 						selectAndImportGenomes(reader);
 					} else {
 						if (FileUtils.getExtension(fc.getSelectedFile()).equals("gck")) {
-                            Gui.this.gecko.setCurrentInputFile(fc.getSelectedFile());
+                            Gui.this.gecko.setCurrentWorkingDirectoryOrFile(fc.getSelectedFile());
                             GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.READING_GENOMES);
 
                             SwingWorker worker = new SwingWorker<Void, Void>() {
                                 GckFileReader reader = new GckFileReader(fc.getSelectedFile());
+                                DataSet data;
                                 @Override
                                 protected Void doInBackground() {
                                     try{
-                                        reader.readData();
+                                        data = reader.readData();
                                     } catch (final IOException e) {
                                         EventQueue.invokeLater(new Runnable() {
                                             public void run() {
@@ -519,7 +516,7 @@ public class Gui {
                                     } catch (InterruptedException | ExecutionException e) {
                                         e.printStackTrace();
                                     }
-                                    GeckoInstance.getInstance().setGeckoInstanceFromReader(reader);
+                                    GeckoInstance.getInstance().setGeckoInstanceData(data);
                                 }
                             };
 
@@ -721,24 +718,22 @@ public class Gui {
 	private final Action saveSessionAction = new AbstractAction() {
 		private static final long serialVersionUID = -1530838105061978403L;
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser fc = new JFileChooser();
+			JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
 			
 			for (FileFilter f : fc.getChoosableFileFilters())
 				fc.removeChoosableFileFilter(f);
 			
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("gck"));
-			if (gecko.getLastSavedFile()!=null)
-				fc.setSelectedFile(gecko.getLastSavedFile());
 				
 			for (;;) {
 				int state = fc.showSaveDialog(null);
 				if (state == JFileChooser.APPROVE_OPTION) {
 					File f = fc.getSelectedFile();
 					
-					if (! fc.getFileFilter().accept(fc.getSelectedFile()))
-						f = new File(f.getAbsolutePath() + ".gck");
-					
-					PrintUtils.printDebug("Choosen file to save to: " + f);
+					if (! fc.getFileFilter().accept(fc.getSelectedFile())) {
+                        f = new File(f.getAbsolutePath() + ".gck");
+                        gecko.setCurrentWorkingDirectoryOrFile(f);
+                    }
 					
 					if (f.exists()) {
 						if (f.isDirectory()) {
@@ -756,7 +751,7 @@ public class Gui {
 							continue;
 					}
 					
-					if (! SessionWriter.saveSessionToFile(f))
+					if (! DataSetWriter.saveDataSetToFile(gecko.getData(), f))
 						JOptionPane.showMessageDialog(mainframe, "An error occured while writing the file!", "Error", JOptionPane.ERROR_MESSAGE);
 					
 					break;
@@ -773,22 +768,23 @@ public class Gui {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser fc = new JFileChooser();
+			JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
 			
 			for (;;) {	
 				int state = fc.showOpenDialog(null);
 				
 				if (state == JFileChooser.APPROVE_OPTION) {
 					File f = fc.getSelectedFile();
+                    gecko.setCurrentWorkingDirectoryOrFile(f);
 					
 					if (f.exists()) {	
 						if (f.isDirectory()) {
 							JOptionPane.showMessageDialog(mainframe, "You cannot choose a directory", "Error", JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
-						
+
 						GeckoInstance geckoInstance = GeckoInstance.getInstance();
-						List<GeneCluster> newCluster = ClusterAnnotationReader.readClusterAnnotations(f, geckoInstance.getGenomes());
+						List<GeneCluster> newCluster = ClusterAnnotationReader.readClusterAnnotations(f, geckoInstance.getData());
 						
 						if (newCluster == null)
 							JOptionPane.showMessageDialog(mainframe, "An error occured while reading the annotations!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -818,27 +814,25 @@ public class Gui {
 		importGenomesAction.putValue(Action.NAME, "Open session or genome file...");
 		importGenomesAction.putValue(Action.SHORT_DESCRIPTION, "Open...");	
 		importGenomesAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileopen.png"));
-		importGenomesAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileopen_large.png"));
+		importGenomesAction.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/fileopen_large.png"));
 		importGenomesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		startComputation.putValue(Action.NAME, "Start computation...");
 		startComputation.putValue(Action.SHORT_DESCRIPTION, "Start computation...");
 		startComputation.putValue(Action.SMALL_ICON, createImageIcon("images/player_play.png"));
-		startComputation.putValue(Action.SMALL_ICON, createImageIcon("images/player_play_large.png"));
+		startComputation.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/player_play_large.png"));
 		startComputation.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		startComputation.setEnabled(false);
 		
 		saveSessionAction.putValue(Action.NAME, "Save session...");
 		saveSessionAction.putValue(Action.SHORT_DESCRIPTION, "Save session...");
 		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave.png"));
-		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave_large.png"));
+		saveSessionAction.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/filesave_large.png"));
 		saveSessionAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		saveSessionAction.setEnabled(false);
 		
 		exportResultsAction.putValue(Action.NAME, "Export results...");
 		exportResultsAction.putValue(Action.SHORT_DESCRIPTION, "Export results...");
-		exportResultsAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileexport_large.png"));
-		exportResultsAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileexport_large.png"));
 		exportResultsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		saveSessionAction.setEnabled(false);
@@ -849,16 +843,16 @@ public class Gui {
 		
 		clearSelectionAction.putValue(Action.SHORT_DESCRIPTION, "Clear selection");
 		clearSelectionAction.putValue(Action.SMALL_ICON, createImageIcon("images/cancel.png"));
-		clearSelectionAction.putValue(Action.SMALL_ICON, createImageIcon("images/cancel_large.png"));
+		clearSelectionAction.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/cancel_large.png"));
 		zoomIn.putValue(Action.NAME, "Zoom in");
 		zoomIn.putValue(Action.SHORT_DESCRIPTION, "Zoom in");
 		zoomIn.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag+.png"));
-		zoomIn.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag+_large.png"));
+		zoomIn.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/viewmag+_large.png"));
 		zoomIn.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		zoomOut.putValue(Action.NAME, "Zoom out");
 		zoomOut.putValue(Action.SHORT_DESCRIPTION, "Zoom out");
 		zoomOut.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag-.png"));
-		zoomOut.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag-_large.png"));
+		zoomOut.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/viewmag-_large.png"));
 		zoomOut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_MINUS,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
 		exitAction.putValue(Action.NAME, "Exit");

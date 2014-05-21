@@ -72,13 +72,13 @@ class GenomeList {
      * @param genomes the lists of Integers.
      */
     GenomeList(int[][][] genomes) {
-        Set<Integer> genes = new HashSet<Integer>();
+        Set<Integer> genes = new HashSet<>();
         genes.add(0);
         int alphSize = 0;
         int i = 0;
-        this.genomes = new ArrayList<Genome>(genomes.length);
+        this.genomes = new ArrayList<>(genomes.length);
         for (int[][] genome : genomes) {
-            List<Chromosome> chromosomes = new ArrayList<Chromosome>(genome.length);
+            List<Chromosome> chromosomes = new ArrayList<>(genome.length);
             int j=0;
             for (int[] chromosome : genome) {
                 for (Integer gene : chromosome) {

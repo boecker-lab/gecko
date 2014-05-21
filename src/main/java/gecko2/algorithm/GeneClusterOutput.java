@@ -10,16 +10,17 @@ import java.util.Map;
  * @author swinter
  */
 public class GeneClusterOutput {
+    private final int id;
 	private final BigDecimal pValue;
 	private final int refSeq;
 	private final int[] distances; 
-	private final Map<Integer, Gene[][]> geneAnnotations;
+	private final Map<GeneFamily, Gene[][]> geneAnnotations;
 	/**
 	 * The gene ids for all the intervals. The first list contains one entry per genome. 
 	 * The second contains one entry per occurrence on the genome. The third contains
 	 * the gene ids for the occurrence.
 	 */
-	private final List<List<List<Integer>>> intervals;
+	private final List<List<List<Gene>>> intervals;
 	/**
 	 * The borders for all the intervals. The first list contains one entry per genome. 
 	 * The second contains one entry per occurrence on the genome. The array is always
@@ -30,21 +31,27 @@ public class GeneClusterOutput {
 	private final List<List<String>> chromosomes;
 	private final int[] nrOfOccurrences;
 
-	public static class Builder {
+    public int getId() {
+        return id;
+    }
+
+    public static class Builder {
+        private final int id;
 		private final int nrOfSequences;
 		
 		private BigDecimal pValue;
 		private int refSeq;
 		private final int[] distances;
-		private Map<Integer, Gene[][]> geneAnnotations;
-		private List<List<List<Integer>>> intervals;
+		private Map<GeneFamily, Gene[][]> geneAnnotations;
+		private List<List<List<Gene>>> intervals;
 		private List<List<int[]>> intervalBorders;
 		private List<List<String>> chromosomes;
 
 		private int[] nrOfOccurrences;
 		
-		public Builder (int nrOfSequences) {
+		public Builder (int nrOfSequences, int id) {
 			this.nrOfSequences = nrOfSequences;
+            this.id = id;
 			
 			distances = new int[this.nrOfSequences];
 			Arrays.fill(distances, 0);
@@ -65,12 +72,12 @@ public class GeneClusterOutput {
 			return this;
 		}
 		
-		public Builder annotations(Map<Integer, Gene[][]> geneAnnotations) {
+		public Builder annotations(Map<GeneFamily, Gene[][]> geneAnnotations) {
 			this.geneAnnotations = geneAnnotations;
 			return this;
 		}
 		
-		public void intervals(List<List<List<Integer>>> intervals) {
+		public void intervals(List<List<List<Gene>>> intervals) {
 			this.intervals = intervals;
 		}
 		
@@ -94,6 +101,7 @@ public class GeneClusterOutput {
 	}
 	
 	private GeneClusterOutput(Builder builder) {
+        id = builder.id;
 		pValue = builder.pValue;
 		refSeq = builder.refSeq;
 		distances = Arrays.copyOf(builder.distances, builder.distances.length);
@@ -120,11 +128,11 @@ public class GeneClusterOutput {
 		return distances;
 	}
 
-	public Map<Integer, Gene[][]> getGeneAnnotations() {
+	public Map<GeneFamily, Gene[][]> getGeneAnnotations() {
 		return geneAnnotations;
 	}
 	
-	public List<List<List<Integer>>> getIntervals() {
+	public List<List<List<Gene>>> getIntervals() {
 		return intervals;
 	}
 	

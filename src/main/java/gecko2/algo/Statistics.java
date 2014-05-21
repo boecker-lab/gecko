@@ -84,8 +84,8 @@ class Statistics {
 				best_pValue[genomeGroupMapping.get(bestRefLoc.getGenomeNr())] = 1.0;
 			else
 				best_pValue[bestRefLoc.getGenomeNr()] = 1.0;
-			
-			cluster.setGenomeNr(bestRefLoc.getGenomeNr());
+
+            cluster.changeReferenceOccurrence(bestRefLoc);
 			
 			cluster.setBestCombined_pValue(combine_pValuesWithQuorum(best_pValue, cluster.getCoveredGenomeGroups()));
 			
@@ -111,7 +111,7 @@ class Statistics {
 	}
 	
 	private void fdrCorrection(List<ReferenceCluster> clusters) {
-		List<ReferenceCluster> sortedList = new ArrayList<ReferenceCluster>(clusters);
+		List<ReferenceCluster> sortedList = new ArrayList<>(clusters);
 		Collections.sort(sortedList, new Comparator<ReferenceCluster>() {
 			@Override
 			public int compare(ReferenceCluster o1, ReferenceCluster o2) {

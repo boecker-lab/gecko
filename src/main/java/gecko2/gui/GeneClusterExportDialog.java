@@ -1,6 +1,7 @@
 package gecko2.gui;
 
 import com.itextpdf.text.DocumentException;
+import gecko2.GeckoInstance;
 import gecko2.algorithm.GeneCluster;
 import gecko2.gui.GenomePainting.NameType;
 import gecko2.io.GeneClusterToPDFWriter;
@@ -118,42 +119,38 @@ public class GeneClusterExportDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// set up file chooser
-				JFileChooser fileLocation = new JFileChooser();
-				fileLocation.setName(FILENAME);
-				fileLocation.addChoosableFileFilter(new FileUtils.GenericFilter("pdf;png;jpg"));
-				fileLocation.setDialogTitle("Select the location to save the file...");
-					
-				do {
-					
-					fileLocation.showDialog(parent, "Ok");
-					fileLocation.setSelectedFile(new File(checkAndFixFileExtension(fileLocation.getSelectedFile().getAbsolutePath())));
-				}
-				while (GeneClusterExportDialog.this.checkFileExistence(fileLocation.getSelectedFile()));
-				
-				// set the path into the text field
-				GeneClusterExportDialog.this.storingLocation.setText(fileLocation.getSelectedFile().getAbsolutePath());	
+				JFileChooser fc = new JFileChooser(GeckoInstance.getInstance().getCurrentWorkingDirectoryOrFile());
+				fc.setName(FILENAME);
+				fc.addChoosableFileFilter(new FileUtils.GenericFilter("pdf;png;jpg"));
+				fc.setDialogTitle("Select the location to save the file...");
+
+                int state = fc.showSaveDialog(GeneClusterExportDialog.this);
+                if (state == JFileChooser.APPROVE_OPTION) {
+                    if (fc.getSelectedFile() != null)
+                        GeneClusterExportDialog.this.storingLocation.setText(fc.getSelectedFile().getAbsolutePath());
+                }
 			}
 		});
 		
 		// check box for using genome names instead of the internal mapped number
-		JCheckBox gName = new JCheckBox();
-		gName.setText("Use genome names instead of numbers.");
+		JCheckBox useGenomeNamesCheckBox = new JCheckBox();
+		useGenomeNamesCheckBox.setText("Use genome names instead of numbers.");
 		
-		gName.addItemListener(new ItemListener() {
+		useGenomeNamesCheckBox.addItemListener(new ItemListener() {
 
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				int status = e.getStateChange();
-				
-				// update preview on select/deselect
-				if (status == ItemEvent.DESELECTED)	
-            		clusterPics.setGnames(false);
-            	else 
-            		clusterPics.setGnames(true);
-				updateImage();
-			}
-		});
-		
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                int status = e.getStateChange();
+
+                // update preview on select/deselect
+                if (status == ItemEvent.DESELECTED)
+                    clusterPics.setGnames(false);
+                else
+                    clusterPics.setGnames(true);
+                updateImage();
+            }
+        });
+
 		
 		final JComboBox geneNamingComboBox = new JComboBox(GenomePainting.NameType.values());
 		geneNamingComboBox.setSelectedIndex(0);
@@ -205,34 +202,27 @@ public class GeneClusterExportDialog extends JDialog {
 			
 		});
 		
-		// Button for launching the export
+        /**
+         * Action which is launched by pressing the export button.
+         * Causes the export of the cluster to a pdf file.
+         */
 		JButton exportButton = new JButton("Export");
 		exportButton.addActionListener(new AbstractAction() {
-            /**
-             * Action which is launched by pressing the export button.
-             * Causes the export of the cluster to a pdf file.
-             */
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                // if the user just used the text field for editing the file name/path
-                // we have to check the file existence independent from the browse button
-                // behavior
-                String filename = checkAndFixFileExtension(GeneClusterExportDialog.this.storingLocation.getText());
-                GeneClusterExportDialog.this.storingLocation.setText(filename);
-                if (!checkFileExistence(new File(filename))) {
-                    try (FileOutputStream out = new FileOutputStream(new File(GeneClusterExportDialog.this.storingLocation.getText()))) {
+                File file = validateSettings();
+                if (file != null) {
+                    try (FileOutputStream out = new FileOutputStream(file)) {
                         if (GeneClusterExportDialog.this.png) {
                             ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "png", out);
                             GeneClusterExportDialog.this.setVisible(false);
                         }
 
-                        // jpg export
                         if (GeneClusterExportDialog.this.jpg) {
                             ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "jpg", out);
                             GeneClusterExportDialog.this.setVisible(false);
                         }
 
-                        // pdf export
                         if (GeneClusterExportDialog.this.pdf) {
                             GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(out);
                             gcw.write(GeneClusterExportDialog.this.clusterPics);
@@ -241,8 +231,6 @@ public class GeneClusterExportDialog extends JDialog {
                     }  catch (IOException | DocumentException e) {
                         e.printStackTrace();
                     }
-                    // png export
-
                 }
             }
         });
@@ -257,7 +245,7 @@ public class GeneClusterExportDialog extends JDialog {
 		storPanel.add(browseButton, BorderLayout.CENTER);
 		mainPanel1.add(storPanel);
 		//mainPanel1.add(storingLocation);
-		mainPanel1.add(gName);
+		mainPanel1.add(useGenomeNamesCheckBox);
 		mainPanel1.add(geneNamingComboBox);
 		//mainPanel1.add(extraData);
 		mainPanel1.add(ovlapStatus1);
@@ -366,6 +354,28 @@ public class GeneClusterExportDialog extends JDialog {
 		this.pack();
 		
 	}
+
+    /**
+     * Validate all settings to check if a result can be exported
+     * @return the File the results will be written to, or null if not valid
+     */
+    private File validateSettings() {
+        if (storingLocation.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(GeneClusterExportDialog.this, "You have to select a file!");
+            return null;
+        }
+        File file = new File(storingLocation.getText());
+        if (file.exists()) {
+            int x = JOptionPane.showConfirmDialog(GeneClusterExportDialog.this,
+                    "The chosen file already exists. Overwrite?",
+                    "Overwrite existing file?",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+            if (x==JOptionPane.NO_OPTION) return null;
+        }
+
+        return file;
+    }
 
     private void matchFileEndingToFiletype() {
         int dot = GeneClusterExportDialog.this.storingLocation.getText().lastIndexOf(".");
