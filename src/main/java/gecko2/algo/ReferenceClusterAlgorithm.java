@@ -21,29 +21,6 @@ public class ReferenceClusterAlgorithm {
 		return computeReferenceClusters(genomes, param, null);
 	}
 
-    private static int[] getSizes(int[][][] genomes) {
-        int[] result = new int[genomes.length];
-        for(int l = 0; l<genomes.length;l++){
-            for(int m = 0; m<genomes[l].length; m++){
-                result[l] += genomes[l][m].length - 2;
-            }
-        }
-        return result;
-    }
-
-    private static void printGenomes(int[][][] genomes) {
-        for(int l = 0; l<genomes.length;l++){
-            for(int m = 0; m<genomes[l].length; m++){
-                for(int x = 0; x<genomes[l][m].length;x++){
-                    System.out.print(genomes[l][m][x] + " ");
-                }
-                System.out.println("");
-            }
-        }
-    }
-
-
-
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
 	 * @param genomes the genomes
