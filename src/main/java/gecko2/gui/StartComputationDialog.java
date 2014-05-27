@@ -28,7 +28,7 @@ public class StartComputationDialog extends JDialog {
 	private int quorum;
 	private Parameter.OperationMode opMode;
     private Parameter.ReferenceType refType;
-	private final JComboBox refCombo;
+	private final JComboBox<Parameter.ReferenceType> refCombo;
 	private final JCheckBox mergeResults;
 	private final GeckoInstance gecko = GeckoInstance.getInstance();
 
@@ -57,7 +57,7 @@ public class StartComputationDialog extends JDialog {
 		qValues[qValues.length-1] = "all";
 		for (int i=2;i<ngenomes;i++)
 			qValues[i-2] = Integer.toString(i);
-		final JComboBox qCombo = new JComboBox(qValues);
+		final JComboBox<String> qCombo = new JComboBox<>(qValues);
 		qCombo.setSelectedIndex(qValues.length-1);
 		qCombo.setPreferredSize(new Dimension(190,30));
 		qCombo.addActionListener(new ActionListener() {
@@ -69,7 +69,7 @@ public class StartComputationDialog extends JDialog {
 			}
 		});
 
-		final JComboBox modeCombo = new JComboBox(Parameter.OperationMode.getSupported());
+		final JComboBox<Parameter.OperationMode> modeCombo = new JComboBox<>(Parameter.OperationMode.getSupported());
 
 		modeCombo.setPreferredSize(new Dimension(190,30));
 
@@ -78,7 +78,7 @@ public class StartComputationDialog extends JDialog {
 		modeCombo.setSelectedIndex(0);
 
         JLabel refLabel = new JLabel("Reference:");
-		refCombo = new JComboBox(Parameter.ReferenceType.getSupported());
+		refCombo = new JComboBox<>(Parameter.ReferenceType.getSupported());
 		refCombo.setPreferredSize(new Dimension(190, 30));
 		
 		modeCombo.addActionListener(new ActionListener() {
@@ -148,7 +148,7 @@ public class StartComputationDialog extends JDialog {
 			
 		};
 		
-		EventList<Genome> genomeEventList = new BasicEventList<Genome>();
+		EventList<Genome> genomeEventList = new BasicEventList<>();
 		genomeEventList.addAll(Arrays.asList(GeckoInstance.getInstance().getGenomes()));
 		
 		final JComboBox refGenomeCombo = new JComboBox();

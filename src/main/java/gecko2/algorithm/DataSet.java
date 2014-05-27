@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class DataSet {
     private Genome[] genomes;
-    private GeneCluster[] clusters;
+    private List<GeneCluster> clusters;
 
     private int maxIdLength;
     private int maxNameLength;
@@ -33,7 +33,7 @@ public class DataSet {
     }
 
     public DataSet(Genome[] genomes,
-                   GeneCluster[] clusters,
+                   List<GeneCluster> clusters,
                    int maxIdLength,
                    int maxNameLength,
                    int maxLocusTagLength,
@@ -41,7 +41,7 @@ public class DataSet {
                    GeneFamily unknownGeneFamily,
                    int numberOfGeneFamiliesWithMultipleGenes) {
         this.genomes = genomes;
-        this.clusters = clusters==null ? new GeneCluster[0] : clusters;
+        this.clusters = clusters==null ? new ArrayList<GeneCluster>() : clusters;
         this.maxIdLength = maxIdLength;
         this.maxNameLength = maxNameLength;
         this.maxLocusTagLength = maxLocusTagLength;
@@ -273,11 +273,11 @@ public class DataSet {
         this.genomes = genomes;
     }
 
-    public GeneCluster[] getClusters() {
+    public List<GeneCluster> getClusters() {
         return clusters;
     }
 
-    public void setClusters(GeneCluster[] clusters) {
+    public void setClusters(List<GeneCluster> clusters) {
         this.clusters = clusters;
     }
 
@@ -341,7 +341,7 @@ public class DataSet {
         DataSet dataSet = (DataSet) o;
 
         if (numberOfGeneFamiliesWithMultipleGenes != dataSet.numberOfGeneFamiliesWithMultipleGenes) return false;
-        if (!Arrays.equals(clusters, dataSet.clusters)) return false;
+        if (!clusters.equals(dataSet.clusters)) return false;
         if (geneFamilySet != null ? !geneFamilySet.equals(dataSet.geneFamilySet) : dataSet.geneFamilySet != null)
             return false;
         if (!Arrays.equals(genomes, dataSet.genomes)) return false;
@@ -354,7 +354,7 @@ public class DataSet {
     @Override
     public int hashCode() {
         int result = genomes != null ? Arrays.hashCode(genomes) : 0;
-        result = 31 * result + (clusters != null ? Arrays.hashCode(clusters) : 0);
+        result = 31 * result + (clusters != null ? clusters.hashCode() : 0);
         result = 31 * result + (geneFamilySet != null ? geneFamilySet.hashCode() : 0);
         result = 31 * result + (unknownGeneFamily != null ? unknownGeneFamily.hashCode() : 0);
         result = 31 * result + numberOfGeneFamiliesWithMultipleGenes;

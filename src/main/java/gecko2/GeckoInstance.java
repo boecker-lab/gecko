@@ -27,6 +27,11 @@ public class GeckoInstance {
     private DataSet data;
 
     private native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
+
+    public List<GeneCluster> computeReferenceStatistics(int[][][] genomes, Parameter params, List<GeneCluster> cluster, GeckoInstance gecko) {
+        return new ArrayList<>(Arrays.asList(computeReferenceStatistics(genomes, params, cluster.toArray(new GeneCluster[cluster.size()]), gecko)));
+    }
+
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
 
     public enum ResultFilter {showAll, showFiltered, showSelected}
@@ -285,11 +290,11 @@ public class GeckoInstance {
 	 * @return the list of gene clusters
 	 */
 	private List<GeneCluster> getClusterList(ResultFilter filter) {
-		ArrayList<GeneCluster> result = new ArrayList<>(data.getClusters().length);
+		ArrayList<GeneCluster> result = new ArrayList<>(data.getClusters().size());
 		
-		for (int i=0; i<data.getClusters().length; i++) {
+		for (int i=0; i<data.getClusters().size(); i++) {
 			if (applyFilter(i, filter))
-				result.add(data.getClusters()[i]);
+				result.add(data.getClusters().get(i));
 		}
 		
 		result.trimToSize();
@@ -345,7 +350,7 @@ public class GeckoInstance {
         dataUpdated();
 	}
 	
-	public void setClusters(GeneCluster[] clusters) {
+	public void setClusters(List<GeneCluster> clusters) {
 		this.data.setClusters(clusters);
         handleUpdatedClusterResults();
 	}
@@ -415,7 +420,7 @@ public class GeckoInstance {
         }
     }
 	
-	public GeneCluster[] getClusters() {
+	public List<GeneCluster> getClusters() {
 		return data.getClusters();
 	}
 	
@@ -445,7 +450,7 @@ public class GeckoInstance {
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public static GeneCluster[] computeClustersJava(DataSet data, Parameter params) {
+	public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params) {
 		return computeClustersJava(data, params, null);
 	}
 	
@@ -456,14 +461,14 @@ public class GeckoInstance {
 	 * @param genomeGrouping the grouping of the genomes, only one genome per group is used for quorum and p-value
 	 * @return the gene clusters
 	 */
-	public static GeneCluster[] computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping) {
+	public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping) {
         int intArray[][][] = data.toIntArray();
 
         params.setAlphabetSize(data.getAlphabetSize());
 		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping);
-        GeneCluster[] result = new GeneCluster[refCluster.size()];
+        List<GeneCluster> result = new ArrayList<>(refCluster.size());
         for (int i=0; i<refCluster.size(); i++)
-            result[i] = new GeneCluster(i, refCluster.get(i), data);
+            result.add(new GeneCluster(i, refCluster.get(i), data));
         return result;
 	}
 	
@@ -472,10 +477,10 @@ public class GeckoInstance {
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClustersLibgecko(DataSet data, Parameter params) {
+	public List<GeneCluster> computeClustersLibgecko(DataSet data, Parameter params) {
         int intArray[][][] = data.toIntArray();
         params.setAlphabetSize(data.getAlphabetSize());
-		return computeClusters(intArray, params, GeckoInstance.this);
+		return new ArrayList<>(Arrays.asList(computeClusters(intArray, params, GeckoInstance.this)));
 	}
 	
 	/**
@@ -483,7 +488,7 @@ public class GeckoInstance {
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public GeneCluster[] computeClusters(Parameter params) {
+	public List<GeneCluster> computeClusters(Parameter params) {
 		return computeClustersJava(data, params);
 		//return computeClustersLibgecko(data, params);
 	}
@@ -525,10 +530,10 @@ public class GeckoInstance {
                 genomeGroups = BreakPointDistance.groupGenomes(data, groupingFactor, false);
 			
 			Date before = new Date();
-			GeneCluster[] res = computeClustersJava(data, p, genomeGroups);
+            List<GeneCluster> res = computeClustersJava(data, p, genomeGroups);
 			Date after = new Date();
 			System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
-            final GeneCluster[] geneClusters;
+            final List<GeneCluster> geneClusters;
 			if (mergeResults)
                 geneClusters = GeneCluster.mergeResults(GeckoInstance.this.getClusters(), res);
 			else
@@ -537,7 +542,7 @@ public class GeckoInstance {
 		}
 	}
 	
-	public GeneCluster[] computeReferenceStatistics(GeneCluster[] clusters){
+	public List<GeneCluster> computeReferenceStatistics(List<GeneCluster> clusters){
 		if (!this.isLibgeckoLoaded()){
 			System.err.println("Running in visualization only mode! Cannot compute statistics!");
 			return clusters;
@@ -551,7 +556,7 @@ public class GeckoInstance {
 			minClusterSize = Math.min(minClusterSize, cluster.getMinRefSeqLength());
 			minQuorum = Math.min(minQuorum, cluster.getSize());
 		}
-		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.length));
+		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.size()));
 		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(data.getAlphabetSize());
 		return this.computeReferenceStatistics(genomes, p, clusters, this);

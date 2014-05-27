@@ -74,36 +74,37 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		this.setPreferredSize(new Dimension(50, 200));
 		table = new JTable();
 		table.setBackground(Color.WHITE);
-		
+
 		model = new GeneClusterSelectorModel();
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setModel(model);
 		TableRowSorter<GeneClusterSelectorModel> sorter = new TableRowSorter<GeneClusterSelectorModel>(model);
 		sorter.setSortable(COL_GENES, false);
-		
+
 		table.setRowSorter(sorter);
 		final TableColumnModel cm = table.getColumnModel();
-		cm.getColumn(0).setPreferredWidth(50); // ID
-		cm.getColumn(1).setPreferredWidth(50); // #Genes
-		cm.getColumn(2).setPreferredWidth(70); // #Genomes
-		
-		cm.getColumn(3).setPreferredWidth(60); // pValue
-		cm.getColumn(4).setPreferredWidth(60); // corrected pValue
-		cm.getColumn(5).setPreferredWidth(200); // Genes
+		cm.getColumn(COL_ID).setPreferredWidth(50); // ID
+		cm.getColumn(COL_NGENES).setPreferredWidth(50); // #Genes
+		cm.getColumn(COL_NGENOMES).setPreferredWidth(70); // #Genomes
+		cm.getColumn(COL_SCORE).setPreferredWidth(60); // pValue
+		cm.getColumn(COL_SCORE_CORRECTED).setPreferredWidth(60); // corrected pValue
+		cm.getColumn(COL_GENES).setPreferredWidth(200); // Genes
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.getViewport().setBackground(Color.WHITE);
-		
+
+        // Add content to Panel
 		this.add(scrollPane, BorderLayout.CENTER);
+
+        // Listeners
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 int row = table.getSelectedRow();
+                if (row < 0)
+                    return;
 
-                if (row < 0) return;
-
-                GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
-
+                GeneCluster gc = GeckoInstance.getInstance().getClusters().get((Integer) table.getValueAt(row, 0));
                 if (gc != null && !(gc.getType() == Parameter.OperationMode.reference)) {
                     fireSelectionEvent(false);
                 }
@@ -176,7 +177,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 
                 if (row < 0) return;
 
-                GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
+                GeneCluster gc = GeckoInstance.getInstance().getClusters().get((Integer) table.getValueAt(row, 0));
                 StringBuilder geneIDs = new StringBuilder();
 
                 for (GeneFamily geneFamily : gc.getGeneFamilies()) {
@@ -189,7 +190,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		table.setDefaultRenderer(Double.class, new DoubleCellRenderer());
 		
 		table.getRowSorter().setSortKeys(Arrays.asList(new RowSorter.SortKey(3, SortOrder.DESCENDING)));
-		
+
 		// Build popup menu
 		popUp = new JPopupMenu();
 		
@@ -221,7 +222,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				AbstractMultipleGenomeBrowser mgb = GeckoInstance.getInstance().getGui().getMgb();
-				if (mgb.getSelectedCluster() == null || !GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(table.getSelectedRow(), 0)].equals(mgb.getSelectedCluster()))
+				if (mgb.getSelectedCluster() == null || !GeckoInstance.getInstance().getClusters().get((Integer) table.getValueAt(table.getSelectedRow(), COL_ID)).equals(mgb.getSelectedCluster()))
 					fireSelectionEvent(true);
 				GeneClusterExportDialog d = new GeneClusterExportDialog(GeckoInstance.getInstance().getGui().getMainframe(), mgb.getSelectedCluster(), mgb.getSubselection());
 				d.setVisible(true);
@@ -247,7 +248,10 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		});
 		popUp.add(menuItem);
 	}
-	
+
+    /**
+     * A new cell renderer for double values, used for the p-values
+     */
 	public static class DoubleCellRenderer extends  DefaultTableCellRenderer.UIResource {
 
 		/**
@@ -276,10 +280,9 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		
 		if (row < 0) return;
 		
-		GeneCluster gc = GeckoInstance.getInstance().getClusters()[(Integer) table.getValueAt(row, 0)];
+		GeneCluster gc = GeckoInstance.getInstance().getClusters().get((Integer) table.getValueAt(row, 0));
 		
 		if (gc.getType() == Parameter.OperationMode.center || gc.getType() == Parameter.OperationMode.median) {
-			
 			showSuboptimalCheckBox.setVisible(false);
 			fireSelectionEvent(new ClusterSelectionEvent(GeneClusterSelector.this, 
 					gc,
@@ -311,15 +314,15 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
 		TableCellRenderer r = table.getDefaultRenderer(String.class);
 		int maxWidth = 0;
-		
+
 		for (int i = 0; i < model.getRowCount(); i++) {
 			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
-			
+
 			if (width > maxWidth) {
 				maxWidth = width;
 			}
 		}
-		
+
 		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
 	}
 
@@ -336,18 +339,18 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
 		TableCellRenderer r = table.getDefaultRenderer(String.class);
 		int maxWidth = 0;
-		
+
 		for (int i = 0; i < model.getRowCount(); i++) {
 			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
-			
+
 			if (width > maxWidth) {
 				maxWidth = width;
 			}
 		}
-		
+
 		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
 	}
-	
+
 	/**
 	 * This method makes the method showClustersWithSelectedGenome from the class
 	 * GeneClusterSelectorModel visible for the user.
@@ -361,18 +364,18 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
 		TableCellRenderer r = table.getDefaultRenderer(String.class);
 		int maxWidth = 0;
-		
+
 		for (int i = 0; i < model.getRowCount(); i++) {
 			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
-			
+
 			if (width > maxWidth) {
 				maxWidth = width;
 			}
 		}
-		
+
 		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
 	}
-	
+
 	/**
 	 * This method make the method showClustersWithoutSelectedGenome from the class 
 	 * GeneClusterSelectorModel visible for the user.
@@ -386,15 +389,15 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
 		TableCellRenderer r = table.getDefaultRenderer(String.class);
 		int maxWidth = 0;
-		
+
 		for (int i = 0; i < model.getRowCount(); i++) {
 			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
-			
+
 			if (width > maxWidth) {
 				maxWidth = width;
 			}
 		}
-		
+
 		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
 	}
 
@@ -411,7 +414,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		private final Set<Integer> include = new HashSet<>();
 		
 		public void refreshMatchingClusters() {
-			
 			matchingClusters.clear();
 
 			if (instance.getClusters() != null)	{
@@ -457,17 +459,17 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		public Object getValueAt(int rowIndex, int columnIndex)	{
 			
 			switch(columnIndex)	{
-				case 0:
+				case COL_ID:
 					return matchingClusters.get(rowIndex).getId();
-				case 1:
+				case COL_NGENES:
 					return matchingClusters.get(rowIndex).getGeneFamilies().size();
-				case 2:
+				case COL_NGENOMES:
 					return matchingClusters.get(rowIndex).getSize();
-				case 3:
+				case COL_SCORE:
 					return matchingClusters.get(rowIndex).getBestScore();
-				case 4:
+				case COL_SCORE_CORRECTED:
 					return matchingClusters.get(rowIndex).getBestCorrectedScore();
-				case 5:
+				case COL_GENES:
                     Set<GeneFamily> genes = matchingClusters.get(rowIndex).getGeneFamilies();
                     ArrayList<String> knownGenes = new ArrayList<>();
 
@@ -497,7 +499,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		 * @param toRemove id of the genome to remove
 		 */
 		protected void removeGenomeFromSelection(int toRemove) {
-			
 			this.refreshMatchingClusters();
 			
 			if (this.include.contains(toRemove)) {

@@ -414,7 +414,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * @param allClusters The array of gene clusters
 	 * @return The SortedSet, containing the indices of the clusters that are to keep
 	 */
-	public static SortedSet<Integer> generateReducedClusterList(GeneCluster[] allClusters) {
+	public static SortedSet<Integer> generateReducedClusterList(List<GeneCluster> allClusters) {
 		return generateSimilarityReducedClusterList(allClusters);
 	}
 	
@@ -424,17 +424,16 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * @param allClusters The array of gene clusters
 	 * @return The SortedSet, containing the indices of the clusters that are to keep
 	 */
-	private static SortedSet<Integer> generateSimilarityReducedClusterList(GeneCluster[] allClusters) {
+	private static SortedSet<Integer> generateSimilarityReducedClusterList(List<GeneCluster> allClusters) {
 		SortedSet<Integer> reducedList = new TreeSet<>();
-        Map<Integer, Set<Integer>> FilteredClusters = new HashMap<>();
-		
-		GeneCluster[] geneClustersCopy = Arrays.copyOf(allClusters, allClusters.length);
-		Arrays.sort(geneClustersCopy);
+
+        List<GeneCluster> geneClustersCopy = new ArrayList<>(allClusters);
+		Collections.sort(geneClustersCopy);
 		for (GeneCluster geneCluster : geneClustersCopy) {
             boolean contained = false;
 			for (Iterator<Integer> it = reducedList.iterator(); it.hasNext() && !contained; ) {
 				int index = it.next();
-				GeneCluster cluster = allClusters[index];
+				GeneCluster cluster = allClusters.get(index);
 				assert(cluster.getId() == index);
 				if (geneCluster.isSimilar(cluster)) { // if similar
 					int compare = geneCluster.bestPValue.compareTo(cluster.bestPValue);
@@ -697,26 +696,20 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return isLinear;
     }
 	
-	public static GeneCluster[] mergeResults(GeneCluster[] oldResults, List<GeneCluster> additionalResults) {
-		return mergeResults(oldResults, additionalResults.toArray(new GeneCluster[additionalResults.size()]));
-	}
-	
-	public static GeneCluster[] mergeResults(GeneCluster[] oldResults, GeneCluster[] additionalResults) {
-		GeneCluster[] newResults;
+	public static List<GeneCluster> mergeResults(List<GeneCluster> oldResults, List<GeneCluster> additionalResults) {
 		if (oldResults == null)
-			newResults = additionalResults;
+			return additionalResults;
 		else if(additionalResults == null)
-			newResults = oldResults;
+			return oldResults;
 		else {
-			newResults = Arrays.copyOf(oldResults, oldResults.length + additionalResults.length);
-			int newId = oldResults.length;
+			int newId = oldResults.size();
 			for (GeneCluster cluster : additionalResults) {
 				cluster.id = newId;
-				newResults[newId] =  cluster;
+				oldResults.add(cluster);
 				newId++;
-			}	
+			}
+            return oldResults;
 		}
-		return newResults;
 	}
 	
 	private static List<List<GeneCluster>> groupSimilarClusters(GeneCluster[] allClusters) {

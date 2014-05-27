@@ -71,7 +71,7 @@ public class Gui {
 		this.waitingAnimation = createImageIcon("images/ghost.png");
 		
 		this.gcDisplay = new GeneClusterDisplay();
-		
+
 		this.gcSelector = new GeneClusterSelector();
 		Dimension startDimension = new Dimension(1024, 768);
 		
@@ -231,7 +231,7 @@ public class Gui {
 		});
 	
 		JPanel p = new JPanel(new BorderLayout());
-		
+
 		searchField = new JTextField("");
 		searchField.setPreferredSize(new Dimension(150, toolbar.getHeight()));
 		searchField.addActionListener(new ActionListener() {
@@ -789,7 +789,7 @@ public class Gui {
 						if (newCluster == null)
 							JOptionPane.showMessageDialog(mainframe, "An error occured while reading the annotations!", "Error", JOptionPane.ERROR_MESSAGE);
 						else {
-							GeneCluster[] clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster.toArray(new GeneCluster[newCluster.size()]));
+                            List<GeneCluster> clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster);
 							geckoInstance.setClusters(GeneCluster.mergeResults(geckoInstance.getClusters(), clusterWithPValue));
 						}									
 						break;

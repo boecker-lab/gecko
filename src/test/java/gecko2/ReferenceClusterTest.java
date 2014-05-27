@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.zip.DataFormatException;
 
 import static gecko2.testUtils.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
+import static gecko2.testUtils.GeneClusterTestUtils.performReferenceClusterTest;
 import static gecko2.testUtils.GeneClusterTestUtils.performTest;
 
 /**
@@ -1134,7 +1135,7 @@ public class ReferenceClusterTest
 		// result of computation
 		List<ReferenceCluster> noQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, noQuorumParameters);
 
-		performTest(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
+		performReferenceClusterTest(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
 	}
 
 	/**

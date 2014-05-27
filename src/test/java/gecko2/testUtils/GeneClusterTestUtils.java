@@ -246,7 +246,7 @@ public class GeneClusterTestUtils {
      * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
      */
-    public static void performTest(List<ReferenceCluster> expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
+    public static void performReferenceClusterTest(List<ReferenceCluster> expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
     {
         assertEquals(expected.size(), actual.size());
 
@@ -263,13 +263,13 @@ public class GeneClusterTestUtils {
 	 * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
 	 */
-	public static void performTest(GeneCluster[] expected, GeneCluster[] actual, PValueComparison pValueComp)
+	public static void performTest(List<GeneCluster> expected, List<GeneCluster> actual, PValueComparison pValueComp)
 	{
-		assertEquals(expected.length, actual.length);
+		assertEquals(expected.size(), actual.size());
 		
-		for(int i = 0; i < expected.length; i++)
+		for(int i = 0; i < expected.size(); i++)
 		{
-			compareGeneClusters(expected[i], actual[i], pValueComp);
+			compareGeneClusters(expected.get(i), actual.get(i), pValueComp);
 		}
 	}
 	
@@ -282,7 +282,7 @@ public class GeneClusterTestUtils {
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet actualData = reader.readData();
 
-		GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups);
+        List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups);
         actualData.setClusters(javaRes);
 		
 		performTest(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_ALL);
@@ -310,7 +310,7 @@ public class GeneClusterTestUtils {
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet data = reader.readData();
 
-        GeneCluster[] javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups);
+        List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups);
         data.setClusters(javaRes);
 
         assertTrue(settings.resultOutputFile.createNewFile());

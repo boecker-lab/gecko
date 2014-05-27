@@ -32,8 +32,8 @@ public class ClusterAnnotationReaderTest {
 		}
 	}
 	
-	private void compareClusters(GeneCluster[] expected, GeneCluster[] actual, boolean comparePValues){
-		assertEquals(expected.length, actual.length);
+	private void compareClusters(List<GeneCluster> expected, List<GeneCluster> actual, boolean comparePValues){
+		assertEquals(expected.size(), actual.size());
 		for (GeneCluster actualCluster : actual) {
 			boolean match = false;
 			
@@ -127,11 +127,9 @@ public class ClusterAnnotationReaderTest {
 
 		Parameter p = new Parameter(1, 4, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
-		GeneCluster[] res = GeckoInstance.computeClustersJava(data, p);
+        List<GeneCluster> res = GeckoInstance.computeClustersJava(data, p);
 		
-		GeneCluster[] readClusters = clusters.toArray(new GeneCluster[clusters.size()]);
-		
-		compareClusters(res, readClusters, false);
+		compareClusters(res, clusters, false);
 		
 		//GeneCluster[] newClusters = GeckoInstance.getInstance().computeReferenceStatistics(computeGenomes, p, readClusters, GeckoInstance.getInstance());
 		//compareClusters(res, newClusters, true);
@@ -150,8 +148,8 @@ public class ClusterAnnotationReaderTest {
 		assertEquals(12, clusters.size());
 		GeckoInstance geckoInstance = GeckoInstance.getInstance();
 		geckoInstance.setGeckoInstanceData(data);
-		GeneCluster[] clusterWithPValue = geckoInstance.computeReferenceStatistics(clusters.toArray(new GeneCluster[clusters.size()]));
+        List<GeneCluster> clusterWithPValue = geckoInstance.computeReferenceStatistics(clusters);
 		
-		compareClusters(clusters.toArray(new GeneCluster[clusters.size()]), clusterWithPValue, false);
+		compareClusters(clusters, clusterWithPValue, false);
 	}
 }
