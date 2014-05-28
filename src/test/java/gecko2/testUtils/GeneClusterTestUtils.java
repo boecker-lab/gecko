@@ -343,7 +343,7 @@ public class GeneClusterTestUtils {
         CogFileReader reducedReader = new CogFileReader(settings.dataFile);
         DataSet reducedData = reducedReader.readData();
 
-        GeneCluster[] reducedRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, true);
+        GeneCluster[] reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true);
         reducedData.setClusters(reducedRes);
 
         compareGeneClusters(expectedData.getClusters(), reducedRes, PValueComparison.COMPARE_NONE);
