@@ -97,7 +97,7 @@ public class Gene implements Serializable {
 	public String getAnnotation() {
 		return annotation;
 	}
-	
+
 	public String getSummary() {
 		if (annotation==null)
 			if (name!=null && !name.equals("----")) {
@@ -106,7 +106,7 @@ public class Gene implements Serializable {
 				return "[no annotation available]";
 		if (name==null || name.equals(""))
 			if (tag == null || tag.equals(""))
-				return "---- -"+annotation;
+				return "---- - "+ annotation;
 			else
 				return tag+" - "+annotation;
 
