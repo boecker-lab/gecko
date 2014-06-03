@@ -43,7 +43,7 @@ Gene Name <TAB> functional annotation <NEWLINE>
 or
 
 <Homology> <TAB> Strand (+ or -) <TAB> functional category <TAB>
-Gene Name <TAB> functional annotation <TAB> Locus Tag <NEWLINE>
+Gene Name <TAB> functional annotation <TAB> Locus Tag <TAB> product <NEWLINE>
 
 <Homology> can be any word or number, all genes with the same entry
 will be in one homology family. All genes with the empty string or
