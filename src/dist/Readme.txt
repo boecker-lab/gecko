@@ -30,7 +30,8 @@ Input files have the file extension '.cog' and have to be
 organized as follows:
 
 GenomeName <COMMA> Descriptive Text  <NEWLINE>
-Descriptive Text (ignored) <NEWLINE> <Genome Content> <NEWLINE>
+Descriptive Text (ignored) <NEWLINE>
+<Genome Content> <NEWLINE>
 
 Where in <Genome Content> each line contains information about the
 family and function of single genes in the order of their
