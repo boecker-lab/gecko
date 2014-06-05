@@ -169,6 +169,8 @@ class GenomeList {
      */
     public void updateLeftBorder(int leftBorder, Chromosome refChr, int refGenomeNr, AlgorithmParameters param) {
         rank.updateRank(refChr, leftBorder, alphabetSize);  //TODO rank really in seqSet? Alternative Rank in Pattern
+        
+        //Überträgt L nicht
         this.updateL(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
         this.updateR(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
         this.updateL_R_prime(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));

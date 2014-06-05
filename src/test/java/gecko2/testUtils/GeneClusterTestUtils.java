@@ -30,9 +30,9 @@ public class GeneClusterTestUtils {
 
     public static void performTest(Parameter p, int[][][] genomes, List<Set<Integer>> genomeGroups, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
         // Test the java implementation
-    	int k = 20;
-        long[][] start = new long [2][k];
-        long[][] stop = new long [2][k];
+    	int k = 10;
+        double[][] start = new double [2][k];
+        double[][] stop = new double [2][k];
         for(int i=0;i<k;i++){
         	start[0][i] = System.currentTimeMillis();
         	List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
@@ -40,7 +40,7 @@ public class GeneClusterTestUtils {
         	stop[0][i] = System.currentTimeMillis();
         }
         int sum = 0;
-        long[] erg = new long [k];
+        double[] erg = new double [k];
         for(int i=0;i<k;i++){
         	erg[i] = stop[0][i]-start[0][i];
         	sum += erg[i];
@@ -314,7 +314,7 @@ public class GeneClusterTestUtils {
 	 * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
 	 */
-	public static void compareGeneClusters(GeneCluster[] expected, GeneCluster[] actual, PValueComparison pValueComp)
+    public static void compareGeneClusters(GeneCluster[] expected, GeneCluster[] actual, PValueComparison pValueComp)
 	{
 		assertEquals(expected.length, actual.length);
 		
@@ -324,36 +324,76 @@ public class GeneClusterTestUtils {
 		}
 	}
 	
+    private static void vergleiche(DataSet x, DataSet y){
+    	int[][][] k = x.toIntArray();
+    	int[][][] l = y.toIntArray();
+    	
+    	MemoryReduction.memReducer(k, l);
+    	
+    	DataSet.printIntArray(k);
+    	System.out.println("");
+    	DataSet.printIntArray(l);
+    	
+    }
+    
 	public static void automaticGeneClusterTestFromFile(ReferenceClusterTestSettings settings, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
         // Expected Results
-        assertNotNull(settings.expectedResultFile);
+        int durchlauf = 1;
+        long start_sp;
+        Runtime rt = Runtime.getRuntime();
+        long end_sp;
+		assertNotNull(settings.expectedResultFile);
         GeckoDataReader resultReader = new GckFileReader(settings.expectedResultFile);
+        
         DataSet expectedData = resultReader.readData();
-
+        
+        System.out.println("");
+    /*
         // Test unreduced
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet actualData = reader.readData();
 
-		GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups);
-        actualData.setClusters(javaRes);
-		
-		compareGeneClusters(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_NONE);
-
+        start_sp = rt.totalMemory() - rt.freeMemory();
+        for (int i =0; i<durchlauf;i++){
+        	GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups);
+        	actualData.setClusters(javaRes);
+        
+        	compareGeneClusters(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_NONE);
+        }
+        end_sp = rt.totalMemory() - rt.freeMemory();
+        */
+//        long start_t = System.currentTimeMillis();
+      
         // Test with memory reduction
         CogFileReader reducedReader = new CogFileReader(settings.dataFile);
         DataSet reducedData = reducedReader.readData();
+        
+		start_sp = rt.totalMemory() - rt.freeMemory();
+		for (int i=0;i<durchlauf;i++){
+			//vergleiche(reducedData, expectedData);
+        	GeneCluster[] reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true);
+        	reducedData.setClusters(reducedRes);
+        	
+        	//System.out.println("erwartet");
+        	//DataSet.printIntArray(expectedData.toIntArray());
+        	System.out.println("reduzierter");
+        	DataSet.printIntArray(reducedData.toIntArray());
+        	
+        	compareGeneClusters(expectedData.getClusters(), reducedData.getClusters(), PValueComparison.COMPARE_NONE);
+        	//compareGeneClusters(expectedData.getClusters(), reducedRes, PValueComparison.COMPARE_NONE);
+        }
+        end_sp = rt.totalMemory() - rt.freeMemory();
 
-        GeneCluster[] reducedRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, true);
-        reducedData.setClusters(reducedRes);
-
-        compareGeneClusters(expectedData.getClusters(), reducedRes, PValueComparison.COMPARE_NONE);
-		
-		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
+//		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
 			//GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(actualData, settings.p);
 		
 			// Test the java implementation
 			//compareReferenceClusters(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-		}
+//		}
+        
+//        long end_t = System.currentTimeMillis();
+//        System.out.println("Benötigte zeit memred " + ((end_t-start_t)/1000)/60 + "s");
+//        System.out.println("Benötigter Speicher " + ((end_sp - start_sp)/8/1024) + "kB");
 	}
 			
 	/**
