@@ -261,17 +261,9 @@ public class StartComputationDialog extends JDialog {
 				// Reorder the genomes if necessary
 				if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.genome && refGenomeCombo.getSelectedIndex()!=0) {
 					PrintUtils.printDebug("swapping genomes");
-					Genome[] genomes = GeckoInstance.getInstance().getGenomes();
-					Genome first = genomes[0];
-					genomes[0] = genomes[refGenomeCombo.getSelectedIndex()];
-					genomes[refGenomeCombo.getSelectedIndex()] = first;
-					
-					gecko.getGui().closeCurrentSession();
-					gecko.setGenomes(genomes);
+                    gecko.reorderGenomes(refGenomeCombo.getSelectedIndex());
 					//TODO improve
 				} else if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.cluster) {
-					Genome[] oldGenomes = gecko.getGenomes();
-					Genome[] genomes = new Genome[oldGenomes.length+1];
 					Genome cluster = new Genome();
 					ArrayList<Gene> genes = new ArrayList<>();
 					Map<String, GeneFamily> revIDMap = gecko.getGeneLabelMap();
@@ -282,10 +274,7 @@ public class StartComputationDialog extends JDialog {
 								genes.add(new Gene(geneFamily));
 						}
 					cluster.getChromosomes().add(new Chromosome("Reference cluster", genes, cluster));
-					genomes[0] = cluster;
-                    System.arraycopy(oldGenomes, 0, genomes, 1, oldGenomes.length);
-					gecko.getGui().closeCurrentSession();
-					gecko.setGenomes(genomes);
+					gecko.addReferenceGenome(cluster);
 				}
 				boolean mergeResultsEnabled = false;
 				if (opMode==Parameter.OperationMode.reference && mergeResults.isSelected())

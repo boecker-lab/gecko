@@ -15,13 +15,13 @@ public class DataSet {
     private Genome[] genomes;
     private List<GeneCluster> clusters;
 
-    private int maxIdLength;
-    private int maxNameLength;
-    private int maxLocusTagLength;
+    private final int maxIdLength;
+    private final int maxNameLength;
+    private final int maxLocusTagLength;
 
-    private Set<GeneFamily> geneFamilySet;
-    private GeneFamily unknownGeneFamily;
-    private int numberOfGeneFamiliesWithMultipleGenes;
+    private final Set<GeneFamily> geneFamilySet;
+    private final GeneFamily unknownGeneFamily;
+    private final int numberOfGeneFamiliesWithMultipleGenes;
     private Map<GeneFamily, Color> colorMap;
 
     public static DataSet getEmptyDataSet() {
@@ -111,28 +111,6 @@ public class DataSet {
                 builder.append(Arrays.toString(chromosome));
             System.out.println(builder.toString());
         }
-    }
-
-    private void setMaxNameLength() {
-        int maxLength = -1;
-        for (Genome g : genomes)
-            for (Chromosome chr : g.getChromosomes())
-                for (Gene gene : chr.getGenes())
-                    if (gene.getName().length() > maxLength)
-                        maxLength = gene.getName().length();
-
-        maxNameLength = maxLength;
-    }
-
-    private void setMaxLocusTagLength() {
-        int maxLength = -1;
-        for (Genome g : genomes)
-            for (Chromosome chr : g.getChromosomes())
-                for (Gene gene : chr.getGenes())
-                    if (gene.getTag().length() > maxLength)
-                        maxLength = gene.getTag().length();
-
-        maxLocusTagLength = maxLength;
     }
 
     /**
@@ -269,8 +247,22 @@ public class DataSet {
         return genomes;
     }
 
-    public void setGenomes(Genome[] genomes) {
-        this.genomes = genomes;
+    public void reorderGenomes(int index) {
+        Genome first = genomes[0];
+        genomes[0] = genomes[index];
+        genomes[index] = first;
+    }
+
+
+    /**
+     * Adds a new reference Genome to the data set
+     * @param newReferenceGenome
+     */
+    public void addReferenceGenome(Genome newReferenceGenome) {
+        Genome[] oldGenomes = genomes;
+        genomes = new Genome[oldGenomes.length+1];
+        genomes[0] = newReferenceGenome;
+        System.arraycopy(oldGenomes, 0, genomes, 1, oldGenomes.length);
     }
 
     public List<GeneCluster> getClusters() {

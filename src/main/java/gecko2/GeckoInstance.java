@@ -344,9 +344,20 @@ public class GeckoInstance {
 	public Gui getGui() {
 		return gui;
 	}
+
+    /**
+     * Swap the genome at position index with the first genome
+     * @param index the position of the new first genome
+     */
+    public void reorderGenomes(int index) {
+        this.data.reorderGenomes(index);
+        this.gui.getMgb().clear();
+        dataUpdated();
+    }
 	
-	public void setGenomes(Genome[] genomes) {
-        this.data.setGenomes(genomes);
+	public void addReferenceGenome(Genome referenceGenome) {
+        this.data.addReferenceGenome(referenceGenome);
+        this.gui.getMgb().clear();
         dataUpdated();
 	}
 	
