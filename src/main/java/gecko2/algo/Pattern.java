@@ -149,7 +149,7 @@ class Pattern {
                         int rightBorder = chr.getR(charPos, dRight);
 
                         if (dRight > 1)  // Teste ob neues unmarkiertes Zeichen R[dRight-1] schon im Intervall vorkommt
-                            if (chr.getPrevOCC(chr.getR(charPos, dRight - 1)) < Math.max(1, chr.getL(charPos, dLeft)))
+                            if (chr.getPrevOCC(chr.getR(charPos, dRight - 1)) < Math.max(1, leftBorder))
                             	interveningChars++;
 
                         // test total distance

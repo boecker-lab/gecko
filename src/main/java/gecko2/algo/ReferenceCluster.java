@@ -258,8 +258,13 @@ public class ReferenceCluster {
 		return false;
 	}
 
-	@Override
-	public String toString() {
-		return bestCombined_pValue.toString();
-	}
+    @Override
+    public String toString() {
+        return "ReferenceCluster{" +
+                "genomeNr=" + genomeNr +
+                ", chrNr=" + chrNr +
+                ", leftBorder=" + leftBorder +
+                ", rightBorder=" + rightBorder +
+                '}';
+    }
 }

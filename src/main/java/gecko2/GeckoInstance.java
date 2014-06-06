@@ -488,10 +488,7 @@ public class GeckoInstance {
             intArray = data.toReducedIntArray();
             params.setAlphabetSize(data.getReducedAlphabetSize());
         }
-        
-        
-        // TODO Wieso bekommt er 366 zurück behält aber nur 331
-        // Clustersize anders
+
 		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping);
         GeneCluster[] result = new GeneCluster[refCluster.size()];
         for (int i=0; i<refCluster.size(); i++)

@@ -224,7 +224,7 @@ public class ReferenceClusterAlgorithm {
 						occursInValid_dLocs(refdLoc.leftMostEssentialChar(referenceChromosome), oldLists, referenceGenomeNr) &&
 						occursInValid_dLocs(refdLoc.rightMostEssentialChar(referenceChromosome), oldLists, referenceGenomeNr)) {
 					
-					List<ListOfDeltaLocations> listCopy = new ArrayList<ListOfDeltaLocations>(genomes.size());
+					List<ListOfDeltaLocations> listCopy = new ArrayList<>(genomes.size());
 					
 					for (int i=0; i<genomes.size(); i++)
 						listCopy.add((oldLists.get(i).getOptimalCopy()));
@@ -236,13 +236,7 @@ public class ReferenceClusterAlgorithm {
 				}
 				r = pattern.getRightBorder()+1;
 			}
-			for (int i=0; i<pattern.getSize()-1;i++){
-				if(pattern.nrOccurrences(i)!=0){
-					System.out.print(i + " ");
-				}
-			}
 		}
-		System.out.println("");
 	}
 	
 	private boolean check_and_insert_refCluster(

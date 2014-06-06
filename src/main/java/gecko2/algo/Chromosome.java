@@ -374,20 +374,15 @@ class Chromosome {
             int[] c_old_L = new int[maxDist+2];
 
             for (int j=1; j<=this.size(); j++) {
-            	if (genes[j]<0 || c_old<0) continue;
+                if (genes[j]<0 || c_old<0)
+                    continue;
                 if (rank.getRank(genes[j]) > rank.getRank(c_old)) {
-
-                    int prevOcc = maxDist + 1;          // the sign is at last position per default
-
-
-                    System.arraycopy(c_old_L, 1, c_old_L, 2, prevOcc - 1);      // shift all entries between position 1 and the old occurrence of c_old
-                    c_old_L[1] = j;
-                } else if (rank.getRank(genes[j]) > rank.getRank(c_old)) {
                     int prevOcc = maxDist + 1;          // the sign is at last position per default
 
                     for (int d=1; d<=maxDist+1; d++) {
-                    	if (c_old_L[d]<0) continue;
-                    
+                    	if (c_old_L[d]<0)
+                            continue;
+
                         if (genes[j] == genes[c_old_L[d]]) {    // search for the first entry in the neighbor array
                             prevOcc = d;                                        // that has the char chr[j], and store the position in prevOcc
                             break;
