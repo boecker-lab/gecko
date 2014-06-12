@@ -389,14 +389,15 @@ public class GeneClusterTestUtils {
 	public static void main(String[] args)
 	{
         ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionBugD2S5Q2();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q2Grouping();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
         try{
-			//generateRefClusterFile(testType);
-            performanceTest(testType, false);
-		} catch (IOException | ParseException | DataFormatException e) {
+			generateRefClusterFile(testType);
+            //performanceTest(testType, false);
+		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
 	}

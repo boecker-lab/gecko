@@ -39,6 +39,27 @@ public class ReferenceClusterTestSettings {
         return settings;
     }
 
+    public static ReferenceClusterTestSettings memoryReductionBugD2S5Q2() {
+        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
+        settings.p = new Parameter(
+                2,
+                5,
+                2,
+                Parameter.QUORUM_NO_COST,
+                Parameter.OperationMode.reference,
+                Parameter.ReferenceType.allAgainstAll
+        );
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/memoryReductionBug.cog").getFile());
+
+        settings.expectedResultFile = null;
+        if (GeneClusterTestUtils.class.getResource("/memoryReductionBugD2S5Q2.gck") != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/memoryReductionBugD2S5Q2.gck").getFile());
+
+        settings.resultOutputFile = new File("src/test/resources/memoryReductionBugD2S5Q2.gck");
+        settings.genomeGroups = null;
+        return settings;
+    }
+
     public static ReferenceClusterTestSettings fiveProteobacterDeltaTable() {
         ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
         settings.p = new Parameter(
