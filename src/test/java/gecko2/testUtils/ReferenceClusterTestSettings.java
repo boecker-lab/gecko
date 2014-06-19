@@ -60,6 +60,27 @@ public class ReferenceClusterTestSettings {
         return settings;
     }
 
+    public static ReferenceClusterTestSettings memoryReductionWithSuboptimalOccurrenceD3S5() {
+        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
+        settings.p = new Parameter(
+                3,
+                5,
+                2,
+                Parameter.QUORUM_NO_COST,
+                Parameter.OperationMode.reference,
+                Parameter.ReferenceType.genome
+        );
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/mRWithSuboptimalOccurrence.cog").getFile());
+
+        settings.expectedResultFile = null;
+        if (GeneClusterTestUtils.class.getResource("/mRWithSuboptimalOccurrenceD3S5.gck") != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/mRWithSuboptimalOccurrenceD3S5.gck").getFile());
+
+        settings.resultOutputFile = new File("src/test/resources/mRWithSuboptimalOccurrenceD3S5.gck");
+        settings.genomeGroups = null;
+        return settings;
+    }
+
     public static ReferenceClusterTestSettings fiveProteobacterDeltaTable() {
         ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
         settings.p = new Parameter(

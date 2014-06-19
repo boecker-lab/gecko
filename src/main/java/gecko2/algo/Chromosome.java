@@ -374,9 +374,10 @@ class Chromosome {
             int[] c_old_L = new int[maxDist+2];
 
             for (int j=1; j<=this.size(); j++) {
-                if (genes[j]<0 || c_old<0)
+                if (c_old<0)
                     continue;
-                if (rank.getRank(genes[j]) > rank.getRank(c_old)) {
+
+                if (genes[j]<0 || rank.getRank(genes[j]) > rank.getRank(c_old)) {
                     int prevOcc = maxDist + 1;          // the sign is at last position per default
 
                     for (int d=1; d<=maxDist+1; d++) {
@@ -497,10 +498,10 @@ class Chromosome {
             int[] c_old_R = IntArray.newIntArray(maxDist+2, this.size()+1);
 
             for (int j=this.size(); j>=1; j--) {
-            	if (genes[j]<0 || c_old<0)
+            	if (c_old<0)
                     continue;
 
-                if (rank.getRank(genes[j]) > rank.getRank(c_old)) {
+                if (genes[j]<0 || rank.getRank(genes[j]) > rank.getRank(c_old)) {
                     int prevOcc = maxDist + 1;          // the sign is at last position per default
 
                     for (int p=1; p<=maxDist+1; p++) {
