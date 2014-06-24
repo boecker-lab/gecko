@@ -132,7 +132,7 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 			return false;
 		if (chromosome.getGene(l-1) == c)
 			return false;
-		if (chromosome.getGene(r+1) == c)
+		if (chromosome.getGene(r+1) == c && c != -1)
 			return false;
 		return true;
 	}
