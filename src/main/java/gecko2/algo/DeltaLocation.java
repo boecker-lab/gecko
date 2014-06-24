@@ -130,9 +130,11 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 	public boolean isInheritableWithoutC(Chromosome chromosome, int delta, int c) {
 		if (distance > delta)
 			return false;
+        if (c < 0)
+            return true;
 		if (chromosome.getGene(l-1) == c)
 			return false;
-		if (chromosome.getGene(r+1) == c && c != -1)
+		if (chromosome.getGene(r+1) == c)
 			return false;
 		return true;
 	}
