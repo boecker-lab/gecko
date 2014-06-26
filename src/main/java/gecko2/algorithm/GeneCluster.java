@@ -743,6 +743,34 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	}
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GeneCluster that = (GeneCluster) o;
+
+        if (minTotalDist != that.minTotalDist) return false;
+        if (size != that.size) return false;
+        if (!Arrays.equals(allOccurrences, that.allOccurrences)) return false;
+        if (!Arrays.equals(bestOccurrences, that.bestOccurrences)) return false;
+        if (!geneFamilies.equals(that.geneFamilies)) return false;
+        if (type != that.type) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = geneFamilies.hashCode();
+        result = 31 * result + size;
+        result = 31 * result + minTotalDist;
+        result = 31 * result + Arrays.hashCode(bestOccurrences);
+        result = 31 * result + Arrays.hashCode(allOccurrences);
+        result = 31 * result + type.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "GeneCluster{" +
                 "id=" + id +
