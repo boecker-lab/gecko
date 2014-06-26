@@ -23,15 +23,18 @@ import java.util.List;
  * @author original author unknown
  */
 public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
-
 	private static final long serialVersionUID = -6769789368841494821L;
-	private final JPanel centerpanel;
 
+	private final JPanel centerpanel;
 	private final JPanel rightPanel;
 	private final List<AbstractGenomeBrowser> genomeBrowsers;
 	private final ScrollListener wheelListener;
 	private LocationSelectionEvent lastLocationEvent;
 	private final List<GBNavigator> gbNavigators;
+
+    public enum GenomeFilterMode {
+        None, Include, Exclude
+    }
 	
 	private final GeckoInstance gecko;
 	
@@ -207,8 +210,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * @return a JComboBox for the use in a GenomeBrowser
 	 */
 	private JComboBox createComboBox(int genomeBrowsersSize, int height) {
-		String[] selection = {"None", "Include", "Exclude"};
-		JComboBox<String> box = new JComboBox<>(selection);
+		JComboBox<GenomeFilterMode> box = new JComboBox<>(GenomeFilterMode.values());
 		box.setPreferredSize(new Dimension(100, height));
 		box.setMaximumSize(box.getPreferredSize());
 		box.setName(Integer.toString(genomeBrowsersSize - 1));
@@ -217,21 +219,9 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
-				JComboBox cb = (JComboBox) arg0.getSource();
-		        String selectedItem = (String) cb.getSelectedItem();
-		        
-		        if (selectedItem.equals("None")) {
-		        	gecko.getGui().getGcSelector().resetGenome(Integer.parseInt(cb.getName()));
-		        }
-		        
-		        if (selectedItem.equals("Include")) {
-		        	gecko.getGui().getGcSelector().showOnlyClusterWithSelectedGenome(Integer.parseInt(cb.getName()));
-		        }
-		        
-		        if (selectedItem.equals("Exclude")) {
-		        	gecko.getGui().getGcSelector().dontShowClusterWithSelectedGenome(Integer.parseInt(cb.getName()));
-		        }
+				JComboBox<GenomeFilterMode> cb = (JComboBox) arg0.getSource();
+
+                gecko.getGui().getGcSelector().setGenomeFilter(Integer.parseInt(cb.getName()), cb.getItemAt(cb.getSelectedIndex()));
 			}
 		});
 			

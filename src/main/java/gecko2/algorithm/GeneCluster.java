@@ -309,6 +309,22 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	public int getSize() {
 		return size;
 	}
+
+    /**
+     * Check if the gene cluster has an occurrence in the given genome
+     * @param genomeIndex the index of the genome
+     * @return
+     */
+    public boolean hasOccurrenceInGenome(int genomeIndex){
+        for (GeneClusterOccurrence occ : getAllOccurrences()) {
+            for (int i = 0; i < occ.getSubsequences()[genomeIndex].length; i++) {
+                if (occ.getSubsequences()[genomeIndex][i].isValid()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 	
 	/**
 	 * Generates a @link GeneClusterOutput object, that contains all information about the gene cluster.
@@ -414,7 +430,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * @param allClusters The array of gene clusters
 	 * @return The SortedSet, containing the indices of the clusters that are to keep
 	 */
-	public static SortedSet<Integer> generateReducedClusterList(List<GeneCluster> allClusters) {
+	public static List<GeneCluster> generateReducedClusterList(List<GeneCluster> allClusters) {
 		return generateSimilarityReducedClusterList(allClusters);
 	}
 	
@@ -424,22 +440,20 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * @param allClusters The array of gene clusters
 	 * @return The SortedSet, containing the indices of the clusters that are to keep
 	 */
-	private static SortedSet<Integer> generateSimilarityReducedClusterList(List<GeneCluster> allClusters) {
-		SortedSet<Integer> reducedList = new TreeSet<>();
+	private static List<GeneCluster> generateSimilarityReducedClusterList(List<GeneCluster> allClusters) {
+		List<GeneCluster> reducedList = new ArrayList<>();
 
         List<GeneCluster> geneClustersCopy = new ArrayList<>(allClusters);
 		Collections.sort(geneClustersCopy);
 		for (GeneCluster geneCluster : geneClustersCopy) {
             boolean contained = false;
-			for (Iterator<Integer> it = reducedList.iterator(); it.hasNext() && !contained; ) {
-				int index = it.next();
-				GeneCluster cluster = allClusters.get(index);
-				assert(cluster.getId() == index);
+			for (Iterator<GeneCluster> it = reducedList.iterator(); it.hasNext() && !contained; ) {
+                GeneCluster cluster = it.next();
 				if (geneCluster.isSimilar(cluster)) { // if similar
 					int compare = geneCluster.bestPValue.compareTo(cluster.bestPValue);
 					if (compare > 0) // if similar, but worse then the previously inserted cluster
 						contained = true;
-					else if (compare == 0){
+					else if (compare == 0){ // if similar, and same p-value, keep the one with bigger size
 						if (geneCluster.size < cluster.size)
 							contained = true;
 						else 
@@ -450,7 +464,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				}
 			}
 			if (!contained)
-				reducedList.add(geneCluster.getId());		
+				reducedList.add(geneCluster);
 		}
 		return reducedList;
 	}

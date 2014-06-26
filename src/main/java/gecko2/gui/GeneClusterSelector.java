@@ -198,7 +198,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		menuItem.addActionListener(new ActionListener()	{
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				GeckoInstance.getInstance().addToClusterSelection((Integer)table.getValueAt(table.getSelectedRow(), 0));				
+				GeckoInstance.getInstance().addToClusterSelection(GeckoInstance.getInstance().getClusters().get((Integer)table.getValueAt(table.getSelectedRow(), 0)));
 			}
 		});
 		
@@ -326,81 +326,29 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
 	}
 
-	/**
-	 * This method makes the method removeGenomeFromSelection from the class
-	 * GeneClusterSelectorModel visible for the user.
-	 * 
-	 * @param genomeToReset genome to remove from the filtered view
-	 */
-	public void resetGenome(int genomeToReset) {
-		table.clearSelection();
-		model.removeGenomeFromSelection(genomeToReset);
-		model.fireTableDataChanged();
-		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
-		TableCellRenderer r = table.getDefaultRenderer(String.class);
-		int maxWidth = 0;
+    public void setGenomeFilter(int genomeIndex, MultipleGenomesBrowser.GenomeFilterMode filterMode) {
+        table.clearSelection();
 
-		for (int i = 0; i < model.getRowCount(); i++) {
-			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
+        model.removeGenomeFromSelection(genomeToReset);
+        model.showClustersWithSelectedGenome(genomeToAddToFilter);
+        model.showClustersWithoutSelectedGenome(genomeToRemove);
 
-			if (width > maxWidth) {
-				maxWidth = width;
-			}
-		}
+        model.fireTableDataChanged();
+        fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
 
-		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
-	}
+        /*TableCellRenderer r = table.getDefaultRenderer(String.class);
+        int maxWidth = 0;
 
-	/**
-	 * This method makes the method showClustersWithSelectedGenome from the class
-	 * GeneClusterSelectorModel visible for the user.
-	 * 
-	 * @param genomeToAddToFilter the index of the genome that is added to the filter
-	 */
-	public void showOnlyClusterWithSelectedGenome(int genomeToAddToFilter) {
-		table.clearSelection();
-		model.showClustersWithSelectedGenome(genomeToAddToFilter);
-		model.fireTableDataChanged();
-		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
-		TableCellRenderer r = table.getDefaultRenderer(String.class);
-		int maxWidth = 0;
+        for (int i = 0; i < model.getRowCount(); i++) {
+            int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
 
-		for (int i = 0; i < model.getRowCount(); i++) {
-			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
+            if (width > maxWidth) {
+                maxWidth = width;
+            }
+        }
 
-			if (width > maxWidth) {
-				maxWidth = width;
-			}
-		}
-
-		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
-	}
-
-	/**
-	 * This method make the method showClustersWithoutSelectedGenome from the class 
-	 * GeneClusterSelectorModel visible for the user.
-	 * 
-	 * @param genomeToRemove genome to add to the filter
-	 */
-	public void dontShowClusterWithSelectedGenome(int genomeToRemove) {
-		table.clearSelection();
-		model.showClustersWithoutSelectedGenome(genomeToRemove);
-		model.fireTableDataChanged();
-		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
-		TableCellRenderer r = table.getDefaultRenderer(String.class);
-		int maxWidth = 0;
-
-		for (int i = 0; i < model.getRowCount(); i++) {
-			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
-
-			if (width > maxWidth) {
-				maxWidth = width;
-			}
-		}
-
-		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
-	}
-
+        table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);*/
+    }
 	
 	static class GeneClusterSelectorModel extends AbstractTableModel {
 
@@ -541,16 +489,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			}
 			
 			for (GeneCluster g : this.matchingClusters) {
-				for (GeneClusterOccurrence k : g.getAllOccurrences()) {
-					for (int i = 0; i < k.getSubsequences()[genomeToAddToFilter].length; i++) {
-						// If a genome is not in the cluster start is greater then stop
-						// keep this in mind
-						if (k.getSubsequences()[genomeToAddToFilter][i].getStart() < k.getSubsequences()[genomeToAddToFilter][i].getStop()) {
-							tmp.add(g);
-							break;
-						}
-					}
-				}
+                if (g.hasOccurrenceInGenome(genomeToAddToFilter))
+                    tmp.add(g);
 			}
 				
 			this.matchingClusters = tmp;
@@ -571,15 +511,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			}
 			
 			for (GeneCluster g : this.matchingClusters) {
-				for (GeneClusterOccurrence k : g.getAllOccurrences()) {
-					for (int i = 0; i < k.getSubsequences()[genomeToRemoveFromClusterSelection].length; i++) {
-						// If a genome is not in the cluster start is greater then stop
-						if (k.getSubsequences()[genomeToRemoveFromClusterSelection][i].getStart() < k.getSubsequences()[genomeToRemoveFromClusterSelection][i].getStop()) {
-							tmp.add(g);
-							break;
-						}
-					}
-				}
+                if (g.hasOccurrenceInGenome(genomeToRemoveFromClusterSelection))
+                    tmp.add(g);
 			}
 			
 			this.matchingClusters.removeAll(tmp);

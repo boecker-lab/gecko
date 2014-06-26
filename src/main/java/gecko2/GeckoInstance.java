@@ -40,9 +40,9 @@ public class GeckoInstance {
 	
 	private File currentWorkingDirectoryOrFile;
 
-	private SortedSet<Integer> clusterSelection;
 	private ResultFilter filterSelection = ResultFilter.showAll;
-	private SortedSet<Integer> reducedList;
+    private List<GeneCluster> clusterSelection;
+	private List<GeneCluster> reducedList;
 	private String filterString;
 	
 	private boolean debug = false;
@@ -147,12 +147,12 @@ public class GeckoInstance {
 	/**
 	 * Adds the cluster with the given index to the cluster selection
 	 * 
-	 * @param clusterIndex the index of the cluster
+	 * @param cluster the cluster
 	 */
-	public void addToClusterSelection(int clusterIndex) {
+	public void addToClusterSelection(GeneCluster cluster) {
 		if (clusterSelection == null)
-			clusterSelection = new TreeSet<>();
-		clusterSelection.add(clusterIndex);
+			clusterSelection = new ArrayList<>();
+		clusterSelection.add(cluster);
 		filterResults();
 	}
 	
@@ -161,30 +161,6 @@ public class GeckoInstance {
 	 */
 	public void clearClusterSelection() {
 		clusterSelection.clear();
-		filterResults();
-	}
-
-	/**
-	 * Adds the cluster with the given index to the list of hidden clusters
-	 *
-	 * @param clusterIndex the index of the cluster
-	 */
-	public void addToReducedList(int clusterIndex) {
-		if (reducedList == null)
-			reducedList = new TreeSet<>();
-		reducedList.add(clusterIndex);
-		filterResults();
-	}
-
-	/**
-	 * Adds the cluster with the given index to the list of hidden clusters
-	 *
-	 * @param toHide the index of the cluster to hide
-	 */
-	public void addToReducedList(SortedSet<Integer> toHide) {
-		if (reducedList == null)
-			reducedList = new TreeSet<>();
-		reducedList.addAll(toHide);
 		filterResults();
 	}
 	
@@ -208,7 +184,7 @@ public class GeckoInstance {
 		if (filterString == null)
 			filterString = "";
 		if (clusterSelection == null)
-			clusterSelection = new TreeSet<>();
+			clusterSelection = new ArrayList<>();
 		if (reducedList == null)
 			reducedList = GeneCluster.generateReducedClusterList(data.getClusters());
 		if (filterString.equals("")) {
@@ -227,7 +203,6 @@ public class GeckoInstance {
 				
 				// Check if there is a match in the genes annotations
 				if (!c.isMatch()) {
-					
 					// ... no comment ...
 					for (GeneClusterOccurrence gOcc : c.getAllOccurrences()) {
 						for (int genome=0; genome<gOcc.getSubsequences().length; genome++) {
@@ -244,7 +219,7 @@ public class GeckoInstance {
 								if (c.isMatch()) break;
 							}
 							if (c.isMatch()) break;
-						}				
+						}
 						if (c.isMatch()) break;
 					}
 				}
