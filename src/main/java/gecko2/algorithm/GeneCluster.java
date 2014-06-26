@@ -751,8 +751,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
         if (minTotalDist != that.minTotalDist) return false;
         if (size != that.size) return false;
-        if (!Arrays.equals(allOccurrences, that.allOccurrences)) return false;
-        if (!Arrays.equals(bestOccurrences, that.bestOccurrences)) return false;
         if (!geneFamilies.equals(that.geneFamilies)) return false;
         if (type != that.type) return false;
 
@@ -764,8 +762,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         int result = geneFamilies.hashCode();
         result = 31 * result + size;
         result = 31 * result + minTotalDist;
-        result = 31 * result + Arrays.hashCode(bestOccurrences);
-        result = 31 * result + Arrays.hashCode(allOccurrences);
         result = 31 * result + type.hashCode();
         return result;
     }

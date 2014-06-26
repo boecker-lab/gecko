@@ -199,7 +199,9 @@ public class ReferenceClusterAlgorithm {
 				
 				for (int k=0; k<genomes.size(); k++){
 					if(k != referenceGenomeNr){
-						ListOfDeltaLocations newList = pattern.computeNewOptimalDeltaLocations(genomes.get(k), pattern.getLastChar(), pattern.getSize(), param);
+                        if (referenceGenomeNr == 1 && k==4 && l==70 && r==76)
+                            System.out.println("BREAK");
+                        ListOfDeltaLocations newList = pattern.computeNewOptimalDeltaLocations(genomes.get(k), pattern.getLastChar(), pattern.getSize(), param);
 						
 						if (param.searchRefInRef() && k == genomes.size()-1){
 							newList.removeRefDLocReferenceHit(pattern, referenceChromosome.getNr());

@@ -132,6 +132,8 @@ class Pattern {
     		
     		int prev_p=0;
             for (int charPos : pos) {
+                if (genome.getNr()==4 && charPos == 1748 && pSize == 7)
+                    System.out.println("BREAK");
                 for (int dLeft = param.getMaximumDelta() + 1; dLeft >= 1; dLeft--) {
                     if (chr.getL(charPos, dLeft) < prev_p)
                         continue;

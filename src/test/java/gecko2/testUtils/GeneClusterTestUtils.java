@@ -344,6 +344,11 @@ public class GeneClusterTestUtils {
         DataSet reducedData = reducedReader.readData();
 
         GeneCluster[] reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true);        reducedData.setClusters(reducedRes);
+        for (int i=0; i<reducedRes.length; i++)
+            if (!expectedData.getClusters()[i].equals(reducedRes[i])) {
+                System.out.println(i);
+                break;
+            }
 
         compareGeneClusters(expectedData.getClusters(), reducedRes, PValueComparison.COMPARE_NONE);
 		
@@ -388,12 +393,14 @@ public class GeneClusterTestUtils {
 	
 	public static void main(String[] args)
 	{
-        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionBugD2S5Q2();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q2Grouping();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionWithSuboptimalOccurrenceD3S5();
+        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionMultipleZerosD3S5();
         try{
 			generateRefClusterFile(testType);
             //performanceTest(testType, false);
