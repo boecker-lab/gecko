@@ -237,7 +237,7 @@ public class Gui {
 		searchField.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				gecko.setFilterString(searchField.getText());
+				gcSelector.setFilterString(searchField.getText());
 				searchField.setSelectionStart(0);
 				searchField.setSelectionEnd(searchField.getText().length());
 			}
