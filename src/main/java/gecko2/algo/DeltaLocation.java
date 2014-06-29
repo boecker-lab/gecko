@@ -132,10 +132,11 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 			return false;
         if (c < 0)
             return true;
-		if (chromosome.getGene(l-1) == c)
+        //warum vergleicht er hier das gen was er hinzufügt mit sich selbst?
+		/*if (chromosome.getGene(l-1) == c)
 			return false;
 		if (chromosome.getGene(r+1) == c)
-			return false;
+			return false;*/
 		return true;
 	}
 

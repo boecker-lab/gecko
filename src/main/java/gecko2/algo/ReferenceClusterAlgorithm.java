@@ -174,7 +174,7 @@ public class ReferenceClusterAlgorithm {
 			while(pattern.updateToNextI_ref(r)) {
 				r = pattern.getRightBorder();
 				
-				for (ListOfDeltaLocations dLocList : oldLists)
+				for (ListOfDeltaLocations dLocList : oldLists) //möglicher fehler
 					dLocList.removeNonInheritableElements(genomes, pattern.getLastChar(), param.getMaximumDelta());
 				
 				for (int i=0; i<genomes.size(); i++){

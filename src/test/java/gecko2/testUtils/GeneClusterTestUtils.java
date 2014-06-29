@@ -329,7 +329,8 @@ public class GeneClusterTestUtils {
         assertNotNull(settings.expectedResultFile);
         GeckoDataReader resultReader = new GckFileReader(settings.expectedResultFile);
         DataSet expectedData = resultReader.readData();
-
+        int help = 0;
+if(help == 1){
         // Test unreduced
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet actualData = reader.readData();
@@ -338,7 +339,7 @@ public class GeneClusterTestUtils {
         actualData.setClusters(javaRes);
 		
 		compareGeneClusters(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_NONE);
-
+}else{
         // Test with memory reduction
         CogFileReader reducedReader = new CogFileReader(settings.dataFile);
         DataSet reducedData = reducedReader.readData();
@@ -351,7 +352,7 @@ public class GeneClusterTestUtils {
             }
 
         compareGeneClusters(expectedData.getClusters(), reducedRes, PValueComparison.COMPARE_NONE);
-		
+}		
 		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
 			//GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(actualData, settings.p);
 		

@@ -30,10 +30,10 @@ public class ReferenceClusterLargeTest {
         }
     }
 	
-/*	@Test
+	@Test
 	public void statisticDataReferenceClusterTest() throws IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
 
         automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
 	}
-*/}
+}
