@@ -352,6 +352,32 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         }
     }
 
+    private static class GeneClusterIncludeExcludeMatcherEditor extends AbstractMatcherEditor<GeneCluster> implements ActionListener{
+        /**
+         * Invoked when an action occurs.
+         *
+         * @param e
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
+
+        private static class GeneClusterIncludeMatcher implements Matcher {
+            private Set<Integer> include;
+            /**
+             * Return true if an item matches a filter.
+             *
+             * @param item The item possibly being filtered.
+             */
+            @Override
+            public boolean matches(Object item) {
+                final GeneCluster cluster = (GeneCluster) item;
+                return include.isEmpty() || cluster.hasOccurrenceInGenome(include);
+            }
+        }
+    }
+
     private void updateData() {
         table.clearSelection();
         //TODO remember selected cluster?
