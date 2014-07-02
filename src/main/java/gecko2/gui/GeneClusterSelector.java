@@ -1,11 +1,11 @@
 package gecko2.gui;
 
+import ca.odell.glazedlists.matchers.AbstractMatcherEditor;
+import ca.odell.glazedlists.matchers.Matcher;
 import gecko2.GeckoInstance;
 import gecko2.GeckoInstance.ResultFilter;
 import gecko2.algorithm.*;
-import gecko2.event.ClusterSelectionEvent;
-import gecko2.event.ClusterSelectionListener;
-import gecko2.event.LocationSelectionEvent;
+import gecko2.event.*;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -22,19 +22,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 
-public class GeneClusterSelector extends JPanel implements ClipboardOwner {
-
+public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataListener {
 	private static final long serialVersionUID = -4860132931042035952L;
+
 	private final GeneClusterSelectorModel model;
+    private java.util.List<GeneCluster> clusters;
 	private final JCheckBox showSuboptimalCheckBox;
 	private final JTable table;
 	private JPopupMenu popUp;
 
-    private ResultFilter filterSelection = ResultFilter.showAll;
-    private String filterString = "";
+    // Filter options
+    private ResultFilter filterSelection;
+    private String[] filterStrings;
+    private Set<Integer> excludeFilter;
+    private Set<Integer> includeFilter;
 
     private final EventListenerList eventListener = new EventListenerList();
 	
@@ -47,6 +50,11 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 
 	
 	public GeneClusterSelector() {
+        filterSelection = ResultFilter.showAll;
+        filterStrings = new String[0];
+        excludeFilter = new HashSet<>();
+        includeFilter = new HashSet<>();
+
 		this.setLayout(new BorderLayout());
 		JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		showSuboptimalCheckBox = new JCheckBox("show suboptimal hits");
@@ -68,7 +76,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
                 ResultFilter newFilter = cb.getItemAt(cb.getSelectedIndex());
                 if (filterSelection != newFilter) {
                     filterSelection = (ResultFilter) ((JComboBox) e.getSource()).getSelectedItem();
-                    filterResults();
+                    updateData();
                 }
             }
         });
@@ -79,12 +87,19 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 		this.setPreferredSize(new Dimension(50, 200));
 		table = new JTable();
 		table.setBackground(Color.WHITE);
-
+        this.clusters = new ArrayList<>();
 		model = new GeneClusterSelectorModel();
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setModel(model);
-		TableRowSorter<GeneClusterSelectorModel> sorter = new TableRowSorter<GeneClusterSelectorModel>(model);
+		TableRowSorter<GeneClusterSelectorModel> sorter = new TableRowSorter<>(model);
 		sorter.setSortable(COL_GENES, false);
+
+        java.util.List<RowFilter<GeneClusterSelectorModel, Integer>> filters = new ArrayList<>(3);
+        filters.add(new GeneClusterIncludeGenomeFilter());
+        filters.add(new GeneClusterExcludeGenomeFilter());
+        filters.add(new GeneClusterTextFilter());
+
+        sorter.setRowFilter(RowFilter.andFilter(filters));
 
 		table.setRowSorter(sorter);
 		final TableColumnModel cm = table.getColumnModel();
@@ -203,7 +218,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				GeckoInstance.getInstance().addToClusterSelection(GeckoInstance.getInstance().getClusters().get((Integer) table.getValueAt(table.getSelectedRow(), 0)));
-                filterResults();
+                if (filterSelection.equals(ResultFilter.showSelected))
+                    updateData();
 			}
 		});
 		
@@ -215,7 +231,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 				int confirmDialog = JOptionPane.showConfirmDialog(GeneClusterSelector.this, "Really clear selection?", "Clear selection", JOptionPane.YES_NO_OPTION);
 				if (confirmDialog == JOptionPane.YES_OPTION) {
 					GeckoInstance.getInstance().clearClusterSelection();
-                    filterResults();
+                    if (filterSelection.equals(ResultFilter.showSelected))
+                        updateData();
 				}
 			}
 		});
@@ -244,46 +261,143 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String filterString = table.getValueAt(table.getSelectedRow(), 4).toString();
-				
 				if (filterString.length() > 2) {
 					filterString = filterString.substring(1, filterString.length() - 1);
 				}
-				
 				setFilterString(filterString);
 			}
 		});
 		popUp.add(menuItem);
 	}
 
-    public void setFilterString(String filterString) {
-        this.filterString = filterString;
+    private class GeneClusterTextFilter extends RowFilter<GeneClusterSelectorModel, Integer> {
+        /**
+         * Returns true if the specified entry should be shown;
+         * returns false if the entry should be hidden.
+         * <p/>
+         * The <code>entry</code> argument is valid only for the duration of
+         * the invocation.  Using <code>entry</code> after the call returns
+         * results in undefined behavior.
+         *
+         * @param entry a non-<code>null</code> object that wraps the underlying
+         *              object from the model
+         * @return true if the entry should be shown
+         */
+        @Override
+        public boolean include(Entry<? extends GeneClusterSelectorModel, ? extends Integer> entry) {
+            if (0 == filterStrings.length)
+                return true;
+            GeneCluster cluster = entry.getModel().getGeneCluster(entry.getIdentifier());
+
+            for (GeneClusterOccurrence gOcc : cluster.getAllOccurrences()) {
+                for (int genome = 0; genome < gOcc.getSubsequences().length; genome++) {
+                    Subsequence[] subseqs = gOcc.getSubsequences()[genome];
+                    for (Subsequence s : subseqs) {
+                        //TODO GeneCluster should know their genomes?
+                        for (Gene g : GeckoInstance.getInstance().getGenomes()[genome].getSubsequence(s)) {
+                            for (String pattern : filterStrings) {
+                                if (g.getSummary().toLowerCase().contains(pattern)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
     }
 
-    /**
-     * A new cell renderer for double values, used for the p-values
-     */
-	public static class DoubleCellRenderer extends  DefaultTableCellRenderer.UIResource {
+    private class GeneClusterIncludeGenomeFilter extends RowFilter<GeneClusterSelectorModel, Integer> {
+        /**
+         * Returns true if the specified entry should be shown;
+         * returns false if the entry should be hidden.
+         * <p/>
+         * The <code>entry</code> argument is valid only for the duration of
+         * the invocation.  Using <code>entry</code> after the call returns
+         * results in undefined behavior.
+         *
+         * @param entry a non-<code>null</code> object that wraps the underlying
+         *              object from the model
+         * @return true if the entry should be shown
+         */
+        @Override
+        public boolean include(Entry<? extends GeneClusterSelectorModel, ? extends Integer> entry) {
+            if (includeFilter.isEmpty())
+                return true;
+            GeneCluster cluster = entry.getModel().getGeneCluster(entry.getIdentifier());
+            return cluster.hasOccurrenceInGenome(includeFilter);
+        }
+    }
 
-		/**
-		 * Random generated serialization UID
-		 */
-		private static final long serialVersionUID = 3185195801465019965L;
+    private class GeneClusterExcludeGenomeFilter extends RowFilter<GeneClusterSelectorModel, Integer> {
+        /**
+         * Returns true if the specified entry should be shown;
+         * returns false if the entry should be hidden.
+         * <p/>
+         * The <code>entry</code> argument is valid only for the duration of
+         * the invocation.  Using <code>entry</code> after the call returns
+         * results in undefined behavior.
+         *
+         * @param entry a non-<code>null</code> object that wraps the underlying
+         *              object from the model
+         * @return true if the entry should be shown
+         */
+        @Override
+        public boolean include(Entry<? extends GeneClusterSelectorModel, ? extends Integer> entry) {
+            if (excludeFilter.isEmpty())
+                return true;
+            GeneCluster cluster = entry.getModel().getGeneCluster(entry.getIdentifier());
+            return !cluster.hasOccurrenceInGenome(excludeFilter);
+        }
+    }
 
-		public DoubleCellRenderer() {
-			super();
-		    setHorizontalAlignment(JLabel.RIGHT);
-		}
-		
-		@Override
-		protected void setValue(Object value) {
-			if (value == null || (! (value instanceof Double))) {
-				setText("");
-			} 
-			else {
-				setText(String.format("%1.3f", (Double)value));
-			}
-		}
-	}
+    private void updateData() {
+        table.clearSelection();
+        //TODO remember selected cluster?
+        clusters = GeckoInstance.getInstance().getClusterList(filterSelection);
+        model.fireTableDataChanged();
+
+        fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
+        TableCellRenderer r = table.getDefaultRenderer(String.class);
+        int maxWidth = 0;
+
+        for (int i = 0; i < model.getRowCount(); i++) {
+            int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
+            if (width > maxWidth) {
+                maxWidth = width;
+            }
+        }
+
+        table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
+    }
+
+    public void setGenomeFilter(int genomeIndex, MultipleGenomesBrowser.GenomeFilterMode filterMode) {
+        table.clearSelection();
+        switch (filterMode){
+            case None:
+                excludeFilter.remove(genomeIndex);
+                includeFilter.remove(genomeIndex);
+                break;
+            case Exclude:
+                includeFilter.remove(genomeIndex);
+                break;
+            case Include:
+                excludeFilter.remove(genomeIndex);
+        }
+        model.fireTableDataChanged();
+        fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
+    }
+
+    public void setFilterString(String filterString) {
+        filterStrings = filterString.trim().split(" ");
+        for (int i=0; i<filterStrings.length; i++)
+            filterStrings[i] = filterStrings[i].toLowerCase();
+        if (1 == filterStrings.length && filterStrings.equals(""))
+            filterStrings = new String[0];
+
+        model.fireTableDataChanged();
+    }
 	
 	private void fireSelectionEvent(boolean instant) {
 		int row = table.getSelectedRow();
@@ -316,170 +430,28 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 					instant));
 		}
 	}
-		
-	public void refresh() {
-		table.clearSelection();
-		model.refreshMatchingClusters();
-		model.fireTableDataChanged();
-		fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
-		TableCellRenderer r = table.getDefaultRenderer(String.class);
-		int maxWidth = 0;
-
-		for (int i = 0; i < model.getRowCount(); i++) {
-			int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
-
-			if (width > maxWidth) {
-				maxWidth = width;
-			}
-		}
-
-		table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
-	}
-
-    public void setGenomeFilter(int genomeIndex, MultipleGenomesBrowser.GenomeFilterMode filterMode) {
-        table.clearSelection();
-
-        model.removeGenomeFromSelection(genomeToReset);
-        model.showClustersWithSelectedGenome(genomeToAddToFilter);
-        model.showClustersWithoutSelectedGenome(genomeToRemove);
-
-        model.fireTableDataChanged();
-        fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
-
-        /*TableCellRenderer r = table.getDefaultRenderer(String.class);
-        int maxWidth = 0;
-
-        for (int i = 0; i < model.getRowCount(); i++) {
-            int width = (int) r.getTableCellRendererComponent(table, model.getValueAt(i, 4), false, true, i, 4).getPreferredSize().getWidth();
-
-            if (width > maxWidth) {
-                maxWidth = width;
-            }
-        }
-
-        table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);*/
-    }
 
     /**
-     * Filter the results with the last filter string
+     * This method is called when the data, i.e. the genomes or clusters currently
+     * observed in this session are changed.
+     *
+     * @param e The data event that references the {@link gecko2.GeckoInstance} object
+     *          handled the data update
      */
-    public void filterResults() {
-        java.util.List<GeneCluster> clusters = GeckoInstance.getInstance().getClusterList(filterSelection);
-
-        if (clusters==null) return;
-
-        if (filterString == null)
-            filterString = "";
-
-        boolean applyTextFilter;
-        String[] searchPatterns;
-
-        boolean applyGenomeFilter;
-
-        if (filterString.equals("")) {
-            applyTextFilter = false;
-        }
-        else {
-            applyTextFilter = true;
-            searchPatterns = filterString.split(" ");
-            for (int i=0; i<searchPatterns.length; i++)
-                searchPatterns[i] = Pattern.quote(searchPatterns[i].toLowerCase());
-        }
-
-        for (GeneCluster cluster : clusters) {
-            cluster.setMatch(true);
-
-            if
-        }
-
-        if (filterString.equals("")) {
-        }
-        else {
-
-            for (GeneCluster c : data.getClusters()) {
-                c.setMatch(false);
-
-                // Check if there is a match in the genes annotations
-                if (!c.isMatch()) {
-                    // ... no comment ...
-                    for (GeneClusterOccurrence gOcc : c.getAllOccurrences()) {
-                        for (int genome=0; genome<gOcc.getSubsequences().length; genome++) {
-                            Subsequence[] subseqs = gOcc.getSubsequences()[genome];
-                            for (Subsequence s : subseqs) {
-                                for (Gene g : data.getGenomes()[genome].getSubsequence(s)) {
-                                    for (String pattern: searchPatterns)
-                                        if (g.getSummary().toLowerCase().matches(".*"+pattern+".*")) {
-                                            c.setMatch(applyFilter(c.getId()));
-                                            break;
-                                        }
-                                    if (c.isMatch()) break;
-                                }
-                                if (c.isMatch()) break;
-                            }
-                            if (c.isMatch()) break;
-                        }
-                        if (c.isMatch()) break;
-                    }
-                }
-            }
-        }
-        gui.getGcSelector().refresh();
+    @Override
+    public void dataChanged(DataEvent e) {
+        updateData();
     }
 
-    /**
-     * Tests, if the cluster with the given index is in given filter set
-     * @param clusterIndex the index of the cluster
-     * @param filter the used filtering
-     * @return true if the cluster is displayed in the given filter set
-     */
-    private boolean applyFilter(int clusterIndex, ResultFilter filter) {
-        switch (filter) {
-            case showSelected:
-                if (clusterSelection.contains(clusterIndex))
-                    return true;
-                break;
-            case showFiltered:
-                if (reducedList.contains(clusterIndex))
-                    return true;
-                break;
-            default:
-                return true;
-        }
-        return false;
-    }
-
-	static class GeneClusterSelectorModel extends AbstractTableModel {
-
+    private class GeneClusterSelectorModel extends AbstractTableModel {
 		private static final long serialVersionUID = -8389126835229250539L;
+
 		private final Class<?>[] columns = {Integer.class, Integer.class, Integer.class, Double.class, Double.class, String.class};
 		private final String[] columnNames = {"ID", "#Genes", "#Genomes", "Score", "C-Score", "Genes"};
-		private final GeckoInstance instance;
-		
-		private java.util.List<GeneCluster> matchingClusters;
-		private final Set<Integer> exclude = new HashSet<>();
-		private final Set<Integer> include = new HashSet<>();
-		
-		public void refreshMatchingClusters() {
-			matchingClusters.clear();
 
-			if (instance.getClusters() != null)	{
-				for (GeneCluster c : instance.getClusters()) {
-					if (c.isMatch()) {
-						matchingClusters.add(c);
-					}
-				}
-			}
-		}
-		
-		public java.util.List<GeneCluster> getMatchingClusters()	{
-			return matchingClusters;
-		}
-		
-		
-		public GeneClusterSelectorModel() {
-			this.instance = GeckoInstance.getInstance();
-			matchingClusters = new ArrayList<>();
-		}
+        public GeneCluster getGeneCluster(int index) {
+            return clusters.get(index);
+        }
 
         @Override
 		public Class<?> getColumnClass(int columnIndex)	{
@@ -498,24 +470,24 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 
         @Override
 		public int getRowCount() {
-			return matchingClusters.size();
+			return clusters.size();
 		}
 
         @Override
 		public Object getValueAt(int rowIndex, int columnIndex)	{
 			switch(columnIndex)	{
 				case COL_ID:
-					return matchingClusters.get(rowIndex).getId();
+					return clusters.get(rowIndex).getId();
 				case COL_NGENES:
-					return matchingClusters.get(rowIndex).getGeneFamilies().size();
+					return clusters.get(rowIndex).getGeneFamilies().size();
 				case COL_NGENOMES:
-					return matchingClusters.get(rowIndex).getSize();
+					return clusters.get(rowIndex).getSize();
 				case COL_SCORE:
-					return matchingClusters.get(rowIndex).getBestScore();
+					return clusters.get(rowIndex).getBestScore();
 				case COL_SCORE_CORRECTED:
-					return matchingClusters.get(rowIndex).getBestCorrectedScore();
+					return clusters.get(rowIndex).getBestCorrectedScore();
 				case COL_GENES:
-                    Set<GeneFamily> genes = matchingClusters.get(rowIndex).getGeneFamilies();
+                    Set<GeneFamily> genes = clusters.get(rowIndex).getGeneFamilies();
                     ArrayList<String> knownGenes = new ArrayList<>();
 
                     for (GeneFamily g : genes)	{
@@ -536,86 +508,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 			// Read-only table
 			return false;
 		}
-		
-		/**
-		 * This method removes a genome from the criteria list of genomes
-		 * which are in-/excluded from the clusters.
-		 * 
-		 * @param toRemove id of the genome to remove
-		 */
-		protected void removeGenomeFromSelection(int toRemove) {
-			this.refreshMatchingClusters();
-			
-			if (this.include.contains(toRemove)) {
-				include.remove(toRemove);
-			}
-			
-			if (this.exclude.contains(toRemove)) {
-				exclude.remove(toRemove);
-			}
-			
-			Object[] includeHelper = this.include.toArray();
-			Object[] excludeHelper = this.exclude.toArray();
-			
-			this.exclude.clear();
-			this.include.clear();
-			
-			// If the array lists are not empty we have to include/exclude the rest of
-			// the contained genomes
-			for (int i = 0; i < includeHelper.length && includeHelper.length > 0; i++) {
-				this.showClustersWithSelectedGenome((Integer) includeHelper[i]);
-			}
-			
-			for (int i = 0; i < excludeHelper.length && excludeHelper.length > 0; i++) {
-				this.showClustersWithoutSelectedGenome((Integer) excludeHelper[i]);
-			}
-		}
-		
-		
-		/**
-		 * This method filters the matching clusters array list. It sorts out all
-		 * clusters which do not contain the given genome.
-		 * 
-		 * @param genomeToAddToFilter id of the genome to keep in clusters
-		 */
-		protected void showClustersWithSelectedGenome(int genomeToAddToFilter) {
-			ArrayList<GeneCluster> tmp = new ArrayList<>();
-			
-			if (this.exclude.contains(genomeToAddToFilter)) {
-				this.removeGenomeFromSelection(genomeToAddToFilter);
-			}
-			
-			for (GeneCluster g : this.matchingClusters) {
-                if (g.hasOccurrenceInGenome(genomeToAddToFilter))
-                    tmp.add(g);
-			}
-				
-			this.matchingClusters = tmp;
-			this.include.add(genomeToAddToFilter);	
-		} 
-		
-		/**
-		 * This method filters the matching clusters array list. It sorts out all
-		 * clusters which do contain the given genome.
-		 * 
-		 * @param genomeToRemoveFromClusterSelection id of the genome to sort out (number)
-		 */
-		protected void showClustersWithoutSelectedGenome(int genomeToRemoveFromClusterSelection) {
-			ArrayList<GeneCluster> tmp = new ArrayList<>();
-			
-			if (this.include.contains(genomeToRemoveFromClusterSelection)) {
-				this.removeGenomeFromSelection(genomeToRemoveFromClusterSelection);
-			}
-			
-			for (GeneCluster g : this.matchingClusters) {
-                if (g.hasOccurrenceInGenome(genomeToRemoveFromClusterSelection))
-                    tmp.add(g);
-			}
-			
-			this.matchingClusters.removeAll(tmp);
-			this.exclude.add(genomeToRemoveFromClusterSelection);
-		}
-	}
+    }
 	
 	public void addSelectionListener(ClusterSelectionListener s) {
 		eventListener.add(ClusterSelectionListener.class, s);
@@ -635,6 +528,31 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner {
 	public void lostOwnership(Clipboard clipboard, Transferable contents) {
 		// Do nothing		
 	}
-	
+
+    /**
+     * A new cell renderer for double values, used for the p-values
+     */
+    static class DoubleCellRenderer extends  DefaultTableCellRenderer.UIResource {
+
+        /**
+         * Random generated serialization UID
+         */
+        private static final long serialVersionUID = 3185195801465019965L;
+
+        public DoubleCellRenderer() {
+            super();
+            setHorizontalAlignment(JLabel.RIGHT);
+        }
+
+        @Override
+        protected void setValue(Object value) {
+            if (value == null || (! (value instanceof Double))) {
+                setText("");
+            }
+            else {
+                setText(String.format("%1.3f", (Double)value));
+            }
+        }
+    }
 }
 

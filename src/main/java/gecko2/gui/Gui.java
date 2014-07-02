@@ -73,6 +73,7 @@ public class Gui {
 		this.gcDisplay = new GeneClusterDisplay();
 
 		this.gcSelector = new GeneClusterSelector();
+        gecko.addDataListener(gcSelector);
 		Dimension startDimension = new Dimension(1024, 768);
 		
 		// Basic frame settings
@@ -436,10 +437,6 @@ public class Gui {
 	public void closeCurrentSession() {
         gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
 		mgb.clear();
-	}
-	
-	public void updategcSelector() {
-		gcSelector.refresh();
 	}
 	
 	/*

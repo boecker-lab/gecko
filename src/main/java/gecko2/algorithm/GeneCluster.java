@@ -312,14 +312,16 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
     /**
      * Check if the gene cluster has an occurrence in the given genome
-     * @param genomeIndex the index of the genome
+     * @param genomes the indices of the genomes
      * @return
      */
-    public boolean hasOccurrenceInGenome(int genomeIndex){
+    public boolean hasOccurrenceInGenome(Set<Integer> genomes){
         for (GeneClusterOccurrence occ : getAllOccurrences()) {
-            for (int i = 0; i < occ.getSubsequences()[genomeIndex].length; i++) {
-                if (occ.getSubsequences()[genomeIndex][i].isValid()) {
-                    return true;
+            for (Integer genomeIndex : genomes) {
+                for (int i = 0; i < occ.getSubsequences()[genomeIndex].length; i++) {
+                    if (occ.getSubsequences()[genomeIndex][i].isValid()) {
+                        return true;
+                    }
                 }
             }
         }

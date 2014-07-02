@@ -233,16 +233,16 @@ public class GeckoInstance {
 	}
 
     private void handleUpdatedClusterResults() {
-        if (GeckoInstance.this.gui != null) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
-                    GeckoInstance.this.clusterSelection = null;
-                    GeckoInstance.this.gui.getGcSelector().refresh();
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
+                GeckoInstance.this.clusterSelection = null;
+                GeckoInstance.this.fireDataChanged();
+                if (GeckoInstance.this.gui != null) {
                     GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
                 }
-            });
-        }
+            }
+        });
     }
 
     private void dataUpdated() {
@@ -256,12 +256,11 @@ public class GeckoInstance {
                     else
                         scd = null;
                     gui.updateViewscreen();
-                    gui.getGcSelector().refresh();
+                    fireDataChanged();
                 }
             });
         } else
             scd = null;
-        this.fireDataChanged();
     }
 
     public DataSet getData() {
@@ -279,7 +278,6 @@ public class GeckoInstance {
                 @Override
                 public void run() {
                     gui.updateViewscreen();
-                    gui.updategcSelector();
                     if (data.equals(DataSet.getEmptyDataSet()))
                         gui.changeMode(Gui.Mode.NO_SESSION);
                     else
