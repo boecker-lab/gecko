@@ -18,10 +18,7 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataListener {
@@ -36,8 +33,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
     // Filter options
     private ResultFilter filterSelection;
     private String[] filterStrings;
-    private Set<Integer> excludeFilter;
-    private Set<Integer> includeFilter;
 
     private final EventListenerList eventListener = new EventListenerList();
 	
@@ -52,8 +47,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 	public GeneClusterSelector() {
         filterSelection = ResultFilter.showAll;
         filterStrings = new String[0];
-        excludeFilter = new HashSet<>();
-        includeFilter = new HashSet<>();
 
 		this.setLayout(new BorderLayout());
 		JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -95,8 +88,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 		sorter.setSortable(COL_GENES, false);
 
         java.util.List<RowFilter<GeneClusterSelectorModel, Integer>> filters = new ArrayList<>(3);
-        filters.add(new GeneClusterIncludeGenomeFilter());
-        filters.add(new GeneClusterExcludeGenomeFilter());
         filters.add(new GeneClusterTextFilter());
 
         sorter.setRowFilter(RowFilter.andFilter(filters));
@@ -308,51 +299,9 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         }
     }
 
-    private class GeneClusterIncludeGenomeFilter extends RowFilter<GeneClusterSelectorModel, Integer> {
-        /**
-         * Returns true if the specified entry should be shown;
-         * returns false if the entry should be hidden.
-         * <p/>
-         * The <code>entry</code> argument is valid only for the duration of
-         * the invocation.  Using <code>entry</code> after the call returns
-         * results in undefined behavior.
-         *
-         * @param entry a non-<code>null</code> object that wraps the underlying
-         *              object from the model
-         * @return true if the entry should be shown
-         */
-        @Override
-        public boolean include(Entry<? extends GeneClusterSelectorModel, ? extends Integer> entry) {
-            if (includeFilter.isEmpty())
-                return true;
-            GeneCluster cluster = entry.getModel().getGeneCluster(entry.getIdentifier());
-            return cluster.hasOccurrenceInGenome(includeFilter);
-        }
-    }
-
-    private class GeneClusterExcludeGenomeFilter extends RowFilter<GeneClusterSelectorModel, Integer> {
-        /**
-         * Returns true if the specified entry should be shown;
-         * returns false if the entry should be hidden.
-         * <p/>
-         * The <code>entry</code> argument is valid only for the duration of
-         * the invocation.  Using <code>entry</code> after the call returns
-         * results in undefined behavior.
-         *
-         * @param entry a non-<code>null</code> object that wraps the underlying
-         *              object from the model
-         * @return true if the entry should be shown
-         */
-        @Override
-        public boolean include(Entry<? extends GeneClusterSelectorModel, ? extends Integer> entry) {
-            if (excludeFilter.isEmpty())
-                return true;
-            GeneCluster cluster = entry.getModel().getGeneCluster(entry.getIdentifier());
-            return !cluster.hasOccurrenceInGenome(excludeFilter);
-        }
-    }
-
-    private static class GeneClusterIncludeExcludeMatcherEditor extends AbstractMatcherEditor<GeneCluster> implements ActionListener{
+    private static class GeneClusterIncludeExcludeMatcherEditor extends AbstractMatcherEditor<GeneCluster> implements ActionListener {
+        private Set<Integer> include;
+        private Set<Integer> exclude;
         /**
          * Invoked when an action occurs.
          *
@@ -360,11 +309,50 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
          */
         @Override
         public void actionPerformed(ActionEvent e) {
+            JComboBox<MultipleGenomesBrowser.GenomeFilterMode> cb = (JComboBox) e.getSource();
+            int genomeIndex = Integer.parseInt(cb.getName());
+            MultipleGenomesBrowser.GenomeFilterMode filterMode = cb.getItemAt(cb.getSelectedIndex());
 
+            boolean relaxed = false;
+            boolean constrained = false;
+
+            switch (filterMode) {
+                case None:
+                    relaxed = (exclude.remove(genomeIndex) ||include.remove(genomeIndex));
+                    break;
+                case Exclude:
+                    relaxed = include.remove(genomeIndex);
+                    constrained = exclude.add(genomeIndex);
+                    break;
+                case Include:
+                    relaxed = exclude.remove(genomeIndex);
+                    constrained = include.remove(genomeIndex);
+            }
+
+            if (relaxed && !constrained) {
+                if (include.isEmpty() && exclude.isEmpty())
+                    this.fireMatchAll();
+                else
+                    this.fireRelaxed(new GeneClusterIncludeExcludeMatcher(include, exclude));
+            } else if (constrained && ! relaxed) {
+                this.fireConstrained(new GeneClusterIncludeExcludeMatcher(include, exclude));
+
+            } else if (constrained && relaxed) {
+                this.fireChanged(new GeneClusterIncludeExcludeMatcher(include, exclude));
+            }
+
+            this.fireMatchAll();
+            this.fireChanged(new GeneClusterIncludeExcludeMatcher(include, exclude));
         }
 
-        private static class GeneClusterIncludeMatcher implements Matcher {
+        private static class GeneClusterIncludeExcludeMatcher implements Matcher {
             private Set<Integer> include;
+            private Set<Integer> exclude;
+
+            public GeneClusterIncludeExcludeMatcher(Set<Integer> include, Set<Integer> exclude){
+                this.include = new HashSet<>(include);
+                this.exclude = new HashSet<>(exclude);
+            }
             /**
              * Return true if an item matches a filter.
              *
@@ -373,7 +361,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
             @Override
             public boolean matches(Object item) {
                 final GeneCluster cluster = (GeneCluster) item;
-                return include.isEmpty() || cluster.hasOccurrenceInGenome(include);
+                return (include.isEmpty() || cluster.hasOccurrenceInGenome(include)) &&
+                        (exclude.isEmpty() || cluster.hasOccurrenceInGenome(exclude));
             }
         }
     }
@@ -396,23 +385,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         }
 
         table.getColumnModel().getColumn(4).setPreferredWidth(maxWidth + 5);
-    }
-
-    public void setGenomeFilter(int genomeIndex, MultipleGenomesBrowser.GenomeFilterMode filterMode) {
-        table.clearSelection();
-        switch (filterMode){
-            case None:
-                excludeFilter.remove(genomeIndex);
-                includeFilter.remove(genomeIndex);
-                break;
-            case Exclude:
-                includeFilter.remove(genomeIndex);
-                break;
-            case Include:
-                excludeFilter.remove(genomeIndex);
-        }
-        model.fireTableDataChanged();
-        fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
     }
 
     public void setFilterString(String filterString) {
