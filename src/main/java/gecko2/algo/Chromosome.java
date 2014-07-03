@@ -381,10 +381,7 @@ class Chromosome {
                     int prevOcc = maxDist + 1;          // the sign is at last position per default
 
                     for (int d=1; d<=maxDist+1; d++) {
-                    	if (c_old_L[d]<0)
-                            continue;
-
-                        if (genes[j] == genes[c_old_L[d]]) {    // search for the first entry in the neighbor array
+                        if (genes[j] >= 0 && genes[j] == genes[c_old_L[d]]) {    // search for the first entry in the neighbor array
                             prevOcc = d;                                        // that has the char chr[j], and store the position in prevOcc
                             break;
                         }
@@ -505,8 +502,7 @@ class Chromosome {
                     int prevOcc = maxDist + 1;          // the sign is at last position per default
 
                     for (int p=1; p<=maxDist+1; p++) {
-                    	if (c_old_R[p]<0) continue;
-                        if (genes[j] == genes[c_old_R[p]]) {    // search for the first entry in the neighbor array
+                        if (genes[j] >= 0 && genes[j] == genes[c_old_R[p]]) {    // search for the first entry in the neighbor array
                             prevOcc = p;                                        // that has the char chr[j], and store the position in prevOcc
                             break;
                         }
