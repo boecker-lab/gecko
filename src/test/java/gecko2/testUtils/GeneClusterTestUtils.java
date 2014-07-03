@@ -30,53 +30,11 @@ public class GeneClusterTestUtils {
 
     public static void performTest(Parameter p, int[][][] genomes, List<Set<Integer>> genomeGroups, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
         // Test the java implementation
-    	int k = 20;
-        long[][] start = new long [2][k];
-        long[][] stop = new long [2][k];
-        for(int i=0;i<k;i++){
-        	start[0][i] = System.currentTimeMillis();
-        	List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
-        	compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
-        	stop[0][i] = System.currentTimeMillis();
-        }
-        int sum = 0;
-        long[] erg = new long [k];
-        for(int i=0;i<k;i++){
-        	erg[i] = stop[0][i]-start[0][i];
-        	sum += erg[i];
-        }
-        sum/=k;
-        Arrays.sort(erg);
-        System.out.println("ohne Speicher red");
-        System.out.println("	arith. Mittelwert; " + sum);
-        System.out.println("	median Mittelwert; " + erg[k/2-1]);
-        
-        //DataSet.printIntArray(genomes);
-        //for (ExpectedReferenceClusterValues cluster : expectedReferenceClusters)
-        //    System.out.println(cluster.getGeneContent());
+        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
+        compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
 
-        MemoryReduction.memReducer(genomes, expectedReferenceClusters);
-        
-        //System.out.println();
-        //DataSet.printIntArray(genomes);
-        //for (ExpectedReferenceClusterValues cluster : expectedReferenceClusters)
-        //    System.out.println(cluster.getGeneContent());
-        for(int i=0;i<k;i++){
-        	start[1][i] = System.currentTimeMillis();
-        	List<ReferenceCluster> reducedRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
-        	compareReferenceClusters(expectedReferenceClusters, reducedRes, PValueComparison.COMPARE_NONE);
-        	stop[1][i] = System.currentTimeMillis();
-        }
-        for(int i=0;i<k;i++){
-        	erg[i] = stop[1][i]-start[1][i];
-        	sum += erg[i];
-        }
-        sum/=k;
-        Arrays.sort(erg);
-        System.out.println("mit Speicher red");
-        System.out.println("	arith. Mittelwert; " + sum);
-        System.out.println("	median Mittelwert; " + erg[k/2-1]);
-        System.out.println("");
+        List<ReferenceCluster> reducedRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
+        compareReferenceClusters(expectedReferenceClusters, reducedRes, PValueComparison.COMPARE_NONE);
     }
 
     public enum PValueComparison {
@@ -379,13 +337,36 @@ public class GeneClusterTestUtils {
         DataSetWriter.saveDataSetToFile(data, settings.resultOutputFile);
 	}
 
-    public static void performanceTest(ReferenceClusterTestSettings settings, boolean useMemoryReduction) throws IOException, DataFormatException, ParseException {
+    public static void performanceTest(ReferenceClusterTestSettings settings, boolean useMemoryReduction) throws IOException, ParseException {
         // Test unreduced
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet actualData = reader.readData();
 
-        GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction);
-        actualData.setClusters(javaRes);
+        // Test the java implementation
+        int k = 20;
+        long[][] start = new long [2][k];
+        long[][] stop = new long [2][k];
+        for(int i=0;i<k;i++){
+            start[0][i] = System.currentTimeMillis();
+            GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction);
+            actualData.setClusters(javaRes);
+            stop[0][i] = System.currentTimeMillis();
+        }
+        int sum = 0;
+        long[] erg = new long [k];
+        for(int i=0;i<k;i++){
+            erg[i] = stop[0][i]-start[0][i];
+            sum += erg[i];
+        }
+        double mean = (double)sum/k;
+        Arrays.sort(erg);
+        if (useMemoryReduction)
+            System.out.println("mit Speicher red");
+        else
+            System.out.println("ohne Speicher red");
+        System.out.println("	minimum; " + erg[0]);
+        System.out.println("	arith. Mittelwert; " + mean);
+        System.out.println("	median Mittelwert; " + erg[k/2-1]);
     }
 	
 	public static void main(String[] args)
@@ -393,14 +374,14 @@ public class GeneClusterTestUtils {
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionBugD2S5Q2();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q2Grouping();
-        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
+        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionWithSuboptimalOccurrenceD3S5();
-        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionMultipleZerosD3S5();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionMultipleZerosD3S5();
         try{
-			generateRefClusterFile(testType);
-            //performanceTest(testType, false);
+			//generateRefClusterFile(testType);
+            performanceTest(testType, false);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
