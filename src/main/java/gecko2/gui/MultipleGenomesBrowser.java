@@ -214,6 +214,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		box.setPreferredSize(new Dimension(100, height));
 		box.setMaximumSize(box.getPreferredSize());
 		box.setName(Integer.toString(genomeBrowsersSize - 1));
+        gecko.getGui().getGcSelector().addIncludeExcludeFilterComboBox(box);
 		return box;
 	}
 	
@@ -245,9 +246,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		boxPanel.setBackground(gb.getBackground());
 		boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
 		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(), gb.getBackground());
-//		n.addMouseListener(gb.getGenomebrowsermouseover());
 		JComboBox box = createComboBox(genomeBrowsers.size(), getGenomeBrowserHeight());
-        gecko.getGui().getGcSelector().addIncludeExcludeFilterComboBox(box);
 		boxPanel.add(box);
 		boxPanel.add(new JToolBar.Separator());
 		boxPanel.add(n);
