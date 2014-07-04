@@ -273,6 +273,7 @@ public class GeckoInstance {
 
     public void setGeckoInstanceData(final DataSet data) {
         this.data = data;
+        handleUpdatedClusterResults();
         if (gui != null) {
             Runnable updateGui = new Runnable() {
                 @Override

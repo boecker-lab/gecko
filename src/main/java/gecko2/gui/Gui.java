@@ -71,8 +71,8 @@ public class Gui {
 		this.waitingAnimation = createImageIcon("images/ghost.png");
 		
 		this.gcDisplay = new GeneClusterDisplay();
-
-		this.gcSelector = new GeneClusterSelector();
+        searchField = new JTextField("");
+		this.gcSelector = new GeneClusterSelector(searchField);
         gecko.addDataListener(gcSelector);
 		Dimension startDimension = new Dimension(1024, 768);
 		
@@ -232,17 +232,7 @@ public class Gui {
 		});
 	
 		JPanel p = new JPanel(new BorderLayout());
-
-		searchField = new JTextField("");
 		searchField.setPreferredSize(new Dimension(150, toolbar.getHeight()));
-		searchField.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				gcSelector.setFilterString(searchField.getText());
-				searchField.setSelectionStart(0);
-				searchField.setSelectionEnd(searchField.getText().length());
-			}
-		});
 		
 		p.setMaximumSize(new Dimension(150, (int) toolbar.getPreferredSize().getHeight()));
 		p.add(searchField, BorderLayout.CENTER);

@@ -315,17 +315,38 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
      * @param genomes the indices of the genomes
      * @return
      */
-    public boolean hasOccurrenceInGenome(Set<Integer> genomes){
+    public boolean hasNoOccurrenceInGenomes(Set<Integer> genomes){
         for (GeneClusterOccurrence occ : getAllOccurrences()) {
             for (Integer genomeIndex : genomes) {
                 for (int i = 0; i < occ.getSubsequences()[genomeIndex].length; i++) {
                     if (occ.getSubsequences()[genomeIndex][i].isValid()) {
-                        return true;
+                        return false;
                     }
                 }
             }
         }
-        return false;
+        return true;
+    }
+
+    /**
+     * Check if the gene cluster has an occurrence in the given genome
+     * @param genomes the indices of the genomes
+     * @return
+     */
+    public boolean hasOccurrenceInAllGenomes(Set<Integer> genomes){
+        for (Integer genomeIndex : genomes) {
+            boolean hasOccurrence = false;
+            for (GeneClusterOccurrence occ : getAllOccurrences()) {
+                for (int i = 0; i < occ.getSubsequences()[genomeIndex].length; i++) {
+                    if (occ.getSubsequences()[genomeIndex][i].isValid()) {
+                        hasOccurrence = true;
+                    }
+                }
+            }
+            if (!hasOccurrence)
+                return false;
+        }
+        return true;
     }
 	
 	/**
