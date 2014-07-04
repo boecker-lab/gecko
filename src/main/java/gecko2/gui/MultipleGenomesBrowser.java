@@ -61,8 +61,8 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		this.addSelectionListener(this);
 		this.setPreferredSize(new Dimension(0,0));
 		this.wheelListener = new ScrollListener();
-		this.genomeBrowsers = new ArrayList<AbstractGenomeBrowser>();
-		this.gbNavigators = new ArrayList<GBNavigator>();
+		this.genomeBrowsers = new ArrayList<>();
+		this.gbNavigators = new ArrayList<>();
 		this.setLayout(new BorderLayout());
         JPanel leftpanel = new JPanel();
 		this.centerpanel = new JPanel();
@@ -400,8 +400,8 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		
 		int[] positions = new int[gOcc.getSubsequences().length];
 		Arrays.fill(positions, -1);
-		ArrayList<Integer> minus = new ArrayList<Integer>();
-		ArrayList<Integer> plus = new ArrayList<Integer>();
+		ArrayList<Integer> minus = new ArrayList<>();
+		ArrayList<Integer> plus = new ArrayList<>();
 		for (int i=0; i<positions.length;i++) {
 			// If genome i is not in the cluser, skip
 			if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
