@@ -568,7 +568,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				builder.append(", ");
 			else
 				first = false;
-			builder.append(name);
+			builder.append((name.trim().equals("")) ? "-" : name);
 		}
 		return builder.toString();
 	}
