@@ -460,10 +460,12 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	/**
 	 * Generates a reduced list of the gene clusters, keeping of all similar clusters only the one with the lowest p-Value.
 	 * Returns a @Link SortedSet of the indices of the kept clusters.  
-	 * @param allClusters The array of gene clusters
-	 * @return The SortedSet, containing the indices of the clusters that are to keep
+	 * @param allClusters The list of gene clusters
+	 * @return the reduced list of gene clusters
 	 */
 	private static List<GeneCluster> generateSimilarityReducedClusterList(List<GeneCluster> allClusters) {
+        if (allClusters.isEmpty())
+            return new ArrayList<>();
 		List<GeneCluster> reducedList = new ArrayList<>();
 
         List<GeneCluster> geneClustersCopy = new ArrayList<>(allClusters);

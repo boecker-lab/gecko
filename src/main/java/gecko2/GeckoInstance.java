@@ -233,16 +233,12 @@ public class GeckoInstance {
 	}
 
     private void handleUpdatedClusterResults() {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
-                GeckoInstance.this.clusterSelection = null;
-                GeckoInstance.this.fireDataChanged();
-                if (GeckoInstance.this.gui != null) {
-                    GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
-                }
-            }
-        });
+        GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
+        GeckoInstance.this.clusterSelection = null;
+        GeckoInstance.this.fireDataChanged();
+        if (GeckoInstance.this.gui != null) {
+            GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
+        }
     }
 
     private void dataUpdated() {
