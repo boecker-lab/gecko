@@ -15,6 +15,7 @@ import javax.swing.*;
 import javax.swing.event.EventListenerList;
 import java.awt.*;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -235,14 +236,21 @@ public class GeckoInstance {
     private void handleUpdatedClusterResults() {
         GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
         GeckoInstance.this.clusterSelection = null;
-        GeckoInstance.this.fireDataChanged();
-        if (GeckoInstance.this.gui != null) {
-            GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+                public void run() {
+                    GeckoInstance.this.fireDataChanged();
+                    if (GeckoInstance.this.gui != null) {
+                        GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
+                    }
+                }
+            });
+        } catch (InterruptedException | InvocationTargetException e) {
+            e.printStackTrace();
         }
     }
 
     private void dataUpdated() {
-        this.reducedList = null;
         if (this.gui != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -269,7 +277,8 @@ public class GeckoInstance {
 
     public void setGeckoInstanceData(final DataSet data) {
         this.data = data;
-        handleUpdatedClusterResults();
+        GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
+        GeckoInstance.this.clusterSelection = null;
         if (gui != null) {
             Runnable updateGui = new Runnable() {
                 @Override
