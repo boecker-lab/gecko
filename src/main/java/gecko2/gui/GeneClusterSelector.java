@@ -6,6 +6,8 @@ import ca.odell.glazedlists.matchers.AbstractMatcherEditor;
 import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.*;
+import ca.odell.glazedlists.swing.TableComparatorChooser;
+import ca.odell.glazedlists.swt.*;
 import gecko2.GeckoInstance;
 import gecko2.GeckoInstance.ResultFilter;
 import gecko2.algorithm.*;
@@ -266,6 +268,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         tableModel = new DefaultEventSelectionModel<>(textFilteredList);
         table.setModel(geneClusterTableModel);
         table.setSelectionModel(tableModel);
+        TableComparatorChooser<GeneCluster> tableComparatorChooser = TableComparatorChooser.install(table, sortedList, TableComparatorChooser.SINGLE_COLUMN);
+        tableComparatorChooser.getComparatorsForColumn(COL_GENES).clear();
         final TableColumnModel cm = table.getColumnModel();
         cm.getColumn(COL_ID).setPreferredWidth(50); // ID
         cm.getColumn(COL_NGENES).setPreferredWidth(50); // #Genes
