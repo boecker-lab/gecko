@@ -42,7 +42,6 @@ public class Gui {
 	private final JCheckBox mgbViewSwitcher = new JCheckBox();
 	private final JTextField searchField;
 
-		
 	public JFrame getMainframe() {
 		return mainframe;
 	}
@@ -67,7 +66,6 @@ public class Gui {
 		this.statusbartext = new JLabel();
 		this.progressbar = new JProgressBar();
 		progressbar.setMaximumSize(new Dimension(100, 30));
-		progressbar.setValue(12);
 		this.waitingAnimation = createImageIcon("images/ghost.png");
 		
 		this.gcDisplay = new GeneClusterDisplay();

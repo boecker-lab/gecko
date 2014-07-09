@@ -131,7 +131,7 @@ public class GckFileReaderTest {
         assertEquals(expectedData.getGeneFamilySet(), actualData.getGeneFamilySet());
         assertEquals(expectedData.getUnknownGeneFamily(), actualData.getUnknownGeneFamily());
 
-        List<GeneCluster> computedResult = GeckoInstance.getInstance().computeClustersJava(expectedData, p);
+        List<GeneCluster> computedResult = GeckoInstance.getInstance().computeClustersJava(expectedData, p, null);
 
         performTest(computedResult, actualData.getClusters(), GeneClusterTestUtils.PValueComparison.COMPARE_NONE);
     }

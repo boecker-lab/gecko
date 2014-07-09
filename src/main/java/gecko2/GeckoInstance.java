@@ -2,6 +2,8 @@ package gecko2;
 
 import gecko2.algo.ReferenceCluster;
 import gecko2.algo.ReferenceClusterAlgorithm;
+import gecko2.algo.status.AlgorithmProgressListener;
+import gecko2.algo.status.AlgorithmStatusEvent;
 import gecko2.algorithm.*;
 import gecko2.event.DataEvent;
 import gecko2.event.DataListener;
@@ -18,6 +20,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
@@ -236,17 +239,9 @@ public class GeckoInstance {
     private void handleUpdatedClusterResults() {
         GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
         GeckoInstance.this.clusterSelection = null;
-        try {
-            EventQueue.invokeAndWait(new Runnable() {
-                public void run() {
-                    GeckoInstance.this.fireDataChanged();
-                    if (GeckoInstance.this.gui != null) {
-                        GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
-                    }
-                }
-            });
-        } catch (InterruptedException | InvocationTargetException e) {
-            e.printStackTrace();
+        GeckoInstance.this.fireDataChanged();
+        if (GeckoInstance.this.gui != null) {
+            GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
         }
     }
 
@@ -330,8 +325,8 @@ public class GeckoInstance {
 	 * @param params the parameters
 	 * @return the gene clusters
 	 */
-	public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params) {
-		return computeClustersJava(data, params, null);
+	public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params, AlgorithmProgressListener listener) {
+		return computeClustersJava(data, params, null, listener);
 	}
 	
 	/**
@@ -341,11 +336,11 @@ public class GeckoInstance {
 	 * @param genomeGrouping the grouping of the genomes, only one genome per group is used for quorum and p-value
 	 * @return the gene clusters
 	 */
-	public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping) {
+	public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
         int intArray[][][] = data.toIntArray();
 
         params.setAlphabetSize(data.getAlphabetSize());
-		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping);
+		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping, listener);
         List<GeneCluster> result = new ArrayList<>(refCluster.size());
         for (int i=0; i<refCluster.size(); i++)
             result.add(new GeneCluster(i, refCluster.get(i), data));
@@ -362,65 +357,91 @@ public class GeckoInstance {
         params.setAlphabetSize(data.getAlphabetSize());
 		return new ArrayList<>(Arrays.asList(computeClusters(intArray, params, GeckoInstance.this)));
 	}
-	
-	/**
-	 * Computes the gene clusters for the given genomes with the given parameters
-	 * @param params the parameters
-	 * @return the gene clusters
-	 */
-	public List<GeneCluster> computeClusters(Parameter params) {
-		return computeClustersJava(data, params);
-		//return computeClustersLibgecko(data, params);
-	}
-	
-	public ExecutorService performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-		lastParameter = p;
-        if (gui != null)
-		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
-		ClusterComputationRunnable clusterComputation = new ClusterComputationRunnable(p, mergeResults, genomeGroupingFactor);
 
-        executor.submit(clusterComputation);
-        return executor;
-	}
-	
-	private class ClusterComputationRunnable implements Runnable {
-
-		private final Parameter p;
-		private final boolean mergeResults;
+    class GeneClusterDetectionTask extends SwingWorker<List<GeneCluster>, Void> implements AlgorithmProgressListener{
+        private final Parameter p;
+        private final boolean mergeResults;
         private final double groupingFactor;
-		
-		public ClusterComputationRunnable(Parameter p, boolean mergeResults, double groupingFactor) {
-			this.p = p;
-			this.mergeResults = mergeResults;
+        private final DataSet data;
+
+        public GeneClusterDetectionTask(Parameter p, boolean mergeResults, double groupingFactor, DataSet data) {
+            this.p = p;
+            this.mergeResults = mergeResults;
             this.groupingFactor = groupingFactor;
-		}
-		
-		public void run() {
-			//printGenomeStatistics(GeckoInstance.this.genomes, p.getAlphabetSize(), 1500, 250);
-			//BreakPointDistance.breakPointDistance(GeckoInstance.this.genomes, false);
-			//BreakPointDistance.groupGenomes(genomes, 0.1, 0.95, 0.1, false);
-			//System.out.println("\n");
-			//BreakPointDistance.breakPointDistance(GeckoInstance.this.genomes, true);
-			
-			// We do this very ugly with a 3D integer array to make things easier
-			// during the JNI<->JAVA phase
+            this.data = data;
+        }
+
+        /**
+         * Computes a result, or throws an exception if unable to do so.
+         * <p/>
+         * <p/>
+         * Note that this method is executed only once.
+         * <p/>
+         * <p/>
+         * Note: this method is executed in a background thread.
+         *
+         * @return the computed result
+         * @throws Exception if unable to compute a result
+         */
+        @Override
+        protected List<GeneCluster> doInBackground() throws Exception {
+            //printGenomeStatistics(GeckoInstance.this.genomes, p.getAlphabetSize(), 1500, 250);
+            //BreakPointDistance.breakPointDistance(GeckoInstance.this.genomes, false);
+            //BreakPointDistance.groupGenomes(genomes, 0.1, 0.95, 0.1, false);
+            //System.out.println("\n");
+            //BreakPointDistance.breakPointDistance(GeckoInstance.this.genomes, true);
+
             List<Set<Integer>> genomeGroups = null;
             if (groupingFactor <= 1.0)
                 genomeGroups = BreakPointDistance.groupGenomes(data, groupingFactor, false);
-			
-			Date before = new Date();
-            List<GeneCluster> res = computeClustersJava(data, p, genomeGroups);
-			Date after = new Date();
-			System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
+
+            Date before = new Date();
+            List<GeneCluster> res = computeClustersJava(data, p, genomeGroups, this);
+            Date after = new Date();
+            setProgressStatus(100, AlgorithmStatusEvent.Task.Done);
+            System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
             final List<GeneCluster> geneClusters;
-			if (mergeResults)
-                geneClusters = GeneCluster.mergeResults(GeckoInstance.this.getClusters(), res);
-			else
+            if (mergeResults)
+                geneClusters = GeneCluster.mergeResults(data.getClusters(), res);
+            else
                 geneClusters = res;
-            GeckoInstance.this.setClusters(geneClusters);
-		}
+
+            return geneClusters;
+        }
+
+        @Override
+        public void done() {
+            try {
+                List<GeneCluster> results = get();
+                GeckoInstance.this.setClusters(results);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void algorithmProgressUpdate(AlgorithmStatusEvent statusEvent) {
+            setProgressStatus(statusEvent.getProgress(), statusEvent.getTask());
+        }
+    }
+
+    /**
+     * Creates and executes the swing worker that performs the cluster detection.
+     * Returns the SwingWorker, so the calling method can wait (by calling get() ) until it is done.
+     * @param p
+     * @param mergeResults
+     * @param genomeGroupingFactor
+     * @return
+     */
+	public SwingWorker<List<GeneCluster>, Void> performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
+		lastParameter = p;
+        if (gui != null)
+		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
+        SwingWorker<List<GeneCluster>, Void> geneClusterSwingWorker = new GeneClusterDetectionTask(p, mergeResults, genomeGroupingFactor, GeckoInstance.this.getData());
+        geneClusterSwingWorker.execute();
+        return geneClusterSwingWorker;
 	}
+
 	
 	public List<GeneCluster> computeReferenceStatistics(List<GeneCluster> clusters){
 		if (!this.isLibgeckoLoaded()){
@@ -462,20 +483,25 @@ public class GeckoInstance {
 
 	}
 	
-	public void setProgressStatus(int value) {
-		final int v = value;
+	public void setProgressStatus(final int value, final AlgorithmStatusEvent.Task task) {
 		if (gui != null)
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					if (v<gui.getProgressbar().getMaximum()) {
-						gui.changeMode(Gui.Mode.COMPUTING);
-						gui.getProgressbar().setValue(v);
-					} else if (v<gui.getProgressbar().getMaximum()*2) {
-                        gui.changeMode(Gui.Mode.DOING_STATISTICS);
-                        gui.getProgressbar().setValue(v-gui.getProgressbar().getMaximum());
-                    } else {
-						gui.changeMode(Gui.Mode.FINISHING_COMPUTATION);
-					}
+                    switch (task) {
+                        case Init:
+                            gui.getProgressbar().setMaximum(value);
+                        case ComputingClusters:
+                            gui.changeMode(Gui.Mode.COMPUTING);
+                            gui.getProgressbar().setValue(value);
+                            break;
+                        case ComputingStatistics:
+                            gui.changeMode(Gui.Mode.DOING_STATISTICS);
+                            gui.getProgressbar().setValue(value);
+                            break;
+                        case Done:
+                            gui.changeMode(Gui.Mode.FINISHING_COMPUTATION);
+                            break;
+                    }
 				}
 			});
 	}

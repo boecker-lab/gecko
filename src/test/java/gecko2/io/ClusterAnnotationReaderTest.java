@@ -127,7 +127,7 @@ public class ClusterAnnotationReaderTest {
 
 		Parameter p = new Parameter(1, 4, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
-        List<GeneCluster> res = GeckoInstance.computeClustersJava(data, p);
+        List<GeneCluster> res = GeckoInstance.computeClustersJava(data, p, null);
 		
 		compareClusters(res, clusters, false);
 		
