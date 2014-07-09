@@ -17,13 +17,9 @@ import javax.swing.*;
 import javax.swing.event.EventListenerList;
 import java.awt.*;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 
 public class GeckoInstance {
 	private static GeckoInstance instance;
