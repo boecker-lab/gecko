@@ -83,7 +83,7 @@ public class Gecko2 {
         }
 
         if (args.length <= 1 || options.useGui()) {
-            if (!System.getProperty("java.awt.headless").equals("null")) {
+            if (System.getProperty("java.awt.headless")!=null) {
                 printUsage(System.out, parser, "You are running headless java, but trying to start the gui!");
                 return;
             }
