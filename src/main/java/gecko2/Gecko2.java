@@ -40,7 +40,7 @@ public class Gecko2 {
         }
 
         if ((args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) || options.showHelp()) {
-            printUsage(System.out, parser, null);
+            printUsage(System.out, parser);
             return;
         }
 
@@ -83,6 +83,10 @@ public class Gecko2 {
         }
 
         if (args.length <= 1 || options.useGui()) {
+            if (!System.getProperty("java.awt.headless").equals("null")) {
+                printUsage(System.out, parser, "You are running headless java, but trying to start the gui!");
+                return;
+            }
             Gui.startUp();
         }
 
@@ -113,9 +117,17 @@ public class Gecko2 {
 
 	}
 
-    private static void printUsage(PrintStream out, CmdLineParser parser, Exception e) {
-        if (e!= null)
-            out.println(e.getMessage());
+    private static void printUsage(PrintStream out, CmdLineParser parser) {
+        printUsage(out, parser, "");
+    }
+
+    private static void printUsage(PrintStream out, CmdLineParser parser, Exception exception) {
+        printUsage(out, parser, exception.getMessage());
+    }
+
+    private static void printUsage(PrintStream out, CmdLineParser parser, String errorText) {
+        if (errorText!= null && !errorText.equals(""))
+            out.println(errorText);
         out.println("java -jar Gecko2.jar [optional Input.gck/.cog] for Gui mode or");
         out.println("java -jar Gecko2.jar [options...]");
         parser.printUsage(out);
