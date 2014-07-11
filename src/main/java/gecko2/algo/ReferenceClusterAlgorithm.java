@@ -105,8 +105,10 @@ public class ReferenceClusterAlgorithm {
 	private List<ReferenceCluster> computeRefClusters(){
 		//System.out.println("Computing Gene Clusters!");
 		
-		//long startTime = System.nanoTime();
-		
+		Runtime rt = Runtime.getRuntime();
+		long sp[][] = new long[2][2];
+		sp[0][0] = System.currentTimeMillis();
+		sp[1][0] = rt.totalMemory()-rt.freeMemory();
         if (param.getNrOfGenomes() != genomes.size())
             throw new RuntimeException("Number of genomes in param does not equal number of genomes!");
 		
@@ -125,12 +127,14 @@ public class ReferenceClusterAlgorithm {
 		for (ReferenceCluster cluster : refClusterList)
 			cluster.setGeneContent(genomes);
 		
-		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping);
+		//Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping);
 		
 		//long statTime = System.nanoTime();
 		//System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));
 		//System.out.println(String.format("Statistics: %fs",(statTime - calcTime)/1.0E09));
-		
+		sp[1][1] = rt.totalMemory()-rt.freeMemory();
+		sp[0][1] = System.currentTimeMillis();
+		System.out.println("Zeit: "+((sp[0][1]-sp[0][0])/1000)+"s Speicher: "+((sp[1][1]-sp[1][0])/(8*1024))+"kB");
 		return refClusterList;
 	}
 	

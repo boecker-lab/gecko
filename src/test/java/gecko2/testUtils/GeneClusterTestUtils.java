@@ -343,17 +343,17 @@ public class GeneClusterTestUtils {
         DataSet actualData = reader.readData();
 
         // Test the java implementation
-        int k = 20;
-        long[][] start = new long [2][k];
-        long[][] stop = new long [2][k];
+        int k = 1;
+        //long[][] start = new long [2][k];
+        //7long[][] stop = new long [2][k];
         for(int i=0;i<k;i++){
-            start[0][i] = System.currentTimeMillis();
+        //    start[0][i] = System.currentTimeMillis();
             GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction);
             actualData.setClusters(javaRes);
-            stop[0][i] = System.currentTimeMillis();
+        //    stop[0][i] = System.currentTimeMillis();
         }
         int sum = 0;
-        long[] erg = new long [k];
+        /*long[] erg = new long [k];
         for(int i=0;i<k;i++){
             erg[i] = stop[0][i]-start[0][i];
             sum += erg[i];
@@ -367,7 +367,7 @@ public class GeneClusterTestUtils {
         System.out.println("	minimum; " + erg[0]);
         System.out.println("	arith. Mittelwert; " + mean);
         System.out.println("	median Mittelwert; " + erg[k/2-1]);
-    }
+    */}
 	
 	public static void main(String[] args)
 	{
