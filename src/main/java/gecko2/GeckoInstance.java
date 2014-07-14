@@ -468,7 +468,7 @@ public class GeckoInstance {
      * @return the gene clusters
      */
     public static GeneCluster[] computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping) {
-        return computeClustersJava(data, params, genomeGrouping, false);
+        return computeClustersJava(data, params, genomeGrouping, true);
     }
 	
 	/**
@@ -493,6 +493,8 @@ public class GeckoInstance {
         GeneCluster[] result = new GeneCluster[refCluster.size()];
         for (int i=0; i<refCluster.size(); i++)
             result[i] = new GeneCluster(i, refCluster.get(i), data);
+
+        java.lang.System.exit(0);
         return result;
 	}
 	

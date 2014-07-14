@@ -303,7 +303,7 @@ class Chromosome {
      * @param rank the rank array of the current reference interval.
      * @param maxDist the maximal possible distance for a valid gene cluster.
      */
-    private void computeL(Rank rank, int maxDist){
+    void computeL(Rank rank, int maxDist){
         resetL();                                           
         for (int i=1; i<=this.size(); i++) {
             L[i][0] = i;                                 // no mismatch left of position is the position
@@ -329,73 +329,83 @@ class Chromosome {
     }
 
     /**
+     * Calculate new values for L for positions with characters with rank smaller than c_old
+     * @param rank
+     * @param maxDist
+     * @param c_old
+     */
+    private void updateL_characterRankSmallerC_Old(Rank rank, int maxDist, int c_old){
+        if (c_old < 0)
+            return;
+
+        int lastOcc = 0;
+        for (int j=1; j<=this.size(); j++){
+            if (genes[j] < 0)
+                continue;
+
+            if (lastOcc!=0) {                                                       // if c_old has already occurred in the list
+                if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
+
+                    for (int l=1; l<=maxDist+1; l++) {                              // test if entries for position i in array L change,
+                        if  (this.getL(j, l) < lastOcc) {                            // because c_old is a new mismatch left of i
+                            for (int p=maxDist+1; p>l; p--)
+                                L[j][p] = this.getL(j, p-1);                   // shift all higher entries in L
+                            L[j][l] = lastOcc;                                // and insert the new mismatch position
+                            break;                                                  // no further changes in L[j] possible
+                        }
+                    }
+                }
+            }                                       // if c_old not yet read, L[j] cannot change
+            if (this.getGene(j) == c_old) {
+                lastOcc = j;                        // new occurrence of c_old read
+            }
+        }
+    }
+
+    /**
+     * Calculate new values for L for positions with character c_old
+     * @param rank
+     * @param maxDist
+     * @param c_old
+     */
+    private void updateL_characterEqualsC_Old(Rank rank, int maxDist, int c_old){
+        int[] c_old_L = new int[maxDist+2];
+
+        for (int j=1; j<=this.size(); j++) {
+            if (c_old<0)
+                continue;
+
+            if (genes[j]<0 || rank.getRank(genes[j]) > rank.getRank(c_old)) {
+                int prevOcc = maxDist + 1;          // the sign is at last position per default
+
+                for (int d=1; d<=maxDist+1; d++) {
+                    if (genes[j] >= 0 && genes[j] == genes[c_old_L[d]]) {    // search for the first entry in the neighbor array
+                        prevOcc = d;                                        // that has the char chr[j], and store the position in prevOcc
+                        break;
+                    }
+                }
+                System.arraycopy(c_old_L, 1, c_old_L, 2, prevOcc - 1);      // shift all entries between position 1 and the old occurrence of c_old
+
+                c_old_L[1] = j;
+            }
+
+            if (genes[j] == c_old) {                                  // if occurrence of the c_old found
+                System.arraycopy(c_old_L, 1, L[j], 1, maxDist + 1);   // replace all entries in L[j] with the entries in c_old_L
+            }
+        }
+    }
+
+    /**
      * Updates or computes the matrix L.
      * <br>L holds the max. maxDist positions of the next unmarked characters left of each position in the chromosome.
      * <br>rank is used to determine unmarked characters. An unmarked character must have a higher rank then the character at the current position.
      * @param rank the rank array of the current reference interval.
-     * @param i the start position of the current reference interval on the reference chromosome.
      * @param maxDist the maximal possible distance for a valid gene cluster.
-     * @param c_old the character that was last added to the reference interval.
+     * @param c_old the character that was last added to the reference interval. Must not be < 0.
      */
-    public void updateL(Rank rank, int i, int maxDist, int c_old){
-        if (i==1) {                         // if first position in reference sequence
-            this.computeL(rank, maxDist);
-        }
-        else{
-            // calculate new values for L for positions with characters with rank smaller than c_old
-            
-            int lastOcc = 0;
-            for (int j=1; j<=this.size(); j++){
-                if (genes[j] < 0)
-                    continue;
-
-                if (lastOcc!=0) {                                                       // if c_old has already occurred in the list
-                    if (c_old < 0)
-                        continue;
-                	if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
-
-                        for (int l=1; l<=maxDist+1; l++) {                              // test if entries for position i in array L change,
-                            if  (this.getL(j, l) < lastOcc) {                            // because c_old is a new mismatch left of i
-                                for (int p=maxDist+1; p>l; p--)
-                                    L[j][p] = this.getL(j, p-1);                   // shift all higher entries in L
-                                L[j][l] = lastOcc;                                // and insert the new mismatch position
-                                break;                                                  // no further changes in L[j] possible
-                            }
-                        }
-                    }
-                }                                       // if c_old not yet read, L[j] cannot change
-                if (this.getGene(j) == c_old) {
-                    lastOcc = j;                        // new occurrence of c_old read
-                }
-            }
-
-            // calculate new values for L for positions with character c_old
-
-            int[] c_old_L = new int[maxDist+2];
-
-            for (int j=1; j<=this.size(); j++) {
-                if (c_old<0)
-                    continue;
-
-                if (genes[j]<0 || rank.getRank(genes[j]) > rank.getRank(c_old)) {
-                    int prevOcc = maxDist + 1;          // the sign is at last position per default
-
-                    for (int d=1; d<=maxDist+1; d++) {
-                        if (genes[j] >= 0 && genes[j] == genes[c_old_L[d]]) {    // search for the first entry in the neighbor array
-                            prevOcc = d;                                        // that has the char chr[j], and store the position in prevOcc
-                            break;
-                        }
-                    }
-                    System.arraycopy(c_old_L, 1, c_old_L, 2, prevOcc - 1);      // shift all entries between position 1 and the old occurrence of c_old
-
-                    c_old_L[1] = j;
-                }
-
-                if (genes[j] == c_old) {                                  // if occurrence of the c_old found
-                    System.arraycopy(c_old_L, 1, L[j], 1, maxDist + 1);   // replace all entries in L[j] with the entries in c_old_L
-                }
-            }
-        }
+    void updateL(Rank rank, int maxDist, int c_old){
+        updateL_characterRankSmallerC_Old(rank, maxDist, c_old);
+        updateL_characterEqualsC_Old(rank, maxDist, c_old);
     }
 
     /**
@@ -424,7 +434,7 @@ class Chromosome {
      * @param rank the rank array of the current reference interval.
      * @param maxDist the maximal possible distance for a valid gene cluster.
      */
-    private void computeR(Rank rank, int maxDist){
+    void computeR(Rank rank, int maxDist){
     	resetR();
         for (int i=1; i<=this.size(); i++) {
             R[i][0] = i;                          // first mismatch right of position is the position
@@ -450,73 +460,77 @@ class Chromosome {
     }
 
     /**
+     * Calculate new values for R for positions with characters with rank smaller than c_old
+     * @param rank
+     * @param maxDist
+     * @param c_old
+     */
+    private void updateR_characterRankSmallerC_Old(Rank rank, int maxDist, int c_old){
+        int lastOcc = this.size()+1;
+
+        for (int j=this.size(); j>=1; j--) {
+            if (genes[j] < 0)
+                continue;
+            if (lastOcc != this.size() + 1) {                                            // if c_old has already occurred in the list
+                if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
+
+                    for (int l = 1; l <= maxDist + 1; l++) {                              // test if entries for position i in array R change,
+                        if (this.getR(j, l) > lastOcc) {                            // because c_old is a new mismatch left of i
+                            for (int p = maxDist + 1; p > l; p--)
+                                R[j][p] = this.getR(j, p - 1);                   // shift all higher entries in R
+                            R[j][l] = lastOcc;                                // and insert the new mismatch position
+                            break;                                                  // no further changes in R[j] possible
+                        }
+                    }
+                }
+            }                                       // if c_old not yet read, R[j] cannot change
+            if (genes[j] == c_old) {
+                lastOcc = j;                        // new occurrence of c_old read
+            }
+        }
+    }
+
+    /**
+     * Calculate new values for R for positions with character c_old
+     * @param rank
+     * @param maxDist
+     * @param c_old
+     */
+    private void updateR_characterEqualsC_Old(Rank rank, int maxDist, int c_old){
+        int[] c_old_R = IntArray.newIntArray(maxDist+2, this.size()+1);
+
+        for (int j=this.size(); j>=1; j--) {
+            if (genes[j]<0 || rank.getRank(genes[j]) > rank.getRank(c_old)) {
+                int prevOcc = maxDist + 1;          // the sign is at last position per default
+
+                for (int p=1; p<=maxDist+1; p++) {
+                    if (genes[j] >= 0 && genes[j] == genes[c_old_R[p]]) {    // search for the first entry in the neighbor array
+                        prevOcc = p;                                        // that has the char chr[j], and store the position in prevOcc
+                        break;
+                    }
+                }
+
+                System.arraycopy(c_old_R, 1, c_old_R, 2, prevOcc - 1);    // shift all entries between position 1 and the old occurrence of c_old
+                c_old_R[1] = j;
+            }
+
+            if (genes[j] == c_old) {                                  // if occurrence of the c_old found
+                System.arraycopy(c_old_R, 1, R[j], 1, maxDist + 1);   // replace all entries in R[j] with the entries in c_old_R
+            }
+        }
+    }
+
+    /**
      * Updates or computes the matrix R.
      * <br>R holds the max. maxDist positions of the next unmarked characters right of each position in the chromosome.
      * <br>rank is used to determine unmarked characters. An unmarked character must have a higher rank then the character at the current position.
      * @param rank the rank array of the current reference interval.
-     * @param i the start position of the current reference interval on the reference chromosome.
      * @param maxDist the maximal possible distance for a valid gene cluster.
      * @param c_old the character that was last added to the reference interval.
      */
-    public void updateR(Rank rank, int i, int maxDist, int c_old){
-        if (i==1) {                         // if first position in reference sequence
-            this.computeR(rank, maxDist);
-        }
-        else{
-            // calculate new values for R for positions with characters with rank smaller than c_old
-
-            int lastOcc = this.size()+1;
-
-            for (int j=this.size(); j>=1; j--){
-                if (genes[j] < 0)
-                    continue;
-                if (lastOcc!=this.size()+1) {                                            // if c_old has already occurred in the list
-                    if (c_old<0)
-                        continue;
-                	if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
-
-                        for (int l=1; l<=maxDist+1; l++) {                              // test if entries for position i in array R change,
-                            if  (this.getR(j, l) > lastOcc) {                            // because c_old is a new mismatch left of i
-                                for (int p=maxDist+1; p>l; p--)
-                                    R[j][p] = this.getR(j, p-1);                   // shift all higher entries in R
-                                R[j][l] = lastOcc;                                // and insert the new mismatch position
-                                break;                                                  // no further changes in R[j] possible
-                            }
-                        }
-                    }
-                }                                       // if c_old not yet read, R[j] cannot change
-                if (genes[j] == c_old) {
-                    lastOcc = j;                        // new occurrence of c_old read
-                }
-            }
-
-            // calculate new values for R for positions with character c_old
-
-            int[] c_old_R = IntArray.newIntArray(maxDist+2, this.size()+1);
-
-            for (int j=this.size(); j>=1; j--) {
-            	if (c_old<0)
-                    continue;
-
-                if (genes[j]<0 || rank.getRank(genes[j]) > rank.getRank(c_old)) {
-                    int prevOcc = maxDist + 1;          // the sign is at last position per default
-
-                    for (int p=1; p<=maxDist+1; p++) {
-                        if (genes[j] >= 0 && genes[j] == genes[c_old_R[p]]) {    // search for the first entry in the neighbor array
-                            prevOcc = p;                                        // that has the char chr[j], and store the position in prevOcc
-                            break;
-                        }
-                    }
-
-                    System.arraycopy(c_old_R, 1, c_old_R, 2, prevOcc - 1);    // shift all entries between position 1 and the old occurrence of c_old
-                    c_old_R[1] = j;
-                }
-
-                if (genes[j] == c_old) {                                  // if occurrence of the c_old found
-                    System.arraycopy(c_old_R, 1, R[j], 1, maxDist + 1);   // replace all entries in R[j] with the entries in c_old_R
-                }
-            }
-        }
+    void updateR(Rank rank, int maxDist, int c_old){
+        updateR_characterRankSmallerC_Old(rank, maxDist, c_old);
+        updateR_characterEqualsC_Old(rank, maxDist, c_old);
     }
 
     /**

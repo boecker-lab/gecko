@@ -210,7 +210,10 @@ class GenomeList {
             }
 
             for (Chromosome chr: genomes.get(k)) {
-                chr.updateL(rank, i, maxDist, c_old);
+                if (i==1)
+                    chr.computeL(rank, maxDist);
+                else if (c_old >= 0)
+                    chr.updateL(rank, maxDist, c_old);
             }
         }
     }
@@ -227,13 +230,14 @@ class GenomeList {
      */
     private void updateR(int refGenomeNr, int i, int maxDist, int c_old){
         for (int k=0; k<this.size(); k++) {
-            if (k==refGenomeNr) {               // not needed for the reference sequence
-                    continue;
-            }
+            if (k==refGenomeNr)
+                continue;
 
-            for (Chromosome chr: genomes.get(k)) {
-                chr.updateR(rank, i, maxDist, c_old);
-            }
+            for (Chromosome chr: genomes.get(k))
+                if (i==1)
+                    chr.computeR(rank, maxDist);
+                else if (c_old >= 0)
+                    chr.updateR(rank, maxDist, c_old);
         }
     }
     

@@ -62,13 +62,13 @@ public class ReferenceClusterAlgorithm {
 			data = new GenomeList(genomes);
 			param.setAlphabetSize(data.getAlphabetSize());
 		}
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getLowConservedParameters(param, param.getAlphabetSize(), data.size());
+		AlgorithmParameters algoParameters = AlgorithmParameters.getLowConservedParameters(param, param.getAlphabetSize(), data.size());
 		//AlgorithmParameters algoParameters = AlgorithmParameters.getHighlyConservedParameters(param, param.getAlphabetSize(), data.size());
 		//AlgorithmParameters algoParameters = AlgorithmParameters.getLichtheimiaParameters(param, param.getAlphabetSize(), data.size());
 		//AlgorithmParameters algoParameters = AlgorithmParameters.getStatisticPaperGenomeParameters(param, param.getAlphabetSize(), data.size());
 		//AlgorithmParameters algoParameters = AlgorithmParameters.getFiveProteobacterDeltaTableTestParameters(param.getAlphabetSize(), data.size());
 		
-		AlgorithmParameters algoParameters = new AlgorithmParameters(param, param.getAlphabetSize(), data.size());
+		//AlgorithmParameters algoParameters = new AlgorithmParameters(param, param.getAlphabetSize(), data.size());
 		
 		if (!checkParameters(algoParameters)) 
 			throw new IllegalArgumentException("invalid parameters");
@@ -103,12 +103,11 @@ public class ReferenceClusterAlgorithm {
 	}
 	
 	private List<ReferenceCluster> computeRefClusters(){
-		//System.out.println("Computing Gene Clusters!");
+		System.out.println("Computing Gene Clusters!");
 		
 		Runtime rt = Runtime.getRuntime();
-		long sp[][] = new long[2][2];
-		sp[0][0] = System.currentTimeMillis();
-		sp[1][0] = rt.totalMemory()-rt.freeMemory();
+        long startTime = System.nanoTime();
+		long startMemory = rt.totalMemory()-rt.freeMemory();
         if (param.getNrOfGenomes() != genomes.size())
             throw new RuntimeException("Number of genomes in param does not equal number of genomes!");
 		
@@ -120,21 +119,21 @@ public class ReferenceClusterAlgorithm {
 			refGenomeCount = genomes.size();
 		for (int i=0; i<refGenomeCount; i++)
 			detectReferenceGeneClusterFromSingleGenome(i, refClusterList);
-		
-		//long calcTime = System.nanoTime();		
-		//System.out.println("Doing Statistics!");
+
+		long calcTime = System.nanoTime();
+        long endOfCalcMemory = rt.totalMemory()-rt.freeMemory();
+		System.out.println("Doing Statistics!");
 		
 		for (ReferenceCluster cluster : refClusterList)
 			cluster.setGeneContent(genomes);
-		
+
+        //long statisticsStartTime = System.nanoTime();
 		//Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping);
 		
 		//long statTime = System.nanoTime();
-		//System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));
+		System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));
 		//System.out.println(String.format("Statistics: %fs",(statTime - calcTime)/1.0E09));
-		sp[1][1] = rt.totalMemory()-rt.freeMemory();
-		sp[0][1] = System.currentTimeMillis();
-		System.out.println("Zeit: "+((sp[0][1]-sp[0][0])/1000)+"s Speicher: "+((sp[1][1]-sp[1][0])/(8*1024))+"kB");
+        System.out.println(String.format("Memory Difference: %dkB", (startMemory-endOfCalcMemory)/(8*1024)));
 		return refClusterList;
 	}
 	
