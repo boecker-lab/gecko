@@ -610,10 +610,7 @@ class Chromosome {
 
 				for(int p=1; p<=delta+1; p++) {
 					for(int l=this.R[j][p]-1; l>=j; l--) {
-						if(genes[l]<0 || genes[j]<0)
-                            continue;
-
-						if(rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
+						if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
 							R_prime[j][p] = l;
 							break;
 						}
