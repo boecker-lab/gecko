@@ -494,7 +494,6 @@ public class GeckoInstance {
         for (int i=0; i<refCluster.size(); i++)
             result[i] = new GeneCluster(i, refCluster.get(i), data);
 
-        java.lang.System.exit(0);
         return result;
 	}
 	

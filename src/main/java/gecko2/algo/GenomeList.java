@@ -171,9 +171,9 @@ class GenomeList {
         rank.updateRank(refChr, leftBorder, alphabetSize);  //TODO rank really in seqSet? Alternative Rank in Pattern
         
         //Überträgt L nicht
-        this.updateL(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
-        this.updateR(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
-        this.updateL_R_prime(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
+        this.updateL(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
+        this.updateR(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
+        this.updateL_R_prime(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
     }
     
     public boolean zeroOccs(int refGenomeNr, int refChrNr, int position, boolean searchRefInRef){
@@ -200,10 +200,9 @@ class GenomeList {
      * The array rank is used to determine unmarked characters.
      * @param refGenomeNr the number of the current reference genome.
      * @param i the start position of the current reference interval on the reference chromosome.
-     * @param maxDist the maximal possible distance for a valid gene cluster.
      * @param c_old the character that was last added to the reference interval.
      */
-    private void updateL(int refGenomeNr, int i, int maxDist, int c_old) {  //TODO parallel?
+    private void updateL(int refGenomeNr, int i, int c_old) {  //TODO parallel?
         for (int k=0; k<this.size(); k++) {
             if (k==refGenomeNr) {
                     continue;
@@ -211,9 +210,9 @@ class GenomeList {
 
             for (Chromosome chr: genomes.get(k)) {
                 if (i==1)
-                    chr.computeL(rank, maxDist);
+                    chr.computeL(rank);
                 else if (c_old >= 0)
-                    chr.updateL(rank, maxDist, c_old);
+                    chr.updateL(rank, c_old);
             }
         }
     }
@@ -225,28 +224,26 @@ class GenomeList {
      * The array rank is used to determine unmarked characters.
      * @param refGenomeNr the number of the current reference genome.
      * @param i the start position of the current reference interval on the reference chromosome.
-     * @param maxDist the maximal possible distance for a valid gene cluster.
      * @param c_old the character that was last added to the reference interval.
      */
-    private void updateR(int refGenomeNr, int i, int maxDist, int c_old){
+    private void updateR(int refGenomeNr, int i, int c_old){
         for (int k=0; k<this.size(); k++) {
             if (k==refGenomeNr)
                 continue;
 
             for (Chromosome chr: genomes.get(k))
                 if (i==1)
-                    chr.computeR(rank, maxDist);
+                    chr.computeR(rank);
                 else if (c_old >= 0)
-                    chr.updateR(rank, maxDist, c_old);
+                    chr.updateR(rank, c_old);
         }
     }
     
-    private void updateL_R_prime(int refGenomeNr, int leftBorder, int delta,
-			int gene) {
+    private void updateL_R_prime(int refGenomeNr, int leftBorder, int gene) {
 		for (int k=0; k<this.size(); k++) {
 			if (k != refGenomeNr) {
 				for (Chromosome c: genomes.get(k)) {
-					c.updateL_R_prime(rank, leftBorder, delta, gene, alphabetSize);
+					c.updateL_R_prime(rank, leftBorder, gene, alphabetSize);
 				}
 			}
 		}
