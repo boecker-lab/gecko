@@ -608,10 +608,10 @@ class Chromosome {
                 continue;
     		if(rank.getRank(genes[j])<=maxUpdateRank) {
 
-				for(int p=1; p<=delta+1; p++) {
-					for(int l=this.R[j][p]-1; l>=j; l--) {
+				for(int d=1; d<=delta+1; d++) {
+					for(int l=this.R[j][d]-1; l>=j; l--) {
 						if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
-							R_prime[j][p] = l;
+							R_prime[j][d] = l;
 							break;
 						}
 					}
