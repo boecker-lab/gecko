@@ -140,7 +140,8 @@ public class GeckoInstance {
 	public void addToClusterSelection(GeneCluster cluster) {
 		if (clusterSelection == null)
 			clusterSelection = new ArrayList<>();
-		clusterSelection.add(cluster);
+        if (!clusterSelection.contains(cluster))  //TODO LinkedHashSet for performance?
+		    clusterSelection.add(cluster);
 	}
 	
 	/**

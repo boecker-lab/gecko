@@ -34,6 +34,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
     //private java.util.List<GeneCluster> clusters;
 	private final JCheckBox showSuboptimalCheckBox;
 	private final JTable table;
+    private EventList<GeneCluster> displayedTableData;
     private DefaultEventSelectionModel<GeneCluster> tableModel;
 	private JPopupMenu popUp;
 
@@ -72,6 +73,20 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 
         JComboBox<ResultFilter> selectionComboBox = new JComboBox<>(ResultFilter.values());
 		selectionComboBox.setVisible(true);
+
+        // Build popup menu
+        popUp = new JPopupMenu();
+        JMenuItem addToSelectionMenuItem = new JMenuItem("Add to selection");
+        final JMenuItem addAllToSelectionMenuItem = new JMenuItem("Add all in list to selection");
+        JMenuItem clearSelectionMenuItem = new JMenuItem("Clear selection");
+        JMenuItem exportMenuItem = new JMenuItem("Export gene cluster");
+        JMenuItem showSimilarMenuItem = new JMenuItem("Show similar clusters");
+        popUp.add(addToSelectionMenuItem);
+        popUp.add(addAllToSelectionMenuItem);
+        popUp.add(clearSelectionMenuItem);
+        popUp.add(exportMenuItem);
+        popUp.addSeparator();
+        popUp.add(showSimilarMenuItem);
 		
 		selectionComboBox.addActionListener(new ActionListener() {
             @Override
@@ -80,6 +95,11 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
                 ResultFilter newFilter = cb.getItemAt(cb.getSelectedIndex());
                 if (filterSelection != newFilter) {
                     filterSelection = (ResultFilter) ((JComboBox) e.getSource()).getSelectedItem();
+                    if (filterSelection.equals(ResultFilter.showSelected)) {
+                        addAllToSelectionMenuItem.setEnabled(false);
+                    } else {
+                        addAllToSelectionMenuItem.setEnabled(true);
+                    }
                     updateData();
                 }
             }
@@ -189,11 +209,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         });
 		table.setDefaultRenderer(Double.class, new DoubleCellRenderer());
 
-		// Build popup menu
-		popUp = new JPopupMenu();
-		
-		JMenuItem menuItem = new JMenuItem("Add to selection");
-		menuItem.addActionListener(new ActionListener()	{
+		addToSelectionMenuItem.addActionListener(new ActionListener()	{
 			@Override
 			public void actionPerformed(ActionEvent e) {
                 List<GeneCluster> gcs = tableModel.getSelected();
@@ -205,10 +221,22 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
                     updateData();
 			}
 		});
-		
-		popUp.add(menuItem);
-		menuItem = new JMenuItem("Clear selection");
-		menuItem.addActionListener(new ActionListener() {
+
+        addAllToSelectionMenuItem.addActionListener(new ActionListener()	{
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (displayedTableData.isEmpty())
+                    return;
+                for (GeneCluster geneCluster : displayedTableData) {
+                    GeckoInstance.getInstance().addToClusterSelection(geneCluster);
+                }
+                if (filterSelection.equals(ResultFilter.showSelected))
+                    updateData();
+            }
+        });
+
+
+		clearSelectionMenuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int confirmDialog = JOptionPane.showConfirmDialog(GeneClusterSelector.this, "Really clear selection?", "Clear selection", JOptionPane.YES_NO_OPTION);
@@ -219,11 +247,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 				}
 			}
 		});
-		
-		popUp.add(menuItem);
 
-		menuItem = new JMenuItem("Export gene cluster");
-		menuItem.addActionListener(new ActionListener() {			
+		exportMenuItem.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -238,13 +263,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 				d.setVisible(true);
 			}
 		});
-		
-		popUp.add(menuItem);
-		
-		popUp.addSeparator();
-		
-		menuItem = new JMenuItem("Show similar clusters");
-		menuItem.addActionListener(new ActionListener() {			
+
+		showSimilarMenuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String filterString = table.getValueAt(table.getSelectedRow(), 4).toString();
@@ -254,22 +274,26 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 				filterField.setText(filterString);
 			}
 		});
-		popUp.add(menuItem);
 	}
 
     private void updateData() {
         table.clearSelection();
         List<GeneCluster> clusters = GeckoInstance.getInstance().getClusterList(filterSelection);
+
+        //EventLists, sorting and filtering
         EventList<GeneCluster> geneClusterEventList = GlazedLists.eventList(clusters);
         SortedList<GeneCluster> sortedList = new SortedList<>(geneClusterEventList);
         FilterList<GeneCluster> includeExcludeFilteredList = new FilterList<>(sortedList, includeExcludeMatcherEditor);
         FilterList<GeneCluster> textFilteredList = new FilterList<>(includeExcludeFilteredList, textMatcherEditor);
-        AdvancedTableModel<GeneCluster> geneClusterTableModel = GlazedListsSwing.eventTableModelWithThreadProxyList(textFilteredList, new GeneClusterTableFormat());
+
+        displayedTableData = textFilteredList;
+        AdvancedTableModel<GeneCluster> geneClusterTableModel = GlazedListsSwing.eventTableModelWithThreadProxyList(displayedTableData, new GeneClusterTableFormat());
         tableModel = new DefaultEventSelectionModel<>(textFilteredList);
         table.setModel(geneClusterTableModel);
         table.setSelectionModel(tableModel);
         TableComparatorChooser<GeneCluster> tableComparatorChooser = TableComparatorChooser.install(table, sortedList, TableComparatorChooser.SINGLE_COLUMN);
         tableComparatorChooser.getComparatorsForColumn(COL_GENES).clear();
+
         final TableColumnModel cm = table.getColumnModel();
         cm.getColumn(COL_ID).setPreferredWidth(50); // ID
         cm.getColumn(COL_NGENES).setPreferredWidth(50); // #Genes

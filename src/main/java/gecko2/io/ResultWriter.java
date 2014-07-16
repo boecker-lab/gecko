@@ -124,6 +124,8 @@ public class ResultWriter {
 
             writer.write(String.format("Detected %d gene clusters.%n", clusters.size()));
             if (printGeneralStatistics){
+                final int MAXIMUM_CLUSTER_SIZE = 100;
+
                 writer.write("General statistics:\n");
 
                 List<List<Integer>> distancesPerGenome = new ArrayList<>(genomeNames.size());
@@ -139,11 +141,11 @@ public class ResultWriter {
                     conservedGenes.add(new HashSet<GeneFamily>());
                 int[] totalConservedGenes = new int[genomeNames.size()];
 
-                int[] clusterSizes = new int[50];
-                int[] intervalLength = new int[50];
-                int[][] intervalLengths = new int[genomeNames.size()][50];
-                int[] intervalLengthMult = new int[50];
-                int[][] intervalLengthsMult = new int[genomeNames.size()][50];
+                int[] clusterSizes = new int[MAXIMUM_CLUSTER_SIZE];
+                int[] intervalLength = new int[MAXIMUM_CLUSTER_SIZE];
+                int[][] intervalLengths = new int[genomeNames.size()][MAXIMUM_CLUSTER_SIZE];
+                int[] intervalLengthMult = new int[MAXIMUM_CLUSTER_SIZE];
+                int[][] intervalLengthsMult = new int[genomeNames.size()][MAXIMUM_CLUSTER_SIZE];
                 List<String> clusterTabel = new ArrayList<>(clusters.size());
                 for (int c=0; c<clusters.size(); c++){
                     GeneCluster cluster = clusters.get(c);
@@ -191,7 +193,7 @@ public class ResultWriter {
                     List<Integer> bestOccsOnSameChrom = new ArrayList<>();
                     List<Integer> allOccsOnSameChrom = new ArrayList<>();
                     int totalOccs = 0;
-                    int [] clusterLengths = new int[50];
+                    int [] clusterLengths = new int[MAXIMUM_CLUSTER_SIZE];
                     for (GeneClusterOccurrence occ : cluster.getOccurrences()){
                         for (int i=0; i<occ.getSubsequences().length; i++) {
                             Subsequence[] subseq = occ.getSubsequences()[i];
