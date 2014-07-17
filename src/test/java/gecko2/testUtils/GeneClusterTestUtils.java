@@ -33,6 +33,8 @@ public class GeneClusterTestUtils {
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
         compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
 
+        //TODO Reduce genomes
+
         List<ReferenceCluster> reducedRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
         compareReferenceClusters(expectedReferenceClusters, reducedRes, PValueComparison.COMPARE_NONE);
     }

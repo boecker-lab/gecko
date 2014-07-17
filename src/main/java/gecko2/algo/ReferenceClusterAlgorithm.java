@@ -134,6 +134,9 @@ public class ReferenceClusterAlgorithm {
 		System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));
 		//System.out.println(String.format("Statistics: %fs",(statTime - calcTime)/1.0E09));
         System.out.println(String.format("Memory Difference: %dkB", (startMemory-endOfCalcMemory)/(8*1024)));
+
+        //TODO if (reduce) for (ReferenceCluster cluster : refClusterList) {cluster.fixPosition()}
+
 		return refClusterList;
 	}
 	

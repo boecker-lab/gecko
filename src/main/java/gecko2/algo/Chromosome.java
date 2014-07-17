@@ -332,12 +332,9 @@ class Chromosome {
     /**
      * Calculate new values for L for positions with characters with rank smaller than c_old
      * @param rank
-     * @param c_old
+     * @param c_old must not be < 0
      */
     private void updateL_characterRankSmallerC_Old(Rank rank, int c_old){
-        if (c_old < 0)
-            return;
-
         int lastOcc = 0;
         for (int j=1; j<=this.size(); j++){
             if (genes[j] < 0)
@@ -365,15 +362,12 @@ class Chromosome {
     /**
      * Calculate new values for L for positions with character c_old
      * @param rank
-     * @param c_old
+     * @param c_old must not be < 0
      */
     private void updateL_characterEqualsC_Old(Rank rank, int c_old){
         int[] c_old_L = new int[delta+2];
 
         for (int j=1; j<=this.size(); j++) {
-            if (c_old<0)
-                continue;
-
             if (genes[j]<0 || rank.getRank(genes[j]) > rank.getRank(c_old)) {
                 int prevOcc = delta + 1;          // the sign is at last position per default
 
@@ -459,7 +453,7 @@ class Chromosome {
     /**
      * Calculate new values for R for positions with characters with rank smaller than c_old
      * @param rank
-     * @param c_old
+     * @param c_old must not be < 0
      */
     private void updateR_characterRankSmallerC_Old(Rank rank, int c_old){
         int lastOcc = this.size()+1;
@@ -489,7 +483,7 @@ class Chromosome {
     /**
      * Calculate new values for R for positions with character c_old
      * @param rank
-     * @param c_old
+     * @param c_old must not be < 0
      */
     private void updateR_characterEqualsC_Old(Rank rank, int c_old){
         int[] c_old_R = IntArray.newIntArray(delta+2, this.size()+1);
@@ -520,7 +514,7 @@ class Chromosome {
      * <br>R holds the max. maxDist positions of the next unmarked characters right of each position in the chromosome.
      * <br>rank is used to determine unmarked characters. An unmarked character must have a higher rank then the character at the current position.
      * @param rank the rank array of the current reference interval.
-     * @param c_old the character that was last added to the reference interval.
+     * @param c_old the character that was last added to the reference interval. Must not be < 0
      */
     void updateR(Rank rank, int c_old){
         updateR_characterRankSmallerC_Old(rank, c_old);
