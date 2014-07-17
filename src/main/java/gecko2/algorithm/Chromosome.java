@@ -84,32 +84,6 @@ public class Chromosome implements Serializable {
      * @return the array of gene ids
      */
     private static int[] toIntArray(List<Gene> genes, MutableInteger unHomologueGeneFamilyId, boolean addZeros, boolean abs) {
-    	ArrayList<Integer> ar = new ArrayList<>();
-
-    	ar.add(0);
-        for (int i=0;i<genes.size();i++) {
-            if(!genes.get(i).isUnknown()){
-            	ar.add(genes.get(i).getAlgorithmId());
-            } else if(ar.get(ar.size()-1)<=-1){
-            	ar.set(ar.size()-1,ar.get(ar.size()-1)-1);
-            } else {
-            	ar.add(-1);
-            }            
-        }
-        ar.add(0);
-        int array[] = new int[ar.size()];
-        for(int i=0;i<ar.size();i++){
-        	array[i] = ar.get(i);
-        }
-        return array;
-    }
-
-    /**
-     * Returns the int array for this chromosome. All un-homologue genes will have id -1
-     * @param addZeros if the array should begin and end with 0
-     * @return the array of gene ids
-     */
-    public int[] toReducedIntArray(boolean addZeros) {
         int array[] = addZeros?new int[genes.size()+2]:new int[genes.size()];
         final int offset = addZeros?1:0;
 
@@ -119,7 +93,44 @@ public class Chromosome implements Serializable {
         }
 
         for (int i=0;i<genes.size();i++) {
-            array[i+offset] = genes.get(i).isUnknown() ? -1 : genes.get(i).getAlgorithmId();
+            int family;
+            if (genes.get(i).isUnknown()) {
+                family = unHomologueGeneFamilyId.getValue();
+                unHomologueGeneFamilyId.setValue(family + 1);
+            } else {
+                family = genes.get(i).getAlgorithmId();
+            }
+            array[i+offset] = abs ? family : family * genes.get(i).getOrientation().getSign();
+        }
+
+        return array;
+    }
+
+    /**
+     * Returns the int array for this chromosome. All un-homologue genes will have id -1
+     * @param addZeros if the array should begin and end with 0
+     * @return the array of gene ids
+     */
+    public int[] toReducedIntArray(boolean addZeros) {
+        List<Integer> ar = new ArrayList<>(genes.size()+2);
+
+        if (addZeros)
+            ar.add(0);
+        for (int i=0;i<genes.size();i++) {
+            if(!genes.get(i).isUnknown()){
+                ar.add(genes.get(i).getAlgorithmId());
+            } else if(ar.get(ar.size()-1)<=-1){
+                ar.set(ar.size()-1,ar.get(ar.size()-1)-1);
+            } else {
+                ar.add(-1);
+            }
+        }
+        if (addZeros)
+            ar.add(0);
+
+        int array[] = new int[ar.size()];
+        for(int i=0;i<ar.size();i++){
+            array[i] = ar.get(i);
         }
         return array;
     }
