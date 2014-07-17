@@ -7,6 +7,7 @@ import gecko2.testUtils.*;
 import gecko2.testUtils.GeneClusterTestUtils.PValueComparison;
 import gecko2.util.LibraryUtils;
 import gecko2.util.LibraryUtils.PlatformNotSupportedException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,6 +45,36 @@ public class ReferenceClusterTest
         }
 	}
 
+	@Test
+    public void testMemoryReductionGroup()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, -4, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
+
+        Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+
+        // def result (using p values from calculated result)
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
+        List<Integer> genes1 = Arrays.asList(-1, 1, 2);
+        int[] minimumDistances = new int[]{1, 0};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
+
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances,
+                        1,
+                        0,
+                        2,
+                        expectedDeltaLocationValues
+                )
+        };
+
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+    }
+	
     @Test
     public void testMemoryReduction()
     {

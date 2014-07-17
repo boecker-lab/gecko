@@ -84,25 +84,23 @@ public class Chromosome implements Serializable {
      * @return the array of gene ids
      */
     private static int[] toIntArray(List<Gene> genes, MutableInteger unHomologueGeneFamilyId, boolean addZeros, boolean abs) {
-        int array[] = addZeros?new int[genes.size()+2]:new int[genes.size()];
-        final int offset = addZeros?1:0;
+    	ArrayList<Integer> ar = new ArrayList<>();
 
-        if (addZeros) {
-            array[0] = 0;
-            array[array.length-1] = 0;
-        }
-
+    	ar.add(0);
         for (int i=0;i<genes.size();i++) {
-            int family;
-            if (genes.get(i).isUnknown()) {
-                family = unHomologueGeneFamilyId.getValue();
-                unHomologueGeneFamilyId.setValue(family + 1);
+            if(!genes.get(i).isUnknown()){
+            	ar.add(genes.get(i).getAlgorithmId());
+            } else if(ar.get(ar.size()-1)<=-1){
+            	ar.set(ar.size()-1,ar.get(ar.size()-1)-1);
             } else {
-                family = genes.get(i).getAlgorithmId();
-            }
-            array[i+offset] = abs ? family : family * genes.get(i).getOrientation().getSign();
+            	ar.add(-1);
+            }            
         }
-
+        ar.add(0);
+        int array[] = new int[ar.size()];
+        for(int i=0;i<ar.size();i++){
+        	array[i] = ar.get(i);
+        }
         return array;
     }
 
