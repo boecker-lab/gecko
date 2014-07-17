@@ -81,27 +81,6 @@ public class ReferenceClusterTestSettings {
         return settings;
     }
 
-    public static ReferenceClusterTestSettings memoryReductionMultipleZerosD3S5() {
-        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
-        settings.p = new Parameter(
-                3,
-                5,
-                2,
-                Parameter.QUORUM_NO_COST,
-                Parameter.OperationMode.reference,
-                Parameter.ReferenceType.genome
-        );
-        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/mRMultipleZerosBug.cog").getFile());
-
-        settings.expectedResultFile = null;
-        if (GeneClusterTestUtils.class.getResource("/mRMultipleZerosBugD3S5.gck") != null)
-            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/mRMultipleZerosBugD3S5.gck").getFile());
-
-        settings.resultOutputFile = new File("src/test/resources/mRMultipleZerosBugD3S5.gck");
-        settings.genomeGroups = null;
-        return settings;
-    }
-
     public static ReferenceClusterTestSettings fiveProteobacterDeltaTable() {
         ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
         settings.p = new Parameter(

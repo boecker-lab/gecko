@@ -897,13 +897,6 @@ public class ReferenceClusterTest
         automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
     }
 
-    @Test
-    public void memoryReductionMultipleZerosD3S5() throws URISyntaxException, IOException, DataFormatException, ParseException {
-        ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.memoryReductionMultipleZerosD3S5();
-
-        automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
-    }
-
 	@Test
 	public void fiveProteobacterReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
