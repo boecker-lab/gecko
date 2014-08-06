@@ -233,9 +233,13 @@ public class GeckoInstance {
         handleUpdatedClusterResults();
 	}
 
-    private void handleUpdatedClusterResults() {
+    private void updateReducedDataAndSelection() {
         GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
         GeckoInstance.this.clusterSelection = null;
+    }
+
+    private void handleUpdatedClusterResults() {
+        updateReducedDataAndSelection();
         GeckoInstance.this.fireDataChanged();
         if (GeckoInstance.this.gui != null) {
             GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
@@ -269,8 +273,7 @@ public class GeckoInstance {
 
     public void setGeckoInstanceData(final DataSet data) {
         this.data = data;
-        GeckoInstance.this.reducedList = GeneCluster.generateReducedClusterList(GeckoInstance.this.getClusters());
-        GeckoInstance.this.clusterSelection = null;
+        this.updateReducedDataAndSelection();
         if (gui != null) {
             Runnable updateGui = new Runnable() {
                 @Override
