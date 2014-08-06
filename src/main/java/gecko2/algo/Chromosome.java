@@ -309,22 +309,41 @@ class Chromosome {
         for (int i=1; i<=this.size(); i++) {
             L[i][0] = i;                                 // no mismatch left of position is the position
             int d = 1;
-            if (genes[i] <0)
-                continue;
+            if (genes[i] <0){
+            	int k = Math.abs(genes[i]);
+            	while(d<=delta+1 && k>=0){
+            		L[i][d]=i;
+            		d++;
+            		k--;
+            	}
+            	if(d>=delta+1)
+            		continue;
+            }
+                //continue;
+            if (genes[i]<0){
+            	//TODO Fix L for i
+            } else {
+            	for (int j=i-1; j>0 && d<=delta+1; j--) {                                 // search for unmarked char left of i
+            		if (genes[j] < 0) {
+            			int k = Math.abs(genes[j]);
+            			while(d<=delta+1 && k>0){
+            				L[i][d]=j;
+            				d++;
+            				k--;
+            			}
+            			//L[i][d] = j;
+            			//d++;
+            			if (d>=delta+1)
+            				continue;
+            		}
 
-            for (int j=i-1; j>0 && d<=delta+1; j--) {                                 // search for unmarked char left of i
-            	if (genes[j] < 0) {
-                    L[i][d] = j;
-                    d++;
-                    continue;
-                }
-
-                if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
-                    if(this.getNUMDiff(j, i, j+1, i) > 0) {                         // if unmarked char found for the 1st time
-                        L[i][d] = j;
-                        d++;
-                    }
-                }
+            		if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
+            			if(this.getNUMDiff(j, i, j+1, i) > 0) {                         // if unmarked char found for the 1st time
+            				L[i][d] = j;
+            				d++;
+            			}
+            		}
+            	}
             }
         }
     }
@@ -431,19 +450,38 @@ class Chromosome {
             R[i][0] = i;                          // first mismatch right of position is the position
             int d = 1;
             
-            if(genes[i]<0)
-                continue;
-            
-            for (int j=i+1; j<=this.size() && d<=delta+1; j++) {                   // search for unmarked char right of i
-            	if (genes[j]<0 ) {
-                    R[i][d] = j;
-                    d++;
-                    continue;
-                }
-            	if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
-            		if(this.getNUMDiff(i, j, i, j-1) > 0) {                         // if unmarked char found for the 1st time
-            			R[i][d] = j;
-            			d++;
+            if(genes[i]<0){
+            	int k = 0;
+            	while(d<=delta+1 && k<Math.abs(genes[i])){
+            		R[i][d] = i;
+            		k++;
+            		d++;
+            	}
+            	if (d>=delta+1)
+            		continue;
+            }
+                //continue;
+            if (genes[i]<0){
+            	//TODO Fix R for i
+            } else {   
+            	for (int j=i+1; j<=this.size() && d<=delta+1; j++) {                   // search for unmarked char right of i
+            		if (genes[j]<0 ) {
+            			int k = 0;
+            			while(d<=delta+1 && k<Math.abs(genes[j])){
+            				R[i][d] = j;
+            				d++;
+            				k++;
+            			}
+                    
+            			//R[i][d] = j;
+            			//d++;
+            			continue;
+            		}
+            		if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
+            			if(this.getNUMDiff(i, j, i, j-1) > 0) {                         // if unmarked char found for the 1st time
+            				R[i][d] = j;
+            				d++;
+            			}
             		}
             	}
             }

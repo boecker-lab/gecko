@@ -198,7 +198,11 @@ public class ReferenceClusterAlgorithm {
 				
 				oldLists.get(referenceGenomeNr).emptyList();
 				DeltaLocation refdLoc = DeltaLocation.getReferenceLocation(referenceGenomeNr, referenceChromosome.getNr(), l, r, pattern.getSize());
-				oldLists.get(referenceGenomeNr).insertDeltaLocation(refdLoc);
+				
+				
+			/*	oldLists.get(referenceGenomeNr).emptyList();
+				DeltaLocation refdLoc = DeltaLocation.getReferenceLocation(referenceGenomeNr, referenceChromosome.getNr(), l, r, pattern.getSize());
+			*/	oldLists.get(referenceGenomeNr).insertDeltaLocation(refdLoc);
 				
 				int minHitCoveredCount = 0;
 				boolean[] containedGenomeClusters = new boolean[nrOfGenomeGroups];

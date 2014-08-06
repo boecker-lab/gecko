@@ -30,8 +30,8 @@ public class GeneClusterTestUtils {
 
     public static void performTest(Parameter p, int[][][] genomes, List<Set<Integer>> genomeGroups, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
         // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
-        compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
+        //List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
+        //compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
 
         //TODO Reduce genomes
 

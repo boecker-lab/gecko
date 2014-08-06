@@ -51,7 +51,7 @@ public class ReferenceClusterTest
         // def array for computation
         int genomes[][][] = {{{0, 1, 2, -4, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
 
-        Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        Parameter p = new Parameter(1, 3, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
