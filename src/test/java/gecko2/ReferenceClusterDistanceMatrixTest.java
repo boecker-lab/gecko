@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.zip.DataFormatException;
 
 import static gecko2.testUtils.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
+import static gecko2.testUtils.GeneClusterTestUtils.performReferenceClusterTest;
 import static gecko2.testUtils.GeneClusterTestUtils.performTest;
 
 public class ReferenceClusterDistanceMatrixTest {
@@ -307,7 +308,7 @@ public class ReferenceClusterDistanceMatrixTest {
 		
 		// def result (using p values from calculated result)
 		
-		performTest(deltaTableRes, res, PValueComparison.COMPARE_NONE);
+		performReferenceClusterTest(deltaTableRes, res, PValueComparison.COMPARE_NONE);
 	}
 	
 	

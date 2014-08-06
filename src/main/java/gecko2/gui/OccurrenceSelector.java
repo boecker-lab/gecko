@@ -61,7 +61,7 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 //		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		table.setDefaultRenderer(Double.class, new GeneClusterSelector.DoubleCellRenderer());
-		TableRowSorter<AbstractTableModel> rowSorter = new TableRowSorter<AbstractTableModel>(model);
+		TableRowSorter<AbstractTableModel> rowSorter = new TableRowSorter<>(model);
 		table.setRowSorter(rowSorter);
 		
 		JScrollPane scrollPane = new JScrollPane(table);
@@ -152,11 +152,8 @@ public class OccurrenceSelector extends JPanel implements ClusterSelectionListen
 	}
 	
 	private final AbstractTableModel model = new AbstractTableModel() {
-		
-		/**
-		 * Random generated serialization UID
-		 */
 		private static final long serialVersionUID = 4474685987973352693L;
+
 		private final Class<?>[] columns = {Integer.class,Integer.class, Double.class, Integer.class};
 		private final String[] columnNames = {"ID", "#Genomes", "Score","Distance"};
 		private final static int COL_ID = 0;

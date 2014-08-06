@@ -16,16 +16,6 @@ test {
     ignoreFailures = true
 }
 
-task uberjar(type: Jar) {
-    from files(sourceSets.main.output.classesDir)
-    from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
-
-    manifest {
-        attributes 'Main-Class' : mainClassName
-    }
-}
-
 repositories {
     mavenLocal()
     mavenCentral()

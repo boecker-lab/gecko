@@ -1,9 +1,13 @@
 package gecko2;
 
+import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
 import gecko2.io.DataSetWriter;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -38,11 +42,10 @@ public class CommandLineExecution {
         Parameter parameter = new Parameter(options.getMaxDistance(), options.getMinClusterSize(), options.getMinCoveredGenomes(), Parameter.QUORUM_NO_COST, options.getOperationMode(), refType);
 
         // compute the clusters
-        ExecutorService executor = GeckoInstance.getInstance().performClusterDetection(parameter, false, options.getGenomeGroupingFactor());
-        executor.shutdown();
+        SwingWorker<List<GeneCluster>, Void> worker = GeckoInstance.getInstance().performClusterDetection(parameter, false, options.getGenomeGroupingFactor());
         try{
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
+            worker.get(); // Blocks until worker is done()
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 

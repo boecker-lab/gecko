@@ -42,7 +42,6 @@ public class Gui {
 	private final JCheckBox mgbViewSwitcher = new JCheckBox();
 	private final JTextField searchField;
 
-		
 	public JFrame getMainframe() {
 		return mainframe;
 	}
@@ -67,12 +66,12 @@ public class Gui {
 		this.statusbartext = new JLabel();
 		this.progressbar = new JProgressBar();
 		progressbar.setMaximumSize(new Dimension(100, 30));
-		progressbar.setValue(12);
 		this.waitingAnimation = createImageIcon("images/ghost.png");
 		
 		this.gcDisplay = new GeneClusterDisplay();
-		
-		this.gcSelector = new GeneClusterSelector();
+        searchField = new JTextField("");
+		this.gcSelector = new GeneClusterSelector(searchField);
+        gecko.addDataListener(gcSelector);
 		Dimension startDimension = new Dimension(1024, 768);
 		
 		// Basic frame settings
@@ -231,17 +230,7 @@ public class Gui {
 		});
 	
 		JPanel p = new JPanel(new BorderLayout());
-		
-		searchField = new JTextField("");
 		searchField.setPreferredSize(new Dimension(150, toolbar.getHeight()));
-		searchField.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				gecko.setFilterString(searchField.getText());
-				searchField.setSelectionStart(0);
-				searchField.setSelectionEnd(searchField.getText().length());
-			}
-		});
 		
 		p.setMaximumSize(new Dimension(150, (int) toolbar.getPreferredSize().getHeight()));
 		p.add(searchField, BorderLayout.CENTER);
@@ -436,10 +425,6 @@ public class Gui {
 	public void closeCurrentSession() {
         gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
 		mgb.clear();
-	}
-	
-	public void updategcSelector() {
-		gcSelector.refresh();
 	}
 	
 	/*
@@ -789,7 +774,7 @@ public class Gui {
 						if (newCluster == null)
 							JOptionPane.showMessageDialog(mainframe, "An error occured while reading the annotations!", "Error", JOptionPane.ERROR_MESSAGE);
 						else {
-							GeneCluster[] clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster.toArray(new GeneCluster[newCluster.size()]));
+                            List<GeneCluster> clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster);
 							geckoInstance.setClusters(GeneCluster.mergeResults(geckoInstance.getClusters(), clusterWithPValue));
 						}									
 						break;

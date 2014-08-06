@@ -13,15 +13,15 @@ import java.util.List;
  */
 public class DataSet {
     private Genome[] genomes;
-    private GeneCluster[] clusters;
+    private List<GeneCluster> clusters;
 
-    private int maxIdLength;
-    private int maxNameLength;
-    private int maxLocusTagLength;
+    private final int maxIdLength;
+    private final int maxNameLength;
+    private final int maxLocusTagLength;
 
-    private Set<GeneFamily> geneFamilySet;
-    private GeneFamily unknownGeneFamily;
-    private int numberOfGeneFamiliesWithMultipleGenes;
+    private final Set<GeneFamily> geneFamilySet;
+    private final GeneFamily unknownGeneFamily;
+    private final int numberOfGeneFamiliesWithMultipleGenes;
     private Map<GeneFamily, Color> colorMap;
 
     public static DataSet getEmptyDataSet() {
@@ -33,7 +33,7 @@ public class DataSet {
     }
 
     public DataSet(Genome[] genomes,
-                   GeneCluster[] clusters,
+                   List<GeneCluster> clusters,
                    int maxIdLength,
                    int maxNameLength,
                    int maxLocusTagLength,
@@ -41,7 +41,7 @@ public class DataSet {
                    GeneFamily unknownGeneFamily,
                    int numberOfGeneFamiliesWithMultipleGenes) {
         this.genomes = genomes;
-        this.clusters = clusters==null ? new GeneCluster[0] : clusters;
+        this.clusters = clusters==null ? new ArrayList<GeneCluster>() : clusters;
         this.maxIdLength = maxIdLength;
         this.maxNameLength = maxNameLength;
         this.maxLocusTagLength = maxLocusTagLength;
@@ -111,28 +111,6 @@ public class DataSet {
                 builder.append(Arrays.toString(chromosome));
             System.out.println(builder.toString());
         }
-    }
-
-    private void setMaxNameLength() {
-        int maxLength = -1;
-        for (Genome g : genomes)
-            for (Chromosome chr : g.getChromosomes())
-                for (Gene gene : chr.getGenes())
-                    if (gene.getName().length() > maxLength)
-                        maxLength = gene.getName().length();
-
-        maxNameLength = maxLength;
-    }
-
-    private void setMaxLocusTagLength() {
-        int maxLength = -1;
-        for (Genome g : genomes)
-            for (Chromosome chr : g.getChromosomes())
-                for (Gene gene : chr.getGenes())
-                    if (gene.getTag().length() > maxLength)
-                        maxLength = gene.getTag().length();
-
-        maxLocusTagLength = maxLength;
     }
 
     /**
@@ -269,15 +247,29 @@ public class DataSet {
         return genomes;
     }
 
-    public void setGenomes(Genome[] genomes) {
-        this.genomes = genomes;
+    public void reorderGenomes(int index) {
+        Genome first = genomes[0];
+        genomes[0] = genomes[index];
+        genomes[index] = first;
     }
 
-    public GeneCluster[] getClusters() {
+
+    /**
+     * Adds a new reference Genome to the data set
+     * @param newReferenceGenome
+     */
+    public void addReferenceGenome(Genome newReferenceGenome) {
+        Genome[] oldGenomes = genomes;
+        genomes = new Genome[oldGenomes.length+1];
+        genomes[0] = newReferenceGenome;
+        System.arraycopy(oldGenomes, 0, genomes, 1, oldGenomes.length);
+    }
+
+    public List<GeneCluster> getClusters() {
         return clusters;
     }
 
-    public void setClusters(GeneCluster[] clusters) {
+    public void setClusters(List<GeneCluster> clusters) {
         this.clusters = clusters;
     }
 
@@ -341,7 +333,7 @@ public class DataSet {
         DataSet dataSet = (DataSet) o;
 
         if (numberOfGeneFamiliesWithMultipleGenes != dataSet.numberOfGeneFamiliesWithMultipleGenes) return false;
-        if (!Arrays.equals(clusters, dataSet.clusters)) return false;
+        if (!clusters.equals(dataSet.clusters)) return false;
         if (geneFamilySet != null ? !geneFamilySet.equals(dataSet.geneFamilySet) : dataSet.geneFamilySet != null)
             return false;
         if (!Arrays.equals(genomes, dataSet.genomes)) return false;
@@ -354,7 +346,7 @@ public class DataSet {
     @Override
     public int hashCode() {
         int result = genomes != null ? Arrays.hashCode(genomes) : 0;
-        result = 31 * result + (clusters != null ? Arrays.hashCode(clusters) : 0);
+        result = 31 * result + (clusters != null ? clusters.hashCode() : 0);
         result = 31 * result + (geneFamilySet != null ? geneFamilySet.hashCode() : 0);
         result = 31 * result + (unknownGeneFamily != null ? unknownGeneFamily.hashCode() : 0);
         result = 31 * result + numberOfGeneFamiliesWithMultipleGenes;

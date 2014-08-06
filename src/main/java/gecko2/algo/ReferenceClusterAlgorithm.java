@@ -1,15 +1,22 @@
 package gecko2.algo;
 
+import gecko2.algo.status.AlgorithmProgressListener;
+import gecko2.algo.status.AlgorithmProgressProvider;
+import gecko2.algo.status.AlgorithmStatusEvent;
 import gecko2.algorithm.Parameter;
 
 import java.util.*;
 
-public class ReferenceClusterAlgorithm {
+public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	private final GenomeList genomes;
 	private final AlgorithmParameters param;
 	private final Map<Integer, Integer> genomeGroupMapping;
 	private final int nrOfGenomeGroups;
 	private final boolean useGenomeGrouping;
+
+    private List<AlgorithmProgressListener> progressListeners;
+    private int maxProgressValue;
+    private int progressValue;
 	
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
@@ -18,17 +25,40 @@ public class ReferenceClusterAlgorithm {
 	 * @return the gene clusters
 	 */
 	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param) {
-		return computeReferenceClusters(genomes, param, null);
+		return computeReferenceClusters(genomes, param, null, null);
 	}
+
+    /**
+     * Computes reference gene clusters for the given list of genomes and the given parameters
+     * @param genomes the genomes
+     * @param param the parameters
+     * @param listener the progress listener
+     * @return the gene clusters
+     */
+    public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, AlgorithmProgressListener listener) {
+        return computeReferenceClusters(genomes, param, null, listener);
+    }
+
+    /**
+     * Computes reference gene clusters for the given list of genomes and the given parameters
+     * @param genomes the genomes
+     * @param param the parameters
+     * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
+     * @return the gene clusters
+     */
+    public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
+        return computeReferenceClusters(genomes, param, genomeGrouping, null);
+    }
 
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
 	 * @param genomes the genomes
 	 * @param param the parameters
 	 * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
+     * @param listener the progress listener
 	 * @return the gene clusters
 	 */
-	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
+	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
 
@@ -51,6 +81,7 @@ public class ReferenceClusterAlgorithm {
 			throw new IllegalArgumentException("invalid parameters");
 		
 		ReferenceClusterAlgorithm refClusterAlgorithm = new ReferenceClusterAlgorithm(data, algoParameters, genomeGrouping);
+        refClusterAlgorithm.addListener(listener);
 		
 		List<ReferenceCluster> refCluster = refClusterAlgorithm.computeRefClusters();
 
@@ -77,6 +108,13 @@ public class ReferenceClusterAlgorithm {
 					genomeGroupMapping.put(genomeNr, groupId);
 			}
 		}
+
+        progressListeners = new ArrayList<>();
+        for (int i=0; i < ((param.useSingleReference()) ? 1 : genomes.size()); i++) {
+            for (Chromosome chr : genomes.get(i))
+                maxProgressValue += chr.size();
+        }
+        progressValue = 0;
 	}
 	
 	private List<ReferenceCluster> computeRefClusters(){
@@ -88,11 +126,12 @@ public class ReferenceClusterAlgorithm {
             throw new RuntimeException("Number of genomes in param does not equal number of genomes!");
 		
 		genomes.initializeForCalculation(param.getMaximumDelta());
-		List<ReferenceCluster> refClusterList = new ArrayList<ReferenceCluster>();
+		List<ReferenceCluster> refClusterList = new ArrayList<>();
 		
 		int refGenomeCount = 1;
 		if (!param.useSingleReference())
 			refGenomeCount = genomes.size();
+
 		for (int i=0; i<refGenomeCount; i++)
 			detectReferenceGeneClusterFromSingleGenome(i, refClusterList);
 		
@@ -102,7 +141,7 @@ public class ReferenceClusterAlgorithm {
 		for (ReferenceCluster cluster : refClusterList)
 			cluster.setGeneContent(genomes);
 		
-		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping);
+		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
 		
 		long statTime = System.nanoTime();
 		System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));
@@ -135,6 +174,7 @@ public class ReferenceClusterAlgorithm {
 	
 	private void detectReferenceGeneClusterFromSingleChromosome(int referenceGenomeNr, Chromosome referenceChromosome, List<ReferenceCluster> refClusterList){
 		for (int l = 1; l <= referenceChromosome.size(); l++){
+            fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingClusters));
 			genomes.updateLeftBorder(l, referenceChromosome, referenceGenomeNr, param);
 			Pattern pattern = new Pattern(genomes.getAlphabetSize(), genomes.size(), param, referenceGenomeNr, referenceChromosome, l);
 			
@@ -248,5 +288,24 @@ public class ReferenceClusterAlgorithm {
                 nonOccs++;
 		return nonOccs;
 	}
-	
+
+    @Override
+    public void addListener(AlgorithmProgressListener listener) {
+        if (listener != null) {
+            progressListeners.add(listener);
+            listener.algorithmProgressUpdate(new AlgorithmStatusEvent(maxProgressValue, AlgorithmStatusEvent.Task.Init));
+            listener.algorithmProgressUpdate(new AlgorithmStatusEvent(progressValue, AlgorithmStatusEvent.Task.ComputingClusters));
+        }
+    }
+
+    @Override
+    public void removeListener(AlgorithmProgressListener listener) {
+        if (listener != null)
+            progressListeners.remove(listener);
+    }
+
+    private void fireProgressUpdateEvent(AlgorithmStatusEvent statusEvent){
+        for (AlgorithmProgressListener listener : progressListeners)
+            listener.algorithmProgressUpdate(statusEvent);
+    }
 }

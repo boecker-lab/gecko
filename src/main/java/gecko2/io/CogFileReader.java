@@ -333,6 +333,8 @@ public class CogFileReader implements GeckoDataReader {
      */
     private void parseGeneLine(String line, List<Gene> genes, Map<String, GeneFamily> geneFamilyMap) {
         String[] explode = line.split("\t");
+        for (int i=0; i<explode.length; i++)
+            explode[i] = explode[i].trim();
         String[] ids = explode[0].split(",");
         for (int j = 0; j < ids.length; j++)
             ids[j] = this.convertToValidIdFormat(ids[j]);

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.List;
 
 
 /**
@@ -84,7 +85,7 @@ public class DataSetWriter
         out.newLine();
     }
 
-    private static void writeClusters(BufferedWriter out, GeneCluster[] clusters) throws  IOException {
+    private static void writeClusters(BufferedWriter out, List<GeneCluster> clusters) throws  IOException {
         out.write(CLUSTER_SECTION_START);
         out.newLine();
         for (GeneCluster cluster : clusters){

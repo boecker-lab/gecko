@@ -180,8 +180,8 @@ public class GeneClusterPicture {
 		refPaintLength = 0;
 		
 		for (int i = 0; i < this.selectedCluster.getOccurrences()[0].getSubsequences().length; i++) {			
-			if (this.selectedCluster.getOccurrences()[0].getSubsequences()[i].length != 0) {
-				Subsequence subsequence = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][subselection[i]];
+			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
+				Subsequence subsequence = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]];
 				int size = subsequence.getStop() - subsequence.getStart() + 1;
 				
 				if (size > refPaintLength) {		
@@ -229,7 +229,7 @@ public class GeneClusterPicture {
 		maxSubseqLength = 0;
 		
 		for (int i = 0; i < gecko.getGenomes().length; i++) {	
-			if (this.selectedCluster.getOccurrences()[0].getSubsequences()[i].length > 0) {			
+			if (this.selectedCluster.getOccurrences()[0].getSubsequences()[i].length > 0) {
                 if (getSubselection()[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
                     continue;
 
