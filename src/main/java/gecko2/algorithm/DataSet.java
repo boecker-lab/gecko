@@ -293,6 +293,10 @@ public class DataSet {
         return unknownGeneFamily;
     }
 
+    public int getNumberOfGeneFamiliesWithMultipleGenes() {
+        return numberOfGeneFamiliesWithMultipleGenes;
+    }
+
     public Map<String,GeneFamily> getGeneLabelMap() {
         Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
         geneFamilyMap.put(unknownGeneFamily.getExternalId(), unknownGeneFamily);

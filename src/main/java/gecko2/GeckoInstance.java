@@ -318,7 +318,9 @@ public class GeckoInstance {
 		}
 		return instance;
 	}
-	
+
+    private static final boolean USE_MEMORY_REDUCTION_DEFAULT = false;
+
 	/**
 	 * Computes the gene clusters for the given genomes with the given parameters
 	 * @param data the data
@@ -326,7 +328,7 @@ public class GeckoInstance {
 	 * @return the gene clusters
 	 */
 	public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params, AlgorithmProgressListener listener) {
-		return computeClustersJava(data, params, null, false, listener);
+		return computeClustersJava(data, params, null, USE_MEMORY_REDUCTION_DEFAULT, listener);
 	}
 
     /**
@@ -348,7 +350,7 @@ public class GeckoInstance {
      * @return the gene clusters
      */
     public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
-        return computeClustersJava(data, params, genomeGrouping, true, listener);
+        return computeClustersJava(data, params, genomeGrouping, USE_MEMORY_REDUCTION_DEFAULT, listener);
     }
 	
 	/**

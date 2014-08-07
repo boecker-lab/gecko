@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.DataFormatException;
 
 import static org.junit.Assert.*;
@@ -348,7 +349,7 @@ public class GeneClusterTestUtils {
         //7long[][] stop = new long [2][k];
         for(int i=0;i<k;i++){
         //    start[0][i] = System.currentTimeMillis();
-            List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction);
+            List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction, null);
             actualData.setClusters(javaRes);
         //    stop[0][i] = System.currentTimeMillis();
         }

@@ -112,25 +112,16 @@ public class Chromosome implements Serializable {
      * @return the array of gene ids
      */
     public int[] toReducedIntArray(boolean addZeros) {
-        List<Integer> ar = new ArrayList<>(genes.size()+2);
+        int array[] = addZeros?new int[genes.size()+2]:new int[genes.size()];
+        final int offset = addZeros?1:0;
 
-        if (addZeros)
-            ar.add(0);
-        for (int i=0;i<genes.size();i++) {
-            if(!genes.get(i).isUnknown()){
-                ar.add(genes.get(i).getAlgorithmId());
-            } else if(ar.get(ar.size()-1)<=-1){
-                ar.set(ar.size()-1,ar.get(ar.size()-1)-1);
-            } else {
-                ar.add(-1);
-            }
+        if (addZeros) {
+            array[0] = 0;
+            array[array.length-1] = 0;
         }
-        if (addZeros)
-            ar.add(0);
 
-        int array[] = new int[ar.size()];
-        for(int i=0;i<ar.size();i++){
-            array[i] = ar.get(i);
+        for (int i=0;i<genes.size();i++) {
+            array[i+offset] = genes.get(i).isUnknown() ? -1 : genes.get(i).getAlgorithmId();
         }
         return array;
     }
