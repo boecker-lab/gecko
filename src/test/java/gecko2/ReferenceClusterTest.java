@@ -55,9 +55,9 @@ public class ReferenceClusterTest
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
-        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 1);
         List<Integer> genes1 = Arrays.asList(-1, 1, 2);
-        int[] minimumDistances = new int[]{1, 0};
+        int[] minimumDistances = new int[]{1, 1};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
 

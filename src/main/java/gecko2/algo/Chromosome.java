@@ -356,21 +356,30 @@ class Chromosome {
     private void updateL_characterRankSmallerC_Old(Rank rank, int c_old){
         int lastOcc = 0;
         for (int j=1; j<=this.size(); j++){
-            if (genes[j] < 0)
-                continue;
+        	int d = 1;
+            if (genes[j] < 0){
+            	int k = Math.abs(genes[j]);
+            	while(d<=delta+1 && k>0){
+            		L[j][d]=j;
+            		k--;
+            		d++;
+            	}
+            	if(d>=delta+1)
+            		continue;
+            } else {
+            	if (lastOcc!=0) {                                                       // if c_old has already occurred in the list
+            		if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
 
-            if (lastOcc!=0) {                                                       // if c_old has already occurred in the list
-                if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
-
-                    for (int l=1; l<=delta+1; l++) {                              // test if entries for position i in array L change,
-                        if  (this.getL(j, l) < lastOcc) {                            // because c_old is a new mismatch left of i
-                            for (int p=delta+1; p>l; p--)
-                                L[j][p] = this.getL(j, p-1);                   // shift all higher entries in L
-                            L[j][l] = lastOcc;                                // and insert the new mismatch position
-                            break;                                                  // no further changes in L[j] possible
-                        }
-                    }
-                }
+            			for (int l=d; l<=delta+1; l++) {                              // test if entries for position i in array L change,
+            				if  (this.getL(j, l) < lastOcc) {                            // because c_old is a new mismatch left of i
+            					for (int p=delta+1; p>l; p--)
+            						L[j][p] = this.getL(j, p-1);                   // shift all higher entries in L
+            					L[j][l] = lastOcc;                                // and insert the new mismatch position
+            					break;                                                  // no further changes in L[j] possible
+            				}
+            			}
+            		}
+            	}
             }                                       // if c_old not yet read, L[j] cannot change
             if (this.getGene(j) == c_old) {
                 lastOcc = j;                        // new occurrence of c_old read
@@ -497,20 +506,30 @@ class Chromosome {
         int lastOcc = this.size()+1;
 
         for (int j=this.size(); j>=1; j--) {
-            if (genes[j] < 0)
-                continue;
-            if (lastOcc != this.size() + 1) {                                            // if c_old has already occurred in the list
-                if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
+            int d = 1;
+        	if (genes[j] < 0){
+            	int k=0;
+            	while(d<=delta+1 && k<Math.abs(genes[j])){
+            		R[j][d]=j;
+            		d++;
+            		k++;
+            	}
+            	if (d>=delta+1)
+            		continue;
+            } else {
+            	if (lastOcc != this.size() + 1) {                                            // if c_old has already occurred in the list
+            		if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
 
-                    for (int l = 1; l <= delta + 1; l++) {                              // test if entries for position i in array R change,
-                        if (this.getR(j, l) > lastOcc) {                            // because c_old is a new mismatch left of i
-                            for (int p = delta + 1; p > l; p--)
-                                R[j][p] = this.getR(j, p - 1);                   // shift all higher entries in R
-                            R[j][l] = lastOcc;                                // and insert the new mismatch position
-                            break;                                                  // no further changes in R[j] possible
-                        }
-                    }
-                }
+            			for (int l = d; l <= delta + 1; l++) {                              // test if entries for position i in array R change,
+            				if (this.getR(j, l) > lastOcc) {                            // because c_old is a new mismatch left of i
+            					for (int p = delta + 1; p > l; p--)
+            						R[j][p] = this.getR(j, p - 1);                   // shift all higher entries in R
+            					R[j][l] = lastOcc;                                // and insert the new mismatch position
+            					break;                                                  // no further changes in R[j] possible
+            				}
+            			}
+            		}
+            	}
             }                                       // if c_old not yet read, R[j] cannot change
             if (genes[j] == c_old) {
                 lastOcc = j;                        // new occurrence of c_old read

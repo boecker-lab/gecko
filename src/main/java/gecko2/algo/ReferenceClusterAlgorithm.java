@@ -197,8 +197,10 @@ public class ReferenceClusterAlgorithm {
 					break;
 				
 				oldLists.get(referenceGenomeNr).emptyList();
-				DeltaLocation refdLoc = DeltaLocation.getReferenceLocation(referenceGenomeNr, referenceChromosome.getNr(), l, r, pattern.getSize());
+				DeltaLocation refdLoc = DeltaLocation.getReferenceLocation(referenceGenomeNr, referenceChromosome.getNr(), referenceChromosome, l, r, pattern.getSize());
 				
+				if(refdLoc.getDistance()>param.getMaximumDelta())
+					break;
 				
 			/*	oldLists.get(referenceGenomeNr).emptyList();
 				DeltaLocation refdLoc = DeltaLocation.getReferenceLocation(referenceGenomeNr, referenceChromosome.getNr(), l, r, pattern.getSize());

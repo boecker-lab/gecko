@@ -47,8 +47,14 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 	}
 	
 	public static DeltaLocation getReferenceLocation(int referenceGenomeNr,
-			int referenceChromosomeNr, int l, int r, int patternSize) {
-		return new DeltaLocation(referenceGenomeNr, referenceChromosomeNr, l, r, 0, 0, 0, patternSize, patternSize, true);
+			int referenceChromosomeNr,Chromosome refChr, int l, int r, int patternSize) {
+		int count = 0;
+		for (int i=l;i<r;i++){
+			if(refChr.getGene(i)<0)
+				count+=Math.abs(refChr.getGene(i));
+		}
+		
+		return new DeltaLocation(referenceGenomeNr, referenceChromosomeNr, l, r, count, 0, 0, patternSize, patternSize, true);
 	}
 	
 	public static DeltaLocation getArtificialDeltaLocation(int genomeNr, int distance) {
