@@ -333,8 +333,8 @@ class Chromosome {
             			}
             			//L[i][d] = j;
             			//d++;
-            			if (d>=delta+1)
-            				continue;
+            			continue;
+            			
             		}
 
             		if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
