@@ -3,12 +3,15 @@ package gecko2.algo;
 import cern.jet.random.Binomial;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
+import gecko2.algo.status.AlgorithmProgressListener;
+import gecko2.algo.status.AlgorithmProgressProvider;
+import gecko2.algo.status.AlgorithmStatusEvent;
 import org.apache.commons.math3.util.Precision;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-class Statistics {
+class Statistics implements AlgorithmProgressProvider {
 	private final GenomeList genomes;
 	private final List<ReferenceCluster> refCluster;
 	private final int delta;
@@ -19,6 +22,10 @@ class Statistics {
 	
 	private BigDecimal testedIntervals;	
 	private final RandomEngine random;
+
+    private List<AlgorithmProgressListener> progressListeners;
+    private int maxProgressValue;
+    private int progressValue;
 	
 	private Statistics(GenomeList genomes, List<ReferenceCluster> refCluster, int delta, boolean singleReference, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping) {
 		this.genomes = genomes;
@@ -31,14 +38,16 @@ class Statistics {
 		this.useGenomeGrouping = nrOfGenomeGroups != genomes.size();
 		
 		this.random = new MersenneTwister();
+
+        progressListeners = new ArrayList<>();
+        maxProgressValue = genomes.size()*refCluster.size() + refCluster.size();
+        progressValue = 0;
 	}
 	
-	public static void computeReferenceStatistics(GenomeList genomes, List<ReferenceCluster> refCluster, int delta, boolean singleReference) {
-		computeReferenceStatistics(genomes, refCluster, delta, singleReference, genomes.size(), null);
-	}
-	
-	public static void computeReferenceStatistics(GenomeList genomes, List<ReferenceCluster> refCluster, int delta, boolean singleReference, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping) {
+	public static void computeReferenceStatistics(GenomeList genomes, List<ReferenceCluster> refCluster, int delta, boolean singleReference, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping, List<AlgorithmProgressListener> listeners) {
 		Statistics statistics = new Statistics(genomes, refCluster, delta, singleReference, nrOfGenomeGroups, genomeGroupMapping);
+        for (AlgorithmProgressListener listener : listeners)
+            statistics.addListener(listener);
 		
 		statistics.computeStatistics();
 	}
@@ -51,6 +60,7 @@ class Statistics {
 			computeSinglePValuesForGenome(k, maxClusterSize, charFrequencies[k]);
 		} 
 		for (ReferenceCluster cluster : refCluster){
+            fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
 			double[] best_pValue = new double[nrOfGenomeGroups];  // init with 0.0
 
 			double bestRefLoc_pValue = 0.0;
@@ -277,6 +287,7 @@ class Statistics {
 		PTable pPlusTable = new PTable(genomes.getAlphabetSize(), maxClusterSize, delta, globalProbabilityForDifferentCharHits, random);
 		
 		for (ReferenceCluster cluster : refCluster){
+            fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
 			if (cluster.getDeltaLocations(genomeNr).isEmpty()){
 				DeltaLocation artificial_dLoc = DeltaLocation.getArtificialDeltaLocation(genomeNr, cluster.getMaxDistance());
 				cluster.getDeltaLocations(genomeNr).add(artificial_dLoc);					
@@ -426,4 +437,24 @@ class Statistics {
 		}
 		return charProb;
 	}
+
+    @Override
+    public void addListener(AlgorithmProgressListener listener) {
+        if (listener != null) {
+            progressListeners.add(listener);
+            listener.algorithmProgressUpdate(new AlgorithmStatusEvent(maxProgressValue, AlgorithmStatusEvent.Task.Init));
+            listener.algorithmProgressUpdate(new AlgorithmStatusEvent(progressValue, AlgorithmStatusEvent.Task.ComputingStatistics));
+        }
+    }
+
+    @Override
+    public void removeListener(AlgorithmProgressListener listener) {
+        if (listener != null)
+            progressListeners.remove(listener);
+    }
+
+    private void fireProgressUpdateEvent(AlgorithmStatusEvent statusEvent){
+        for (AlgorithmProgressListener listener : progressListeners)
+            listener.algorithmProgressUpdate(statusEvent);
+    }
 }

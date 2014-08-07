@@ -23,15 +23,18 @@ import java.util.List;
  * @author original author unknown
  */
 public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
-
 	private static final long serialVersionUID = -6769789368841494821L;
-	private final JPanel centerpanel;
 
+	private final JPanel centerpanel;
 	private final JPanel rightPanel;
 	private final List<AbstractGenomeBrowser> genomeBrowsers;
 	private final ScrollListener wheelListener;
 	private LocationSelectionEvent lastLocationEvent;
 	private final List<GBNavigator> gbNavigators;
+
+    public enum GenomeFilterMode {
+        None, Include, Exclude
+    }
 	
 	private final GeckoInstance gecko;
 	
@@ -58,8 +61,8 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		this.addSelectionListener(this);
 		this.setPreferredSize(new Dimension(0,0));
 		this.wheelListener = new ScrollListener();
-		this.genomeBrowsers = new ArrayList<AbstractGenomeBrowser>();
-		this.gbNavigators = new ArrayList<GBNavigator>();
+		this.genomeBrowsers = new ArrayList<>();
+		this.gbNavigators = new ArrayList<>();
 		this.setLayout(new BorderLayout());
         JPanel leftpanel = new JPanel();
 		this.centerpanel = new JPanel();
@@ -207,34 +210,11 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * @return a JComboBox for the use in a GenomeBrowser
 	 */
 	private JComboBox createComboBox(int genomeBrowsersSize, int height) {
-		String[] selection = {"None", "Include", "Exclude"};
-		JComboBox<String> box = new JComboBox<>(selection);
+		JComboBox<GenomeFilterMode> box = new JComboBox<>(GenomeFilterMode.values());
 		box.setPreferredSize(new Dimension(100, height));
 		box.setMaximumSize(box.getPreferredSize());
 		box.setName(Integer.toString(genomeBrowsersSize - 1));
-		
-		box.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-				JComboBox cb = (JComboBox) arg0.getSource();
-		        String selectedItem = (String) cb.getSelectedItem();
-		        
-		        if (selectedItem.equals("None")) {
-		        	gecko.getGui().getGcSelector().resetGenome(Integer.parseInt(cb.getName()));
-		        }
-		        
-		        if (selectedItem.equals("Include")) {
-		        	gecko.getGui().getGcSelector().showOnlyClusWthSelecGenome(Integer.parseInt(cb.getName()));
-		        }
-		        
-		        if (selectedItem.equals("Exclude")) {
-		        	gecko.getGui().getGcSelector().dontShowClusterWithSelectedGenome(Integer.parseInt(cb.getName()));
-		        }
-			}
-		});
-			
+        gecko.getGui().getGcSelector().addIncludeExcludeFilterComboBox(box);
 		return box;
 	}
 	
@@ -266,7 +246,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		boxPanel.setBackground(gb.getBackground());
 		boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
 		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(), gb.getBackground());
-//		n.addMouseListener(gb.getGenomebrowsermouseover());
 		JComboBox box = createComboBox(genomeBrowsers.size(), getGenomeBrowserHeight());
 		boxPanel.add(box);
 		boxPanel.add(new JToolBar.Separator());
@@ -421,8 +400,8 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		
 		int[] positions = new int[gOcc.getSubsequences().length];
 		Arrays.fill(positions, -1);
-		ArrayList<Integer> minus = new ArrayList<Integer>();
-		ArrayList<Integer> plus = new ArrayList<Integer>();
+		ArrayList<Integer> minus = new ArrayList<>();
+		ArrayList<Integer> plus = new ArrayList<>();
 		for (int i=0; i<positions.length;i++) {
 			// If genome i is not in the cluser, skip
 			if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)

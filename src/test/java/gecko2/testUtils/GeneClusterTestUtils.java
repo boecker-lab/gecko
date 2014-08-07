@@ -14,10 +14,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.DataFormatException;
 
 import static org.junit.Assert.*;
@@ -274,13 +272,13 @@ public class GeneClusterTestUtils {
 	 * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
 	 */
-	public static void compareGeneClusters(GeneCluster[] expected, GeneCluster[] actual, PValueComparison pValueComp)
+	public static void compareGeneClusters(List<GeneCluster> expected, List<GeneCluster> actual, PValueComparison pValueComp)
 	{
-		assertEquals(expected.length, actual.length);
+		assertEquals(expected.size(), actual.size());
 		
-		for(int i = 0; i < expected.length; i++)
+		for(int i = 0; i < expected.size(); i++)
 		{
-			compareGeneClusters(expected[i], actual[i], pValueComp);
+			compareGeneClusters(expected.get(i), actual.get(i), pValueComp);
 		}
 	}
 	
@@ -293,7 +291,7 @@ public class GeneClusterTestUtils {
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet actualData = reader.readData();
 
-		GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups);
+        List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, null);
         actualData.setClusters(javaRes);
 		
 		compareGeneClusters(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_NONE);
@@ -301,9 +299,9 @@ public class GeneClusterTestUtils {
         CogFileReader reducedReader = new CogFileReader(settings.dataFile);
         DataSet reducedData = reducedReader.readData();
 
-        GeneCluster[] reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true);        reducedData.setClusters(reducedRes);
-        for (int i=0; i<reducedRes.length; i++)
-            if (!expectedData.getClusters()[i].equals(reducedRes[i])) {
+        List<GeneCluster> reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true, null);        reducedData.setClusters(reducedRes);
+        for (int i=0; i<reducedRes.size(); i++)
+            if (!expectedData.getClusters().get(i).equals(reducedRes.get(i))) {
                 System.out.println(i);
                 break;
             }
@@ -332,7 +330,7 @@ public class GeneClusterTestUtils {
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet data = reader.readData();
 
-        GeneCluster[] javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups);
+        List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups, null);
         data.setClusters(javaRes);
 
         assertTrue(settings.resultOutputFile.createNewFile());
@@ -350,7 +348,7 @@ public class GeneClusterTestUtils {
         //7long[][] stop = new long [2][k];
         for(int i=0;i<k;i++){
         //    start[0][i] = System.currentTimeMillis();
-            GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction);
+            List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction);
             actualData.setClusters(javaRes);
         //    stop[0][i] = System.currentTimeMillis();
         }

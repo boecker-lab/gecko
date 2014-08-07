@@ -34,7 +34,7 @@ public class GckFileReader implements GeckoDataReader {
 	/**
 	 * Storing place for the gene clusters.
 	 */
-	private GeneCluster[] clusters;
+	private List<GeneCluster> clusters;
 	
 	/**
 	 * Storing place for the length of the longest id.
@@ -210,7 +210,7 @@ public class GckFileReader implements GeckoDataReader {
                     throw new ParseException("Maleformed line: " + line, 0);
             }
         }
-        clusters = clusterList.toArray(new GeneCluster[clusterList.size()]);
+        clusters = clusterList;
     }
 
     private static class GeneClusterBuilder {

@@ -28,7 +28,7 @@ public class StartComputationDialog extends JDialog {
 	private int quorum;
 	private Parameter.OperationMode opMode;
     private Parameter.ReferenceType refType;
-	private final JComboBox refCombo;
+	private final JComboBox<Parameter.ReferenceType> refCombo;
 	private final JCheckBox mergeResults;
 	private final GeckoInstance gecko = GeckoInstance.getInstance();
 
@@ -57,7 +57,7 @@ public class StartComputationDialog extends JDialog {
 		qValues[qValues.length-1] = "all";
 		for (int i=2;i<ngenomes;i++)
 			qValues[i-2] = Integer.toString(i);
-		final JComboBox qCombo = new JComboBox(qValues);
+		final JComboBox<String> qCombo = new JComboBox<>(qValues);
 		qCombo.setSelectedIndex(qValues.length-1);
 		qCombo.setPreferredSize(new Dimension(190,30));
 		qCombo.addActionListener(new ActionListener() {
@@ -69,7 +69,7 @@ public class StartComputationDialog extends JDialog {
 			}
 		});
 
-		final JComboBox modeCombo = new JComboBox(Parameter.OperationMode.getSupported());
+		final JComboBox<Parameter.OperationMode> modeCombo = new JComboBox<>(Parameter.OperationMode.getSupported());
 
 		modeCombo.setPreferredSize(new Dimension(190,30));
 
@@ -78,7 +78,7 @@ public class StartComputationDialog extends JDialog {
 		modeCombo.setSelectedIndex(0);
 
         JLabel refLabel = new JLabel("Reference:");
-		refCombo = new JComboBox(Parameter.ReferenceType.getSupported());
+		refCombo = new JComboBox<>(Parameter.ReferenceType.getSupported());
 		refCombo.setPreferredSize(new Dimension(190, 30));
 		
 		modeCombo.addActionListener(new ActionListener() {
@@ -148,7 +148,7 @@ public class StartComputationDialog extends JDialog {
 			
 		};
 		
-		EventList<Genome> genomeEventList = new BasicEventList<Genome>();
+		EventList<Genome> genomeEventList = new BasicEventList<>();
 		genomeEventList.addAll(Arrays.asList(GeckoInstance.getInstance().getGenomes()));
 		
 		final JComboBox refGenomeCombo = new JComboBox();
@@ -261,17 +261,9 @@ public class StartComputationDialog extends JDialog {
 				// Reorder the genomes if necessary
 				if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.genome && refGenomeCombo.getSelectedIndex()!=0) {
 					PrintUtils.printDebug("swapping genomes");
-					Genome[] genomes = GeckoInstance.getInstance().getGenomes();
-					Genome first = genomes[0];
-					genomes[0] = genomes[refGenomeCombo.getSelectedIndex()];
-					genomes[refGenomeCombo.getSelectedIndex()] = first;
-					
-					gecko.getGui().closeCurrentSession();
-					gecko.setGenomes(genomes);
+                    gecko.reorderGenomes(refGenomeCombo.getSelectedIndex());
 					//TODO improve
 				} else if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.cluster) {
-					Genome[] oldGenomes = gecko.getGenomes();
-					Genome[] genomes = new Genome[oldGenomes.length+1];
 					Genome cluster = new Genome();
 					ArrayList<Gene> genes = new ArrayList<>();
 					Map<String, GeneFamily> revIDMap = gecko.getGeneLabelMap();
@@ -282,10 +274,7 @@ public class StartComputationDialog extends JDialog {
 								genes.add(new Gene(geneFamily));
 						}
 					cluster.getChromosomes().add(new Chromosome("Reference cluster", genes, cluster));
-					genomes[0] = cluster;
-                    System.arraycopy(oldGenomes, 0, genomes, 1, oldGenomes.length);
-					gecko.getGui().closeCurrentSession();
-					gecko.setGenomes(genomes);
+					gecko.addReferenceGenome(cluster);
 				}
 				boolean mergeResultsEnabled = false;
 				if (opMode==Parameter.OperationMode.reference && mergeResults.isSelected())
