@@ -55,9 +55,39 @@ public class ReferenceClusterTest
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
-        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 1);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
         List<Integer> genes1 = Arrays.asList(-1, 1, 2);
-        int[] minimumDistances = new int[]{1, 1};
+        int[] minimumDistances = new int[]{1, 0};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
+
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances,
+                        1,
+                        0,
+                        2,
+                        expectedDeltaLocationValues
+                )
+        };
+
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+    }
+
+    @Test
+    public void testMemoryReductionClusterWithMergedGenes()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, 0}}, {{0, 2, -2, 1, 0}}};
+
+        Parameter p = new Parameter(2, 3, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+
+        // def result (using p values from calculated result)
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 2);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
+        List<Integer> genes1 = Arrays.asList(-1, 1, 2);
+        int[] minimumDistances = new int[]{2, 0};
 
         ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
 

@@ -186,7 +186,7 @@ class GenomeList {
     		if (searchRefInRef && l == genomes.size()-1){
     			//TODO refInRef
     		} else {
-    			if (!genomes.get(l).noOcc(c))
+    			if (genomes.get(l).noOcc(c) == 0)
     				return false;
     		}
     	}

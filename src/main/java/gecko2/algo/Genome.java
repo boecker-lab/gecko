@@ -63,17 +63,18 @@ class Genome implements Iterable<Chromosome> {
     }   
     
     /**
-     * Checks if the character c does not occurre on the genome
+     * Checks if the character c does not occur on the genome
      * @param c the character
-     * @return true if the character does not occurre
+     * @return 0 if the character does occur, values > 0 for how many characters do not occur
      */
-    boolean noOcc(int c){
+    int noOcc(int c){
+        if (c < 0)
+            return -c;
     	for (Chromosome chr: chromosomes){
-    		if (c<0) continue;
     		if (chr.getPOS(c).length != 0)
-    			return false;
+    			return 0;
     	}
-    	return true;
+    	return 1;
     }
     
     /**

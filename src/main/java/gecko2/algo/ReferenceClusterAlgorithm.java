@@ -173,7 +173,7 @@ public class ReferenceClusterAlgorithm {
 			
 			int r = l;
 			int[] noOccCount = new int[genomes.size()];
-			List<ListOfDeltaLocations> oldLists = new ArrayList<ListOfDeltaLocations>(genomes.size());
+			List<ListOfDeltaLocations> oldLists = new ArrayList<>(genomes.size());
 			for (int i=0; i<genomes.size(); i++)
 				oldLists.add(new ListOfDeltaLocations());
 			
@@ -186,10 +186,9 @@ public class ReferenceClusterAlgorithm {
 				for (int i=0; i<genomes.size(); i++){
 					if (param.searchRefInRef() && i==genomes.size()-1){
 						if (genomes.get(i).noOccOutsideInterval(pattern.getLastChar(), l, r, referenceChromosome.getNr()))
-							noOccCount[i]++;
+							noOccCount[i]++; // TODO Fix for < 0
 					} else {
-						if (genomes.get(i).noOcc(pattern.getLastChar()))
-							noOccCount[i]++;
+                        noOccCount[i] += genomes.get(i).noOcc(pattern.getLastChar());
 					}
 				}
 				
@@ -197,14 +196,8 @@ public class ReferenceClusterAlgorithm {
 					break;
 				
 				oldLists.get(referenceGenomeNr).emptyList();
-				DeltaLocation refdLoc = DeltaLocation.getReferenceLocation(referenceGenomeNr, referenceChromosome.getNr(), referenceChromosome, l, r, pattern.getSize());
-				
-				if(refdLoc.getDistance()>param.getMaximumDelta())
-					break;
-				
-			/*	oldLists.get(referenceGenomeNr).emptyList();
 				DeltaLocation refdLoc = DeltaLocation.getReferenceLocation(referenceGenomeNr, referenceChromosome.getNr(), l, r, pattern.getSize());
-			*/	oldLists.get(referenceGenomeNr).insertDeltaLocation(refdLoc);
+				oldLists.get(referenceGenomeNr).insertDeltaLocation(refdLoc);
 				
 				int minHitCoveredCount = 0;
 				boolean[] containedGenomeClusters = new boolean[nrOfGenomeGroups];
