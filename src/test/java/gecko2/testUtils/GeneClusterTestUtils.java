@@ -155,17 +155,15 @@ public class GeneClusterTestUtils {
      */
     private static void compareReferenceCluster(ExpectedReferenceClusterValues expected, ReferenceCluster actual, PValueComparison pValueComp) {
         assertEquals(expected.getGeneContent().size(), actual.getGeneContent().size());
-        // TODO Test removed till statistics is fixed
-        //assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent()));
+        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent()));
         assertEquals(expected.getSize(), actual.getSize());
         if (pValueComp != PValueComparison.COMPARE_NONE)
             assertEqualsBigDecimal(expected.getBestCombined_pValue(), actual.getBestCombined_pValue());
         if (pValueComp == PValueComparison.COMPARE_ALL)
             assertEqualsBigDecimal(expected.getBestCombined_pValueCorrected(), actual.getBestCombined_pValueCorrected());
         assertArrayEquals(expected.getMinimumDistances(), actual.getMinimumDistances());
-        // TODO Test removed till statistics is fixed
-        //assertEquals(expected.getGenomeNr(), actual.getGenomeNr());
-        //assertEquals(expected.getChrNr(), actual.getChrNr());
+        assertEquals(expected.getGenomeNr(), actual.getGenomeNr());
+        assertEquals(expected.getChrNr(), actual.getChrNr());
         assertEquals(expected.getCoveredGenomes(), actual.getCoveredGenomes());
 
         assertEquals(expected.getAllDeltaLocations().length, actual.getAllDeltaLocations().size());
@@ -205,8 +203,7 @@ public class GeneClusterTestUtils {
 	 */
 	private static void compareGeneClusters(GeneCluster expected, GeneCluster actual, PValueComparison pValueComp) {
 		assertEquals(expected.getId(), actual.getId());
-        // TODO Test removed till statistics is fixed
-		//assertEquals(expected.getGeneFamilies(), actual.getGeneFamilies());
+		assertEquals(expected.getGeneFamilies(), actual.getGeneFamilies());
 		assertEquals(expected.getSize(), actual.getSize());
 		assertEquals(expected.isMatch(), actual.isMatch());
 		if (pValueComp != PValueComparison.COMPARE_NONE)
@@ -215,8 +212,7 @@ public class GeneClusterTestUtils {
 			assertEqualsBigDecimal(expected.getBestPValueCorrected(), actual.getBestPValueCorrected());
 		assertEquals(expected.getMinTotalDist(), actual.getMinTotalDist());
 		assertEquals(expected.getType(), actual.getType());
-        // TODO Test removed till statistics is fixed
-		//assertEquals(expected.getRefSeqIndex(), actual.getRefSeqIndex());
+		assertEquals(expected.getRefSeqIndex(), actual.getRefSeqIndex());
 		
 		assertEquals(expected.getOccurrences().length, actual.getOccurrences().length);
 		

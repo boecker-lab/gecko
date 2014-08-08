@@ -99,6 +99,20 @@ class Genome implements Iterable<Chromosome> {
 		}
 		return true;
 	}
+
+    public int[] getCharFrequency(int alphabetSize) {
+        int[] charFreq = new int[alphabetSize + 1];
+
+        for (Chromosome chr : chromosomes)
+            for (int i = 1; i < chr.size() + 1; i++) {  // Correct for not counted 0 termination
+                if (chr.getGene(i) < 0)
+                    charFreq[0]++;
+                else
+                    charFreq[chr.getGene(i)]++;
+            }
+
+        return charFreq;
+    }
     
     /**
      * Returns a string representing the data in this genome.

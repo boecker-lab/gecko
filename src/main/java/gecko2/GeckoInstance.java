@@ -319,7 +319,7 @@ public class GeckoInstance {
 		return instance;
 	}
 
-    private static final boolean USE_MEMORY_REDUCTION_DEFAULT = false;
+    private static final boolean USE_MEMORY_REDUCTION_DEFAULT = true;
 
 	/**
 	 * Computes the gene clusters for the given genomes with the given parameters

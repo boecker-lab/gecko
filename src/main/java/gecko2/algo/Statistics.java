@@ -53,11 +53,10 @@ class Statistics implements AlgorithmProgressProvider {
 	}
 
 	private void computeStatistics() {
-		int[][] charFrequencies = genomes.charFrequencies();
 		int maxClusterSize = getMaxRefClusterSize() + delta;
 		
 		for (int k=0; k<genomes.size(); k++){
-			computeSinglePValuesForGenome(k, maxClusterSize, charFrequencies[k]);
+			computeSinglePValuesForGenome(k, maxClusterSize);
 		} 
 		for (ReferenceCluster cluster : refCluster){
             fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
@@ -282,8 +281,9 @@ class Statistics implements AlgorithmProgressProvider {
 		return sum.toBigDecimal();
 	}
 
-	private void computeSinglePValuesForGenome(int genomeNr, int maxClusterSize, int[] charFrequencies){
-		double[] globalProbabilityForDifferentCharHits = computeGlobalProbabilityForDifferentCharHits(genomes.getAlphabetSize()+1, charFrequencies);
+	private void computeSinglePValuesForGenome(int genomeNr, int maxClusterSize){
+        int[] charFrequencies = genomes.get(genomeNr).getCharFrequency(genomes.getAlphabetSize());
+		double[] globalProbabilityForDifferentCharHits = computeGlobalProbabilityForDifferentCharHits(charFrequencies);
 		PTable pPlusTable = new PTable(genomes.getAlphabetSize(), maxClusterSize, delta, globalProbabilityForDifferentCharHits, random);
 		
 		for (ReferenceCluster cluster : refCluster){
@@ -423,16 +423,19 @@ class Statistics implements AlgorithmProgressProvider {
 		return maxSize;
 	}
 
-	private double[] computeGlobalProbabilityForDifferentCharHits(int alphabetSize,
-			int[] charFrequencies) {
-		double[] charProb = new double[alphabetSize];
+	private double[] computeGlobalProbabilityForDifferentCharHits(int[] charFrequencies) {
+		double[] charProb = new double[charFrequencies.length + charFrequencies[0]];
 		int totalFreq = 0;
-		for (int i=1; i<alphabetSize; i++){
+        for (int i=0; i<charFrequencies[0]; i++){
+            totalFreq++;
+            charProb[i+1] = 1.0 / totalFreq;
+        }
+		for (int i=1; i<charFrequencies.length; i++){
 			totalFreq += charFrequencies[i];
 			if (charFrequencies[i] <= 0.0)
-				charProb[i] = 0.0;
+				charProb[i+charFrequencies[0]] = 0.0;
 			else{
-				charProb[i] = ((double)charFrequencies[i] / totalFreq);
+				charProb[i+charFrequencies[0]] = ((double)charFrequencies[i] / totalFreq);
 			}
 		}
 		return charProb;
