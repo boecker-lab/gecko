@@ -38,7 +38,7 @@ class PTable {
 		
 		table = new ArrayList<>(numberOfChars+1);
 		for (int i=0; i<=numberOfChars; i++){
-			table.add(new ArrayList<double[]>());  // TODO perhaps use max size here. Improves performance, how much extra memory is needed?
+			table.add(new ArrayList<double[]>());
 			table.get(i).add(new double[this.maxDifferentCharsGenerated + 1]);
 			table.get(i).get(0)[0] = 1.0;
 		}
