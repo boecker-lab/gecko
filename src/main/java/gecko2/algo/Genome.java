@@ -105,8 +105,8 @@ class Genome implements Iterable<Chromosome> {
 
         for (Chromosome chr : chromosomes)
             for (int i = 1; i < chr.size() + 1; i++) {  // Correct for not counted 0 termination
-                if (chr.getGene(i) < 0)
-                    charFreq[0]++;
+                if (chr.getGene(i) < 0)                 // singleton genes have negative ids,
+                    charFreq[0] -= chr.getGene(i);      // so subtract to add the number of singleton genes
                 else
                     charFreq[chr.getGene(i)]++;
             }

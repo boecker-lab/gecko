@@ -284,8 +284,8 @@ class Statistics implements AlgorithmProgressProvider {
 	private void computeSinglePValuesForGenome(int genomeNr, int maxClusterSize){
         int[] charFrequencies = genomes.get(genomeNr).getCharFrequency(genomes.getAlphabetSize());
 		double[] globalProbabilityForDifferentCharHits = computeGlobalProbabilityForDifferentCharHits(charFrequencies);
-		PTable pPlusTable = new PTable(genomes.getAlphabetSize(), maxClusterSize, delta, globalProbabilityForDifferentCharHits, random);
-		
+		PTable pPlusTable = new PTable(globalProbabilityForDifferentCharHits, maxClusterSize, delta, random);
+
 		for (ReferenceCluster cluster : refCluster){
             fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
 			if (cluster.getDeltaLocations(genomeNr).isEmpty()){
@@ -293,23 +293,28 @@ class Statistics implements AlgorithmProgressProvider {
 				cluster.getDeltaLocations(genomeNr).add(artificial_dLoc);					
 			}
             for (DeltaLocation dLoc : cluster.getDeltaLocations(genomeNr)) {
-                // For individual distance bound
-            	dLoc.setpValue(prob_C_has_approxOccInGenome(dLoc.getDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
-                // For global distance bound
-                //dLoc.setpValue(prob_C_has_approxOccInGenome(cluster.getMaxDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
+                if (cluster.isOnlyPossibleReferenceOccurrence(dLoc))
+                    dLoc.setpValue(1.0);                                         // does not need p-value
+                else {
+                    // For individual distance bound
+                    dLoc.setpValue(prob_C_has_approxOccInGenome(dLoc.getDistance(), genomes.get(genomeNr).getLength(), cluster.getGeneContent(), pPlusTable, charFrequencies));
+                    // For global distance bound
+                    //dLoc.setpValue(prob_C_has_approxOccInGenome(cluster.getMaxDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
+                }
             }
 		}
 	}
 	
 	private double prob_C_has_approxOccInGenome(int delta, int totalLength,
-			int alphabetSize, List<Integer> geneContent, PTable pPlusTable, int[] charFreqs) {
-		if (noDLocPossible(geneContent, delta, charFreqs))
+			List<Integer> geneContent, PTable pPlusTable, int[] charFrequencies) {
+
+		if (noDLocPossible(geneContent, delta, charFrequencies))
 			return 0.0;
 		
-		double[] localCharProb = computeLocalCharProb(geneContent, charFreqs);
-		double probOfC = elementOfC_Prob(geneContent, charFreqs, totalLength);
+		double[] localCharProb = computeLocalCharProb(geneContent, charFrequencies);
+		double probOfC = elementOfC_Prob(geneContent, charFrequencies, totalLength);
 		
-		PTable pTable = new PTable(geneContent.size(), geneContent.size(), geneContent.size(), localCharProb, random);
+		PTable pTable = new PTable(localCharProb, geneContent.size(), geneContent.size(), random);
 		
 		double log = 0.0;
 		int L = Math.max(1, geneContent.size()-delta);
@@ -368,44 +373,43 @@ class Statistics implements AlgorithmProgressProvider {
 		return prob;
 	}
 
-	private double elementOfC_Prob(List<Integer> geneContent, int[] charFreqs,
+	private double elementOfC_Prob(List<Integer> geneContent, int[] charFrequencies,
 			int totalLength) {
 		int totalCharFreq = 0;
 		for (Integer gene : geneContent)
-			totalCharFreq += charFreqs[neg(gene)];
+            if (gene > 0)
+			    totalCharFreq += charFrequencies[gene];
 		
 		return ((double)totalCharFreq)/totalLength;
 	}
 
 	private double[] computeLocalCharProb(List<Integer> geneContent,
-			int[] charFreqs) {
+			int[] charFrequencies) {
 		
 		double[] localCharProb = new double[geneContent.size()+1];
 		int totalFreq = 0;
 		int i=1;
-		for (Integer gene : geneContent){
-			totalFreq += charFreqs[neg(gene)];
-			if (charFreqs[neg(gene)] <= 0)
-				localCharProb[i] = 0.0;
-			else
-				localCharProb[i] = ((double)charFreqs[neg(gene)])/totalFreq;
+		for (Integer gene : geneContent) {
+            if (gene >= 0) {
+                totalFreq += charFrequencies[gene];
+                if (charFrequencies[gene] <= 0)
+                    localCharProb[i] = 0.0;
+                else
+                    localCharProb[i] = ((double)charFrequencies[gene])/totalFreq;
+            }
 			i++;
 		}
-		assert(geneContent.size() + 1 == i);
-		
+
 		return localCharProb;
 	}
 
-	private int neg(int gen){
-		if(gen>0) return gen;
-		else return 0;
-	}
-
 	private boolean noDLocPossible(List<Integer> geneContent, int maxDelta,
-                                   int[] charFreqs) {
+                                   int[] charFrequencies) {
 		int nonAppearingGenes = 0;
 		for (Integer gene : geneContent){
-			if (charFreqs[neg(gene)] == 0)
+            if (gene < 0)
+                nonAppearingGenes++;
+			else if (charFrequencies[gene] == 0)
 				nonAppearingGenes++;
 			if (nonAppearingGenes > maxDelta)
 				return true;

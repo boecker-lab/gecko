@@ -16,6 +16,7 @@ public class ReferenceCluster {
 	private BigDecimal bestCombined_pValue;
 	private BigDecimal bestCombined_pValueCorrected;
 	private List<Integer> geneContent;
+    private boolean containsSingletonGene;
 	private final boolean searchRefInRef;
 
     public ReferenceCluster(Pattern refPattern, List<ListOfDeltaLocations> dLocLists, boolean searchRefInRef, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping){
@@ -210,8 +211,15 @@ public class ReferenceCluster {
 
 	public void setGeneContent(GenomeList genomes) {
 		geneContent = new ArrayList<>(size);
+        containsSingletonGene = false;
 		for (int i=leftBorder; i<=rightBorder && geneContent.size()<size; i++){
-			if (genomes.get(genomeNr).get(chrNr).getPrevOCC(i) < leftBorder){
+            int gene = genomes.get(genomeNr).get(chrNr).getGene(i);
+            if (gene < 0) {
+                containsSingletonGene = true;
+                for (int g=0; g<-gene; g++)
+                    geneContent.add(-1);
+            }
+			else if (genomes.get(genomeNr).get(chrNr).getPrevOCC(i) < leftBorder){
 				geneContent.add(genomes.get(genomeNr).get(chrNr).getGene(i));
 			}
 		}
@@ -220,6 +228,10 @@ public class ReferenceCluster {
 	public List<Integer> getGeneContent(){
 		return geneContent;
 	}
+
+    public boolean isOnlyPossibleReferenceOccurrence(DeltaLocation dLoc) {
+        return dLoc.getDistance() == 0 && dLoc.getGenomeNr() == this.getGenomeNr() && containsSingletonGene;
+    }
 
 	/**
 	 * Converts additional reference hits in the second reference genome into hits in the original reference genome. 
