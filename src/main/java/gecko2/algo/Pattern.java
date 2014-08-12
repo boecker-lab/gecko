@@ -123,9 +123,10 @@ class Pattern {
     
     public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, int character, int pSize, AlgorithmParameters param) {
     	ListOfDeltaLocations newList = new ListOfDeltaLocations();
-    	
+		if (character<0)
+			return newList;
+		
     	for (Chromosome chr : genome){
-    		if (character<0) continue;
     		int[] pos = chr.getPOS(character);
     		if (pos.length == 0)
     			continue;

@@ -379,7 +379,26 @@ public class CogFileReaderTest {
         // Then
         assertArrayEquals(expected, genomes);
     }
+    
+    @Test
+    public void testFileReaderToReducedGenomeGroupIntArrayWithUnHomologous() throws IOException, ParseException{
+        // Given
+        File inputFile = new File(getClass().getResource("/unHomologueGenes.cog").getFile());
+        int[][][] expected = new int[][][] {
+                {{0,-6,2,1,1,3,0}},
+                {{0,-1,2,3,0}}
+        };
 
+        // When
+        CogFileReader reader = new CogFileReader(inputFile);
+        DataSet data = reader.readData();
+
+        int[][][] genomes = data.toReducedIntArray();
+
+        // Then
+        assertArrayEquals(expected, genomes);
+    }
+    
     @Test
     public void testFileReaderToReducedGenomeIntArrayWithUnHomologous() throws IOException, ParseException{
         // Given
