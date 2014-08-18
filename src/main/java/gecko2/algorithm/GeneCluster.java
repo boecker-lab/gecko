@@ -86,6 +86,84 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		this.id = id;
 	}
 	
+	public GeneCluster(int id, ReferenceCluster refCluster, DataSet data, int[][][] redArray, int[][][] intArray){
+		this.id = id;
+		this.match = true;
+		this.bestPValue = refCluster.getBestCombined_pValue();
+		this.bestPValueCorrected = refCluster.getBestCombined_pValueCorrected();
+		this.refSeqIndex = refCluster.getGenomeNr();
+		this.type = Parameter.OperationMode.reference;
+
+		this.size = 0;
+		this.minTotalDist = 0;
+		int[] minDistances = refCluster.getMinimumDistances();
+		for (Integer dist : minDistances){
+			if (dist >= 0){
+				this.size++;
+				this.minTotalDist += dist;
+			}
+		}
+		if (redArray[refCluster.getGenomeNr()][refCluster.getChrNr()].length != 0){
+			int k = 0;
+			int help = 0;
+			int help2 = 0;
+			while (k<redArray[refCluster.getGenomeNr()][refCluster.getChrNr()].length && redArray[refCluster.getGenomeNr()][refCluster.getChrNr()][k]<refCluster.getRightBorder()){
+				if(redArray[refCluster.getGenomeNr()][refCluster.getChrNr()][k]< refCluster.getLeftBorder()){
+					help-=intArray[refCluster.getGenomeNr()][refCluster.getChrNr()][redArray[refCluster.getGenomeNr()][refCluster.getChrNr()][k]]+1;
+					help2 = help;
+				} else if(redArray[refCluster.getGenomeNr()][refCluster.getChrNr()][k]<refCluster.getRightBorder()){
+					help2-=intArray[refCluster.getGenomeNr()][refCluster.getChrNr()][redArray[refCluster.getGenomeNr()][refCluster.getChrNr()][k]]+1;
+				}
+				k++;
+			}
+			refCluster.setLeftBorder(refCluster.getLeftBorder()+help);
+			refCluster.setRightBorder(refCluster.getRightBorder()+help2);
+		}
+        geneFamilies = new HashSet<>();
+        for (int i=refCluster.getLeftBorder()-1; i<refCluster.getRightBorder() && geneFamilies.size()<refCluster.getSize(); i++){
+            geneFamilies.add(data.getGenomes()[refCluster.getGenomeNr()].getChromosomes().get(refCluster.getChrNr()).getGenes().get(i).getGeneFamily());
+        }
+
+
+		Subsequence[][] bestSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
+		Subsequence[][] allSubseqs = new Subsequence[refCluster.getAllDeltaLocations().size()][];
+		for (int i=0; i<refCluster.getAllDeltaLocations().size(); i++){
+			List<Subsequence> allSub = new ArrayList<>(refCluster.getDeltaLocations(i).size());
+			List<Subsequence> bestSub = new ArrayList<>(refCluster.getDeltaLocations(i).size());
+			for (DeltaLocation dLoc : refCluster.getDeltaLocations(i)){
+				if (redArray[dLoc.getGenomeNr()][dLoc.getChrNr()].length != 0){
+					int k = 0;
+					int help = 0;
+					int help2 = 0;
+					while (k<redArray[dLoc.getGenomeNr()][dLoc.getChrNr()].length && redArray[dLoc.getGenomeNr()][dLoc.getChrNr()][k]<dLoc.getR()){
+						if(redArray[dLoc.getGenomeNr()][dLoc.getChrNr()][k]< dLoc.getL()){
+							help-=intArray[dLoc.getGenomeNr()][dLoc.getChrNr()][redArray[dLoc.getGenomeNr()][dLoc.getChrNr()][k]]+1;
+							help2 = help;
+						} else if(redArray[dLoc.getGenomeNr()][dLoc.getChrNr()][k]<dLoc.getR()){
+							help2-=intArray[dLoc.getGenomeNr()][dLoc.getChrNr()][redArray[dLoc.getGenomeNr()][dLoc.getChrNr()][k]]+1;
+						}
+						k++;
+					}
+					dLoc.setL(dLoc.getL()+help);
+					dLoc.setR(dLoc.getR()+help2);
+				}
+					
+				
+				Subsequence subseq = new Subsequence(dLoc.getL(), dLoc.getR(), dLoc.getChrNr(), dLoc.getDistance(), new BigDecimal(dLoc.getpValue()));
+				if (dLoc.getDistance() <= minDistances[i]){
+					bestSub.add(subseq);
+				}
+				allSub.add(subseq);
+			}
+			bestSubseqs[i]=bestSub.toArray(new Subsequence[bestSub.size()]);
+			allSubseqs[i]=allSub.toArray(new Subsequence[allSub.size()]);
+		}
+		this.bestOccurrences = new GeneClusterOccurrence[1];
+		this.bestOccurrences[0] = new GeneClusterOccurrence(0, bestSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
+		this.allOccurrences = new GeneClusterOccurrence[1];
+		this.allOccurrences[0] = new GeneClusterOccurrence(0, allSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
+	}
+	
 	public GeneCluster(int id, ReferenceCluster refCluster, DataSet data){
 		this.id = id;
 		this.match = true;

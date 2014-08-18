@@ -102,9 +102,17 @@ public class ReferenceCluster {
     public int getLeftBorder() {
         return leftBorder;
     }
+    
+    public void setLeftBorder(int x){
+    	this.leftBorder = x;
+    }
 
     public int getRightBorder() {
         return rightBorder;
+    }
+    
+    public void setRightBorder(int x){
+    	this.rightBorder = x;
     }
 
 	public BigDecimal getBestCombined_pValue() {

@@ -121,7 +121,7 @@ class Pattern {
         return true;
     }
     
-    public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, int character, int pSize, AlgorithmParameters param) {
+    public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, int character, int pSize, AlgorithmParameters param, int refMis) {
     	ListOfDeltaLocations newList = new ListOfDeltaLocations();
 		if (character<0)
 			return newList;
@@ -140,8 +140,8 @@ class Pattern {
                     while (dLeft > 1 && chr.getL(charPos, dLeft) == chr.getL(charPos, dLeft - 1))
                         dLeft--;
 
-                    int interveningChars = dLeft - 1;
-
+                    int interveningChars = dLeft - 1 + Math.max(refMis-1, 0);
+                    
                     for (int dRight = 1; dRight <= param.getMaximumDelta() + 1; dRight++) {
                         if (dRight > 1 && chr.getR(charPos, dRight) == chr.getR(charPos, dRight - 1))
                             break;

@@ -47,7 +47,12 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
             if (i<pos.length && dLoc.getR() >= pos[i])
                 dLoc.increaseHitCount();
             else {
-                dLoc.increaseDistance();
+            	int k=c;
+            	do{
+            		dLoc.increaseDistance();
+            		k++;
+            	}while(k<0);
+                //dLoc.increaseDistance();
                 if (!dLoc.isInheritableWithoutC(genomes.get(dLoc.getGenomeNr()).get(dLoc.getChrNr()), delta, c)){
                     dLocIt.remove();
                 }

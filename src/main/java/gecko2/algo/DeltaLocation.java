@@ -7,8 +7,8 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 	
 	private int genomeNr;
 	private final int chrNr;
-	private final int l;
-	private final int r;
+	private int l;
+	private int r;
 	private int distance;
 	private int missingChars;
 	private int additionalChars;
@@ -65,6 +65,14 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
 
 	public int getChrNr() {
 		return chrNr;
+	}
+	
+	public void setL(int x){
+		this.l = x;
+	}
+	
+	public void setR(int x){
+		this.r = x;
 	}
 
 	public int getL() {

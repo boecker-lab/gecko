@@ -10,9 +10,11 @@ import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
 import gecko2.io.ResultWriter;
 import gecko2.io.ResultWriter.ExportType;
+import gecko2.testUtils.MemoryReduction;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
+
 import java.awt.*;
 import java.io.File;
 import java.util.*;
@@ -479,21 +481,47 @@ public class GeckoInstance {
      * @param useMemoryReduction
 	 * @return the gene clusters
 	 */
+    private static int[][][]  lookReduce(int[][][] intArray){
+    	int[][][] help2 = new int[intArray.length][][];
+    	for (int i=0;i<intArray.length;i++){
+    		help2[i] = new int[intArray[i].length][];
+    		for (int j=0;j<intArray[i].length;j++){
+    			List<Integer> help = new ArrayList<>();
+    			for (int m=0;m<intArray[i][j].length;m++){
+    				if(intArray[i][j][m]<-1)
+    					help.add(m);
+    			}
+    			help2[i][j] = new int[help.size()];
+    			for (int m=0;m<help.size();m++){
+    				help2[i][j][m]=help.get(m);
+    			}
+    		}
+    	}
+    	
+    	return help2;
+    }
+    
 	public static GeneCluster[] computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping, boolean useMemoryReduction) {
         int[][][] intArray;
+        int[][][] redArray = null;
         if (!useMemoryReduction) {
             intArray = data.toIntArray();
             params.setAlphabetSize(data.getCompleteAlphabetSize());
         } else {
             intArray = data.toReducedIntArray();
+            redArray = lookReduce(intArray);
             params.setAlphabetSize(data.getReducedAlphabetSize());
         }
-
+        
 		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping);
         GeneCluster[] result = new GeneCluster[refCluster.size()];
-        for (int i=0; i<refCluster.size(); i++)
-            result[i] = new GeneCluster(i, refCluster.get(i), data);
-
+        if(!useMemoryReduction){
+        	for (int i=0; i<refCluster.size(); i++)
+        		result[i] = new GeneCluster(i, refCluster.get(i), data);
+        } else {
+        	for (int i=0;i<refCluster.size();i++)
+        		result[i] = new GeneCluster(i, refCluster.get(i), data, redArray, intArray);
+        }
         return result;
 	}
 	

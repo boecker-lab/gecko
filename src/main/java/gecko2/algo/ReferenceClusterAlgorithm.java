@@ -166,6 +166,7 @@ public class ReferenceClusterAlgorithm {
 		for (int l = 1; l <= referenceChromosome.size(); l++){
 			genomes.updateLeftBorder(l, referenceChromosome, referenceGenomeNr, param);
 			Pattern pattern = new Pattern(genomes.getAlphabetSize(), genomes.size(), param, referenceGenomeNr, referenceChromosome, l);
+			int refMis = 0;
 			
 			// Gene does not occure in any other Genome and does not occure in chr[i,...]
 			if (referenceChromosome.getGene(l) < 0 || (referenceChromosome.getNextOCC(l) > referenceChromosome.size() && genomes.zeroOccs(referenceGenomeNr, referenceChromosome.getNr(), l, param.searchRefInRef())))
@@ -179,7 +180,8 @@ public class ReferenceClusterAlgorithm {
 			
 			while(pattern.updateToNextI_ref(r)) {
 				r = pattern.getRightBorder();
-				
+				if(referenceChromosome.getGene(r)<0)
+					refMis+= -referenceChromosome.getGene(r);
 				for (ListOfDeltaLocations dLocList : oldLists) //möglicher fehler
 					dLocList.removeNonInheritableElements(genomes, pattern.getLastChar(), param.getMaximumDelta());
 				
@@ -204,7 +206,7 @@ public class ReferenceClusterAlgorithm {
 				
 				for (int k=0; k<genomes.size(); k++){
 					if(k != referenceGenomeNr){
-                        ListOfDeltaLocations newList = pattern.computeNewOptimalDeltaLocations(genomes.get(k), pattern.getLastChar(), pattern.getSize(), param);
+                        ListOfDeltaLocations newList = pattern.computeNewOptimalDeltaLocations(genomes.get(k), pattern.getLastChar(), pattern.getSize(), param, refMis);
 						
 						if (param.searchRefInRef() && k == genomes.size()-1){
 							newList.removeRefDLocReferenceHit(pattern, referenceChromosome.getNr());
@@ -255,6 +257,7 @@ public class ReferenceClusterAlgorithm {
 				otherClusterIt.remove();
 			}
 		}
+		
 		refClusterList.add(newCluster);
 		return true;
 	}
