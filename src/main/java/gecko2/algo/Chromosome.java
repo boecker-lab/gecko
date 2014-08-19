@@ -207,7 +207,9 @@ class Chromosome {
     public int getNUM(int l, int r) {
         int numCount = 0;
         for (int i=l; i<=r; i++) {
-            if (prevOcc[i] < l)
+            if (genes[i] < 0)
+                numCount-=genes[i];
+            else if (prevOcc[i] < l)
                 numCount++;
         }
         return numCount;

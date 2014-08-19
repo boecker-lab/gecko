@@ -1,7 +1,5 @@
 package gecko2.testUtils;
 
-import gecko2.algorithm.Parameter;
-
 import java.util.ArrayList;
 import java.util.List;
 

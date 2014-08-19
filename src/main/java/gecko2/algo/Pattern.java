@@ -93,9 +93,12 @@ class Pattern {
     private void addToPattern(int c, int r) {
         this.lastChar = c;
         this.r = r;
-        pSize++;
-        if (c>=0)
+        if (c>=0) {
             occ[c]++;
+            pSize++;
+        }
+        else
+            pSize-=c;
         IntArray.increaseAll(minDist);
         minDist[refGenomeNr]--;
         IntArray.reset(maxRemDist, -1);
@@ -121,7 +124,7 @@ class Pattern {
         return true;
     }
     
-    public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, int character, int pSize, AlgorithmParameters param, int refMis) {
+    public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, int character, int pSize, AlgorithmParameters param) {
     	ListOfDeltaLocations newList = new ListOfDeltaLocations();
 		if (character<0)
 			return newList;
@@ -140,7 +143,7 @@ class Pattern {
                     while (dLeft > 1 && chr.getL(charPos, dLeft) == chr.getL(charPos, dLeft - 1))
                         dLeft--;
 
-                    int interveningChars = dLeft - 1 + Math.max(refMis-1, 0);
+                    int interveningChars = dLeft - 1;
                     
                     for (int dRight = 1; dRight <= param.getMaximumDelta() + 1; dRight++) {
                         if (dRight > 1 && chr.getR(charPos, dRight) == chr.getR(charPos, dRight - 1))

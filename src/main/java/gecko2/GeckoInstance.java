@@ -10,7 +10,6 @@ import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
 import gecko2.io.ResultWriter;
 import gecko2.io.ResultWriter.ExportType;
-import gecko2.testUtils.MemoryReduction;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
