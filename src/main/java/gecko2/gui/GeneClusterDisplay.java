@@ -26,7 +26,6 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     private static final Font boldFont = new JLabel().getFont().deriveFont(Font.BOLD);
 
 	private final JPanel masterPanel;
-	private final JPanel flowPanel;
 	private GeneCluster cluster;
 	private GeneClusterOccurrence gOcc;
 
@@ -52,13 +51,10 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 	private static final String GENES_TITLE = "Genes in this Cluster:";
 	
 	public GeneClusterDisplay() {
-		flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		masterPanel = new JPanel();		
 		masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
 		masterPanel.setBackground(Color.WHITE);
-		flowPanel.setBackground(masterPanel.getBackground());
-		flowPanel.add(masterPanel);
-		this.setViewportView(flowPanel);
+		this.setViewportView(masterPanel);
 
         chromosomeNameTable = new JTable(new ChromosomeNameTableModel());
         chromosomeNameTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
