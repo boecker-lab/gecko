@@ -1,4 +1,4 @@
-package gecko2.gui;
+package gecko2.gui.util;
 
 public class ColorUtils {
 

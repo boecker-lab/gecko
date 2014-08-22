@@ -2,6 +2,7 @@ package gecko2.gui;
 
 import gecko2.GeckoInstance;
 import gecko2.algorithm.DataSet;
+import gecko2.gui.util.ColorUtils;
 import gecko2.io.CogFileReader;
 import gecko2.io.GenomeOccurrence;
 import gecko2.util.SortUtils;
@@ -297,7 +298,7 @@ public class GenomeSelector extends JDialog {
 	}
 	
 	private Color getRandomColor() {
-		return new Color(ColorUtils.HSVtoRGB(rand.nextFloat(),(205+rand.nextInt(50))/255F,(205+rand.nextInt(50))/255F));
+		return new Color(ColorUtils.HSVtoRGB(rand.nextFloat(), (205 + rand.nextInt(50)) / 255F, (205 + rand.nextInt(50)) / 255F));
 	}
 	
 	private void checkAll() {
