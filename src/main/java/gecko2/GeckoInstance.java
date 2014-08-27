@@ -128,7 +128,7 @@ public class GeckoInstance {
 
 	public synchronized StartComputationDialog getStartComputationDialog() {
 		if (scd==null)
-			scd = new StartComputationDialog(data.getGenomes().length);
+			scd = new StartComputationDialog();
 		return scd;
 	}
 	
@@ -252,7 +252,7 @@ public class GeckoInstance {
                 @Override
                 public void run() {
                     if (data.getGenomes() != null)
-                        scd = new StartComputationDialog(data.getGenomes().length);
+                        scd = new StartComputationDialog();
                     else
                         scd = null;
                     gui.updateViewscreen();

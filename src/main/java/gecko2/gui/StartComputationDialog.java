@@ -23,114 +23,74 @@ import java.util.Map;
 
 
 public class StartComputationDialog extends JDialog {
-
 	private static final long serialVersionUID = -5635614016950101153L;
+
+    private static final int COMBO_HEIGHT = 30;
+    private static final int V_GAP = 2;
+
 	private int quorum;
 	private Parameter.OperationMode opMode;
     private Parameter.ReferenceType refType;
 	private final JComboBox<Parameter.ReferenceType> refCombo;
 	private final JCheckBox mergeResults;
-	private final GeckoInstance gecko = GeckoInstance.getInstance();
+    private final JSpinner distanceSpinner;
+    private final JSpinner sizeSpinner;
 
-	public StartComputationDialog(int ngenomes) {
+	public StartComputationDialog() {
+        final GeckoInstance gecko = GeckoInstance.getInstance();
 		this.setModal(true);
 		this.setResizable(false);
 		this.setIconImage(Gui.createImageIcon("images/gecko2_a_small.png").getImage());
 		this.setTitle("Configure computation");
-		
-		JPanel panel = new JPanel(new FlowLayout());
+
+        this.opMode = Parameter.OperationMode.reference;
+        this.refType = Parameter.ReferenceType.allAgainstAll;
+        this.distanceSpinner = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
+        this.sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
+
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		panel.setPreferredSize(new Dimension(430,310));
-		final JPanel gridpanel = new JPanel();
-		gridpanel.setPreferredSize(new Dimension(410,250));
-		gridpanel.setLayout(new GridLayout(7,2));
-		
-		final JSpinner dSpinner = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
-		dSpinner.setPreferredSize(new Dimension(150,30));
-		
-		final JSpinner sSpinner = new JSpinner(new SpinnerNumberModel(7, 0, Integer.MAX_VALUE, 1));
-		sSpinner.setPreferredSize(new Dimension(150,30));
+        panel.add(getDistancePanel());
+
+		final JPanel gridPanel = new JPanel();
+		gridPanel.setPreferredSize(new Dimension(410, 166));
+        GridLayout gridLayout = new GridLayout(5, 2, 1, 1);
+		gridPanel.setLayout(gridLayout);
 
         final JSpinner groupSpinner = new JSpinner(new SpinnerNumberModel(1.1, 0.0, 1.1, 0.1));
-        sSpinner.setPreferredSize(new Dimension(150,30));
+        groupSpinner.setPreferredSize(new Dimension(150, COMBO_HEIGHT));
+
+        final JComboBox<Parameter.OperationMode> modeCombo = new JComboBox<>(Parameter.OperationMode.getSupported());
+        modeCombo.setPreferredSize(new Dimension(190, COMBO_HEIGHT));
+        modeCombo.setSelectedIndex(0);
 		
-		final String[] qValues = new String[ngenomes-1];
+		final String[] qValues = new String[gecko.getGenomes().length-1];
 		qValues[qValues.length-1] = "all";
-		for (int i=2;i<ngenomes;i++)
+		for (int i=2;i<gecko.getGenomes().length;i++)
 			qValues[i-2] = Integer.toString(i);
 		final JComboBox<String> qCombo = new JComboBox<>(qValues);
 		qCombo.setSelectedIndex(qValues.length-1);
-		qCombo.setPreferredSize(new Dimension(190,30));
-		qCombo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (qCombo.getSelectedIndex()==qValues.length-1)
-					quorum = 0;
-				else
-					quorum = qCombo.getSelectedIndex()+2;
-			}
-		});
+		qCombo.setPreferredSize(new Dimension(180, COMBO_HEIGHT));
 
-		final JComboBox<Parameter.OperationMode> modeCombo = new JComboBox<>(Parameter.OperationMode.getSupported());
+        refCombo = new JComboBox<>(Parameter.ReferenceType.getSupported());
+        refCombo.setPreferredSize(new Dimension(190, COMBO_HEIGHT));
 
-		modeCombo.setPreferredSize(new Dimension(190,30));
+        mergeResults = new JCheckBox("Merge Results");
+        mergeResults.setPreferredSize(new Dimension(100, COMBO_HEIGHT));
+        mergeResults.setSelected(false);
+		
+		JLabel minimumNumberOfGenomesLabel = new JLabel("Minimum # of genomes: ", JLabel.LEFT);
+		gridPanel.add(minimumNumberOfGenomesLabel);
+		gridPanel.add(qCombo);
 
-		this.opMode = Parameter.OperationMode.reference;
-		this.refType = Parameter.ReferenceType.allAgainstAll;
-		modeCombo.setSelectedIndex(0);
+		JLabel searchModeLabel = new JLabel("Search mode: ", JLabel.LEFT);
+        gridPanel.add(searchModeLabel);
+		gridPanel.add(modeCombo);
 
-        JLabel refLabel = new JLabel("Reference:");
-		refCombo = new JComboBox<>(Parameter.ReferenceType.getSupported());
-		refCombo.setPreferredSize(new Dimension(190, 30));
-		
-		modeCombo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-                opMode = (Parameter.OperationMode)modeCombo.getSelectedItem();
-			}
-		});
-		
-		mergeResults = new JCheckBox("Merge Results");
-		mergeResults.setSelected(false);
-		
-		JPanel p1a = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		((FlowLayout) p1a.getLayout()).setVgap(12);
-		JLabel l1 = new JLabel("Maximum distance: ");
-		p1a.add(l1);
-		gridpanel.add(p1a);
-		JPanel p1b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		p1b.add(dSpinner);
-		gridpanel.add(p1b);
-		
-		
-		JPanel p2a = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		((FlowLayout) p2a.getLayout()).setVgap(12);
-		p2a.add(new JLabel("Minimum cluster size: "));
-		gridpanel.add(p2a);
-		JPanel p2b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		p2b.add(sSpinner);
-		gridpanel.add(p2b);
-		
-		JPanel p3a = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		((FlowLayout) p3a.getLayout()).setVgap(12);
-		p3a.add(new JLabel("Minimum number of genomes: "));
-		gridpanel.add(p3a);
-		JPanel p3b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		p3b.add(qCombo);
-		gridpanel.add(p3b);
-		
-		JPanel p4a = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		((FlowLayout) p4a.getLayout()).setVgap(12);
-		p4a.add(new JLabel("Search mode: "));
-		gridpanel.add(p4a);
-		JPanel p4b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		p4b.add(modeCombo);
-		gridpanel.add(p4b);
-		
-		JPanel p5a = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		((FlowLayout) p5a.getLayout()).setVgap(12);
-		p5a.add(refLabel);
-		gridpanel.add(p5a);
-		JPanel p5b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		p5b.add(refCombo);
-		gridpanel.add(p5b);
+
+        JLabel refLabel = new JLabel("Reference:", JLabel.LEFT);
+        gridPanel.add(refLabel);
+		gridPanel.add(refCombo);
 		
 		final JTextField refClusterField = new JTextField() {
 			
@@ -155,27 +115,38 @@ public class StartComputationDialog extends JDialog {
 		AutoCompleteSupport.install(refGenomeCombo, genomeEventList);
 		refGenomeCombo.setSelectedIndex(0);
 		
-		
-		refGenomeCombo.setPreferredSize(new Dimension(190, 30));
-		refClusterField.setPreferredSize(new Dimension(190, 30));
-		
-		
-		JPanel p6a = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		((FlowLayout) p6a.getLayout()).setVgap(12);
-		p6a.add(mergeResults);
-		gridpanel.add(p6a);
-		final JPanel p6b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		gridpanel.add(p6b);
+		refGenomeCombo.setPreferredSize(new Dimension(190, COMBO_HEIGHT));
+		refClusterField.setPreferredSize(new Dimension(190, COMBO_HEIGHT));
 
-        final JPanel p7a = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        ((FlowLayout) p6a.getLayout()).setVgap(12);
-        p7a.add(new JLabel("Genome Grouping Factor: "));
-        gridpanel.add(p7a);
-        final JPanel p7b = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        p7b.add(groupSpinner);
-        gridpanel.add(p7b);
+		gridPanel.add(mergeResults);
+		final JPanel additionalRefClusterSettings = new JPanel(new CardLayout());
+        JPanel emptyCard = new JPanel();
+        additionalRefClusterSettings.add(emptyCard, Parameter.ReferenceType.allAgainstAll.toString());
+        additionalRefClusterSettings.add(refGenomeCombo, Parameter.ReferenceType.genome.toString());
+        additionalRefClusterSettings.add(refClusterField, Parameter.ReferenceType.cluster.toString());
+		gridPanel.add(additionalRefClusterSettings);
+
+        JLabel genomeGroupingLable = new JLabel("Genome Grouping Factor: ", JLabel.LEFT);
+        gridPanel.add(genomeGroupingLable);
+        gridPanel.add(groupSpinner);
 		
-		panel.add(gridpanel);
+		panel.add(gridPanel);
+
+        // Actions
+        qCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (qCombo.getSelectedIndex()==qValues.length-1)
+                    quorum = 0;
+                else
+                    quorum = qCombo.getSelectedIndex()+2;
+            }
+        });
+
+        modeCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                opMode = (Parameter.OperationMode)modeCombo.getSelectedItem();
+            }
+        });
 		
 		refCombo.setEnabled(true);
 		mergeResults.setEnabled(true);
@@ -217,38 +188,22 @@ public class StartComputationDialog extends JDialog {
 		};
 		
 		refClusterField.setDocument(refClusterFieldDocument);
-	
-		
-		ActionListener refGenomeComboListener = new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
+
+		refCombo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 refType = (Parameter.ReferenceType) refCombo.getSelectedItem();
-                switch (refType) {
-                    case genome:
-                        p6b.remove(refClusterField);
-					    p6b.add(refGenomeCombo);
-                        break;
-                    case cluster:
-                        p6b.remove(refGenomeCombo);
-                        p6b.add(refClusterField);
-					    ToolTipManager.sharedInstance().mouseMoved(
-					        new MouseEvent(refClusterField, 0, 0, 0,
-					                (int) refClusterField.getLocation().getX(), // X-Y of the mouse for the tool tip
-					                (int) refClusterField.getLocation().getY(),
-					                0, false));
-                        break;
-                    default:
-                        p6b.remove(refClusterField);
-					    p6b.remove(refGenomeCombo);
+                CardLayout layout = (CardLayout)(additionalRefClusterSettings.getLayout());
+                layout.show(additionalRefClusterSettings, refType.toString());
+                if (refType.equals(Parameter.ReferenceType.cluster)){
+                    ToolTipManager.sharedInstance().mouseMoved(
+                            new MouseEvent(refClusterField, 0, 0, 0,
+                                    (int) refClusterField.getLocation().getX(), // X-Y of the mouse for the tool tip
+                                    (int) refClusterField.getLocation().getY(),
+                                    0, false));
                 }
-				p6b.validate();
-				gridpanel.validate();
-				
-				StartComputationDialog.this.repaint();
-			}
-		};
-		refCombo.addActionListener(refGenomeComboListener);
+            }
+        });
 		
 		JPanel lowerpanel = new JPanel();
 		lowerpanel.setLayout(new BoxLayout(lowerpanel,BoxLayout.X_AXIS));
@@ -262,14 +217,13 @@ public class StartComputationDialog extends JDialog {
 				if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.genome && refGenomeCombo.getSelectedIndex()!=0) {
 					PrintUtils.printDebug("swapping genomes");
                     gecko.reorderGenomes(refGenomeCombo.getSelectedIndex());
-					//TODO improve
 				} else if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.cluster) {
 					Genome cluster = new Genome();
 					ArrayList<Gene> genes = new ArrayList<>();
 					Map<String, GeneFamily> revIDMap = gecko.getGeneLabelMap();
 					for (String id : refClusterField.getText().split(" "))
 						if (id!=null && (!(id.equals("")))) {
-							GeneFamily geneFamily = revIDMap.get(id); //TODO contains strings, should not work!
+							GeneFamily geneFamily = revIDMap.get(id);
 							if (geneFamily!=null)
 								genes.add(new Gene(geneFamily));
 						}
@@ -279,14 +233,14 @@ public class StartComputationDialog extends JDialog {
 				boolean mergeResultsEnabled = false;
 				if (opMode==Parameter.OperationMode.reference && mergeResults.isSelected())
 					mergeResultsEnabled = true;
-				GeckoInstance.getInstance().performClusterDetection(new Parameter((Integer) dSpinner.getValue(), 
-						(Integer) sSpinner.getValue(),
-						quorum,
-						Parameter.QUORUM_NO_COST, 
-						opMode,
-						refType),
-						mergeResultsEnabled,
-                        (Double)groupSpinner.getValue());
+				gecko.performClusterDetection(new Parameter((Integer) distanceSpinner.getValue(),
+                                (Integer) sizeSpinner.getValue(),
+                                quorum,
+                                Parameter.QUORUM_NO_COST,
+                                opMode,
+                                refType),
+                        mergeResultsEnabled,
+                        (Double) groupSpinner.getValue());
 			}
 			
 		};
@@ -316,5 +270,23 @@ public class StartComputationDialog extends JDialog {
 	
 		this.pack();
 	}
+
+    private JPanel getDistancePanel() {
+        JPanel distancePanel = new JPanel(new GridLayout(2, 2, 1, 1));
+        distancePanel.setPreferredSize(new Dimension(410,2*COMBO_HEIGHT));
+        distanceSpinner.setPreferredSize(new Dimension(150, COMBO_HEIGHT));
+
+        sizeSpinner.setPreferredSize(new Dimension(150, COMBO_HEIGHT));
+
+        JLabel distanceLabel = new JLabel("Maximum distance: ", JLabel.LEFT);
+        distancePanel.add(distanceLabel);
+        distancePanel.add(distanceSpinner);
+
+        JLabel sizeLabel = new JLabel("Minimum cluster size: ", JLabel.LEFT);
+        distancePanel.add(sizeLabel);
+        distancePanel.add(sizeSpinner);
+
+        return distancePanel;
+    }
 
 }
