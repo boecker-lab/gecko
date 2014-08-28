@@ -26,7 +26,9 @@ public class StartComputationDialog extends JDialog {
 	private static final long serialVersionUID = -5635614016950101153L;
 
     private static final int COMBO_HEIGHT = 30;
-    private static final int V_GAP = 2;
+    private static final int COMBO_WIDTH = 180;
+    private static final int V_GAP = 1;
+    private static final int H_GAP = 1;
 
 	private int quorum;
 	private Parameter.OperationMode opMode;
@@ -49,19 +51,26 @@ public class StartComputationDialog extends JDialog {
         this.sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
 
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-		panel.setPreferredSize(new Dimension(430,310));
-        panel.add(getDistancePanel());
+		panel.setPreferredSize(new Dimension(430,360));
+
+        final JTabbedPane tabbedDistancePane = new JTabbedPane();
+        tabbedDistancePane.addTab("SingleDistance", getDistancePanel(new Dimension(410, 60)));
+        for (Parameter.DeltaTable table : Parameter.DeltaTable.getSupported())
+            tabbedDistancePane.addTab(table.toString(), new DeltaTable(new Dimension(410, 60), table.getDeltaTable()));
+        panel.add(tabbedDistancePane);
 
 		final JPanel gridPanel = new JPanel();
-		gridPanel.setPreferredSize(new Dimension(410, 166));
-        GridLayout gridLayout = new GridLayout(5, 2, 1, 1);
+		gridPanel.setPreferredSize(new Dimension(410, 6*(COMBO_HEIGHT+V_GAP)));
+        GridLayout gridLayout = new GridLayout(6, 2, H_GAP, V_GAP);
 		gridPanel.setLayout(gridLayout);
 
+        sizeSpinner.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
+
         final JSpinner groupSpinner = new JSpinner(new SpinnerNumberModel(1.1, 0.0, 1.1, 0.1));
-        groupSpinner.setPreferredSize(new Dimension(150, COMBO_HEIGHT));
+        groupSpinner.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
 
         final JComboBox<Parameter.OperationMode> modeCombo = new JComboBox<>(Parameter.OperationMode.getSupported());
-        modeCombo.setPreferredSize(new Dimension(190, COMBO_HEIGHT));
+        modeCombo.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
         modeCombo.setSelectedIndex(0);
 		
 		final String[] qValues = new String[gecko.getGenomes().length-1];
@@ -70,14 +79,18 @@ public class StartComputationDialog extends JDialog {
 			qValues[i-2] = Integer.toString(i);
 		final JComboBox<String> qCombo = new JComboBox<>(qValues);
 		qCombo.setSelectedIndex(qValues.length-1);
-		qCombo.setPreferredSize(new Dimension(180, COMBO_HEIGHT));
+		qCombo.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
 
         refCombo = new JComboBox<>(Parameter.ReferenceType.getSupported());
-        refCombo.setPreferredSize(new Dimension(190, COMBO_HEIGHT));
+        refCombo.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
 
         mergeResults = new JCheckBox("Merge Results");
         mergeResults.setPreferredSize(new Dimension(100, COMBO_HEIGHT));
         mergeResults.setSelected(false);
+
+        JLabel sizeLabel = new JLabel("Minimum cluster size: ", JLabel.LEFT);
+        gridPanel.add(sizeLabel);
+        gridPanel.add(sizeSpinner);
 		
 		JLabel minimumNumberOfGenomesLabel = new JLabel("Minimum # of genomes: ", JLabel.LEFT);
 		gridPanel.add(minimumNumberOfGenomesLabel);
@@ -115,8 +128,8 @@ public class StartComputationDialog extends JDialog {
 		AutoCompleteSupport.install(refGenomeCombo, genomeEventList);
 		refGenomeCombo.setSelectedIndex(0);
 		
-		refGenomeCombo.setPreferredSize(new Dimension(190, COMBO_HEIGHT));
-		refClusterField.setPreferredSize(new Dimension(190, COMBO_HEIGHT));
+		refGenomeCombo.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
+		refClusterField.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
 
 		gridPanel.add(mergeResults);
 		final JPanel additionalRefClusterSettings = new JPanel(new CardLayout());
@@ -126,8 +139,8 @@ public class StartComputationDialog extends JDialog {
         additionalRefClusterSettings.add(refClusterField, Parameter.ReferenceType.cluster.toString());
 		gridPanel.add(additionalRefClusterSettings);
 
-        JLabel genomeGroupingLable = new JLabel("Genome Grouping Factor: ", JLabel.LEFT);
-        gridPanel.add(genomeGroupingLable);
+        JLabel genomeGroupingLabel = new JLabel("Genome Grouping Factor: ", JLabel.LEFT);
+        gridPanel.add(genomeGroupingLabel);
         gridPanel.add(groupSpinner);
 		
 		panel.add(gridPanel);
@@ -212,6 +225,29 @@ public class StartComputationDialog extends JDialog {
 		
 			private static final long serialVersionUID = 6197096728152587585L;
 			public void actionPerformed(ActionEvent e) {
+                Parameter parameter;
+                if (tabbedDistancePane.getSelectedIndex() == 0) {
+                    parameter = new Parameter(
+                            (Integer) distanceSpinner.getValue(),
+                            (Integer) sizeSpinner.getValue(),
+                            quorum,
+                            opMode,
+                            refType);
+                } else {
+                    DeltaTable deltaTable = (gecko2.gui.DeltaTable)tabbedDistancePane.getSelectedComponent();
+                    if (!deltaTable.isValidDeltaTable()) {
+                        JOptionPane.showMessageDialog(StartComputationDialog.this, "Invalid Distance Table!", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    } else {
+                        parameter = new Parameter(
+                                deltaTable.getDeltaTable(),
+                                (Integer) sizeSpinner.getValue(),
+                                quorum,
+                                opMode,
+                                refType);
+                    }
+                }
+
 				StartComputationDialog.this.setVisible(false);
 				// Reorder the genomes if necessary
 				if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.genome && refGenomeCombo.getSelectedIndex()!=0) {
@@ -233,12 +269,9 @@ public class StartComputationDialog extends JDialog {
 				boolean mergeResultsEnabled = false;
 				if (opMode==Parameter.OperationMode.reference && mergeResults.isSelected())
 					mergeResultsEnabled = true;
-				gecko.performClusterDetection(new Parameter((Integer) distanceSpinner.getValue(),
-                                (Integer) sizeSpinner.getValue(),
-                                quorum,
-                                Parameter.QUORUM_NO_COST,
-                                opMode,
-                                refType),
+
+				gecko.performClusterDetection(
+                        parameter,
                         mergeResultsEnabled,
                         (Double) groupSpinner.getValue());
 			}
@@ -271,22 +304,23 @@ public class StartComputationDialog extends JDialog {
 		this.pack();
 	}
 
-    private JPanel getDistancePanel() {
-        JPanel distancePanel = new JPanel(new GridLayout(2, 2, 1, 1));
-        distancePanel.setPreferredSize(new Dimension(410,2*COMBO_HEIGHT));
-        distanceSpinner.setPreferredSize(new Dimension(150, COMBO_HEIGHT));
-
-        sizeSpinner.setPreferredSize(new Dimension(150, COMBO_HEIGHT));
-
+    private JPanel getDistancePanel(Dimension dimension) {
+        JPanel distancePanel = new JPanel(new GridLayout(1, 2, H_GAP, V_GAP));
+        distancePanel.setPreferredSize(new Dimension((int)dimension.getWidth(), COMBO_HEIGHT));
+        distanceSpinner.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
         JLabel distanceLabel = new JLabel("Maximum distance: ", JLabel.LEFT);
         distancePanel.add(distanceLabel);
         distancePanel.add(distanceSpinner);
 
-        JLabel sizeLabel = new JLabel("Minimum cluster size: ", JLabel.LEFT);
-        distancePanel.add(sizeLabel);
-        distancePanel.add(sizeSpinner);
+        JPanel panel = new JPanel();
+        GridBagLayout layout = new GridBagLayout();
+        panel.setLayout(layout);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        layout.setConstraints(distancePanel, constraints);
+        panel.add(distancePanel);
 
-        return distancePanel;
+        return panel;
     }
 
 }

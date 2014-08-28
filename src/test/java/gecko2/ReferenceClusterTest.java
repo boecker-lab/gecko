@@ -69,7 +69,7 @@ public class ReferenceClusterTest
 			
 		// def parameters
 			
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -117,7 +117,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 6, 5, 4, 0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -181,7 +181,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}, {{0, 1, 2, 5, 4, 0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -242,7 +242,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 4, 0}}, {{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -290,7 +290,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 4, 0}}, {{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -338,7 +338,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 8, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 7, 5, 4, 0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -417,7 +417,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 8, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 5, 4, 0}, {0,11, 10, 7, 2, 1, 5, 0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -482,7 +482,7 @@ public class ReferenceClusterTest
 		// def array for computationsub2, sub4
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 10, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 8, 5, 4, 0}, {0, 7, 11, 11, 2, 1, 12, 5, 0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -580,7 +580,7 @@ public class ReferenceClusterTest
 		// def array for computationsub2, sub4
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11, 6, 7, 0}}};
 
-		Parameter p = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(0, 3, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -630,7 +630,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
-		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(1, 3, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -695,7 +695,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -760,7 +760,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -808,7 +808,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 7, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11,0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -855,7 +855,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 7, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11,0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -919,7 +919,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 0}}, {{0, 1, 2, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(1, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(1, 2, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -967,7 +967,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 3, 0}}, {{0, 1, 2, 0}}, {{0, 2, 3, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(1, 3, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -1030,7 +1030,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 1, 2, 0}}, {{0, 3, 4, 5, 4, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(0, 2, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
+		Parameter p = new Parameter(0, 2, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -1078,7 +1078,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 3, 2, 5, 1, 2, 0}}, {{0, 3, 4, 5, 4, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(1, 3, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
+		Parameter p = new Parameter(1, 3, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -1119,18 +1119,18 @@ public class ReferenceClusterTest
 	}
 
 	@Test
-	public void testQuorumParamterJava()
+	public void testQuorumParameterJava()
 	{
 		// def array for computationsub2, sub4
 		int genomes[][][] = {{{0, 1, 2, 3, 0}}, {{0, 1, 2, 3, 0}}, {{0, 1, 3, 0}}};
 
 		// def parameters
-		Parameter maxQuorumParamters = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter maxQuorumParameters = new Parameter(0, 3, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
 		// result of computation
-		List<ReferenceCluster> maxQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, maxQuorumParamters);
+		List<ReferenceCluster> maxQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, maxQuorumParameters);
 
-		Parameter noQuorumParameters = new Parameter(0, 3, 0, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter noQuorumParameters = new Parameter(0, 3, 0, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
 		// result of computation
 		List<ReferenceCluster> noQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, noQuorumParameters);
@@ -1169,7 +1169,7 @@ public class ReferenceClusterTest
 		genomeGroups.add(set2);
 
 		// def parameters
-		Parameter p = new Parameter(0, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(0, 2, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);

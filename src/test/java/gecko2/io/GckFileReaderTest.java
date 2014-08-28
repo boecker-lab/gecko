@@ -49,7 +49,7 @@ public class GckFileReaderTest {
     public void readFileSmallClusters()  throws IOException, ParseException{
         File cogFile = new File(getClass().getResource("/smallReaderTest.cog").getFile());
         File gckFile = new File(getClass().getResource("/smallReaderTestClusters.gck").getFile());
-        Parameter p = new Parameter(1, 4, 4, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        Parameter p = new Parameter(1, 4, 4, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
         testReadingClusters(cogFile, gckFile, p);
     }
 
@@ -57,7 +57,7 @@ public class GckFileReaderTest {
     public void readFileWithUnknownGeneInClusters()  throws IOException, ParseException{
         File cogFile = new File(getClass().getResource("/gckReaderTestUnknownGeneInCluster.cog").getFile());
         File gckFile = new File(getClass().getResource("/gckReaderTestUnknownGeneInCluster.gck").getFile());
-        Parameter p = new Parameter(1, 4, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        Parameter p = new Parameter(1, 4, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
         testReadingClusters(cogFile, gckFile, p);
     }
 
@@ -66,7 +66,7 @@ public class GckFileReaderTest {
         File cogFile = new File(getClass().getResource("/statistics.cog").getFile());
         File gckFile = new File(getClass().getResource("/statisticsClusters.gck").getFile());
 
-        Parameter p = new Parameter(3, 7, 10, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+        Parameter p = new Parameter(3, 7, 10, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
         testReadingClusters(cogFile, gckFile, p);
     }
 
@@ -75,7 +75,7 @@ public class GckFileReaderTest {
         File cogFile = new File(getClass().getResource("/stringDBPartial.cog").getFile());
         File gckFile = new File(getClass().getResource("/stringDBPartialClusters.gck").getFile());
 
-        Parameter p = new Parameter(3, 7, 10, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+        Parameter p = new Parameter(3, 7, 10, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
         testReadingClusters(cogFile, gckFile, p);
     }
 

@@ -9,6 +9,7 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.zip.DataFormatException;
 
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)
@@ -16,16 +17,20 @@ import java.util.Arrays;
 public class DeltaTable extends JPanel{
     DeltaTableTableModel model;
 
-    public DeltaTable() {
+    public DeltaTable(Dimension dimension) {
+        this(dimension, null);
+    }
+
+    public DeltaTable(Dimension dimension, int[][] deltas) {
         super(new GridLayout(1,0));
         JTable deltaTable = new JTableSelectAll();
         deltaTable.setBackground(Color.WHITE);
-        model = new DeltaTableTableModel();
+        model = new DeltaTableTableModel(deltas);
         deltaTable.setModel(model);
         deltaTable.setRowSelectionAllowed(false);
         deltaTable.setCellSelectionEnabled(true);
         deltaTable.setDefaultRenderer(Integer.class, new DeltaTableCellRenderer());
-        deltaTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
+        deltaTable.setPreferredScrollableViewportSize(dimension);
         deltaTable.setFillsViewportHeight(true);
 
         JScrollPane scrollPane = new JScrollPane(deltaTable);
@@ -45,10 +50,6 @@ public class DeltaTable extends JPanel{
 
         private final String[] columnNames = {"D_LOSS", "D_ADD", "D_SUM", "Size"};
         private java.util.List<int[]> deltaValues;
-
-        public DeltaTableTableModel() {
-            this(null);
-        }
 
         public DeltaTableTableModel(int[][] values) {
             setDeltaTable(values);
@@ -76,8 +77,6 @@ public class DeltaTable extends JPanel{
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            if (columnIndex == COL_SIZE)
-                return isLastRow(rowIndex) ? "-" : rowIndex;
             return deltaValues.get(rowIndex)[columnIndex];
         }
 
@@ -96,10 +95,7 @@ public class DeltaTable extends JPanel{
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            if (col == COL_SIZE)
-                return false;
-            else
-                return true;
+            return true;
         }
 
         public boolean isValidRow(int row) {
@@ -111,10 +107,15 @@ public class DeltaTable extends JPanel{
         }
 
         public boolean isValidCell(int row, int column) {
-            if (column == COL_SIZE)
-                return true;
             if (deltaValues.get(row)[column] < 0)
                 return false;
+
+            if (column == COL_SIZE)
+                if (row > 0)
+                    return deltaValues.get(row-1)[column] < deltaValues.get(row)[column];
+                else
+                    return true;
+
             boolean valid = true;
             if (row >= 1) {
                 valid &= deltaValues.get(row-1)[column] <= deltaValues.get(row)[column];
@@ -122,7 +123,7 @@ public class DeltaTable extends JPanel{
             if (column == COL_D_SUM) {
                 valid &= deltaValues.get(row)[column] >= deltaValues.get(row)[COL_D_ADD];
                 valid &= deltaValues.get(row)[column] >= deltaValues.get(row)[COL_D_LOSS];
-            } else {
+            } else if (column == COL_D_LOSS || column == COL_D_ADD){
                 valid &= deltaValues.get(row)[column] <= deltaValues.get(row)[COL_D_SUM];
             }
             return valid;
@@ -148,22 +149,29 @@ public class DeltaTable extends JPanel{
         public void setDeltaTable(int[][] deltaTable) {
             this.deltaValues = new ArrayList<>(deltaTable!=null ? deltaTable.length+1 : 1);
             if (deltaTable!= null){
-                for (int[] deltas : deltaTable) {
-                    if (deltas.length != 3)
+                for (int i=0; i<deltaTable.length; i++) {
+                    if (deltaTable[i].length != 3)
                         throw new IllegalArgumentException("Invalid array, needs to contain exactly 3 elements!");
-                    deltaValues.add(Arrays.copyOf(deltas, deltas.length));
+                    if (isZeroRow(deltaTable[i]))
+                        continue;
+                    int[] newValues = Arrays.copyOf(deltaTable[i], deltaTable[i].length+1);
+                    newValues[COL_SIZE] = i;
+                    deltaValues.add(newValues);
                 }
             }
             if (deltaTable==null || deltaTable.length==0 || isValidRow(deltaValues.size()-1))
                 addEmptyDeltaValues();
         }
 
-        private void addEmptyDeltaValues() {
-            deltaValues.add(new int[]{-1, -1, -1});
+        boolean isZeroRow(int[] values) {
+            for (int i=0; i<values.length; i++)
+                if (values[i] != 0)
+                    return false;
+            return true;
         }
 
-        private boolean isLastRow(int row) {
-            return row == deltaValues.size()-1;
+        private void addEmptyDeltaValues() {
+            deltaValues.add(new int[]{-1, -1, -1, (deltaValues.isEmpty()) ? 0 : deltaValues.get(deltaValues.size()-1)[COL_SIZE]+1 });
         }
     }
 
@@ -208,7 +216,7 @@ public class DeltaTable extends JPanel{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create and set up the content pane.
-        DeltaTable deltaTable1 = new DeltaTable();
+        DeltaTable deltaTable1 = new DeltaTable(new Dimension(500, 70));
         frame.setContentPane(deltaTable1);
 
         //Display the window.

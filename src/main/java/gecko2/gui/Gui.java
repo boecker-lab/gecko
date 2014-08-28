@@ -425,16 +425,16 @@ public class Gui {
 	/*
 	 * The following section contains the actions that the user can trigger
 	 */
-	
+
 	private final Action stopComputationAction = new AbstractAction() {
 
 		private static final long serialVersionUID = -6567239762573695048L;
 
 		public void actionPerformed(ActionEvent e) {
-			gecko.getLastParameter().setRun(false);
-		}	
+			gecko.stopComputation();
+		}
 	};
-	
+
 	private final Action importGenomesAction = new AbstractAction() {
 		private static final long serialVersionUID = -7418023194238092616L;
 		

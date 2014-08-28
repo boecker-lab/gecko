@@ -21,10 +21,9 @@ public class ReferenceClusterTestSettings {
     public static ReferenceClusterTestSettings fiveProteobacterDeltaTable() {
         ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
         settings.p = new Parameter(
-                new int[][]{{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}},
+                Parameter.DeltaTable.test_five_proteobacter.getDeltaTable(),
                 4,
                 4,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.allAgainstAll
         );
@@ -45,7 +44,6 @@ public class ReferenceClusterTestSettings {
                 3,
                 6,
                 4,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.allAgainstAll
         );
@@ -66,7 +64,6 @@ public class ReferenceClusterTestSettings {
                 3,
                 6,
                 2,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.allAgainstAll
         );
@@ -98,7 +95,6 @@ public class ReferenceClusterTestSettings {
                 5,
                 8,
                 10,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.genome
         );

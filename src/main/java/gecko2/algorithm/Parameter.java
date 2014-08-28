@@ -1,5 +1,7 @@
 package gecko2.algorithm;
 
+import gecko2.gui.DeltaTable;
+
 public class Parameter {
 
     public enum OperationMode {
@@ -87,39 +89,58 @@ public class Parameter {
             //return new ReferenceType[]{ReferenceType.allAgainstAll, ReferenceType.genome};
         }
     }
+
+    public enum DeltaTable {
+        highly_conserved, low_conserved, lichtheimia, lichtheimia_inner, statistic_paper, test_five_proteobacter;
+
+        public int[][] getDeltaTable() {
+            switch (this) {
+                case highly_conserved:
+                    return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {2, 1, 2}, {3, 2, 3}, {4, 2, 4}, {5, 3, 5}, {6, 3, 6}};
+                case low_conserved:
+                    return new int[][]{{0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {2, 1, 2}, {3, 2, 3}, {3, 3, 3}, {4, 3, 4}, {5, 3, 5}, {6, 4, 6}};
+                case lichtheimia:
+                    return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
+                case lichtheimia_inner:
+                    return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}};
+                case statistic_paper:
+                    return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {5, 5, 5}};
+                case test_five_proteobacter:
+                    return new int[][]{{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}};
+
+            }
+            throw new RuntimeException("Should not happen!");
+        }
+
+        /**
+         * Wrapper method for values() that only returns the currently supported subset of values
+         * @return the supported subset of values
+         */
+        public static DeltaTable[] getSupported() {
+            // Support all values
+            //return values();
+
+            // Support only a subset of values
+            return new DeltaTable[]{highly_conserved, low_conserved};
+        }
+    }
 	
-    private final static int DELTA_TABLE_SIZE = 3;
-	
+    public final static int DELTA_TABLE_SIZE = 3;
+
 	private int delta;
 	private int[][] deltaTable;
 	private int minClusterSize;
 	private int alphabetSize;
 	private int q;
-	private short qtype;
 	private ReferenceType refType;
 	private OperationMode operationMode;
 	private boolean searchRefInRef;
 	
-	// used to interrupt the c function when requested by the user.
-	private volatile boolean run = true;
-	
-	public static final short QUORUM_NO_COST = 1;
-	public static final short QUORUM_DELTA_OVER_NGENOMES = 2;
-	public static final short QUORUM_MEDIAN_SIZE = 3;
-	
-	public void setRun(boolean run) {
-		this.run = run;
+	public Parameter(int delta, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType) {
+		this(delta, minClusterSize, q, operationMode, refType, false);
 	}
 	
-	public boolean isRun() {
-		return run;
-	}	
-	
-	public Parameter(int delta, int minClusterSize, int q, short qtype, OperationMode operationMode, ReferenceType refType) {
-		this(delta, minClusterSize, q, qtype, operationMode, refType, false);
-	}
-	
-	public Parameter(int delta, int minClusterSize, int q, short qtype, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
+	public Parameter(int delta, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
 		if (searchRefInRef && operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Searching the reference occurrence in the reference genome is only compatible with reference mode!");
 		
@@ -127,18 +148,17 @@ public class Parameter {
 		this.deltaTable = null;
 		this.minClusterSize = minClusterSize;
 		this.q = q;
-		this.qtype = qtype;
 		this.operationMode = operationMode;
 		this.refType = refType;
 		this.alphabetSize = -1;
 		this.searchRefInRef = searchRefInRef;
 	}
 	
-	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, OperationMode operationMode, ReferenceType refType) {
-		this(deltaTable, minClusterSize, q, qtype, operationMode, refType, false);
+	public Parameter(int[][] deltaTable, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType) {
+		this(deltaTable, minClusterSize, q, operationMode, refType, false);
 	}
 	
-	public Parameter(int[][] deltaTable, int minClusterSize, int q, short qtype, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
+	public Parameter(int[][] deltaTable, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
 		if (operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Delta table is only compatible with reference mode!");
 		
@@ -152,7 +172,6 @@ public class Parameter {
         }
 		this.minClusterSize = minClusterSize;
 		this.q = q;
-		this.qtype = qtype;
 		this.operationMode = operationMode;
 		this.refType = refType;
 		this.alphabetSize = -1;
@@ -213,14 +232,6 @@ public class Parameter {
 
 	public void setQ(int q) {
 		this.q = q;
-	}
-
-	public short getQtype() {
-		return qtype;
-	}
-
-	public void setQtype(short qtype) {
-		this.qtype = qtype;
 	}
 	
 	public boolean searchRefInRef() {

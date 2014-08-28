@@ -29,7 +29,7 @@ public class ReferenceClusterDistanceMatrixTest {
 			
 		// def parameters
 		int[][] distanceMatrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
-		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -81,7 +81,7 @@ public class ReferenceClusterDistanceMatrixTest {
 		int[] geneLabelMap = {1, 2, 3, 4, 5, 6, 7, 8};
 		
 		int[][] distanceMatrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {2, 2, 2}};
-		Parameter p = new Parameter(distanceMatrix, 4, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+		Parameter p = new Parameter(distanceMatrix, 4, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 		p.setAlphabetSize(geneLabelMap.length);
 
         // Test the java implementation
@@ -133,7 +133,7 @@ public class ReferenceClusterDistanceMatrixTest {
 			
 		// def parameters
 		int[][] distanceMatrix = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {3, 3, 3}};
-		Parameter p = new Parameter(distanceMatrix, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+		Parameter p = new Parameter(distanceMatrix, 2, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -184,7 +184,7 @@ public class ReferenceClusterDistanceMatrixTest {
 			
 		// def parameters
 		int[][] distanceMatrix = {{1, 0, 1}, {1, 0, 1}, {1, 0, 1}, {1, 0, 1}};
-		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -219,7 +219,7 @@ public class ReferenceClusterDistanceMatrixTest {
 			
 		// def parameters
 		int[][] distanceMatrix = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 1, 1}};
-		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -254,7 +254,7 @@ public class ReferenceClusterDistanceMatrixTest {
 			
 		// def parameters
 		int[][] distanceMatrix = {{1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}};
-		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+		Parameter p = new Parameter(distanceMatrix, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 
         // Test the java implementation
         List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
@@ -297,10 +297,10 @@ public class ReferenceClusterDistanceMatrixTest {
 				{{0, 7, 6, 5, 4, 10, 1, 0}}};
 		
 		// def parameters
-		Parameter p = new Parameter(5, 8, genomes.length-1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+		Parameter p = new Parameter(5, 8, genomes.length-1, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 		
 		int[][] deltaTable = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {5, 5, 5}};
-		Parameter p_deltaTable = new Parameter(deltaTable, 4, genomes.length-1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+		Parameter p_deltaTable = new Parameter(deltaTable, 4, genomes.length-1, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 			
 		// Test the java implementation
 		List<ReferenceCluster> deltaTableRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p_deltaTable);

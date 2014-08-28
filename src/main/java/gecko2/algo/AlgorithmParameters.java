@@ -18,16 +18,6 @@ public class AlgorithmParameters{
     private final boolean singleReference;
     private final boolean refInRef;
     
-    private final static int DELTA_TABLE_SIZE = 3;
-    
-    private final static int[][] HIGHLY_CONSERVED_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {2, 1, 2}, {3, 2, 3}, {4, 2, 4}, {5, 3, 5}, {6, 3, 6}};
-    private final static int[][] LOW_CONSERVED_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {2, 1, 2}, {3, 2, 3}, {3, 3, 3}, {4, 3, 4}, {5, 3, 5}, {6, 4, 6}};
-    private final static int[][] LICHTHEIMIA_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
-    private final static int[][] LICHTHEIMIA_INNER_GENOME_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}};
-    private final static int[][] STATISTIC_PAPER_DELTA_TABLE = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {5, 5, 5}};
-
-    private final static int[][] TEST__FIVE_PROTEOBACTER_DELTA_TABLE = new int[][]{{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}};
-    
 	public AlgorithmParameters(int delta, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference) {
 		this(delta, minClusterSize, q, nrOfGenomes, alphabetSize, singleReference, false);
 	}
@@ -50,42 +40,6 @@ public class AlgorithmParameters{
 			throw new IllegalArgumentException("Parameters not compatible to Java mode.");
 	}
 	
-	public static AlgorithmParameters getHighlyConservedParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, HIGHLY_CONSERVED_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != Parameter.ReferenceType.allAgainstAll), p.searchRefInRef());
-	}
-	
-	public static AlgorithmParameters getHighlyConservedParameters(int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
-		return new AlgorithmParameters(-1, HIGHLY_CONSERVED_DELTA_TABLE, 3, q, nrOfGenomes, alphabetSize, singleReference, refInRef);
-	}
-	
-	public static AlgorithmParameters getLowConservedParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, LOW_CONSERVED_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != Parameter.ReferenceType.allAgainstAll), p.searchRefInRef());
-	}
-	
-	public static AlgorithmParameters getLowConservedParameters(int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
-		return new AlgorithmParameters(-1, LOW_CONSERVED_DELTA_TABLE, 3, q, nrOfGenomes, alphabetSize, singleReference, refInRef);
-	}
-	
-	public static AlgorithmParameters getLichtheimiaParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, LICHTHEIMIA_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != Parameter.ReferenceType.allAgainstAll), p.searchRefInRef());
-	}
-	
-	public static AlgorithmParameters getLichtheimiaInnerGenomeParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, LICHTHEIMIA_INNER_GENOME_DELTA_TABLE, 3, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != Parameter.ReferenceType.allAgainstAll), true);
-	}
-	
-	public static AlgorithmParameters getStatisticPaperGenomeParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, STATISTIC_PAPER_DELTA_TABLE, 4, p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != Parameter.ReferenceType.allAgainstAll), p.searchRefInRef());
-	}
-	
-	public static AlgorithmParameters getLichtheimiaParameters(int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
-		return new AlgorithmParameters(-1, LICHTHEIMIA_DELTA_TABLE, 3, q, nrOfGenomes, alphabetSize, singleReference, refInRef);
-	}
-	
-	public static AlgorithmParameters getFiveProteobacterDeltaTableTestParameters(int alphabetSize, int nrOfGenomes) {
-		return new AlgorithmParameters(-1, TEST__FIVE_PROTEOBACTER_DELTA_TABLE, 4, 4, nrOfGenomes, alphabetSize, false, false);
-	}
-	
 	private AlgorithmParameters(int delta, int[][] deltaTable, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
 		if (delta >= 0 && deltaTable != null)
 			throw new IllegalArgumentException("Invalid delta and deltaTable values. Cannot use both!");
@@ -103,8 +57,8 @@ public class AlgorithmParameters{
 			
 			this.deltaTable = new int[deltaTable.length][];
 			for (int i=0; i<deltaTable.length; i++){
-				this.deltaTable[i] = new int[DELTA_TABLE_SIZE];
-				System.arraycopy(deltaTable[i], 0, this.deltaTable[i], 0, DELTA_TABLE_SIZE);
+				this.deltaTable[i] = new int[Parameter.DELTA_TABLE_SIZE];
+				System.arraycopy(deltaTable[i], 0, this.deltaTable[i], 0, Parameter.DELTA_TABLE_SIZE);
 			}
 		}
 		this.minClusterSize = minClusterSize;
@@ -131,7 +85,7 @@ public class AlgorithmParameters{
 		int del=0;
 		int total=0;
         for (int[] deltaTableColumn : deltaTable) {
-            if (deltaTableColumn.length != DELTA_TABLE_SIZE)
+            if (deltaTableColumn.length != Parameter.DELTA_TABLE_SIZE)
                 return true;
 
             // allowed distance must not decrease

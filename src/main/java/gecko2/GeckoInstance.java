@@ -34,6 +34,10 @@ public class GeckoInstance {
 
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
 
+    public void stopComputation() {
+        //TODO fill
+    }
+
     public enum ResultFilter {showAll, showFiltered, showSelected}
 	
 	private boolean libgeckoLoaded;
@@ -458,7 +462,7 @@ public class GeckoInstance {
 			minQuorum = Math.min(minQuorum, cluster.getSize());
 		}
 		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.size()));
-		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(data.getAlphabetSize());
 		return this.computeReferenceStatistics(genomes, p, clusters, this);
 	}
