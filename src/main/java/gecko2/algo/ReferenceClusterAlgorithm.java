@@ -179,6 +179,9 @@ public class ReferenceClusterAlgorithm {
 			
 			while(pattern.updateToNextI_ref(r)) {
 				r = pattern.getRightBorder();
+				if(referenceGenomeNr==1 && l==1567 && r>=1572){
+					System.out.println("Ready");
+				}
 				for (ListOfDeltaLocations dLocList : oldLists)
 					dLocList.removeNonInheritableElements(genomes, pattern.getLastChar(), param.getMaximumDelta());
 				

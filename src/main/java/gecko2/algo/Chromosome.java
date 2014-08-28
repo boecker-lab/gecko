@@ -375,10 +375,10 @@ class Chromosome {
         for (int j=1; j<=this.size(); j++) {
             if (genes[j]<0) {
                 if (-genes[j] <= delta + 1)
-                    System.arraycopy(c_old_L, 1, c_old_L, -genes[j], delta + 2 + genes[j]);
-
+                    System.arraycopy(c_old_L, 1, c_old_L, -genes[j]+1, (c_old_L.length -(-genes[j]+1)) /*delta + 2 + genes[j]*/);
+                
                 for (int k=Math.min(-genes[j], delta+1); k>0; k--) {
-                    c_old_L[k] = j;
+                	c_old_L[k] = j;
                 }
             }
             else if(rank.getRank(genes[j]) > rank.getRank(c_old)) {
