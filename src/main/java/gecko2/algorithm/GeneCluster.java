@@ -387,6 +387,45 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	public int getSize() {
 		return size;
 	}
+
+    /**
+     * Check if the gene cluster has an occurrence in the given genome
+     * @param genomes the indices of the genomes
+     * @return
+     */
+    public boolean hasNoOccurrenceInGenomes(Set<Integer> genomes){
+        for (GeneClusterOccurrence occ : getAllOccurrences()) {
+            for (Integer genomeIndex : genomes) {
+                for (int i = 0; i < occ.getSubsequences()[genomeIndex].length; i++) {
+                    if (occ.getSubsequences()[genomeIndex][i].isValid()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if the gene cluster has an occurrence in the given genome
+     * @param genomes the indices of the genomes
+     * @return
+     */
+    public boolean hasOccurrenceInAllGenomes(Set<Integer> genomes){
+        for (Integer genomeIndex : genomes) {
+            boolean hasOccurrence = false;
+            for (GeneClusterOccurrence occ : getAllOccurrences()) {
+                for (int i = 0; i < occ.getSubsequences()[genomeIndex].length; i++) {
+                    if (occ.getSubsequences()[genomeIndex][i].isValid()) {
+                        hasOccurrence = true;
+                    }
+                }
+            }
+            if (!hasOccurrence)
+                return false;
+        }
+        return true;
+    }
 	
 	/**
 	 * Generates a @link GeneClusterOutput object, that contains all information about the gene cluster.
@@ -407,7 +446,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		else
 			occ = this.getAllOccurrences()[0];
 		
-		GeneClusterOutput.Builder builder = new GeneClusterOutput.Builder(occ.getSubsequences().length);
+		GeneClusterOutput.Builder builder = new GeneClusterOutput.Builder(occ.getSubsequences().length, this.id);
 		builder.pValue(this.getBestPValue());
 		builder.refSeq(this.getRefSeqIndex());
 
@@ -492,32 +531,32 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * @param allClusters The array of gene clusters
 	 * @return The SortedSet, containing the indices of the clusters that are to keep
 	 */
-	public static SortedSet<Integer> generateReducedClusterList(GeneCluster[] allClusters) {
+	public static List<GeneCluster> generateReducedClusterList(List<GeneCluster> allClusters) {
 		return generateSimilarityReducedClusterList(allClusters);
 	}
 	
 	/**
 	 * Generates a reduced list of the gene clusters, keeping of all similar clusters only the one with the lowest p-Value.
 	 * Returns a @Link SortedSet of the indices of the kept clusters.  
-	 * @param allClusters The array of gene clusters
-	 * @return The SortedSet, containing the indices of the clusters that are to keep
+	 * @param allClusters The list of gene clusters
+	 * @return the reduced list of gene clusters
 	 */
-	private static SortedSet<Integer> generateSimilarityReducedClusterList(GeneCluster[] allClusters) {
-		SortedSet<Integer> reducedList = new TreeSet<>();
-		
-		GeneCluster[] tmp = Arrays.copyOf(allClusters, allClusters.length);
-		Arrays.sort(tmp);
-		for (GeneCluster geneCluster : tmp) {
+	private static List<GeneCluster> generateSimilarityReducedClusterList(List<GeneCluster> allClusters) {
+        if (allClusters.isEmpty())
+            return new ArrayList<>();
+		List<GeneCluster> reducedList = new ArrayList<>();
+
+        List<GeneCluster> geneClustersCopy = new ArrayList<>(allClusters);
+		Collections.sort(geneClustersCopy);
+		for (GeneCluster geneCluster : geneClustersCopy) {
             boolean contained = false;
-			for (Iterator<Integer> it = reducedList.iterator(); it.hasNext() && !contained; ) {
-				int index = it.next();
-				GeneCluster cluster = allClusters[index];
-				assert(cluster.getId() == index);
+			for (Iterator<GeneCluster> it = reducedList.iterator(); it.hasNext() && !contained; ) {
+                GeneCluster cluster = it.next();
 				if (geneCluster.isSimilar(cluster)) { // if similar
 					int compare = geneCluster.bestPValue.compareTo(cluster.bestPValue);
-					if (compare > 0)// if similar, but worse then the previously inserted cluster
+					if (compare > 0) // if similar, but worse then the previously inserted cluster
 						contained = true;
-					else if (compare == 0){
+					else if (compare == 0){ // if similar, and same p-value, keep the one with bigger size
 						if (geneCluster.size < cluster.size)
 							contained = true;
 						else 
@@ -528,7 +567,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 				}
 			}
 			if (!contained)
-				reducedList.add(geneCluster.getId());		
+				reducedList.add(geneCluster);
 		}
 		return reducedList;
 	}
@@ -581,33 +620,33 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * Returns the tags of the gene in the reference occurrence
 	 * @return the tags of the gene in the reference occurrence
 	 */
-	public String getReferenceTags() {
+	public String getReferenceGeneNames() {
 		Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
 		Genome genome = GeckoInstance.getInstance().getGenomes()[getRefSeqIndex()];
-		List<String> tags = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		for (int index = seq.getStart()-1; index < seq.getStop(); index++){
-			String newTag = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getTag();
+			String newName = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getName();
 			boolean merged = false;
-			for (int i=0; i<tags.size(); i++) {
-				String tag = tags.get(i);
-				if (newTag.length() > 3 && tag.length() > 3 && newTag.substring(0, 3).equals(tag.substring(0,3))) {
-					String mergedTag = tag.concat(newTag.substring(3));
-					tags.set(i, mergedTag);
+			for (int i=0; i<names.size(); i++) {
+				String name = names.get(i);
+				if (newName.length() > 3 && name.length() > 3 && newName.substring(0, 3).equals(name.substring(0, 3))) {
+					String mergedTag = name.concat(newName.substring(3));
+					names.set(i, mergedTag);
 					merged = true;
 					break;
 				}
 			}
 			if (! merged)
-				tags.add(newTag);
+				names.add(newName);
 		}
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
-		for (String tag : tags){
+		for (String name : names){
 			if (! first)
 				builder.append(", ");
 			else
 				first = false;
-			builder.append(tag);
+			builder.append((name.trim().equals("")) ? "-" : name);
 		}
 		return builder.toString();
 	}
@@ -774,26 +813,20 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return isLinear;
     }
 	
-	public static GeneCluster[] mergeResults(GeneCluster[] oldResults, List<GeneCluster> additionalResults) {
-		return mergeResults(oldResults, additionalResults.toArray(new GeneCluster[additionalResults.size()]));
-	}
-	
-	public static GeneCluster[] mergeResults(GeneCluster[] oldResults, GeneCluster[] additionalResults) {
-		GeneCluster[] newResults;
+	public static List<GeneCluster> mergeResults(List<GeneCluster> oldResults, List<GeneCluster> additionalResults) {
 		if (oldResults == null)
-			newResults = additionalResults;
+			return additionalResults;
 		else if(additionalResults == null)
-			newResults = oldResults;
+			return oldResults;
 		else {
-			newResults = Arrays.copyOf(oldResults, oldResults.length + additionalResults.length);
-			int newId = oldResults.length;
+			int newId = oldResults.size();
 			for (GeneCluster cluster : additionalResults) {
 				cluster.id = newId;
-				newResults[newId] =  cluster;
+				oldResults.add(cluster);
 				newId++;
-			}	
+			}
+            return oldResults;
 		}
-		return newResults;
 	}
 	
 	private static List<List<GeneCluster>> groupSimilarClusters(GeneCluster[] allClusters) {

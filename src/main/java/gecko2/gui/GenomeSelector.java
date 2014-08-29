@@ -328,13 +328,10 @@ public class GenomeSelector extends JDialog {
 	
 	
 	private class GenomeTableMouseListener extends MouseAdapter {
-				
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			checkSelectedRowCount();
 		}
-		
-	
 	}
 	
 	private void checkSelectedRowCount() {

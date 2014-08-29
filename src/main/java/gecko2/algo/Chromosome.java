@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
-class Chromosome {
+class Chromosome { 
     private final int nr;                 //nr of the chromosome in the genome
 	private final int[] genes;
     private int[] prevOcc;
@@ -28,7 +28,6 @@ class Chromosome {
     // values used for lazy updating L_prime and R_prime
     private boolean updatePrimes;
     private int leftBorderForPrimes;
-
     private int geneForPrimes;
     private Rank rank;
     private int alphabetSize;
@@ -50,7 +49,6 @@ class Chromosome {
         this.L_prime = null;
         this.R_prime = null;
     }
-    
     
     /**
      * Constructs a new instance of a Chromosome from a List of Integers representing the gene homologies. Assigns a number to the chromosome and appends terminal character 0 to the chromosome. Calculates some additional members of the Chromosome, based on the alphabet size of the whole set of genomes and the parameters of the algorithm.
@@ -143,8 +141,6 @@ class Chromosome {
         int[] occ = new int[alphabetSize + 1];//max(this.genes)+1];
         int[] newPrevOcc = new int[this.size() + 2];//max(this.genes)+1];
 
-        
-        
         for (int i = 1; i <= this.size(); i++) {
         	if(genes[i]>=0){
             	newPrevOcc[i] = occ[genes[i]];

@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,13 +29,8 @@ public class GeneClusterTestUtils {
 
     public static void performTest(Parameter p, int[][][] genomes, List<Set<Integer>> genomeGroups, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
         // Test the java implementation
-        //List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
-        //compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
-
-        //TODO Reduce genomes
-
-        List<ReferenceCluster> reducedRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
-        compareReferenceClusters(expectedReferenceClusters, reducedRes, PValueComparison.COMPARE_NONE);
+        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
+        compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
     }
 
     public enum PValueComparison {
@@ -156,17 +150,15 @@ public class GeneClusterTestUtils {
      */
     private static void compareReferenceCluster(ExpectedReferenceClusterValues expected, ReferenceCluster actual, PValueComparison pValueComp) {
         assertEquals(expected.getGeneContent().size(), actual.getGeneContent().size());
-        // TODO Test removed till statistics is fixed
-        //assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent()));
+        assertEquals(new HashSet<>(expected.getGeneContent()), new HashSet<>(actual.getGeneContent()));
         assertEquals(expected.getSize(), actual.getSize());
         if (pValueComp != PValueComparison.COMPARE_NONE)
             assertEqualsBigDecimal(expected.getBestCombined_pValue(), actual.getBestCombined_pValue());
         if (pValueComp == PValueComparison.COMPARE_ALL)
             assertEqualsBigDecimal(expected.getBestCombined_pValueCorrected(), actual.getBestCombined_pValueCorrected());
         assertArrayEquals(expected.getMinimumDistances(), actual.getMinimumDistances());
-        // TODO Test removed till statistics is fixed
-        //assertEquals(expected.getGenomeNr(), actual.getGenomeNr());
-        //assertEquals(expected.getChrNr(), actual.getChrNr());
+        assertEquals(expected.getGenomeNr(), actual.getGenomeNr());
+        assertEquals(expected.getChrNr(), actual.getChrNr());
         assertEquals(expected.getCoveredGenomes(), actual.getCoveredGenomes());
 
         assertEquals(expected.getAllDeltaLocations().length, actual.getAllDeltaLocations().size());
@@ -206,8 +198,7 @@ public class GeneClusterTestUtils {
 	 */
 	private static void compareGeneClusters(GeneCluster expected, GeneCluster actual, PValueComparison pValueComp) {
 		assertEquals(expected.getId(), actual.getId());
-        // TODO Test removed till statistics is fixed
-		//assertEquals(expected.getGeneFamilies(), actual.getGeneFamilies());
+		assertEquals(expected.getGeneFamilies(), actual.getGeneFamilies());
 		assertEquals(expected.getSize(), actual.getSize());
 		assertEquals(expected.isMatch(), actual.isMatch());
 		if (pValueComp != PValueComparison.COMPARE_NONE)
@@ -216,8 +207,7 @@ public class GeneClusterTestUtils {
 			assertEqualsBigDecimal(expected.getBestPValueCorrected(), actual.getBestPValueCorrected());
 		assertEquals(expected.getMinTotalDist(), actual.getMinTotalDist());
 		assertEquals(expected.getType(), actual.getType());
-        // TODO Test removed till statistics is fixed
-		//assertEquals(expected.getRefSeqIndex(), actual.getRefSeqIndex());
+		assertEquals(expected.getRefSeqIndex(), actual.getRefSeqIndex());
 		
 		assertEquals(expected.getOccurrences().length, actual.getOccurrences().length);
 		
@@ -274,13 +264,13 @@ public class GeneClusterTestUtils {
 	 * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
 	 */
-	public static void compareGeneClusters(GeneCluster[] expected, GeneCluster[] actual, PValueComparison pValueComp)
+	public static void compareGeneClusters(List<GeneCluster> expected, List<GeneCluster> actual, PValueComparison pValueComp)
 	{
-		assertEquals(expected.length, actual.length);
+		assertEquals(expected.size(), actual.size());
 		
-		for(int i = 0; i < expected.length; i++)
+		for(int i = 0; i < expected.size(); i++)
 		{
-			compareGeneClusters(expected[i], actual[i], pValueComp);
+			compareGeneClusters(expected.get(i), actual.get(i), pValueComp);
 		}
 	}
 	
@@ -293,18 +283,22 @@ public class GeneClusterTestUtils {
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet actualData = reader.readData();
 
-		GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups);
+        List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, false, null);
         actualData.setClusters(javaRes);
-        
-        GeneCluster[] ex = expectedData.getClusters();
-
+		
 		compareGeneClusters(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_NONE);
         // Test with memory reduction
         CogFileReader reducedReader = new CogFileReader(settings.dataFile);
         DataSet reducedData = reducedReader.readData();
 
-        GeneCluster[] reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true);
+        GeneCluster[] reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true, null);
         reducedData.setClusters(reducedRes);
+        List<GeneCluster> reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true, null);        reducedData.setClusters(reducedRes);
+        for (int i=0; i<reducedRes.size(); i++)
+            if (!expectedData.getClusters().get(i).equals(reducedRes.get(i))) {
+                System.out.println(i);
+                break;
+            }
 
         compareGeneClusters(expectedData.getClusters(), reducedRes, PValueComparison.COMPARE_NONE);
 		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
@@ -330,7 +324,7 @@ public class GeneClusterTestUtils {
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet data = reader.readData();
 
-        GeneCluster[] javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups);
+        List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups, null);
         data.setClusters(javaRes);
 
         assertTrue(settings.resultOutputFile.createNewFile());
@@ -348,7 +342,7 @@ public class GeneClusterTestUtils {
         //7long[][] stop = new long [2][k];
         for(int i=0;i<k;i++){
         //    start[0][i] = System.currentTimeMillis();
-            GeneCluster[] javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction);
+            List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction, null);
             actualData.setClusters(javaRes);
         //    stop[0][i] = System.currentTimeMillis();
         }

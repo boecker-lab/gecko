@@ -42,7 +42,6 @@ public class Gui {
 	private final JCheckBox mgbViewSwitcher = new JCheckBox();
 	private final JTextField searchField;
 
-		
 	public JFrame getMainframe() {
 		return mainframe;
 	}
@@ -67,12 +66,12 @@ public class Gui {
 		this.statusbartext = new JLabel();
 		this.progressbar = new JProgressBar();
 		progressbar.setMaximumSize(new Dimension(100, 30));
-		progressbar.setValue(12);
 		this.waitingAnimation = createImageIcon("images/ghost.png");
 		
 		this.gcDisplay = new GeneClusterDisplay();
-		
-		this.gcSelector = new GeneClusterSelector();
+        searchField = new JTextField("");
+		this.gcSelector = new GeneClusterSelector(searchField);
+        gecko.addDataListener(gcSelector);
 		Dimension startDimension = new Dimension(1024, 768);
 		
 		// Basic frame settings
@@ -231,17 +230,7 @@ public class Gui {
 		});
 	
 		JPanel p = new JPanel(new BorderLayout());
-		
-		searchField = new JTextField("");
 		searchField.setPreferredSize(new Dimension(150, toolbar.getHeight()));
-		searchField.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				gecko.setFilterString(searchField.getText());
-				searchField.setSelectionStart(0);
-				searchField.setSelectionEnd(searchField.getText().length());
-			}
-		});
 		
 		p.setMaximumSize(new Dimension(150, (int) toolbar.getPreferredSize().getHeight()));
 		p.add(searchField, BorderLayout.CENTER);
@@ -436,10 +425,6 @@ public class Gui {
 	public void closeCurrentSession() {
         gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
 		mgb.clear();
-	}
-	
-	public void updategcSelector() {
-		gcSelector.refresh();
 	}
 	
 	/*
@@ -789,7 +774,7 @@ public class Gui {
 						if (newCluster == null)
 							JOptionPane.showMessageDialog(mainframe, "An error occured while reading the annotations!", "Error", JOptionPane.ERROR_MESSAGE);
 						else {
-							GeneCluster[] clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster.toArray(new GeneCluster[newCluster.size()]));
+                            List<GeneCluster> clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster);
 							geckoInstance.setClusters(GeneCluster.mergeResults(geckoInstance.getClusters(), clusterWithPValue));
 						}									
 						break;
@@ -814,27 +799,25 @@ public class Gui {
 		importGenomesAction.putValue(Action.NAME, "Open session or genome file...");
 		importGenomesAction.putValue(Action.SHORT_DESCRIPTION, "Open...");	
 		importGenomesAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileopen.png"));
-		importGenomesAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileopen_large.png"));
+		importGenomesAction.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/fileopen_large.png"));
 		importGenomesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		startComputation.putValue(Action.NAME, "Start computation...");
 		startComputation.putValue(Action.SHORT_DESCRIPTION, "Start computation...");
 		startComputation.putValue(Action.SMALL_ICON, createImageIcon("images/player_play.png"));
-		startComputation.putValue(Action.SMALL_ICON, createImageIcon("images/player_play_large.png"));
+		startComputation.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/player_play_large.png"));
 		startComputation.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		startComputation.setEnabled(false);
 		
 		saveSessionAction.putValue(Action.NAME, "Save session...");
 		saveSessionAction.putValue(Action.SHORT_DESCRIPTION, "Save session...");
 		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave.png"));
-		saveSessionAction.putValue(Action.SMALL_ICON, createImageIcon("images/filesave_large.png"));
+		saveSessionAction.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/filesave_large.png"));
 		saveSessionAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		saveSessionAction.setEnabled(false);
 		
 		exportResultsAction.putValue(Action.NAME, "Export results...");
 		exportResultsAction.putValue(Action.SHORT_DESCRIPTION, "Export results...");
-		exportResultsAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileexport_large.png"));
-		exportResultsAction.putValue(Action.SMALL_ICON, createImageIcon("images/fileexport_large.png"));
 		exportResultsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		saveSessionAction.setEnabled(false);
@@ -845,16 +828,16 @@ public class Gui {
 		
 		clearSelectionAction.putValue(Action.SHORT_DESCRIPTION, "Clear selection");
 		clearSelectionAction.putValue(Action.SMALL_ICON, createImageIcon("images/cancel.png"));
-		clearSelectionAction.putValue(Action.SMALL_ICON, createImageIcon("images/cancel_large.png"));
+		clearSelectionAction.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/cancel_large.png"));
 		zoomIn.putValue(Action.NAME, "Zoom in");
 		zoomIn.putValue(Action.SHORT_DESCRIPTION, "Zoom in");
 		zoomIn.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag+.png"));
-		zoomIn.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag+_large.png"));
+		zoomIn.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/viewmag+_large.png"));
 		zoomIn.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		zoomOut.putValue(Action.NAME, "Zoom out");
 		zoomOut.putValue(Action.SHORT_DESCRIPTION, "Zoom out");
 		zoomOut.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag-.png"));
-		zoomOut.putValue(Action.SMALL_ICON, createImageIcon("images/viewmag-_large.png"));
+		zoomOut.putValue(Action.LARGE_ICON_KEY, createImageIcon("images/viewmag-_large.png"));
 		zoomOut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_MINUS,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
 		exitAction.putValue(Action.NAME, "Exit");
