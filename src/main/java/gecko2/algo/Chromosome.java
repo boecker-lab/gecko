@@ -347,7 +347,7 @@ class Chromosome {
                 continue;
 
             if (lastOcc!=0) {                                                       // if c_old has already occurred in the list
-                if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
+                if (rank.getRank(genes[j]) < rank.getRank(c_old)) {             // if rank of character smaller than the new rank of c_old
                     for (int l=1; l<=delta+1; l++) {                              // test if entries for position i in array L change,
                         if  (this.getL(j, l) < lastOcc) {                            // because c_old is a new mismatch left of i
                             for (int p=delta+1; p>l; p--)
@@ -375,7 +375,7 @@ class Chromosome {
         for (int j=1; j<=this.size(); j++) {
             if (genes[j]<0) {
                 if (-genes[j] <= delta + 1)
-                    System.arraycopy(c_old_L, 1, c_old_L, (-genes[j]+1), (c_old_L.length -(-genes[j]+1)) /*delta + 2 + genes[j]*/);
+                    System.arraycopy(c_old_L, 1, c_old_L, (-genes[j]+1), (c_old_L.length -(-genes[j]+1)));
                 
                 for (int k=Math.min(-genes[j], delta+1); k>0; k--) {
                 	c_old_L[k] = j;
@@ -508,7 +508,7 @@ class Chromosome {
         for (int j=this.size(); j>=1; j--) {
             if (genes[j]<0) {
                 if (-genes[j] <= delta + 1)
-                    System.arraycopy(c_old_R, 1, c_old_R, (-genes[j]+1),(c_old_R.length-(-genes[j]+1)) /*delta + 2 + genes[j]*/);
+                    System.arraycopy(c_old_R, 1, c_old_R, (-genes[j]+1),(c_old_R.length-(-genes[j]+1)));
 
                 for (int k=Math.min(-genes[j], delta+1); k>0; k--) {
                     c_old_R[k] = j;

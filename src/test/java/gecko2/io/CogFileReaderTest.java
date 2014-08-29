@@ -404,7 +404,7 @@ public class CogFileReaderTest {
         // Given
         File inputFile = new File(getClass().getResource("/unHomologueGenes.cog").getFile());
         int[][][] expected = new int[][][] {
-                {{0,-1,-1,-1,-1,-1,-1,2,1,1,3,0}},
+                {{0,-6,2,1,1,3,0}},
                 {{0,-1,2,3,0}}
         };
 
