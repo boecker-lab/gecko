@@ -143,7 +143,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 		for (ReferenceCluster cluster : refClusterList)
 			cluster.setGeneContent(genomes);
 		
-		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
+		//Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
 		
 		long statTime = System.nanoTime();
 		System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));

@@ -109,9 +109,12 @@ public class DeltaLocation implements Comparable<DeltaLocation> {
         additionalChars--;
 	}
 
-	public void increaseDistance() {
-		distance++;
-		missingChars++;
+    /**
+     * Increase the distance and missing chars by value
+     */
+	public void increaseDistance(int value) {
+		distance+=value;
+		missingChars+=value;
 	}
 	
 	public boolean isNested(DeltaLocation other){
