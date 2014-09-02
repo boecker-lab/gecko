@@ -19,23 +19,23 @@ class Genome implements Iterable<Chromosome> {
      * @param chromosomes the list of chromosomes
      */
 	public Genome(int nr, List<Chromosome> chromosomes) {
-        this.chromosomes = new ArrayList<Chromosome>(chromosomes);
+        this.chromosomes = new ArrayList<>(chromosomes);
         this.nr = nr;
         int l = 0;
         for (Chromosome chr : chromosomes)
-            l += chr.size();
+            l += chr.getTotalGeneNumber();
         length = l;
 	}
 
     public Genome(int nr, Chromosome chromosome) {
-        this.chromosomes = new ArrayList<Chromosome>(1);
+        this.chromosomes = new ArrayList<>(1);
         this.chromosomes.add(chromosome);
         this.nr = nr;
-        length = chromosome.size();
+        length = chromosome.getTotalGeneNumber();
     }
     
     public Genome(Genome other) {
-    	this.chromosomes = new ArrayList<Chromosome>(other.chromosomes.size());
+    	this.chromosomes = new ArrayList<>(other.chromosomes.size());
     	for (Chromosome chr : other.chromosomes)
     		this.chromosomes.add(new Chromosome(chr));
     	this.nr = other.nr;
@@ -105,7 +105,7 @@ class Genome implements Iterable<Chromosome> {
         int[] charFreq = new int[alphabetSize + 1];
 
         for (Chromosome chr : chromosomes)
-            for (int i = 1; i < chr.size() + 1; i++) {  // Correct for not counted 0 termination
+            for (int i = 1; i < chr.getEffectiveGeneNumber() + 1; i++) {  // Correct for not counted 0 termination
                 if (chr.getGene(i) < 0)                 // singleton genes have negative ids,
                     charFreq[0] -= chr.getGene(i);      // so subtract to add the number of singleton genes
                 else

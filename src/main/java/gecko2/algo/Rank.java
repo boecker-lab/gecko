@@ -44,7 +44,7 @@ class Rank{
         rank[0] = MAX_RANK;                            // the terminal characters have character 0 and the highest rank
 
         int r=1;
-        for (int i=1; i<=chr.size(); i++) {                      // all characters in the chromosome
+        for (int i=1; i<=chr.getEffectiveGeneNumber(); i++) {                      // all characters in the chromosome
             if (chr.getGene(i)>=0){
             	if (rank[chr.getGene(i)]==DEFAULT_RANK) {        // who are not already set to a rank
             		rank[chr.getGene(i)] = r++;                  // get ranked by their first occurrence in the chromosome
@@ -66,7 +66,7 @@ class Rank{
         else {
             int maxRank = 0;
             int i;
-            for (i=leftBorder; i<=chr.size(); i++) {                 // Iterate through substrings starting with leftBorder
+            for (i=leftBorder; i<=chr.getEffectiveGeneNumber(); i++) {                 // Iterate through substrings starting with leftBorder
                 if (chr.getGene(i)<0 || chr.getGene(leftBorder-1)<0) continue;
             	if (chr.getGene(i)!=chr.getGene(leftBorder-1)) {                        // if character is not equal to the character at position leftBorder-1
                 	if (chr.getNUMDiff(leftBorder-1, i, leftBorder-1, i-1) > 0) {   // only update if first occurrence after position i
@@ -82,7 +82,7 @@ class Rank{
             }
             if (chr.getGene(leftBorder-1)<0){
             	
-            } else if (i==chr.size()+1) {                                      // if character at position leftBorder-1 is not part of the interval
+            } else if (i==chr.getEffectiveGeneNumber()+1) {                                      // if character at position leftBorder-1 is not part of the interval
                 rank[chr.getGene(leftBorder-1)] = alphabetSize;      // he is assigned the default rank
             }
         }

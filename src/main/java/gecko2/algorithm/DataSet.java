@@ -51,6 +51,26 @@ public class DataSet {
         this.colorMap = null;
     }
 
+    public static int[][][] createRunLengthMergedLookup(int[][][] intArray){
+        int[][][] help2 = new int[intArray.length][][];
+        for (int i=0;i<intArray.length;i++){
+            help2[i] = new int[intArray[i].length][];
+            for (int j=0;j<intArray[i].length;j++){
+                List<Integer> help = new ArrayList<>();
+                for (int m=0;m<intArray[i][j].length;m++){
+                    if(intArray[i][j][m]<-1)
+                        help.add(m);
+                }
+                help2[i][j] = new int[help.size()];
+                for (int m=0;m<help.size();m++){
+                    help2[i][j][m]=help.get(m);
+                }
+            }
+        }
+
+        return help2;
+    }
+
     /**
 	 * Generates an int array from the genomes
 	 * @return an int array, containing all the genes

@@ -97,9 +97,9 @@ class Chromosome {
         this.R_prime = new int[this.genes.length][];
         for (int i = 0; i < this.genes.length; i++) {
             L[i] = new int[maxDelta + 2];
-            R[i] = IntArray.newIntArray(maxDelta + 2, this.size() + 1);
+            R[i] = IntArray.newIntArray(maxDelta + 2, this.getEffectiveGeneNumber() + 1);
             L_prime[i] = new int[maxDelta + 2];
-            R_prime[i] = IntArray.newIntArray(maxDelta + 2, this.size() + 1);
+            R_prime[i] = IntArray.newIntArray(maxDelta + 2, this.getEffectiveGeneNumber() + 1);
         }
         this.delta = maxDelta;
 
@@ -112,7 +112,7 @@ class Chromosome {
         for (int i=0; i<=alphabetSize; i++) {
             tmp.add(null);
         }
-        for (int i=1; i<=this.size(); i++) {       // genes starts and ends with 0 that is not part of the genome
+        for (int i=1; i<=this.getEffectiveGeneNumber(); i++) {       // genes starts and ends with 0 that is not part of the genome
             if (genes[i] < 0)
                 continue;
             if (tmp.get(genes[i])==null) {
@@ -139,9 +139,9 @@ class Chromosome {
     
     private int[] computePrevOcc(int alphabetSize) {
         int[] occ = new int[alphabetSize + 1];//max(this.genes)+1];
-        int[] newPrevOcc = new int[this.size() + 2];//max(this.genes)+1];
+        int[] newPrevOcc = new int[this.getEffectiveGeneNumber() + 2];//max(this.genes)+1];
 
-        for (int i = 1; i <= this.size(); i++) {
+        for (int i = 1; i <= this.getEffectiveGeneNumber(); i++) {
         	if(genes[i]>=0){
             	newPrevOcc[i] = occ[genes[i]];
             	occ[genes[i]] = i;
@@ -154,10 +154,10 @@ class Chromosome {
     }
 
     private int[] computeNextOcc(int alphabetSize) {
-        int[] occ = IntArray.newIntArray(alphabetSize + 1, this.size() + 1);
-        int[] newNextOcc = IntArray.newIntArray(this.size() + 2, this.size() + 1);
+        int[] occ = IntArray.newIntArray(alphabetSize + 1, this.getEffectiveGeneNumber() + 1);
+        int[] newNextOcc = IntArray.newIntArray(this.getEffectiveGeneNumber() + 2, this.getEffectiveGeneNumber() + 1);
 
-        for (int i = this.size() + 1; i >= 1; i--) {
+        for (int i = this.getEffectiveGeneNumber() + 1; i >= 1; i--) {
         	if(genes[i]>=0){
         		newNextOcc[i] = occ[genes[i]];
         		occ[genes[i]] = i;
@@ -187,11 +187,24 @@ class Chromosome {
     }
 
     /**
-     * Returns the number of genes in the chromosome.
-     * @return the number of genes in the chromosome.
+     * Returns the effective number of genes in the chromosome, counting -2 as one gene
+     * @return the effective number of genes in the chromosome.
      */
-    public int size() {
+    public int getEffectiveGeneNumber() {
         return (genes.length-2);   //genes begins and ends with a zero that is not part of the chromosome
+    }
+
+    /**
+     * Returns the total gene number of the chromosome, taking into account negative genes,
+     * e.g. -2 will add 2 genes.
+     * @return the total number of genes
+     */
+    public int getTotalGeneNumber() {
+        int geneNumber = genes.length-2;
+        for (int i=1; i<genes.length-1; i++)
+            if (genes[i] < -1)
+                geneNumber -= genes[i]+1;
+        return geneNumber;
     }
 
     /**
@@ -304,7 +317,7 @@ class Chromosome {
      */
     void computeL(Rank rank){
         resetL();                                           
-        for (int i=1; i<=this.size(); i++) {
+        for (int i=1; i<=this.getEffectiveGeneNumber(); i++) {
             L[i][0] = i;                                 // no mismatch left of position is the position
             int d = 1;
             if (genes[i] <0)
@@ -338,7 +351,7 @@ class Chromosome {
      */
     private void updateL_characterRankSmallerC_Old(Rank rank, int c_old){
         int lastOcc = 0;
-        for (int j=1; j<=this.size(); j++){
+        for (int j=1; j<=this.getEffectiveGeneNumber(); j++){
             if (genes[j] < 0)
                 continue;
 
@@ -368,7 +381,7 @@ class Chromosome {
     private void updateL_characterEqualsC_Old(Rank rank, int c_old){
         int[] c_old_L = new int[delta+2];
 
-        for (int j=1; j<=this.size(); j++) {
+        for (int j=1; j<=this.getEffectiveGeneNumber(); j++) {
             if (genes[j]<0) {
                 if (-genes[j] <= delta + 1)
                     System.arraycopy(c_old_L, 1, c_old_L, (-genes[j]+1), (c_old_L.length -(-genes[j]+1)));
@@ -436,14 +449,14 @@ class Chromosome {
      */
     void computeR(Rank rank){
     	resetR();
-        for (int i=1; i<=this.size(); i++) {
+        for (int i=1; i<=this.getEffectiveGeneNumber(); i++) {
             R[i][0] = i;                          // first mismatch right of position is the position
             int d = 1;
             
             if(genes[i]<0)
                 continue;
 
-            for (int j=i+1; j<=this.size() && d<=delta+1; j++) {                   // search for unmarked char right of i
+            for (int j=i+1; j<=this.getEffectiveGeneNumber() && d<=delta+1; j++) {                   // search for unmarked char right of i
                 if (genes[j]<0 ) {
                     int k = 0;
                     while(d<=delta+1 && k<Math.abs(genes[j])){
@@ -469,12 +482,12 @@ class Chromosome {
      * @param c_old must not be < 0
      */
     private void updateR_characterRankSmallerC_Old(Rank rank, int c_old){
-        int lastOcc = this.size()+1;
+        int lastOcc = this.getEffectiveGeneNumber()+1;
 
-        for (int j=this.size(); j>=1; j--) {
+        for (int j=this.getEffectiveGeneNumber(); j>=1; j--) {
             if (genes[j] < 0)
                 continue;
-            if (lastOcc != this.size() + 1) {                                            // if c_old has already occurred in the list
+            if (lastOcc != this.getEffectiveGeneNumber() + 1) {                                            // if c_old has already occurred in the list
                 if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
 
                     for (int l = 1; l <= delta + 1; l++) {                              // test if entries for position i in array R change,
@@ -499,9 +512,9 @@ class Chromosome {
      * @param c_old must not be < 0
      */
     private void updateR_characterEqualsC_Old(Rank rank, int c_old){
-        int[] c_old_R = IntArray.newIntArray(delta+2, this.size()+1);
+        int[] c_old_R = IntArray.newIntArray(delta+2, this.getEffectiveGeneNumber()+1);
 
-        for (int j=this.size(); j>=1; j--) {
+        for (int j=this.getEffectiveGeneNumber(); j>=1; j--) {
             if (genes[j]<0) {
                 if (-genes[j] <= delta + 1)
                     System.arraycopy(c_old_R, 1, c_old_R, (-genes[j]+1),(c_old_R.length-(-genes[j]+1)));
@@ -546,7 +559,7 @@ class Chromosome {
      */
     private void resetR () {
         for (int i=0; i<genes.length; i++) {
-            IntArray.reset(R[i], this.size()+1);
+            IntArray.reset(R[i], this.getEffectiveGeneNumber()+1);
         }
     }
 
@@ -585,7 +598,7 @@ class Chromosome {
     		maxUpdateRank = (leftBorderForPrimes==1) ? alphabetSize+1 : rank.getRank(geneForPrimes);
     	}
     	
-    	for(int j=1;j<=this.size();j++){ // Iteriere durch jede Position der aktuellen Sequenz
+    	for(int j=1;j<=this.getEffectiveGeneNumber();j++){ // Iteriere durch jede Position der aktuellen Sequenz
 			if(genes[j]<0)
                 continue;
 			if(rank.getRank(genes[j])<=maxUpdateRank) {
@@ -617,7 +630,7 @@ class Chromosome {
     	} else {
     		maxUpdateRank = (leftBorderForPrimes==1) ? alphabetSize+1 : rank.getRank(geneForPrimes);
     	}
-    	for(int j=1;j<=this.size();j++){ // Iteriere durch jede Position der aktuellen Sequenz
+    	for(int j=1;j<=this.getEffectiveGeneNumber();j++){ // Iteriere durch jede Position der aktuellen Sequenz
 			if (genes[j]<0)
                 continue;
     		if(rank.getRank(genes[j])<=maxUpdateRank) {

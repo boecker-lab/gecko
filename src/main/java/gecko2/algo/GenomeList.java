@@ -260,7 +260,7 @@ class GenomeList {
     	
     	for (int k=0; k<genomes.size(); k++)
     		for (Chromosome chr : genomes.get(k))
-    			for (int i=1; i<chr.size()+1; i++){  // Correct for not counted 0 termination
+    			for (int i=1; i<chr.getEffectiveGeneNumber()+1; i++){  // Correct for not counted 0 termination
     				if (chr.getGene(i)<0)
                         charFreq[k][0]++;
                     else

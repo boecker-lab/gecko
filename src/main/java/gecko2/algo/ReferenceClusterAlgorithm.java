@@ -114,7 +114,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
         progressListeners = new ArrayList<>();
         for (int i=0; i < ((param.useSingleReference()) ? 1 : genomes.size()); i++) {
             for (Chromosome chr : genomes.get(i))
-                maxProgressValue += chr.size();
+                maxProgressValue += chr.getEffectiveGeneNumber();
         }
         progressValue = 0;
 	}
@@ -143,7 +143,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 		for (ReferenceCluster cluster : refClusterList)
 			cluster.setGeneContent(genomes);
 		
-		//Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
+		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
 		
 		long statTime = System.nanoTime();
 		System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));
@@ -175,13 +175,13 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	}
 	
 	private void detectReferenceGeneClusterFromSingleChromosome(int referenceGenomeNr, Chromosome referenceChromosome, List<ReferenceCluster> refClusterList){
-		for (int l = 1; l <= referenceChromosome.size(); l++){
+		for (int l = 1; l <= referenceChromosome.getEffectiveGeneNumber(); l++){
             fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingClusters));
 			genomes.updateLeftBorder(l, referenceChromosome, referenceGenomeNr, param);
 			Pattern pattern = new Pattern(genomes.getAlphabetSize(), genomes.size(), param, referenceGenomeNr, referenceChromosome, l);
 			
 			// Gene does not occure in any other Genome and does not occure in chr[i,...]
-			if (referenceChromosome.getGene(l) < 0 || (referenceChromosome.getNextOCC(l) > referenceChromosome.size() && genomes.zeroOccs(referenceGenomeNr, referenceChromosome.getNr(), l, param.searchRefInRef())))
+			if (referenceChromosome.getGene(l) < 0 || (referenceChromosome.getNextOCC(l) > referenceChromosome.getEffectiveGeneNumber() && genomes.zeroOccs(referenceGenomeNr, referenceChromosome.getNr(), l, param.searchRefInRef())))
 				continue;
 			
 			int r = l;
@@ -192,8 +192,8 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 			
 			while(pattern.updateToNextI_ref(r)) {
 				r = pattern.getRightBorder();
-				
-				for (ListOfDeltaLocations dLocList : oldLists)
+
+                for (ListOfDeltaLocations dLocList : oldLists)
 					dLocList.removeNonInheritableElements(genomes, pattern.getLastChar(), param.getMaximumDelta());
 				
 				for (int i=0; i<genomes.size(); i++){

@@ -110,13 +110,13 @@ class Pattern {
      * @return true if the pattern could be expanded successfully.
      */
     public boolean updateToNextI_ref(int i) {
-        if (i > refChr.size())                                 // If end of sequence reached
+        if (i > refChr.getEffectiveGeneNumber())                                 // If end of sequence reached
             return false;
         int c = refChr.getGene(i);
         if (c >= 0 && refChr.getGene(getLeftBorder() - 1) == c)          // If pattern no longer left maximal
             return false;
 
-        while (i < refChr.size() && refChr.getGene(i + 1) > 0
+        while (i < refChr.getEffectiveGeneNumber() && refChr.getGene(i + 1) > 0
                 && (nrOccurrences(refChr.getGene(i + 1)) > 0 || refChr.getGene(i + 1) == c)) // expand until the pattern is right maximal
             i++;
 
@@ -126,6 +126,7 @@ class Pattern {
     
     public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, int character, int pSize, AlgorithmParameters param) {
     	ListOfDeltaLocations newList = new ListOfDeltaLocations();
+
 		if (character<0)
 			return newList;
 		
@@ -146,15 +147,15 @@ class Pattern {
                     int interveningChars = dLeft - 1;
                     
                     for (int dRight = 1; dRight <= param.getMaximumDelta() + 1; dRight++) {
-                        if (dRight > 1 && chr.getR(charPos, dRight) == chr.getR(charPos, dRight - 1))
-                            break;
-
                         int leftBorder = chr.getL(charPos, dLeft);
                         int rightBorder = chr.getR(charPos, dRight);
 
                         if (dRight > 1)  // Teste ob neues unmarkiertes Zeichen R[dRight-1] schon im Intervall vorkommt
                             if (chr.getPrevOCC(chr.getR(charPos, dRight - 1)) < Math.max(1, leftBorder))
                             	interveningChars++;
+
+                        if (dRight > 1 && chr.getR(charPos, dRight) == chr.getR(charPos, dRight - 1))  // either right end of genome, could break
+                            continue;  // or merged non occ gene (-x : x>1), so interveningChars++ and continue
 
                         // test total distance
                         if (interveningChars > param.getMaximumDelta())
@@ -178,7 +179,7 @@ class Pattern {
                         assert (dist >= 0);
 
                         if (dist <= param.getMaximumDelta() && interveningChars <= param.getMaximumInsertions() && missingChars <= param.getMaximumDeletions()) {
-                            assert (rightBorder - 1 <= chr.size());
+                            assert (rightBorder - 1 <= chr.getEffectiveGeneNumber());
 
                             DeltaLocation newDeltaLoc = new DeltaLocation(genome.getNr(), chr.getNr(), leftBorder + 1, rightBorder - 1, dist, missingChars, interveningChars, charSetSize, charSetSize - interveningChars, !param.useDeltaTable());
                             newList.insertDeltaLocation(newDeltaLoc);
@@ -187,7 +188,7 @@ class Pattern {
                 }
             }
     	}
-    	return newList;
+        return newList;
     }
 
     @Override public String toString() {
