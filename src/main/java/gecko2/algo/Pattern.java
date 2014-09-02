@@ -124,14 +124,14 @@ class Pattern {
         return true;
     }
     
-    public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, int character, int pSize, AlgorithmParameters param) {
+    public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, AlgorithmParameters param) {
     	ListOfDeltaLocations newList = new ListOfDeltaLocations();
 
-		if (character<0)
+		if (lastChar<0)
 			return newList;
 		
     	for (Chromosome chr : genome){
-    		int[] pos = chr.getPOS(character);
+    		int[] pos = chr.getPOS(lastChar);
     		if (pos.length == 0)
     			continue;
     		

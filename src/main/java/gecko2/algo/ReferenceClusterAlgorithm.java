@@ -217,7 +217,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 				
 				for (int k=0; k<genomes.size(); k++){
 					if(k != referenceGenomeNr){
-                        ListOfDeltaLocations newList = pattern.computeNewOptimalDeltaLocations(genomes.get(k), pattern.getLastChar(), pattern.getSize(), param);
+                        ListOfDeltaLocations newList = pattern.computeNewOptimalDeltaLocations(genomes.get(k), param);
 						
 						if (param.searchRefInRef() && k == genomes.size()-1){
 							newList.removeRefDLocReferenceHit(pattern, referenceChromosome.getNr());
