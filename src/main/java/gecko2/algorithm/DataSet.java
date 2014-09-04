@@ -322,7 +322,6 @@ public class DataSet {
     }
 
     public int getCompleteAlphabetSize() {
-        System.out.println("alphabetSize: " + (geneFamilySet.size() + unknownGeneFamily.getFamilySize()) + " compressed: " + (numberOfGeneFamiliesWithMultipleGenes));
         return geneFamilySet.size() + unknownGeneFamily.getFamilySize();
     }
 
