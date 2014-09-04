@@ -85,12 +85,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
 		this.id = id;
 	}
-	
-	public GeneCluster(int id, ReferenceCluster refCluster, DataSet data){
-	    this(id, refCluster, data, null, null);
-	}
 
-    public GeneCluster(int id, ReferenceCluster refCluster, DataSet data, int[][][] runLengthMergedLookup, int[][][] intArray){
+    public GeneCluster(int id, ReferenceCluster refCluster, DataSet data){
         this.id = id;
         this.match = true;
         this.bestPValue = refCluster.getBestCombined_pValue();
@@ -108,16 +104,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             }
         }
 
-        if (runLengthMergedLookup != null) {
-            int[] correctedPositions = getCorrectedPosition(
-                    refCluster.getLeftBorder(),
-                    refCluster.getRightBorder(),
-                    runLengthMergedLookup[refCluster.getGenomeNr()][refCluster.getChrNr()],
-                    intArray[refCluster.getGenomeNr()][refCluster.getChrNr()]);
-            refCluster.setLeftBorder(correctedPositions[0]);
-            refCluster.setRightBorder(correctedPositions[1]);
-        }
-
         geneFamilies = new HashSet<>();
         for (int i=refCluster.getLeftBorder()-1; i<refCluster.getRightBorder() && geneFamilies.size()<refCluster.getSize(); i++){
             geneFamilies.add(data.getGenomes()[refCluster.getGenomeNr()].getChromosomes().get(refCluster.getChrNr()).getGenes().get(i).getGeneFamily());
@@ -130,16 +116,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             List<Subsequence> allSub = new ArrayList<>(refCluster.getDeltaLocations(i).size());
             List<Subsequence> bestSub = new ArrayList<>(refCluster.getDeltaLocations(i).size());
             for (DeltaLocation dLoc : refCluster.getDeltaLocations(i)){
-                if (runLengthMergedLookup != null) {
-                    int[] correctedPositions = getCorrectedPosition(
-                            dLoc.getL(),
-                            dLoc.getR(),
-                            runLengthMergedLookup[dLoc.getGenomeNr()][dLoc.getChrNr()],
-                            intArray[dLoc.getGenomeNr()][dLoc.getChrNr()]);
-                    dLoc.setL(correctedPositions[0]);
-                    dLoc.setR(correctedPositions[1]);
-                }
-
                 Subsequence subseq = new Subsequence(dLoc.getL(), dLoc.getR(), dLoc.getChrNr(), dLoc.getDistance(), new BigDecimal(dLoc.getpValue()));
                 if (dLoc.getDistance() <= minDistances[i]){
                     bestSub.add(subseq);
@@ -153,19 +129,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         this.bestOccurrences[0] = new GeneClusterOccurrence(0, bestSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
         this.allOccurrences = new GeneClusterOccurrence[1];
         this.allOccurrences[0] = new GeneClusterOccurrence(0, allSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
-    }
-
-    private int[] getCorrectedPosition(int leftBorder, int rightBorder, int[] runLengthMergedLookup, int[] sequence) {
-        int[] correctedPositions = new int[]{leftBorder, rightBorder};
-        for (int i=0; i<runLengthMergedLookup.length; i++){
-            if (runLengthMergedLookup[i] >= rightBorder)
-                break;
-            if (runLengthMergedLookup[i] < leftBorder)
-                correctedPositions[0] -= sequence[runLengthMergedLookup[i]]+1;
-            if (runLengthMergedLookup[i] < rightBorder)
-                correctedPositions[1] -= sequence[runLengthMergedLookup[i]]+1;
-        }
-        return correctedPositions;
     }
 	
 	public Parameter.OperationMode getType() {

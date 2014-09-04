@@ -43,14 +43,15 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
         List<ReferenceCluster> refCluster = computeReferenceClusters(intArray, params, genomeGrouping, listener);
 
         List<GeneCluster> result = new ArrayList<>(refCluster.size());
-        if(!useMemoryReduction) {
-            for (int i = 0; i < refCluster.size(); i++)
-                result.add(new GeneCluster(i, refCluster.get(i), data));
-        } else {
+
+        if (useMemoryReduction){
             int[][][] runLengthMergedLookup = DataSet.createRunLengthMergedLookup(intArray);
-            for (int i = 0; i < refCluster.size(); i++)
-                result.add(new GeneCluster(i, refCluster.get(i), data, runLengthMergedLookup, intArray));
+            for (ReferenceCluster cluster : refCluster)
+                cluster.correctMergedPositions(runLengthMergedLookup, intArray);
         }
+        for (int i = 0; i < refCluster.size(); i++)
+            result.add(new GeneCluster(i, refCluster.get(i), data));
+
         return result;
     }
 	

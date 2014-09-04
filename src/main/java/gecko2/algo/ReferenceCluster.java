@@ -287,4 +287,44 @@ public class ReferenceCluster {
                 ", rightBorder=" + rightBorder +
                 '}';
     }
+
+    public void correctMergedPositions(int[][][] runLengthMergedLookup, int[][][] intArray) {
+        if (runLengthMergedLookup != null) {
+            int[] correctedPositions = getCorrectedPosition(
+                    getLeftBorder(),
+                    getRightBorder(),
+                    runLengthMergedLookup[getGenomeNr()][getChrNr()],
+                    intArray[getGenomeNr()][getChrNr()]);
+            setLeftBorder(correctedPositions[0]);
+            setRightBorder(correctedPositions[1]);
+        }
+
+        for (int i=0; i<getAllDeltaLocations().size(); i++) {
+            for (DeltaLocation dLoc : getDeltaLocations(i)) {
+                if (runLengthMergedLookup != null) {
+                    int[] correctedPositions = getCorrectedPosition(
+                            dLoc.getL(),
+                            dLoc.getR(),
+                            runLengthMergedLookup[dLoc.getGenomeNr()][dLoc.getChrNr()],
+                            intArray[dLoc.getGenomeNr()][dLoc.getChrNr()]);
+                    dLoc.setL(correctedPositions[0]);
+                    dLoc.setR(correctedPositions[1]);
+                }
+            }
+        }
+    }
+
+
+    private int[] getCorrectedPosition(int leftBorder, int rightBorder, int[] runLengthMergedLookup, int[] sequence) {
+        int[] correctedPositions = new int[]{leftBorder, rightBorder};
+        for (int i=0; i<runLengthMergedLookup.length; i++){
+            if (runLengthMergedLookup[i] >= rightBorder)
+                break;
+            if (runLengthMergedLookup[i] < leftBorder)
+                correctedPositions[0] -= sequence[runLengthMergedLookup[i]]+1;
+            if (runLengthMergedLookup[i] < rightBorder)
+                correctedPositions[1] -= sequence[runLengthMergedLookup[i]]+1;
+        }
+        return correctedPositions;
+    }
 }
