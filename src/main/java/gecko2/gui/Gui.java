@@ -50,11 +50,6 @@ public class Gui {
 		return gcSelector;
 	}
 	
-	public GeneClusterDisplay getGcDisplay() {
-		
-		return gcDisplay;
-	}
-	
 	private Gui() {
 		this.gecko = GeckoInstance.getInstance();
 		this.gecko.setGui(this);

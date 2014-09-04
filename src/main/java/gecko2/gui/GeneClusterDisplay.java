@@ -26,7 +26,6 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     private static final Font boldFont = new JLabel().getFont().deriveFont(Font.BOLD);
 
 	private final JPanel masterPanel;
-	private final JPanel flowPanel;
 	private GeneCluster cluster;
 	private GeneClusterOccurrence gOcc;
 
@@ -52,15 +51,12 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 	private static final String GENES_TITLE = "Genes in this Cluster:";
 	
 	public GeneClusterDisplay() {
-		flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		masterPanel = new JPanel();		
 		masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
 		masterPanel.setBackground(Color.WHITE);
-		flowPanel.setBackground(masterPanel.getBackground());
-		flowPanel.add(masterPanel);
-		this.setViewportView(flowPanel);
+		this.setViewportView(masterPanel);
 
-        chromosomeNameTable = new JTable(new ChromsomeNameTableModel());
+        chromosomeNameTable = new JTable(new ChromosomeNameTableModel());
         chromosomeNameTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         chromosomeNameTable.setShowGrid(false);
         chromosomeNameTable.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -75,7 +71,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         annotationTable.setShowGrid(false);
         annotationTable.setAlignmentX(Component.LEFT_ALIGNMENT);
         annotationTable.setDefaultRenderer(NumberInRectangle.NumberIcon.class, new NumberIconRenderer());
-        annotationTable.setDefaultRenderer(Integer.class, new GeneRenderer());
+        annotationTable.setDefaultRenderer(GeneFamily.class, new GeneRenderer());
         final TableColumnModel annotationTableColumnModel = annotationTable.getColumnModel();
         annotationTableColumnModel.getColumn(1).setPreferredWidth(50); // Index
         annotationTableColumnModel.getColumn(1).setMaxWidth(50); // Index
@@ -205,7 +201,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			masterPanel.add(title3);
 			masterPanel.add(Box.createVerticalStrut(5));
 
-			JPanel cpanel = generateChromsomeDistancePanel();
+			JPanel cpanel = generateChromosomeDistancePanel();
             cpanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             masterPanel.add(cpanel);
 			masterPanel.add(Box.createVerticalStrut(5));
@@ -249,7 +245,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         return cpanel;
     }
 
-    private JPanel generateChromsomeDistancePanel() {  //TODO smarter Object?
+    private JPanel generateChromosomeDistancePanel() {  //TODO smarter Object?
         JPanel cpanel = new JPanel();
         FlowLayout f = new FlowLayout(FlowLayout.LEFT);
         f.setVgap(1);
@@ -293,7 +289,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 		}
 	}
 
-    private class ChromsomeNameTableModel extends AbstractTableModel {
+    private class ChromosomeNameTableModel extends AbstractTableModel {
 
         private static final long serialVersionUID = -3306238610287868813L;
 
