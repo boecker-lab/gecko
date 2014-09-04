@@ -1,5 +1,6 @@
 package gecko2.testUtils;
 
+import gecko2.algo.GeneClusterTestUtils;
 import gecko2.algorithm.Parameter;
 
 import java.io.File;
@@ -12,11 +13,11 @@ import java.util.Set;
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
 public class ReferenceClusterTestSettings {
-    Parameter p;
-    File dataFile;
-    File expectedResultFile;
-    File resultOutputFile;
-    List<Set<Integer>> genomeGroups;
+    public Parameter p;
+    public File dataFile;
+    public File expectedResultFile;
+    public File resultOutputFile;
+    public List<Set<Integer>> genomeGroups;
 
     public static ReferenceClusterTestSettings memoryReductionDataD2S4Q2() {
         ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();

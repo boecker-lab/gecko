@@ -1,10 +1,8 @@
-package gecko2;
+package gecko2.algo;
 
-import gecko2.algo.ReferenceCluster;
-import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.Parameter;
 import gecko2.testUtils.*;
-import gecko2.testUtils.GeneClusterTestUtils.PValueComparison;
+import gecko2.algo.GeneClusterTestUtils.PValueComparison;
 import gecko2.util.LibraryUtils;
 import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 
@@ -17,8 +15,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.zip.DataFormatException;
 
-import static gecko2.testUtils.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
-import static gecko2.testUtils.GeneClusterTestUtils.compareReferenceClusters;
+import static gecko2.algo.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
+import static gecko2.algo.GeneClusterTestUtils.compareReferenceClusters;
 
 /**
  * The class tests the computeClusters algorithm from the Gecko2 program

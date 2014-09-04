@@ -5,7 +5,7 @@ import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.DataSet;
 import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Parameter;
-import gecko2.testUtils.GeneClusterTestUtils;
+import gecko2.algo.GeneClusterTestUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
-import static gecko2.testUtils.GeneClusterTestUtils.compareGeneClusters;
+import static gecko2.algo.GeneClusterTestUtils.compareGeneClusters;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 

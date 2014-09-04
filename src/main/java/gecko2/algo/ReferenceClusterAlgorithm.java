@@ -3,8 +3,11 @@ package gecko2.algo;
 import gecko2.algo.status.AlgorithmProgressListener;
 import gecko2.algo.status.AlgorithmProgressProvider;
 import gecko2.algo.status.AlgorithmStatusEvent;
+import gecko2.algorithm.DataSet;
+import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Parameter;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
@@ -17,6 +20,39 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
     private List<AlgorithmProgressListener> progressListeners;
     private int maxProgressValue;
     private int progressValue;
+
+    /**
+     * Computes reference gene clusters for the given dataset and the given parameters
+     * @param data the genomes
+     * @param params the parameters
+     * @param useMemoryReduction if memory reduction should be used
+     * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
+     * @param listener the progress listener
+     * @return the gene clusters
+     */
+    public static List<GeneCluster> computeReferenceClusters(DataSet data, Parameter params, boolean useMemoryReduction, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
+        int[][][] intArray;
+        if (!useMemoryReduction) {
+            intArray = data.toIntArray();
+            params.setAlphabetSize(data.getCompleteAlphabetSize());
+        } else {
+            intArray = data.toReducedIntArray();
+            params.setAlphabetSize(data.getReducedAlphabetSize());
+        }
+
+        List<ReferenceCluster> refCluster = computeReferenceClusters(intArray, params, genomeGrouping, listener);
+
+        List<GeneCluster> result = new ArrayList<>(refCluster.size());
+        if(!useMemoryReduction) {
+            for (int i = 0; i < refCluster.size(); i++)
+                result.add(new GeneCluster(i, refCluster.get(i), data));
+        } else {
+            int[][][] runLengthMergedLookup = DataSet.createRunLengthMergedLookup(intArray);
+            for (int i = 0; i < refCluster.size(); i++)
+                result.add(new GeneCluster(i, refCluster.get(i), data, runLengthMergedLookup, intArray));
+        }
+        return result;
+    }
 	
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
@@ -24,7 +60,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	 * @param param the parameters
 	 * @return the gene clusters
 	 */
-	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param) {
+	static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param) {
 		return computeReferenceClusters(genomes, param, null, null);
 	}
 
@@ -35,7 +71,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
      * @param listener the progress listener
      * @return the gene clusters
      */
-    public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, AlgorithmProgressListener listener) {
+    static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, AlgorithmProgressListener listener) {
         return computeReferenceClusters(genomes, param, null, listener);
     }
 
@@ -46,7 +82,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
      * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
      * @return the gene clusters
      */
-    public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
+    static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
         return computeReferenceClusters(genomes, param, genomeGrouping, null);
     }
 
@@ -60,7 +96,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
      * @param listener the progress listener
 	 * @return the gene clusters
 	 */
-	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
+	static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
 
@@ -140,8 +176,11 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 		long calcTime = System.nanoTime();		
 		System.out.println("Doing Statistics!");
 		
-		for (ReferenceCluster cluster : refClusterList)
-			cluster.setGeneContent(genomes);
+		for (ReferenceCluster cluster : refClusterList) {
+            cluster.setGeneContent(genomes);
+            cluster.setBestCombined_pValue(BigDecimal.ZERO);
+            cluster.setBestCombined_pValueCorrected(BigDecimal.ZERO);
+        }
 		
 		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
 		

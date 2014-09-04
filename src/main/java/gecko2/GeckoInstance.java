@@ -363,26 +363,7 @@ public class GeckoInstance {
 	 * @return the gene clusters
 	 */
 	public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping, boolean useMemoryReduction, AlgorithmProgressListener listener) {
-        int[][][] intArray;
-        if (!useMemoryReduction) {
-            intArray = data.toIntArray();
-            params.setAlphabetSize(data.getCompleteAlphabetSize());
-        } else {
-            intArray = data.toReducedIntArray();
-            params.setAlphabetSize(data.getReducedAlphabetSize());
-        }
-
-		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping, listener);
-        List<GeneCluster> result = new ArrayList<>(refCluster.size());
-        if(!useMemoryReduction) {
-            for (int i = 0; i < refCluster.size(); i++)
-                result.add(new GeneCluster(i, refCluster.get(i), data));
-        } else {
-            int[][][] runLengthMergedLookup = DataSet.createRunLengthMergedLookup(intArray);
-            for (int i = 0; i < refCluster.size(); i++)
-                result.add(new GeneCluster(i, refCluster.get(i), data, runLengthMergedLookup, intArray));
-        }
-        return result;
+		return ReferenceClusterAlgorithm.computeReferenceClusters(data, params, useMemoryReduction, genomeGrouping, listener);
 	}
 	
 	/**

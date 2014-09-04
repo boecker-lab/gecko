@@ -1,22 +1,13 @@
-package gecko2;
+package gecko2.algo;
 
-import gecko2.algo.ReferenceCluster;
-import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.Parameter;
 import gecko2.testUtils.ExpectedDeltaLocationValues;
 import gecko2.testUtils.ExpectedReferenceClusterValues;
-import gecko2.testUtils.GeneClusterTestUtils;
-import gecko2.testUtils.GeneClusterTestUtils.PValueComparison;
-import gecko2.testUtils.ReferenceClusterTestSettings;
+import gecko2.algo.GeneClusterTestUtils.PValueComparison;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.zip.DataFormatException;
-
-import static gecko2.testUtils.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
 
 public class ReferenceClusterDistanceMatrixTest {
 	

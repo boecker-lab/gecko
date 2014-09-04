@@ -1,4 +1,4 @@
-package gecko2.testUtils;
+package gecko2.algo;
 
 import gecko2.GeckoInstance;
 import gecko2.algo.DeltaLocation;
@@ -9,6 +9,9 @@ import gecko2.io.CogFileReader;
 import gecko2.io.DataSetWriter;
 import gecko2.io.GckFileReader;
 import gecko2.io.GeckoDataReader;
+import gecko2.testUtils.ExpectedDeltaLocationValues;
+import gecko2.testUtils.ExpectedReferenceClusterValues;
+import gecko2.testUtils.ReferenceClusterTestSettings;
 
 import java.io.IOException;
 import java.math.BigDecimal;
