@@ -122,9 +122,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 		ReferenceClusterAlgorithm refClusterAlgorithm = new ReferenceClusterAlgorithm(data, algoParameters, genomeGrouping);
         refClusterAlgorithm.addListener(listener);
 		
-		List<ReferenceCluster> refCluster = refClusterAlgorithm.computeRefClusters();
-
-        return refCluster;
+		return refClusterAlgorithm.computeRefClusters();
 	}
 	
     private static boolean checkParameters(AlgorithmParameters param) {
@@ -238,8 +236,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 				
 				for (int i=0; i<genomes.size(); i++){
 					if (param.searchRefInRef() && i==genomes.size()-1){
-						if (genomes.get(i).noOccOutsideInterval(pattern.getLastChar(), l, r, referenceChromosome.getNr()))
-							noOccCount[i]++; // TODO Fix for < 0
+                        noOccCount[i] += genomes.get(i).noOccOutsideInterval(pattern.getLastChar(), l, r, referenceChromosome.getNr());
 					} else {
                         noOccCount[i] += genomes.get(i).noOcc(pattern.getLastChar());
 					}

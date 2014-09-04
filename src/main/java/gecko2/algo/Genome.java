@@ -70,6 +70,7 @@ class Genome implements Iterable<Chromosome> {
     int noOcc(int c){
         if (c < 0)
             return -c;
+
     	for (Chromosome chr: chromosomes){
     		if (chr.getPOS(c).length != 0)
     			return 0;
@@ -78,27 +79,30 @@ class Genome implements Iterable<Chromosome> {
     }
     
     /**
-     * Checks if the character c does not occurre on the genome outside of the interval [l, r] in chromosome chrNr
+     * Checks if the character c does not occur on the genome outside of the interval [l, r] in chromosome chrNr
      * @param c the character
      * @param l the left border of the interval
      * @param r the right border of the interval
      * @param chrNr the number of the chromosome the interval is located on
-     * @return true if the character does not occurre outside of the interval
+     * @return 0 if the character does occur, values > 0 for how many characters do not occur
      */
-	public boolean noOccOutsideInterval(int c, int l, int r, int chrNr) {
+	public int noOccOutsideInterval(int c, int l, int r, int chrNr) {
+        if (c<0)
+            return -c;
+
 		for (Chromosome chr: chromosomes){
 			if (chr.getNr() != chrNr){
 	    		if (chr.getPOS(c).length != 0)
-	    			return false;
+	    			return 0;
 			} else {
 				int[] pos = chr.getPOS(c);
                 for (int position : pos) {
                     if (position < l || position > r)
-                        return false;
+                        return 0;
                 }
 			}
 		}
-		return true;
+		return 1;
 	}
 
     public int[] getCharFrequency(int alphabetSize) {
