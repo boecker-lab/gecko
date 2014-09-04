@@ -80,18 +80,13 @@ class Rank{
                     break;                                  // update can be stopped, as the rank of all other characters is unchanged
                 }
             }
-            if (chr.getGene(leftBorder-1)<0){
-            	
-            } else if (i==chr.getEffectiveGeneNumber()+1) {                                      // if character at position leftBorder-1 is not part of the interval
+            if (chr.getGene(leftBorder-1)>=0 && i==chr.getEffectiveGeneNumber()+1) {                                      // if character at position leftBorder-1 is not part of the interval
                 rank[chr.getGene(leftBorder-1)] = alphabetSize;      // he is assigned the default rank
             }
         }
     }
 
     @Override public String toString() {
-        if (rank != null)
-            return (String.format("Rank: %1$s", Arrays.toString(rank)));
-        else
-            return "Rank: null";
+        return String.format("Rank: %1$s", Arrays.toString(rank));
     }
 }

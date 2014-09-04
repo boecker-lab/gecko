@@ -17,7 +17,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	private final int nrOfGenomeGroups;
 	private final boolean useGenomeGrouping;
 
-    private List<AlgorithmProgressListener> progressListeners;
+    private final List<AlgorithmProgressListener> progressListeners;
     private int maxProgressValue;
     private int progressValue;
 
@@ -69,17 +69,6 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
      * Computes reference gene clusters for the given list of genomes and the given parameters
      * @param genomes the genomes
      * @param param the parameters
-     * @param listener the progress listener
-     * @return the gene clusters
-     */
-    static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, AlgorithmProgressListener listener) {
-        return computeReferenceClusters(genomes, param, null, listener);
-    }
-
-    /**
-     * Computes reference gene clusters for the given list of genomes and the given parameters
-     * @param genomes the genomes
-     * @param param the parameters
      * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
      * @return the gene clusters
      */
@@ -97,7 +86,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
      * @param listener the progress listener
 	 * @return the gene clusters
 	 */
-	static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
+	private static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
 
@@ -215,10 +204,10 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	private void detectReferenceGeneClusterFromSingleChromosome(int referenceGenomeNr, Chromosome referenceChromosome, List<ReferenceCluster> refClusterList){
 		for (int l = 1; l <= referenceChromosome.getEffectiveGeneNumber(); l++){
             fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingClusters));
-			genomes.updateLeftBorder(l, referenceChromosome, referenceGenomeNr, param);
+			genomes.updateLeftBorder(l, referenceChromosome, referenceGenomeNr);
 			Pattern pattern = new Pattern(genomes.getAlphabetSize(), genomes.size(), param, referenceGenomeNr, referenceChromosome, l);
 			
-			// Gene does not occure in any other Genome and does not occure in chr[i,...]
+			// Gene does not occur in any other Genome and does not occur in chr[i,...]
 			if (referenceChromosome.getGene(l) < 0 || (referenceChromosome.getNextOCC(l) > referenceChromosome.getEffectiveGeneNumber() && genomes.zeroOccs(referenceGenomeNr, referenceChromosome.getNr(), l, param.searchRefInRef())))
 				continue;
 			

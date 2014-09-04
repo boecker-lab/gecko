@@ -10,13 +10,7 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	private Set<DeltaLocation> deltaLocations;
 	
 	ListOfDeltaLocations(){
-		deltaLocations = new TreeSet<DeltaLocation>(new DeltaLocationOrderComperator());
-	}
-	
-	public ListOfDeltaLocations(ListOfDeltaLocations listOfDeltaLocations) {
-		this();
-		for (DeltaLocation dLoc : listOfDeltaLocations)
-			deltaLocations.add(new DeltaLocation(dLoc));
+		deltaLocations = new TreeSet<>(new DeltaLocationOrderComparator());
 	}
 
 	public void emptyList(){
@@ -121,10 +115,6 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 			}
 		return newList;
 	}
-
-	public boolean isEmpty() {
-		return 0 == deltaLocations.size();
-	}
 	
 	public void removeRefDLocReferenceHit(Pattern pattern, int chrNr) {
 		Iterator<DeltaLocation> dLocIt = deltaLocations.iterator();
@@ -153,7 +143,7 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	 * @author swinter
 	 *
 	 */
-	private static class DeltaLocationOrderComperator implements Comparator<DeltaLocation>, Serializable {
+	private static class DeltaLocationOrderComparator implements Comparator<DeltaLocation>, Serializable {
 		@Override
 		public int compare(DeltaLocation o1, DeltaLocation o2) {
 			if (o1.getL() < o2.getL())

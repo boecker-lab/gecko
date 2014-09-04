@@ -13,7 +13,7 @@ import java.util.*;
 
 class Statistics implements AlgorithmProgressProvider {
 	private final GenomeList genomes;
-	private final List<ReferenceCluster> refCluster;
+	private final List<ReferenceCluster> refClusterList;
 	private final int delta;
 	private final boolean singleReference;
 	private final Map<Integer, Integer> genomeGroupMapping;
@@ -23,13 +23,13 @@ class Statistics implements AlgorithmProgressProvider {
 	private BigDecimal testedIntervals;	
 	private final RandomEngine random;
 
-    private List<AlgorithmProgressListener> progressListeners;
-    private int maxProgressValue;
+    private final List<AlgorithmProgressListener> progressListeners;
+    private final int maxProgressValue;
     private int progressValue;
 	
-	private Statistics(GenomeList genomes, List<ReferenceCluster> refCluster, int delta, boolean singleReference, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping) {
+	private Statistics(GenomeList genomes, List<ReferenceCluster> refClusterList, int delta, boolean singleReference, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping) {
 		this.genomes = genomes;
-		this.refCluster = refCluster;
+		this.refClusterList = refClusterList;
 		this.delta = delta;
 		this.singleReference = singleReference;
 		this.testedIntervals = null;
@@ -40,7 +40,7 @@ class Statistics implements AlgorithmProgressProvider {
 		this.random = new MersenneTwister();
 
         progressListeners = new ArrayList<>();
-        maxProgressValue = genomes.size()*refCluster.size() + refCluster.size();
+        maxProgressValue = genomes.size()* refClusterList.size() + refClusterList.size();
         progressValue = 0;
 	}
 	
@@ -57,51 +57,58 @@ class Statistics implements AlgorithmProgressProvider {
 		
 		for (int k=0; k<genomes.size(); k++){
 			computeSinglePValuesForGenome(k, maxClusterSize);
-		} 
-		for (ReferenceCluster cluster : refCluster){
-            fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
-			double[] best_pValue = new double[nrOfGenomeGroups];  // init with 0.0
-
-			double bestRefLoc_pValue = 0.0;
-			DeltaLocation bestRefLoc = null;
-			
-			for (int k=0; k<genomes.size(); k++){
-				Iterator<DeltaLocation> dLocIt = cluster.getDeltaLocations(k).iterator();
-				int genomeGroup = useGenomeGrouping ? genomeGroupMapping.get(k) : k;
-				while(dLocIt.hasNext()){
-					DeltaLocation dLoc = dLocIt.next();
-					
-					double pValue = dLoc.getpValue();
-					if (pValue != 0.0 && (best_pValue[genomeGroup] == 0.0 || pValue < best_pValue[genomeGroup]))
-						best_pValue[genomeGroup] = pValue;
-					
-					if (dLoc.getChrNr() == -1){
-						assert(!dLocIt.hasNext());
-						dLocIt.remove();
-					} else {	
-						if (dLoc.getDistance() == 0 && pValue > bestRefLoc_pValue){
-							if (!singleReference || k==0) {  // only use k==0 as reference if using single reference
-								bestRefLoc_pValue = pValue;
-								bestRefLoc = dLoc;
-							}
-						}
-					}
-				}
-			}
-			bestRefLoc.setpValue(1.0);
-			if (useGenomeGrouping)
-				best_pValue[genomeGroupMapping.get(bestRefLoc.getGenomeNr())] = 1.0;
-			else
-				best_pValue[bestRefLoc.getGenomeNr()] = 1.0;
-
-            cluster.changeReferenceOccurrence(bestRefLoc);
-			
-			cluster.setBestCombined_pValue(combine_pValuesWithQuorum(best_pValue, cluster.getCoveredGenomeGroups()));
-			
-			//cluster.setBestCombined_pValueCorrected(bonferroniCorrection(cluster));
 		}
-		fdrCorrection(refCluster);
+
+		for (ReferenceCluster cluster : refClusterList) {
+            double[] best_pValue = determineBestReferenceOccurrence(cluster);
+            cluster.setBestCombined_pValue(combine_pValuesWithQuorum(best_pValue, cluster.getCoveredGenomeGroups()));
+            //cluster.setBestCombined_pValueCorrected(bonferroniCorrection(cluster));
+        }
+
+		fdrCorrection(refClusterList);
 	}
+
+    private double[] determineBestReferenceOccurrence(ReferenceCluster cluster){
+
+        fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
+        double[] best_pValue = new double[nrOfGenomeGroups];  // init with 0.0
+
+        double bestRefLoc_pValue = 0.0;
+        DeltaLocation bestRefLoc = null;
+
+        for (int k=0; k<genomes.size(); k++){
+            Iterator<DeltaLocation> dLocIt = cluster.getDeltaLocations(k).iterator();
+            int genomeGroup = useGenomeGrouping ? genomeGroupMapping.get(k) : k;
+            while(dLocIt.hasNext()){
+                DeltaLocation dLoc = dLocIt.next();
+
+                double pValue = dLoc.getpValue();
+                if (pValue != 0.0 && (best_pValue[genomeGroup] == 0.0 || pValue < best_pValue[genomeGroup]))
+                    best_pValue[genomeGroup] = pValue;
+
+                if (dLoc.getChrNr() == -1){
+                    assert(!dLocIt.hasNext());
+                    dLocIt.remove();
+                } else {
+                    if (dLoc.getDistance() == 0 && pValue > bestRefLoc_pValue){
+                        if (!singleReference || k==0) {  // only use k==0 as reference if using single reference
+                            bestRefLoc_pValue = pValue;
+                            bestRefLoc = dLoc;
+                        }
+                    }
+                }
+            }
+        }
+        bestRefLoc.setpValue(1.0);
+        if (useGenomeGrouping)
+            best_pValue[genomeGroupMapping.get(bestRefLoc.getGenomeNr())] = 1.0;
+        else
+            best_pValue[bestRefLoc.getGenomeNr()] = 1.0;
+
+        cluster.changeReferenceOccurrence(bestRefLoc);
+
+        return best_pValue;
+    }
 	
 	private BigDecimal bonferroniCorrection(ReferenceCluster cluster) {
 		if (testedIntervals == null){
@@ -286,7 +293,7 @@ class Statistics implements AlgorithmProgressProvider {
 		double[] globalProbabilityForDifferentCharHits = computeGlobalProbabilityForDifferentCharHits(charFrequencies);
 		PTable pPlusTable = new PTable(globalProbabilityForDifferentCharHits, maxClusterSize, delta, random);
 
-		for (ReferenceCluster cluster : refCluster){
+		for (ReferenceCluster cluster : refClusterList){
             fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
 			if (cluster.getDeltaLocations(genomeNr).isEmpty()){
 				DeltaLocation artificial_dLoc = DeltaLocation.getArtificialDeltaLocation(genomeNr, cluster.getMaxDistance());
@@ -420,7 +427,7 @@ class Statistics implements AlgorithmProgressProvider {
 	private int getMaxRefClusterSize() {
 		int maxSize = 0;
 		
-		for (ReferenceCluster cluster : refCluster)
+		for (ReferenceCluster cluster : refClusterList)
 			if (cluster.getSize() > maxSize)
 				maxSize = cluster.getSize();
 		

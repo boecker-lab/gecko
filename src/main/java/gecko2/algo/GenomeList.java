@@ -13,37 +13,6 @@ class GenomeList {
     private final int alphabetSize;
     
     private boolean containsReferenceCopy;
-
-    /**
-     * Constructor for generating a SetOfSequences from a lists of Integers.
-     * @param genomes the lists of Integers.
-     */
-    GenomeList(List<List<List<Integer>>> genomes) {
-        SortedSet<Integer> genes = new TreeSet<Integer>();
-        int alphSize = 0;
-        int i = 0;
-        this.genomes = new ArrayList<Genome>(genomes.size());
-        for (List<List<Integer>> genome : genomes) {
-            List<Chromosome> chromosomes = new ArrayList<Chromosome>(genome.size());
-            int j=0;
-            for (List<Integer> chromosome : genome) {
-                for (Integer gene : chromosome) {
-                    if (gene.equals(0))
-                        throw new IllegalArgumentException("0 genes not permitted!");
-                    if (genes.add(gene))
-                        alphSize++;
-                }
-                chromosomes.add(new Chromosome(chromosome, j));
-                j++;
-            }
-            Genome g = new Genome(i, chromosomes);
-            this.genomes.add(g);
-            i++;
-        }
-        this.alphabetSize = alphSize;
-        this.containsReferenceCopy = false;
-    }
-    
     /**
      * Constructor for generating a SetOfSequences from an array of integer with given alphabet size.
      * @param genomes the lists of Integers.
@@ -165,12 +134,10 @@ class GenomeList {
      * @param leftBorder the new left border of the pattern.
      * @param refChr the reference chromosome.
      * @param refGenomeNr the number of the genome the reference chromosome is located on.
-     * @param param the parameters the algorithm is started with.
      */
-    public void updateLeftBorder(int leftBorder, Chromosome refChr, int refGenomeNr, AlgorithmParameters param) {
+    public void updateLeftBorder(int leftBorder, Chromosome refChr, int refGenomeNr) {
         rank.updateRank(refChr, leftBorder, alphabetSize);  //TODO rank really in seqSet? Alternative Rank in Pattern
-        
-        //Überträgt L nicht
+
         this.updateL(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
         this.updateR(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
         this.updateL_R_prime(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
@@ -249,26 +216,6 @@ class GenomeList {
 		}
 		
 	}
-
-    /**
-     * Returns the frequencies of all different genes for each genome.
-     * charFrequency[i][0] contains the number of singleton genes in genome i
-     * @return
-     */
-    int[][] charFrequencies() {
-    	int[][] charFreq = new int[genomes.size()][alphabetSize+1];
-    	
-    	for (int k=0; k<genomes.size(); k++)
-    		for (Chromosome chr : genomes.get(k))
-    			for (int i=1; i<chr.getEffectiveGeneNumber()+1; i++){  // Correct for not counted 0 termination
-    				if (chr.getGene(i)<0)
-                        charFreq[k][0]++;
-                    else
-    				    charFreq[k][chr.getGene(i)]++;
-    			}
- 
-    	return charFreq;
-    }
 
     @Override public String toString() {
         StringBuilder b = new StringBuilder(String.format("Alphabet size: %1$d%n", alphabetSize));

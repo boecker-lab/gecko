@@ -46,10 +46,6 @@ class Genome implements Iterable<Chromosome> {
         return chromosomes.get(nr);
     }
     
-    public int getChromosomeCount() {
-    	return chromosomes.size();
-    }
-    
     public int getNr(){
     	return nr;
     }

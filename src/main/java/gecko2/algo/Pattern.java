@@ -150,7 +150,7 @@ class Pattern {
                         int leftBorder = chr.getL(charPos, dLeft);
                         int rightBorder = chr.getR(charPos, dRight);
 
-                        if (dRight > 1)  // Teste ob neues unmarkiertes Zeichen R[dRight-1] schon im Intervall vorkommt
+                        if (dRight > 1)  // Check if new unmarked char R[dRight-1] is already contained in the interval
                             if (chr.getPrevOCC(chr.getR(charPos, dRight - 1)) < Math.max(1, leftBorder))
                             	interveningChars++;
 
@@ -192,8 +192,7 @@ class Pattern {
     }
 
     @Override public String toString() {
-        StringBuilder b = new StringBuilder(String.format("Pattern: RefGenomeNr: %1$d, L: %2$d, R: %3$d, lastChar: %4$d, %n", refGenomeNr, l, r, lastChar));
-        b.append(Arrays.toString(occ));
-        return b.toString();
+        return String.format("Pattern: RefGenomeNr: %1$d, L: %2$d, R: %3$d, lastChar: %4$d, %n", refGenomeNr, l, r, lastChar)
+                + Arrays.toString(occ);
     }
 }

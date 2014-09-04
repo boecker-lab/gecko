@@ -51,7 +51,8 @@ class Chromosome {
     }
     
     /**
-     * Constructs a new instance of a Chromosome from a List of Integers representing the gene homologies. Assigns a number to the chromosome and appends terminal character 0 to the chromosome. Calculates some additional members of the Chromosome, based on the alphabet size of the whole set of genomes and the parameters of the algorithm.
+     * Constructs a new instance of a Chromosome from a List of Integers representing the gene homologies.
+     * Assigns a number to the chromosome and appends terminal character 0 to the chromosome.
      *
      * @param genes        the list of Integers that represents the homologies of the genes.
      * @param number       the number of the chromosome.
@@ -145,8 +146,6 @@ class Chromosome {
         	if(genes[i]>=0){
             	newPrevOcc[i] = occ[genes[i]];
             	occ[genes[i]] = i;
-        	} else {
-        		
         	}
         }
 
@@ -161,8 +160,6 @@ class Chromosome {
         	if(genes[i]>=0){
         		newNextOcc[i] = occ[genes[i]];
         		occ[genes[i]] = i;
-        	} else {
-        		//mal schauen
         	}
         }
 
@@ -346,7 +343,7 @@ class Chromosome {
 
     /**
      * Calculate new values for L for positions with characters with rank smaller than c_old
-     * @param rank
+     * @param rank the rank array of the current reference interval.
      * @param c_old must not be < 0
      */
     private void updateL_characterRankSmallerC_Old(Rank rank, int c_old){
@@ -375,7 +372,7 @@ class Chromosome {
 
     /**
      * Calculate new values for L for positions with character c_old
-     * @param rank
+     * @param rank the rank array of the current reference interval.
      * @param c_old must not be < 0
      */
     private void updateL_characterEqualsC_Old(Rank rank, int c_old){
@@ -478,7 +475,7 @@ class Chromosome {
 
     /**
      * Calculate new values for R for positions with characters with rank smaller than c_old
-     * @param rank
+     * @param rank the rank array of the current reference interval.
      * @param c_old must not be < 0
      */
     private void updateR_characterRankSmallerC_Old(Rank rank, int c_old){
@@ -508,7 +505,7 @@ class Chromosome {
 
     /**
      * Calculate new values for R for positions with character c_old
-     * @param rank
+     * @param rank the rank array of the current reference interval.
      * @param c_old must not be < 0
      */
     private void updateR_characterEqualsC_Old(Rank rank, int c_old){
@@ -597,8 +594,7 @@ class Chromosome {
     	} else {
     		maxUpdateRank = (leftBorderForPrimes==1) ? alphabetSize+1 : rank.getRank(geneForPrimes);
     	}
-    	
-    	for(int j=1;j<=this.getEffectiveGeneNumber();j++){ // Iteriere durch jede Position der aktuellen Sequenz
+    	for(int j=1;j<=this.getEffectiveGeneNumber();j++){
 			if(genes[j]<0)
                 continue;
 			if(rank.getRank(genes[j])<=maxUpdateRank) {
@@ -630,11 +626,10 @@ class Chromosome {
     	} else {
     		maxUpdateRank = (leftBorderForPrimes==1) ? alphabetSize+1 : rank.getRank(geneForPrimes);
     	}
-    	for(int j=1;j<=this.getEffectiveGeneNumber();j++){ // Iteriere durch jede Position der aktuellen Sequenz
+    	for(int j=1;j<=this.getEffectiveGeneNumber();j++){
 			if (genes[j]<0)
                 continue;
     		if(rank.getRank(genes[j])<=maxUpdateRank) {
-
 				for(int d=1; d<=delta+1; d++) {
 					for(int l=this.R[j][d]-1; l>=j; l--) {
 						if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {

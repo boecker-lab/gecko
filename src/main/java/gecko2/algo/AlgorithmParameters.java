@@ -122,7 +122,7 @@ public class AlgorithmParameters{
 	}
 	
 	/**
-	 * Checks if a valide delta table has been supplied
+	 * Checks if a valid delta table has been supplied
 	 * @param deltaTable the delta table
 	 * @return true if the table is valid, else false
 	 */
