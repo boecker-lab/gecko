@@ -1,5 +1,6 @@
 package gecko2.gui;
 
+import gecko2.algorithm.Parameter;
 import gecko2.gui.util.JTableSelectAll;
 
 import javax.swing.*;
@@ -7,6 +8,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.zip.DataFormatException;
@@ -18,12 +22,12 @@ public class DeltaTable extends JPanel{
     DeltaTableTableModel model;
 
     public DeltaTable(Dimension dimension) {
-        this(dimension, null);
+        this(dimension, Parameter.DeltaTable.getDefault().getDeltaTable());
     }
 
     public DeltaTable(Dimension dimension, int[][] deltas) {
         super(new GridLayout(1,0));
-        JTable deltaTable = new JTableSelectAll();
+        final JTable deltaTable = new JTableSelectAll();
         deltaTable.setBackground(Color.WHITE);
         model = new DeltaTableTableModel(deltas);
         deltaTable.setModel(model);
@@ -33,8 +37,63 @@ public class DeltaTable extends JPanel{
         deltaTable.setPreferredScrollableViewportSize(dimension);
         deltaTable.setFillsViewportHeight(true);
 
-        JScrollPane scrollPane = new JScrollPane(deltaTable);
+        // add popup menu to table
+        final JPopupMenu popUp = new JPopupMenu();
+        final JMenuItem addRow = new JMenuItem(new AbstractAction("Add row"){
+            private static final long serialVersionUID = -5276986817187027648L;
 
+            /**
+             * Invoked when an action occurs.
+             *
+             * @param e
+             */
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.addEmptyDeltaValues(deltaTable.getSelectedRow());
+
+            }
+        });
+        final JMenuItem deleteRow = new JMenuItem(new AbstractAction("Delete Row") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.removeRow(deltaTable.getSelectedRow());
+            }
+        });
+        final JMenuItem reset = new JMenuItem(new AbstractAction("Reset") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setDeltaTable(Parameter.DeltaTable.getDefault().getDeltaTable());
+            }
+        });
+
+        popUp.add(addRow);
+        popUp.add(deleteRow);
+        popUp.addSeparator();
+        popUp.add(reset);
+
+        // mouse listener for popup menu
+        deltaTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            private void maybeShowPopup(MouseEvent e){
+                if (e.isPopupTrigger()) {
+                    int row = deltaTable.rowAtPoint(e.getPoint());
+                    int column = deltaTable.columnAtPoint(e.getPoint());
+                    deltaTable.changeSelection(row, column, false, false);
+                    popUp.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+
+        JScrollPane scrollPane = new JScrollPane(deltaTable);
         add(scrollPane);
     }
 
@@ -83,13 +142,7 @@ public class DeltaTable extends JPanel{
         @Override
         public void setValueAt(Object value, int rowIndex, int columnIndex) {
             deltaValues.get(rowIndex)[columnIndex] = (int)value;
-            if (rowIndex == deltaValues.size()-1 && isValidRow(rowIndex)){
-                addEmptyDeltaValues();
-                fireTableRowsInserted(rowIndex+1, rowIndex+1);
-            } else if (deltaValues.size() > 1 && rowIndex == deltaValues.size()-2 && isInValidRow(rowIndex) && isInValidRow(rowIndex + 1)) {
-                    deltaValues.remove(deltaValues.size()-1);
-                    fireTableRowsDeleted(rowIndex, rowIndex);
-            }
+            checkAndAddOrRemoveLastRows();
             fireTableCellUpdated(rowIndex, columnIndex);
         }
 
@@ -98,12 +151,13 @@ public class DeltaTable extends JPanel{
             return true;
         }
 
-        public boolean isValidRow(int row) {
-            return isValidCell(row, COL_D_ADD) && isValidCell(row, COL_D_LOSS) && isValidCell(row, COL_D_SUM);
-        }
 
-        private boolean isInValidRow(int row) {
-            return !isValidCell(row, COL_D_ADD) && !isValidCell(row, COL_D_LOSS) && !isValidCell(row, COL_D_SUM);
+        /*
+         * Additional table logic
+         */
+
+        public boolean isValidRow(int row) {
+            return isValidCell(row, COL_D_ADD) && isValidCell(row, COL_D_LOSS) && isValidCell(row, COL_D_SUM) && isValidCell(row, COL_SIZE);
         }
 
         public boolean isValidCell(int row, int column) {
@@ -130,12 +184,23 @@ public class DeltaTable extends JPanel{
         }
 
         public int[][] getDeltaTable() {
-            int[][] deltaTable = new int[deltaValues.size()-1][];
-            for (int i=0; i<deltaTable.length; i++) {
-                deltaTable[i] = new int[3];
-                for (int j=0; j<deltaTable[i].length; j++)
-                    deltaTable[i][j] = deltaValues.get(i)[j];
+            int[][] deltaTable = new int[deltaValues.get(deltaValues.size()-2)[COL_SIZE]+1][];
+            int row = 0;
+            int[] currentDeltaValues = new int[]{0, 0 ,0};
+            for (int i=0; i<deltaValues.size()-1; i++) {
+                int deltaValueRow = deltaValues.get(i)[COL_SIZE];
+                while (row < deltaValueRow)
+                    deltaTable[row++] = Arrays.copyOf(currentDeltaValues, currentDeltaValues.length);
+
+                currentDeltaValues = new int[3];
+                for (int j=0; j<3; j++)
+                    currentDeltaValues[j] = deltaValues.get(i)[j];
+
+                deltaTable[row++] = Arrays.copyOf(currentDeltaValues, currentDeltaValues.length);
             }
+            while (row < deltaTable.length)
+                deltaTable[row++] = Arrays.copyOf(currentDeltaValues, currentDeltaValues.length);
+
             return deltaTable;
         }
 
@@ -163,15 +228,53 @@ public class DeltaTable extends JPanel{
                 addEmptyDeltaValues();
         }
 
-        boolean isZeroRow(int[] values) {
+        private boolean isZeroRow(int[] values) {
             for (int i=0; i<values.length; i++)
                 if (values[i] != 0)
                     return false;
             return true;
         }
 
-        private void addEmptyDeltaValues() {
-            deltaValues.add(new int[]{-1, -1, -1, (deltaValues.isEmpty()) ? 0 : deltaValues.get(deltaValues.size()-1)[COL_SIZE]+1 });
+        private boolean isEmptyRow(int row) {
+            if (deltaValues.get(row)[COL_D_SUM] > 0)
+                return false;
+            if (deltaValues.get(row)[COL_D_LOSS] > 0)
+                return false;
+            if (deltaValues.get(row)[COL_D_ADD] > 0)
+                return false;
+            return true;
+        }
+
+        private void checkAndAddOrRemoveLastRows() {
+            if (isValidRow(deltaValues.size()-1)) {
+                addEmptyDeltaValues();
+            } else if (isEmptyRow(deltaValues.size()-1)) {
+                for (int row = deltaValues.size()-2; row >= 0; row--){
+                    if (isEmptyRow(row)) {
+                        deltaValues.remove(deltaValues.size() - 1);
+                        fireTableRowsDeleted(row, row);
+                    } else
+                        break;
+                }
+            }
+        }
+
+        /**
+         * Adds an empty row at the end of the delta table
+         */
+        void addEmptyDeltaValues() {
+            addEmptyDeltaValues(deltaValues.size());
+        }
+
+        void addEmptyDeltaValues(int index) {
+            deltaValues.add(index, new int[]{-1, -1, -1, (deltaValues.isEmpty()) ? 0 : deltaValues.get(index-1)[COL_SIZE]+1 });
+            fireTableRowsInserted(index, index);
+        }
+
+        public void removeRow(int selectedRow) {
+            if (deltaValues.size()-1 != selectedRow)
+                deltaValues.remove(selectedRow);
+            fireTableRowsDeleted(selectedRow, selectedRow);
         }
     }
 
@@ -196,11 +299,6 @@ public class DeltaTable extends JPanel{
     public int[][] getDeltaTable() {
         return model.getDeltaTable();
     }
-
-    public void setDeltaTable(int[][] deltaTable) {
-        model.setDeltaTable(deltaTable);
-    }
-
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {

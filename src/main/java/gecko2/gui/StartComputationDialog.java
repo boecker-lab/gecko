@@ -54,9 +54,8 @@ public class StartComputationDialog extends JDialog {
 		panel.setPreferredSize(new Dimension(430,360));
 
         final JTabbedPane tabbedDistancePane = new JTabbedPane();
-        tabbedDistancePane.addTab("SingleDistance", getDistancePanel(new Dimension(410, 60)));
-        for (Parameter.DeltaTable table : Parameter.DeltaTable.getSupported())
-            tabbedDistancePane.addTab(table.toString(), new DeltaTable(new Dimension(410, 60), table.getDeltaTable()));
+        tabbedDistancePane.addTab("Single Distance", getDistancePanel(new Dimension(410, 60)));
+        tabbedDistancePane.add("Distance Table", new DeltaTable(new Dimension(410, 60)));
         panel.add(tabbedDistancePane);
 
 		final JPanel gridPanel = new JPanel();
@@ -221,7 +220,7 @@ public class StartComputationDialog extends JDialog {
 		JPanel lowerpanel = new JPanel();
 		lowerpanel.setLayout(new BoxLayout(lowerpanel,BoxLayout.X_AXIS));
 		lowerpanel.setPreferredSize(new Dimension(300,50));
-		Action okAction = new AbstractAction() {
+		Action okAction = new AbstractAction("OK") {
 		
 			private static final long serialVersionUID = 6197096728152587585L;
 			public void actionPerformed(ActionEvent e) {
@@ -277,7 +276,6 @@ public class StartComputationDialog extends JDialog {
 			}
 			
 		};
-		okAction.putValue(Action.NAME, "OK");
 		JButton okButton = new JButton(okAction);
 		Action cancelAction = new AbstractAction() {
 			private static final long serialVersionUID = 2057638030083370800L;

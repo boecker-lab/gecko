@@ -123,6 +123,10 @@ public class Parameter {
             // Support only a subset of values
             return new DeltaTable[]{highly_conserved, low_conserved};
         }
+
+        public static DeltaTable getDefault() {
+            return low_conserved;
+        }
     }
 	
     public final static int DELTA_TABLE_SIZE = 3;
