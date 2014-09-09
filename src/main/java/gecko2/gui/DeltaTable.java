@@ -13,7 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.zip.DataFormatException;
 
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)
@@ -45,7 +44,7 @@ public class DeltaTable extends JPanel{
             /**
              * Invoked when an action occurs.
              *
-             * @param e
+             * @param e the event
              */
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -54,12 +53,16 @@ public class DeltaTable extends JPanel{
             }
         });
         final JMenuItem deleteRow = new JMenuItem(new AbstractAction("Delete Row") {
+            private static final long serialVersionUID = -4664247776129030317L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.removeRow(deltaTable.getSelectedRow());
             }
         });
         final JMenuItem reset = new JMenuItem(new AbstractAction("Reset") {
+            private static final long serialVersionUID = 7855959578095508292L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.setDeltaTable(Parameter.DeltaTable.getDefault().getDeltaTable());
@@ -102,6 +105,8 @@ public class DeltaTable extends JPanel{
      * to always have at least one at a maximum of two invalid rows at the end,
      */
     private static class DeltaTableTableModel extends AbstractTableModel {
+        private static final long serialVersionUID = 769826863674743708L;
+
         private static final short COL_D_LOSS = 0;
         private static final short COL_D_ADD = 1;
         private static final short COL_D_SUM = 2;
@@ -164,15 +169,13 @@ public class DeltaTable extends JPanel{
             if (deltaValues.get(row)[column] < 0)
                 return false;
 
-            if (column == COL_SIZE)
-                if (row > 0)
-                    return deltaValues.get(row-1)[column] < deltaValues.get(row)[column];
-                else
-                    return true;
+            if (column == COL_SIZE) {
+                return row > 0 ? deltaValues.get(row - 1)[column] < deltaValues.get(row)[column] : true;
+            }
 
             boolean valid = true;
             if (row >= 1) {
-                valid &= deltaValues.get(row-1)[column] <= deltaValues.get(row)[column];
+                valid = deltaValues.get(row - 1)[column] <= deltaValues.get(row)[column];
             }
             if (column == COL_D_SUM) {
                 valid &= deltaValues.get(row)[column] >= deltaValues.get(row)[COL_D_ADD];
@@ -229,9 +232,10 @@ public class DeltaTable extends JPanel{
         }
 
         private boolean isZeroRow(int[] values) {
-            for (int i=0; i<values.length; i++)
-                if (values[i] != 0)
+            for (int value : values) {
+                if (value != 0)
                     return false;
+            }
             return true;
         }
 
@@ -298,27 +302,5 @@ public class DeltaTable extends JPanel{
 
     public int[][] getDeltaTable() {
         return model.getDeltaTable();
-    }
-
-    public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-    }
-
-    private static void createAndShowGUI() {
-        //Create and set up the window.
-        JFrame frame = new JFrame("SimpleTableDemo");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Create and set up the content pane.
-        DeltaTable deltaTable1 = new DeltaTable(new Dimension(500, 70));
-        frame.setContentPane(deltaTable1);
-
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
     }
 }
