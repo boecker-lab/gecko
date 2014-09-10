@@ -152,6 +152,10 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	private static class DeltaLocationOrderComperator implements Comparator<DeltaLocation>, Serializable {
 		@Override
 		public int compare(DeltaLocation o1, DeltaLocation o2) {
+            if (o1.getChrNr() < o2.getChrNr())
+                return -1;
+            if (o1.getChrNr() > o2.getChrNr())
+                return 1;
 			if (o1.getL() < o2.getL())
 				return -1;
 			if (o1.getL() == o2.getL() && o1.getR() < o2.getR())
