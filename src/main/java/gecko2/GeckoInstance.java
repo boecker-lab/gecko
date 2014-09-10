@@ -339,11 +339,13 @@ public class GeckoInstance {
 	public static List<GeneCluster> computeClustersJava(DataSet data, Parameter params, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
         int intArray[][][] = data.toIntArray();
 
-        params.setAlphabetSize(data.getAlphabetSize());
+        params.setAlphabetSize(data.getCompleteAlphabetSize());
+
 		List<ReferenceCluster> refCluster = ReferenceClusterAlgorithm.computeReferenceClusters(intArray, params, genomeGrouping, listener);
         List<GeneCluster> result = new ArrayList<>(refCluster.size());
         for (int i=0; i<refCluster.size(); i++)
             result.add(new GeneCluster(i, refCluster.get(i), data));
+
         return result;
 	}
 	
@@ -354,7 +356,7 @@ public class GeckoInstance {
 	 */
 	public List<GeneCluster> computeClustersLibgecko(DataSet data, Parameter params) {
         int intArray[][][] = data.toIntArray();
-        params.setAlphabetSize(data.getAlphabetSize());
+        params.setAlphabetSize(data.getCompleteAlphabetSize());
 		return new ArrayList<>(Arrays.asList(computeClusters(intArray, params, GeckoInstance.this)));
 	}
 
@@ -442,7 +444,6 @@ public class GeckoInstance {
         return geneClusterSwingWorker;
 	}
 
-	
 	public List<GeneCluster> computeReferenceStatistics(List<GeneCluster> clusters){
 		if (!this.isLibgeckoLoaded()){
 			System.err.println("Running in visualization only mode! Cannot compute statistics!");
@@ -459,7 +460,7 @@ public class GeckoInstance {
 		}
 		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.size()));
 		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-		p.setAlphabetSize(data.getAlphabetSize());
+		p.setAlphabetSize(data.getCompleteAlphabetSize());
 		return this.computeReferenceStatistics(genomes, p, clusters, this);
 	}
 	
