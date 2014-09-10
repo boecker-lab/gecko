@@ -6,7 +6,6 @@ import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.zip.DataFormatException;
