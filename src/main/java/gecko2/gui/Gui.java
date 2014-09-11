@@ -445,6 +445,7 @@ public class Gui {
 		
 		public void actionPerformed(ActionEvent e) {
 			final JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
+            fc.setAcceptAllFileFilterUsed(false);
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("cog;gck"));
 
 			int state = fc.showOpenDialog( null );

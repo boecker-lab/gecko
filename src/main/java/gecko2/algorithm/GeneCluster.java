@@ -1,5 +1,6 @@
 package gecko2.algorithm;
 
+import ca.odell.glazedlists.SortedList;
 import gecko2.GeckoInstance;
 import gecko2.algo.DeltaLocation;
 import gecko2.algo.ReferenceCluster;
@@ -543,35 +544,67 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * @return the tags of the gene in the reference occurrence
 	 */
 	public String getReferenceGeneNames() {
-		Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
-		Genome genome = GeckoInstance.getInstance().getGenomes()[getRefSeqIndex()];
-		List<String> names = new ArrayList<>();
-		for (int index = seq.getStart()-1; index < seq.getStop(); index++){
-			String newName = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getName();
-			boolean merged = false;
-			for (int i=0; i<names.size(); i++) {
-				String name = names.get(i);
-				if (newName.length() > 3 && name.length() > 3 && newName.substring(0, 3).equals(name.substring(0, 3))) {
-					String mergedTag = name.concat(newName.substring(3));
-					names.set(i, mergedTag);
-					merged = true;
-					break;
-				}
-			}
-			if (! merged)
-				names.add(newName);
-		}
-		StringBuilder builder = new StringBuilder();
-		boolean first = true;
-		for (String name : names){
-			if (! first)
-				builder.append(", ");
-			else
-				first = false;
-			builder.append((name.trim().equals("")) ? "-" : name);
-		}
-		return builder.toString();
+		return getGeneNames(getRefSeqIndex());
 	}
+
+    public String getGeneNames(int genome_index) {
+        if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
+            return "noOCC";
+        Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
+        Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
+
+        SortedMap<String, List<String>> nameMap = new TreeMap<>();
+        for (int index = seq.getStart()-1; index < seq.getStop(); index++){
+            String newName = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getName();
+            boolean merged = false;
+            if (newName.length() > 3) {
+                String prefix = newName.substring(0, 3);
+                String suffix = newName.substring(3);
+                if (nameMap.containsKey(prefix)){
+                    nameMap.get(prefix).add(suffix);
+                } else {
+                    List<String> list = new ArrayList<>();
+                    list.add(suffix);
+                    nameMap.put(prefix, list);
+                }
+            } else {
+                if (nameMap.containsKey(newName))
+                    nameMap.get(newName).add("-");
+                else {
+                    List<String> list = new ArrayList<>();
+                    list.add("-");
+                    nameMap.put(newName, list);
+                }
+            }
+        }
+        StringBuilder builder = new StringBuilder();
+        boolean first = true;
+        for (String prefix : nameMap.keySet()){
+            if (!first)
+                builder.append(", ");
+            else
+                first = false;
+
+            addSamePrefixString(prefix, nameMap.get(prefix), builder);
+        }
+        return builder.toString();
+    }
+
+    private void addSamePrefixString(String prefix, List<String> suffixes, StringBuilder builder) {
+        Collections.sort(suffixes);
+        if (prefix.trim().equals("")) {
+            for (Iterator<String> it = suffixes.iterator(); it.hasNext(); ){
+                String suffix = it.next();
+                builder.append(suffix);
+                if (it.hasNext())
+                    builder.append(", ");
+            }
+        } else {
+            builder.append(prefix);
+            for (String suffix : suffixes)
+                builder.append(suffix.trim().equals("") ? "-" : suffix);
+        }
+    }
 
     /**
      * Creates a Map that assigns an array of Gene Object to each gene id. Each array element refers
