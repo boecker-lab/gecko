@@ -54,7 +54,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 
 	
 	public GeneClusterSelector(final JTextField filterField) {
-        filterSelection = ResultFilter.showAll;
+        filterSelection = ResultFilter.showFiltered;
         textMatcherEditor = new TextComponentMatcherEditor<>(filterField, new GeneClusterTextFilterator());
         textMatcherEditor.setLive(false);
         textMatcherEditor.setMode(TextMatcherEditor.CONTAINS);
@@ -87,23 +87,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         popUp.add(exportMenuItem);
         popUp.addSeparator();
         popUp.add(showSimilarMenuItem);
-		
-		selectionComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JComboBox<ResultFilter> cb = (JComboBox<ResultFilter>)e.getSource();
-                ResultFilter newFilter = cb.getItemAt(cb.getSelectedIndex());
-                if (filterSelection != newFilter) {
-                    filterSelection = (ResultFilter) ((JComboBox) e.getSource()).getSelectedItem();
-                    if (filterSelection.equals(ResultFilter.showSelected)) {
-                        addAllToSelectionMenuItem.setEnabled(false);
-                    } else {
-                        addAllToSelectionMenuItem.setEnabled(true);
-                    }
-                    updateData();
-                }
-            }
-        });
 
 		checkBoxPanel.add(selectionComboBox);
 		checkBoxPanel.add(showSuboptimalCheckBox);
@@ -120,6 +103,23 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 		this.add(scrollPane, BorderLayout.CENTER);
 
         // Listeners
+        selectionComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox<ResultFilter> cb = (JComboBox<ResultFilter>)e.getSource();
+                ResultFilter newFilter = cb.getItemAt(cb.getSelectedIndex());
+                if (filterSelection != newFilter) {
+                    filterSelection = (ResultFilter) ((JComboBox) e.getSource()).getSelectedItem();
+                    if (filterSelection.equals(ResultFilter.showSelected)) {
+                        addAllToSelectionMenuItem.setEnabled(false);
+                    } else {
+                        addAllToSelectionMenuItem.setEnabled(true);
+                    }
+                    updateData();
+                }
+            }
+        });
+
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
