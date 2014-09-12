@@ -28,13 +28,9 @@ public class GeckoInstance {
 
     private native GeneCluster[] computeClusters(int[][][] genomes, Parameter params, GeckoInstance gecko);
 
-    public List<GeneCluster> computeReferenceStatistics(int[][][] genomes, Parameter params, List<GeneCluster> cluster, GeckoInstance gecko) {
-        return new ArrayList<>(Arrays.asList(computeReferenceStatistics(genomes, params, cluster.toArray(new GeneCluster[cluster.size()]), gecko)));
-    }
-
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
 
-    public enum ResultFilter {showAll, showFiltered, showSelected}
+    public enum ResultFilter {showFiltered, showAll, showSelected}
 	
 	private boolean libgeckoLoaded;
 	
@@ -52,10 +48,11 @@ public class GeckoInstance {
 	
 	private int geneElementHight;
     public static final int DEFAULT_GENE_HIGHT = 20;
+    public static final int DEFAULT_MAX_GENE_NAME_LENGTH = 6;
     private final static int MAX_GENEELEMENT_HIGHT = 40;
     private final static int MIN_GENEELEMENT_HIGHT = 9;
 
-    private int maxGeneNameLength = Integer.MAX_VALUE;
+    private int maxGeneNameLength = DEFAULT_MAX_GENE_NAME_LENGTH;
 
     private final EventListenerList eventListener = new EventListenerList();
 	
@@ -105,6 +102,10 @@ public class GeckoInstance {
 	/*
 	 * END DataEvents
 	 */
+
+    public List<GeneCluster> computeReferenceStatistics(int[][][] genomes, Parameter params, List<GeneCluster> cluster, GeckoInstance gecko) {
+        return new ArrayList<>(Arrays.asList(computeReferenceStatistics(genomes, params, cluster.toArray(new GeneCluster[cluster.size()]), gecko)));
+    }
 	
 	public Parameter getLastParameter() {
 		return lastParameter;

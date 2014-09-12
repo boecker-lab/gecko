@@ -13,6 +13,7 @@ public class ResultWriter {
 	public enum ExportType {
         clusterData("txt"),
         table("txt"),
+        geneNameTable("txt"),
         latexTable("tex"),
         internalDuplications("txt"),
         pdf("pdf"),
@@ -24,6 +25,18 @@ public class ResultWriter {
 
         ExportType(String defaultFileExtension) {
             this.defaultFileExtension = defaultFileExtension;
+        }
+
+        /**
+         * Wrapper method for values() that only returns the currently supported subset of values
+         * @return the supported subset of values
+         */
+        public static ExportType[] getSupported() {
+            // Support all values
+            return values();
+
+            // Support only a subset of values
+            //return new ExportType[]{clusterData, table, latexTable, pdf, multiPdf};
         }
     }
 	
@@ -41,6 +54,9 @@ public class ResultWriter {
                 break;
             case table:
                 writtenSuccessfully = writeGeneClusterTable(file, clusters);
+                break;
+            case geneNameTable:
+                writtenSuccessfully = writeGeneClusterGeneNameTable(file, clusters, genomeNames);
                 break;
             case latexTable:
                 writtenSuccessfully = writeGeneClusterLatexTable(file, clusters);
@@ -91,7 +107,7 @@ public class ResultWriter {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
             for (int i=0; i<clusters.size(); i++) {
                 GeneCluster cluster = clusters.get(i);
-                writer.write(String.format("%d\t%d\t%d\t%d\t%d\t%.1f\t%.2f\t%.2f\t%.4g\t%.4g\t%s%n", i+1, cluster.getGeneFamilies().size(), cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getBestPValue(), cluster.getBestPValueCorrected(), cluster.getReferenceGeneNames()));
+                writer.write(String.format("%d\t%d\t%d\t%d\t%d\t%.1f\t%.2f\t%.2f\t%.4g\t%.4g\t%s%n", cluster.getId(), cluster.getGeneFamilies().size(), cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getBestPValue(), cluster.getBestPValueCorrected(), cluster.getReferenceGeneNames()));
             }
             //writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
         } catch (IOException e) {
@@ -101,13 +117,37 @@ public class ResultWriter {
         return true;
 	}
 
+    private static boolean writeGeneClusterGeneNameTable(File f, List<GeneCluster> clusters, List<String> genomeNames) {
+        int[] genomesForNaming = new int[]{0, 150};
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
+            writer.write("ID \t No of genes \t No of genomes");
+            for (int i=0; i<genomesForNaming.length; i++){
+                writer.write("\t" + genomeNames.get(genomesForNaming[i]));
+            }
+            writer.newLine();
+            for (GeneCluster cluster : clusters) {
+                writer.write(String.format("%d\t%d\t%d", cluster.getId(), cluster.getGeneFamilies().size(), cluster.getSize()));
+                for (int i=0; i<genomesForNaming.length; i++){
+                    writer.write("\t"+cluster.getGeneNames(genomesForNaming[i]));
+                }
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
 	private static boolean writeGeneClusterLatexTable(File f, List<GeneCluster> clusters) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
             //writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
             for (int i=0; i<clusters.size(); i++) {
                 GeneCluster cluster = clusters.get(i);
-                writer.write(String.format("%d & %d & %d & %d & %d & %.1f & %.2f & %.2f & %s \\\\%n", i+1, cluster.getGeneFamilies().size(), cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getReferenceGeneNames()));
-                System.out.println(String.format("%d\t%.8g\t%.8g", i+1, cluster.getBestPValue(), cluster.getBestPValueCorrected()));
+                writer.write(String.format("%d & %d & %d & %d & %d & %.1f & %.2f & %.2f & %s \\\\%n", cluster.getId(), cluster.getGeneFamilies().size(), cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getReferenceGeneNames()));
+                System.out.println(String.format("%d\t%.8g\t%.8g", cluster.getId(), cluster.getBestPValue(), cluster.getBestPValueCorrected()));
             }
             return true;
         } catch (IOException e) {

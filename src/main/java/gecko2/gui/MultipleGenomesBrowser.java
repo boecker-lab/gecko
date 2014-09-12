@@ -124,16 +124,12 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			{
 				if (filterNonContainedGenomes && !filter)
 				{
-					// deactivate filter branch
-					for (int i = 0; i < this.getSelectedCluster().getOccurrences()[0].getSubsequences().length; i++)
-					{
-						this.centerpanel.getComponent(i).setVisible(true);
-						if (this.getSelectedCluster().getOccurrences()[0].getSubsequences()[i].length == 0)
-						{	
-							this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() + getGenomeBrowserHeight()));
-						}
-					}
-				
+                    for (Component component : this.centerpanel.getComponents()) {
+                        if (!component.isVisible()) {
+                            component.setVisible(true);
+                            this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() + getGenomeBrowserHeight()));
+                        }
+                    }
 					this.validate();
 				}
 			}
@@ -554,12 +550,12 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			
 			// save current filter status
 			boolean stat = filterNonContainedGenomes;
-			
+
+            // save the currently selected cluster for the filter function
+            selectedCluster = e.getSelection();
+
 			// deactivate the filter if active
 			this.hideNonClusteredGenomes(false);
-		
-			// save the currently selected cluster for the filter function
-			selectedCluster = e.getSelection();
 			
 			// if the check box is selected we show only the genomes which contain the cluster
 			if (stat)
