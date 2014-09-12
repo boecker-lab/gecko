@@ -589,6 +589,19 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return builder.toString();
     }
 
+    public String getGeneOrientations(int genome_index) {
+        if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
+            return "";
+        Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
+        Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
+
+        StringBuilder builder = new StringBuilder();
+        for (int index = seq.getStart()-1; index < seq.getStop(); index++){
+            builder.append(genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getOrientation().getEncoding());
+        }
+        return builder.toString();
+    }
+
     private void addSamePrefixString(String prefix, List<String> suffixes, StringBuilder builder) {
         Collections.sort(suffixes);
         if (prefix.trim().equals("")) {
