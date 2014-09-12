@@ -1,6 +1,5 @@
 package gecko2.algorithm;
 
-import ca.odell.glazedlists.SortedList;
 import gecko2.GeckoInstance;
 import gecko2.algo.DeltaLocation;
 import gecko2.algo.ReferenceCluster;
