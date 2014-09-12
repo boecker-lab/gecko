@@ -13,6 +13,7 @@ public class ResultWriter {
 	public enum ExportType {
         clusterData("txt"),
         table("txt"),
+        geneNameTable("txt"),
         latexTable("tex"),
         internalDuplications("txt"),
         pdf("pdf"),
@@ -24,6 +25,18 @@ public class ResultWriter {
 
         ExportType(String defaultFileExtension) {
             this.defaultFileExtension = defaultFileExtension;
+        }
+
+        /**
+         * Wrapper method for values() that only returns the currently supported subset of values
+         * @return the supported subset of values
+         */
+        public static ExportType[] getSupported() {
+            // Support all values
+            return values();
+
+            // Support only a subset of values
+            //return new ExportType[]{clusterData, table, latexTable, pdf, multiPdf};
         }
     }
 	
@@ -41,6 +54,9 @@ public class ResultWriter {
                 break;
             case table:
                 writtenSuccessfully = writeGeneClusterTable(file, clusters);
+                break;
+            case geneNameTable:
+                writtenSuccessfully = writeGeneClusterGeneNameTable(file, clusters, genomeNames);
                 break;
             case latexTable:
                 writtenSuccessfully = writeGeneClusterLatexTable(file, clusters);
@@ -100,6 +116,30 @@ public class ResultWriter {
         }
         return true;
 	}
+
+    private static boolean writeGeneClusterGeneNameTable(File f, List<GeneCluster> clusters, List<String> genomeNames) {
+        int[] genomesForNaming = new int[]{0, 150};
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
+            writer.write("ID \t No of genes \t No of genomes");
+            for (int i=0; i<genomesForNaming.length; i++){
+                writer.write("\t" + genomeNames.get(genomesForNaming[i]));
+            }
+            writer.newLine();
+            for (GeneCluster cluster : clusters) {
+                writer.write(String.format("%d\t%d\t%d", cluster.getId(), cluster.getGeneFamilies().size(), cluster.getSize()));
+                for (int i=0; i<genomesForNaming.length; i++){
+                    writer.write("\t"+cluster.getGeneNames(genomesForNaming[i]));
+                }
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
 
 	private static boolean writeGeneClusterLatexTable(File f, List<GeneCluster> clusters) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
