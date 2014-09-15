@@ -136,7 +136,7 @@ public class DataSet {
     /**
      * Print statistics of gene family sizes for all genomes
      */
-    private void printGenomeStatistics(){
+    public void printGenomeStatistics(){
         printGenomeStatistics(-1, -1);
     }
 
@@ -145,13 +145,13 @@ public class DataSet {
      * @param genomeSize  The number of genes that is needed for a genome to be reported. -1 will report statistics for all genomes.
      * @param genomeSizeDelta The maximum deviation form the genomeSize for a genome to be reported
      */
-    private void printGenomeStatistics(int genomeSize, int genomeSizeDelta) {
+    public void printGenomeStatistics(int genomeSize, int genomeSizeDelta) {
         int[][] alphabetPerGenome = new int[genomes.length][getCompleteAlphabetSize() + 1];
         String[][] annotations = new String[genomes.length][getCompleteAlphabetSize() + 1];
 
         SortedMap<Integer,Integer> summedFamilySizes = new TreeMap<>();
         int nrReportedGenomes = 0;
-        List<Integer> genomeSizes = new ArrayList<Integer>();
+        List<Integer> genomeSizes = new ArrayList<>();
         // Generate family sizes per genome and print it
         for (int n=0; n<genomes.length; n++){
             Genome g = genomes[n];

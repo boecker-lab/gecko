@@ -405,7 +405,7 @@ public class GeckoInstance {
          */
         @Override
         protected List<GeneCluster> doInBackground() throws Exception {
-            //printGenomeStatistics(GeckoInstance.this.genomes, p.getAlphabetSize(), 1500, 250);
+            //data.printGenomeStatistics();
             //BreakPointDistance.breakPointDistance(GeckoInstance.this.genomes, false);
             //BreakPointDistance.groupGenomes(genomes, 0.1, 0.95, 0.1, false);
             //System.out.println("\n");
