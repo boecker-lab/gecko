@@ -128,6 +128,9 @@ public class ResultWriter {
             for (int i=0; i<genomesForNaming.length; i++){
                 writer.write("\t" + genomeNames.get(genomesForNaming[i]));
             }
+            for (int i=0; i<genomesForNaming.length; i++){
+                writer.write("\t" + genomeNames.get(genomesForNaming[i]));
+            }
             writer.newLine();
             for (GeneCluster cluster : clusters) {
                 writer.write(String.format("%d\t%d\t%d", cluster.getId(), cluster.getGeneFamilies().size(), cluster.getSize()));
@@ -136,6 +139,9 @@ public class ResultWriter {
                 }
                 for (int i=0; i<genomesForNaming.length; i++){
                     writer.write("\t"+cluster.getGeneOrientations(genomesForNaming[i]));
+                }
+                for (int i=0; i<genomesForNaming.length; i++){
+                    writer.write("\t"+cluster.getLocusTags(genomesForNaming[i]));
                 }
                 writer.newLine();
             }

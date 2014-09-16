@@ -548,7 +548,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
     public String getGeneNames(int genome_index) {
         if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
-            return "noOCC";
+            return "-/-";
         Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
         Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
 
@@ -589,9 +589,27 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return builder.toString();
     }
 
+    public String getLocusTags(int genome_index){
+        if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
+            return "-/-";
+
+        Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
+        Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
+
+        StringBuilder builder = new StringBuilder();
+        for (int index = seq.getStart()-1; index < seq.getStop(); index++) {
+            if (index != seq.getStart()-1) {
+                builder.append(", ");
+            }
+            builder.append(genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getTag());
+        }
+        return builder.toString();
+    }
+
     public String getGeneOrientations(int genome_index) {
         if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
-            return "";
+            return "-/-";
+
         Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
         Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
 
