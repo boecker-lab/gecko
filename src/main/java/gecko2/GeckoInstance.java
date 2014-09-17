@@ -420,6 +420,9 @@ public class GeckoInstance {
                 genomeGroups = BreakPointDistance.groupGenomes(data, groupingFactor, false);
 
             Date before = new Date();
+            if (!mergeResults){
+                data.clearClusters();
+            }
             List<GeneCluster> res = computeClustersJava(data, p, genomeGroups, this);
             Date after = new Date();
             setProgressStatus(100, AlgorithmStatusEvent.Task.Done);

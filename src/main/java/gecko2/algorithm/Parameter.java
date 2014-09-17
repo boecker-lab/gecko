@@ -110,6 +110,25 @@ public class Parameter {
             throw new RuntimeException("Should not happen!");
         }
 
+        public int getMinimumSize() {
+            switch (this) {
+                case highly_conserved:
+                    return 3;
+                case low_conserved:
+                    return 3;
+                case lichtheimia:
+                    return 3;
+                case lichtheimia_inner:
+                    return 3;
+                case statistic_paper:
+                    return 4;
+                case test_five_proteobacter:
+                    return 4;
+
+            }
+            throw new RuntimeException("Should not happen!");
+        }
+
         /**
          * Wrapper method for values() that only returns the currently supported subset of values
          * @return the supported subset of values
