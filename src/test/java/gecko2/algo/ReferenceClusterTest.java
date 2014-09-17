@@ -48,7 +48,7 @@ public class ReferenceClusterTest
         // def array for computation
         int genomes[][][] = {{{0, 1, 2, -4, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
 
-        Parameter p = new Parameter(1, 3, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        Parameter p = new Parameter(1, 3, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
@@ -78,7 +78,7 @@ public class ReferenceClusterTest
         // def array for computation
         int genomes[][][] = {{{0, 1, 2, 0}}, {{0, 2, -2, 1, 0}}};
 
-        Parameter p = new Parameter(2, 3, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        Parameter p = new Parameter(2, 3, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 2);
@@ -108,7 +108,7 @@ public class ReferenceClusterTest
         // def array for computation
         int genomes[][][] = {{{0, 1, 2, -1, -1, -1, -1, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
 
-        Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
@@ -171,7 +171,7 @@ public class ReferenceClusterTest
         int genomes[][][] = {{{0, 1, 2, 3, -1, 0}}, {{0, 1, 2, 3, -1, 0}}};
 
         // def parameters
-        Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -246,7 +246,7 @@ public class ReferenceClusterTest
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 3, -1, 0}}, {{0, 1, 2, -1, 3, -1, 0}}};
 
-        Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+        Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -851,9 +851,6 @@ public class ReferenceClusterTest
 		// def parameters
 		Parameter p = new Parameter(1, 3, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
-
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
         ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
@@ -888,7 +885,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	/**

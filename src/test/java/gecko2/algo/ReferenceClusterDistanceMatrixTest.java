@@ -4,10 +4,17 @@ import gecko2.algorithm.Parameter;
 import gecko2.testUtils.ExpectedDeltaLocationValues;
 import gecko2.testUtils.ExpectedReferenceClusterValues;
 import gecko2.algo.GeneClusterTestUtils.PValueComparison;
+import gecko2.testUtils.ReferenceClusterTestSettings;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.DataFormatException;
+
+import static gecko2.algo.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
 
 public class ReferenceClusterDistanceMatrixTest {
 	
@@ -65,7 +72,7 @@ public class ReferenceClusterDistanceMatrixTest {
 		int genomes[][][] = {{{0, 1, 2, 5, 4 ,3 , 0}}, {{0, 1, 2, 6, 5, 4, 0}}, {{0, 1, 2, 7, 5, 8, 3, 4, 0}}};
 		
 		int[][] distanceMatrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {2, 2, 2}};
-		Parameter p = new Parameter(distanceMatrix, 4, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+		Parameter p = new Parameter(distanceMatrix, 4, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 4, 0);
@@ -282,7 +289,7 @@ public class ReferenceClusterDistanceMatrixTest {
 	
 	
 	@Test
-	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws IOException, DataFormatException, ParseException {
+	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
 
         automaticGeneClusterTestFromFile(settings, false);

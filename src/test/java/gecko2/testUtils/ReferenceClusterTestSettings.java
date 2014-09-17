@@ -25,7 +25,6 @@ public class ReferenceClusterTestSettings {
                 2,
                 4,
                 2,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.allAgainstAll
         );
@@ -46,7 +45,6 @@ public class ReferenceClusterTestSettings {
                 2,
                 5,
                 2,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.allAgainstAll
         );
@@ -67,7 +65,6 @@ public class ReferenceClusterTestSettings {
                 3,
                 5,
                 2,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.genome
         );

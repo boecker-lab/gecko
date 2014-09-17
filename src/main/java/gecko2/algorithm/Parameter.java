@@ -1,7 +1,5 @@
 package gecko2.algorithm;
 
-import gecko2.gui.DeltaTable;
-
 public class Parameter {
 
     public enum OperationMode {
@@ -125,7 +123,7 @@ public class Parameter {
         }
 
         public static DeltaTable getDefault() {
-            return low_conserved;
+            return highly_conserved;
         }
     }
 	

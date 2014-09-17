@@ -378,6 +378,10 @@ public class GeckoInstance {
 		return new ArrayList<>(Arrays.asList(computeClusters(intArray, params, GeckoInstance.this)));
 	}
 
+    public void stopComputation() {
+        //TODO fill
+    }
+
     class GeneClusterDetectionTask extends SwingWorker<List<GeneCluster>, Void> implements AlgorithmProgressListener{
         private final Parameter p;
         private final boolean mergeResults;
@@ -477,7 +481,7 @@ public class GeckoInstance {
 			minQuorum = Math.min(minQuorum, cluster.getSize());
 		}
 		System.out.println(String.format("D:%d, S:%d, Q:%d, for %d clusters.", maxPWDelta, minClusterSize, minQuorum, clusters.size()));
-		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(maxPWDelta, minClusterSize, minQuorum, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 		p.setAlphabetSize(data.getCompleteAlphabetSize());
 		return this.computeReferenceStatistics(genomes, p, clusters, this);
 	}
