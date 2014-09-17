@@ -10,13 +10,7 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	private Set<DeltaLocation> deltaLocations;
 	
 	ListOfDeltaLocations(){
-		deltaLocations = new TreeSet<DeltaLocation>(new DeltaLocationOrderComperator());
-	}
-	
-	public ListOfDeltaLocations(ListOfDeltaLocations listOfDeltaLocations) {
-		this();
-		for (DeltaLocation dLoc : listOfDeltaLocations)
-			deltaLocations.add(new DeltaLocation(dLoc));
+		deltaLocations = new TreeSet<>(new DeltaLocationOrderComparator());
 	}
 
 	public void emptyList(){
@@ -27,31 +21,33 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 		int chrNr = -1;
 		int[] pos = null;
 		Iterator<DeltaLocation> dLocIt = deltaLocations.iterator();
-		while(dLocIt.hasNext()) {
-			DeltaLocation dLoc = dLocIt.next();
-			if (dLoc.getChrNr() != chrNr) {
-				chrNr = dLoc.getChrNr();
-				pos = genomes.get(dLoc.getGenomeNr()).get(chrNr).getPOS(c);
-			}
-			
-			if (pos == null)
-				continue;
-				
-			int i=0;
-			for (; i<pos.length; i++) {
-				if (dLoc.getL() <= pos[i])
-					break;
-			}
-				
-			if (i<pos.length && dLoc.getR() >= pos[i])
-				dLoc.increaseHitCount();
-			else {
-				dLoc.increaseDistance();
-				if (!dLoc.isInheritableWithoutC(genomes.get(dLoc.getGenomeNr()).get(dLoc.getChrNr()), delta, c)){
-					dLocIt.remove();
-				}
-			}
-		}
+
+        while(dLocIt.hasNext()) {
+            DeltaLocation dLoc = dLocIt.next();
+            if (dLoc.getChrNr() != chrNr) {
+                chrNr = dLoc.getChrNr();
+                pos = genomes.get(dLoc.getGenomeNr()).get(chrNr).getPOS(c);
+            }
+
+            if (pos == null)
+                continue;
+
+            int i=0;
+            for (; i<pos.length; i++) {
+                if (dLoc.getL() <= pos[i])
+                    break;
+            }
+
+            if (i<pos.length && dLoc.getR() >= pos[i])
+                dLoc.increaseHitCount();
+            else {
+                dLoc.increaseDistance(Math.max(1, -c));
+
+                if (!dLoc.isInheritableWithoutC(genomes.get(dLoc.getGenomeNr()).get(dLoc.getChrNr()), delta, c)){
+                    dLocIt.remove();
+                }
+            }
+        }
 	}		
 
 
@@ -86,6 +82,8 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	}
 
 	public boolean valid_dLocContainsCharacter(int c, GenomeList genomes) {
+        if (c < 0)
+            return false;
 		for (DeltaLocation dLoc : deltaLocations){
 			if (dLoc.isValid()){
 				for (int l=dLoc.getL(); l<=dLoc.getR(); l++)
@@ -98,7 +96,7 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	
 	public ListOfDeltaLocations getOptimalCopy() {
 		ListOfDeltaLocations newList = new ListOfDeltaLocations();
-		for (DeltaLocation dLoc : deltaLocations)
+ 		for (DeltaLocation dLoc : deltaLocations)
 			if (dLoc.isValid()) {
 				boolean validLoc = true;
 				Iterator<DeltaLocation> newLocIter = newList.iterator();
@@ -116,10 +114,6 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 					newList.deltaLocations.add(dLoc);
 			}
 		return newList;
-	}
-
-	public boolean isEmpty() {
-		return 0 == deltaLocations.size();
 	}
 	
 	public void removeRefDLocReferenceHit(Pattern pattern, int chrNr) {
@@ -149,9 +143,13 @@ public class ListOfDeltaLocations implements Iterable<DeltaLocation>{
 	 * @author swinter
 	 *
 	 */
-	private static class DeltaLocationOrderComperator implements Comparator<DeltaLocation>, Serializable {
+	private static class DeltaLocationOrderComparator implements Comparator<DeltaLocation>, Serializable {
 		@Override
 		public int compare(DeltaLocation o1, DeltaLocation o2) {
+            if (o1.getChrNr() < o2.getChrNr())
+                return -1;
+            if (o1.getChrNr() > o2.getChrNr())
+                return 1;
 			if (o1.getL() < o2.getL())
 				return -1;
 			if (o1.getL() == o2.getL() && o1.getR() < o2.getR())

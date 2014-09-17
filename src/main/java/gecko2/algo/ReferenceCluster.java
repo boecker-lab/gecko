@@ -16,6 +16,7 @@ public class ReferenceCluster {
 	private BigDecimal bestCombined_pValue;
 	private BigDecimal bestCombined_pValueCorrected;
 	private List<Integer> geneContent;
+    private boolean containsSingletonGene;
 	private final boolean searchRefInRef;
 
     public ReferenceCluster(Pattern refPattern, List<ListOfDeltaLocations> dLocLists, boolean searchRefInRef, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping){
@@ -102,9 +103,17 @@ public class ReferenceCluster {
     public int getLeftBorder() {
         return leftBorder;
     }
+    
+    public void setLeftBorder(int x){
+    	this.leftBorder = x;
+    }
 
     public int getRightBorder() {
         return rightBorder;
+    }
+    
+    public void setRightBorder(int x){
+    	this.rightBorder = x;
     }
 
 	public BigDecimal getBestCombined_pValue() {
@@ -210,8 +219,15 @@ public class ReferenceCluster {
 
 	public void setGeneContent(GenomeList genomes) {
 		geneContent = new ArrayList<>(size);
+        containsSingletonGene = false;
 		for (int i=leftBorder; i<=rightBorder && geneContent.size()<size; i++){
-			if (genomes.get(genomeNr).get(chrNr).getPrevOCC(i) < leftBorder){
+            int gene = genomes.get(genomeNr).get(chrNr).getGene(i);
+            if (gene < 0) {
+                containsSingletonGene = true;
+                for (int g=0; g<-gene; g++)
+                    geneContent.add(-1);
+            }
+			else if (genomes.get(genomeNr).get(chrNr).getPrevOCC(i) < leftBorder){
 				geneContent.add(genomes.get(genomeNr).get(chrNr).getGene(i));
 			}
 		}
@@ -220,6 +236,10 @@ public class ReferenceCluster {
 	public List<Integer> getGeneContent(){
 		return geneContent;
 	}
+
+    public boolean isOnlyPossibleReferenceOccurrence(DeltaLocation dLoc) {
+        return dLoc.getDistance() == 0 && dLoc.getGenomeNr() == this.getGenomeNr() && containsSingletonGene;
+    }
 
 	/**
 	 * Converts additional reference hits in the second reference genome into hits in the original reference genome. 
@@ -258,8 +278,53 @@ public class ReferenceCluster {
 		return false;
 	}
 
-	@Override
-	public String toString() {
-		return bestCombined_pValue.toString();
-	}
+    @Override
+    public String toString() {
+        return "ReferenceCluster{" +
+                "genomeNr=" + genomeNr +
+                ", chrNr=" + chrNr +
+                ", leftBorder=" + leftBorder +
+                ", rightBorder=" + rightBorder +
+                '}';
+    }
+
+    public void correctMergedPositions(int[][][] runLengthMergedLookup, int[][][] intArray) {
+        if (runLengthMergedLookup != null) {
+            int[] correctedPositions = getCorrectedPosition(
+                    getLeftBorder(),
+                    getRightBorder(),
+                    runLengthMergedLookup[getGenomeNr()][getChrNr()],
+                    intArray[getGenomeNr()][getChrNr()]);
+            setLeftBorder(correctedPositions[0]);
+            setRightBorder(correctedPositions[1]);
+        }
+
+        for (int i=0; i<getAllDeltaLocations().size(); i++) {
+            for (DeltaLocation dLoc : getDeltaLocations(i)) {
+                if (runLengthMergedLookup != null) {
+                    int[] correctedPositions = getCorrectedPosition(
+                            dLoc.getL(),
+                            dLoc.getR(),
+                            runLengthMergedLookup[dLoc.getGenomeNr()][dLoc.getChrNr()],
+                            intArray[dLoc.getGenomeNr()][dLoc.getChrNr()]);
+                    dLoc.setL(correctedPositions[0]);
+                    dLoc.setR(correctedPositions[1]);
+                }
+            }
+        }
+    }
+
+
+    private int[] getCorrectedPosition(int leftBorder, int rightBorder, int[] runLengthMergedLookup, int[] sequence) {
+        int[] correctedPositions = new int[]{leftBorder, rightBorder};
+        for (int i=0; i<runLengthMergedLookup.length; i++){
+            if (runLengthMergedLookup[i] >= rightBorder)
+                break;
+            if (runLengthMergedLookup[i] < leftBorder)
+                correctedPositions[0] -= sequence[runLengthMergedLookup[i]]+1;
+            if (runLengthMergedLookup[i] < rightBorder)
+                correctedPositions[1] -= sequence[runLengthMergedLookup[i]]+1;
+        }
+        return correctedPositions;
+    }
 }

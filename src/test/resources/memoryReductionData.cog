@@ -1,0 +1,28 @@
+Shorty 1
+4 proteins
+1	+	J	fusA	elongation factor EF-G	
+4	+	J	tufA1	elongation factor EF-Tu	
+10	+	J	tufA1	elongation factor EF-Tu	
+3	+	J	rpsJ	ribosomal protein S10			
+
+Shorty 2
+5 proteins
+14	+	J	fusA	elongation factor EF-G	
+4	+	J	tufA1	elongation factor EF-Tu	
+3	+	J	rpsJ	ribosomal protein S10	
+1	+	J	rplC	ribosomal protein L03	
+13	+	J	rplD	ribosomal protein L04		
+
+Shorty 3 chromosome I
+8 proteins
+4	-	S	----	hypothetical protein	
+3	+	O	----	hypothetical protein	
+11	+	S	----	putative protein
+12	+	S	----	putative protein	
+1	-	M	nsd 	nucleotide sugar dehydrogenase		
+
+Shorty 3 chromosome II
+3 proteins
+3	-	O	smb 	small protein B	
+1	-	S	----	hypothetical protein	
+4	+	O	----	hypothetical protein	

@@ -13,7 +13,7 @@ import java.util.*;
 
 class Statistics implements AlgorithmProgressProvider {
 	private final GenomeList genomes;
-	private final List<ReferenceCluster> refCluster;
+	private final List<ReferenceCluster> refClusterList;
 	private final int delta;
 	private final boolean singleReference;
 	private final Map<Integer, Integer> genomeGroupMapping;
@@ -23,13 +23,13 @@ class Statistics implements AlgorithmProgressProvider {
 	private BigDecimal testedIntervals;	
 	private final RandomEngine random;
 
-    private List<AlgorithmProgressListener> progressListeners;
-    private int maxProgressValue;
-    private int progressValue;
+	private final List<AlgorithmProgressListener> progressListeners;
+	private final int maxProgressValue;
+	private int progressValue;
 	
-	private Statistics(GenomeList genomes, List<ReferenceCluster> refCluster, int delta, boolean singleReference, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping) {
+	private Statistics(GenomeList genomes, List<ReferenceCluster> refClusterList, int delta, boolean singleReference, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping) {
 		this.genomes = genomes;
-		this.refCluster = refCluster;
+		this.refClusterList = refClusterList;
 		this.delta = delta;
 		this.singleReference = singleReference;
 		this.testedIntervals = null;
@@ -39,69 +39,74 @@ class Statistics implements AlgorithmProgressProvider {
 		
 		this.random = new MersenneTwister();
 
-        progressListeners = new ArrayList<>();
-        maxProgressValue = genomes.size()*refCluster.size() + refCluster.size();
-        progressValue = 0;
+		progressListeners = new ArrayList<>();
+		maxProgressValue = genomes.size()* refClusterList.size() + refClusterList.size();
+		progressValue = 0;
 	}
 	
 	public static void computeReferenceStatistics(GenomeList genomes, List<ReferenceCluster> refCluster, int delta, boolean singleReference, int nrOfGenomeGroups, Map<Integer, Integer> genomeGroupMapping, List<AlgorithmProgressListener> listeners) {
 		Statistics statistics = new Statistics(genomes, refCluster, delta, singleReference, nrOfGenomeGroups, genomeGroupMapping);
-        for (AlgorithmProgressListener listener : listeners)
-            statistics.addListener(listener);
+		for (AlgorithmProgressListener listener : listeners)
+			statistics.addListener(listener);
 		
 		statistics.computeStatistics();
 	}
 
 	private void computeStatistics() {
-		int[][] charFrequencies = genomes.charFrequencies();
 		int maxClusterSize = getMaxRefClusterSize() + delta;
 		
 		for (int k=0; k<genomes.size(); k++){
-			computeSinglePValuesForGenome(k, maxClusterSize, charFrequencies[k]);
-		} 
-		for (ReferenceCluster cluster : refCluster){
-            fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
-			double[] best_pValue = new double[nrOfGenomeGroups];  // init with 0.0
+			computeSinglePValuesForGenome(k, maxClusterSize);
+		}
 
-			double bestRefLoc_pValue = 0.0;
-			DeltaLocation bestRefLoc = null;
-			
-			for (int k=0; k<genomes.size(); k++){
-				Iterator<DeltaLocation> dLocIt = cluster.getDeltaLocations(k).iterator();
-				int genomeGroup = useGenomeGrouping ? genomeGroupMapping.get(k) : k;
-				while(dLocIt.hasNext()){
-					DeltaLocation dLoc = dLocIt.next();
-					
-					double pValue = dLoc.getpValue();
-					if (pValue != 0.0 && (best_pValue[genomeGroup] == 0.0 || pValue < best_pValue[genomeGroup]))
-						best_pValue[genomeGroup] = pValue;
-					
-					if (dLoc.getChrNr() == -1){
-						assert(!dLocIt.hasNext());
-						dLocIt.remove();
-					} else {	
-						if (dLoc.getDistance() == 0 && pValue > bestRefLoc_pValue){
-							if (!singleReference || k==0) {  // only use k==0 as reference if using single reference
-								bestRefLoc_pValue = pValue;
-								bestRefLoc = dLoc;
-							}
+		for (ReferenceCluster cluster : refClusterList) {
+			double[] best_pValue = determineBestReferenceOccurrence(cluster);
+			cluster.setBestCombined_pValue(combine_pValuesWithQuorum(best_pValue, cluster.getCoveredGenomeGroups()));
+			//cluster.setBestCombined_pValueCorrected(bonferroniCorrection(cluster));
+		}
+
+		fdrCorrection(refClusterList);
+	}
+
+	private double[] determineBestReferenceOccurrence(ReferenceCluster cluster){
+		fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
+		double[] best_pValue = new double[nrOfGenomeGroups];  // init with 0.0
+
+		double bestRefLoc_pValue = 0.0;
+		DeltaLocation bestRefLoc = null;
+
+		for (int k=0; k<genomes.size(); k++){
+			Iterator<DeltaLocation> dLocIt = cluster.getDeltaLocations(k).iterator();
+			int genomeGroup = useGenomeGrouping ? genomeGroupMapping.get(k) : k;
+			while(dLocIt.hasNext()){
+				DeltaLocation dLoc = dLocIt.next();
+
+				double pValue = dLoc.getpValue();
+				if (pValue != 0.0 && (best_pValue[genomeGroup] == 0.0 || pValue < best_pValue[genomeGroup]))
+					best_pValue[genomeGroup] = pValue;
+
+				if (dLoc.getChrNr() == -1){
+					assert(!dLocIt.hasNext());
+					dLocIt.remove();
+				} else {
+					if (dLoc.getDistance() == 0 && pValue > bestRefLoc_pValue){
+						if (!singleReference || k==0) {  // only use k==0 as reference if using single reference
+							bestRefLoc_pValue = pValue;
+							bestRefLoc = dLoc;
 						}
 					}
 				}
 			}
-			bestRefLoc.setpValue(1.0);
-			if (useGenomeGrouping)
-				best_pValue[genomeGroupMapping.get(bestRefLoc.getGenomeNr())] = 1.0;
-			else
-				best_pValue[bestRefLoc.getGenomeNr()] = 1.0;
-
-            cluster.changeReferenceOccurrence(bestRefLoc);
-			
-			cluster.setBestCombined_pValue(combine_pValuesWithQuorum(best_pValue, cluster.getCoveredGenomeGroups()));
-			
-			//cluster.setBestCombined_pValueCorrected(bonferroniCorrection(cluster));
 		}
-		fdrCorrection(refCluster);
+		bestRefLoc.setpValue(1.0);
+		if (useGenomeGrouping)
+			best_pValue[genomeGroupMapping.get(bestRefLoc.getGenomeNr())] = 1.0;
+		else
+			best_pValue[bestRefLoc.getGenomeNr()] = 1.0;
+
+		cluster.changeReferenceOccurrence(bestRefLoc);
+
+		return best_pValue;
 	}
 	
 	private BigDecimal bonferroniCorrection(ReferenceCluster cluster) {
@@ -227,8 +232,8 @@ class Statistics implements AlgorithmProgressProvider {
 	private BigDecimal combine_pValuesWithQuorum(double[] pValue, int Q) {
 		if (Q == pValue.length || Q == genomes.size()){
 			Probability combined = Probability.ONE;
-            for (double aPValue : pValue)
-                combined = combined.multiply(aPValue);
+			for (double aPValue : pValue)
+				combined = combined.multiply(aPValue);
 			return combined.toBigDecimal();
 		}
 		
@@ -282,34 +287,40 @@ class Statistics implements AlgorithmProgressProvider {
 		return sum.toBigDecimal();
 	}
 
-	private void computeSinglePValuesForGenome(int genomeNr, int maxClusterSize, int[] charFrequencies){
-		double[] globalProbabilityForDifferenCharHits = computeGlobalProbabilityForDifferentCharHits(genomes.getAlphabetSize()+1, charFrequencies);
-		PTable pPlusTable = new PTable(genomes.getAlphabetSize(), maxClusterSize, delta, globalProbabilityForDifferenCharHits, random);
-		
-		for (ReferenceCluster cluster : refCluster){
-            fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
+	private void computeSinglePValuesForGenome(int genomeNr, int maxClusterSize){
+		int[] charFrequencies = genomes.get(genomeNr).getCharFrequency(genomes.getAlphabetSize());
+		double[] globalProbabilityForDifferentCharHits = computeGlobalProbabilityForDifferentCharHits(charFrequencies);
+		PTable pPlusTable = new PTable(globalProbabilityForDifferentCharHits, maxClusterSize, delta, random);
+
+		for (ReferenceCluster cluster : refClusterList){
+			fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingStatistics));
 			if (cluster.getDeltaLocations(genomeNr).isEmpty()){
 				DeltaLocation artificial_dLoc = DeltaLocation.getArtificialDeltaLocation(genomeNr, cluster.getMaxDistance());
 				cluster.getDeltaLocations(genomeNr).add(artificial_dLoc);					
 			}
-            for (DeltaLocation dLoc : cluster.getDeltaLocations(genomeNr)) {
-                // For individual distance bound
-            	dLoc.setpValue(prob_C_has_approxOccInGenome(dLoc.getDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
-                // For global distance bound
-                //dLoc.setpValue(prob_C_has_approxOccInGenome(cluster.getMaxDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
-            }
+			for (DeltaLocation dLoc : cluster.getDeltaLocations(genomeNr)) {
+				if (cluster.isOnlyPossibleReferenceOccurrence(dLoc))
+					dLoc.setpValue(1.0);                                         // does not need p-value
+				else {
+					// For individual distance bound
+					dLoc.setpValue(prob_C_has_approxOccInGenome(dLoc.getDistance(), genomes.get(genomeNr).getLength(), cluster.getGeneContent(), pPlusTable, charFrequencies));
+					// For global distance bound
+					//dLoc.setpValue(prob_C_has_approxOccInGenome(cluster.getMaxDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
+				}
+			}
 		}
 	}
 	
 	private double prob_C_has_approxOccInGenome(int delta, int totalLength,
-			int alphabetSize, List<Integer> geneContent, PTable pPlusTable, int[] charFreqs) {
-		if (noDLocPossible(geneContent, delta, charFreqs))
+			List<Integer> geneContent, PTable pPlusTable, int[] charFrequencies) {
+
+		if (noDLocPossible(geneContent, delta, charFrequencies))
 			return 0.0;
 		
-		double[] localCharProb = computeLocalCharProb(geneContent, charFreqs);
-		double probOfC = elementOfC_Prob(geneContent, charFreqs, totalLength);
+		double[] localCharProb = computeLocalCharProb(geneContent, charFrequencies);
+		double probOfC = elementOfC_Prob(geneContent, charFrequencies, totalLength);
 		
-		PTable pTable = new PTable(geneContent.size(), geneContent.size(), geneContent.size(), localCharProb, random);
+		PTable pTable = new PTable(localCharProb, geneContent.size(), geneContent.size(), random);
 		
 		double log = 0.0;
 		int L = Math.max(1, geneContent.size()-delta);
@@ -346,9 +357,10 @@ class Statistics implements AlgorithmProgressProvider {
 			int sizeOfC, PTable pMinusTable, PTable pPlusTable) {
 		double prob = 0.0;
 		Binomial binomial = null;
-		if (probOfC != 1.0)
+		if (probOfC < 1.0) //!=
 			binomial = new Binomial(L, probOfC, random);
-		
+			//Illegal argument (5 1,2 random) <= 0.0
+
 		for (int d_plus = Math.max(0, d-(sizeOfC-2)); d_plus<=d; d_plus++){
 			if (binomial != null) {
 				for (int l=0; l<=L; l++){
@@ -367,88 +379,95 @@ class Statistics implements AlgorithmProgressProvider {
 		return prob;
 	}
 
-	private double elementOfC_Prob(List<Integer> geneContent, int[] charFreqs,
+	private double elementOfC_Prob(List<Integer> geneContent, int[] charFrequencies,
 			int totalLength) {
 		int totalCharFreq = 0;
 		for (Integer gene : geneContent)
-			totalCharFreq += charFreqs[gene];
+			if (gene > 0)
+				totalCharFreq += charFrequencies[gene];
 		
 		return ((double)totalCharFreq)/totalLength;
 	}
 
 	private double[] computeLocalCharProb(List<Integer> geneContent,
-			int[] charFreqs) {
+			int[] charFrequencies) {
 		
 		double[] localCharProb = new double[geneContent.size()+1];
 		int totalFreq = 0;
 		int i=1;
-		for (Integer gene : geneContent){
-			totalFreq += charFreqs[gene];
-			if (charFreqs[gene] <= 0)
-				localCharProb[i] = 0.0;
-			else
-				localCharProb[i] = ((double)charFreqs[gene])/totalFreq;
+		for (Integer gene : geneContent) {
+			if (gene >= 0) {
+				totalFreq += charFrequencies[gene];
+				if (charFrequencies[gene] <= 0)
+					localCharProb[i] = 0.0;
+				else
+					localCharProb[i] = ((double)charFrequencies[gene])/totalFreq;
+			}
 			i++;
 		}
-		assert(geneContent.size() + 1 == i);
-		
+
 		return localCharProb;
 	}
 
 	private boolean noDLocPossible(List<Integer> geneContent, int maxDelta,
-                                   int[] charFreqs) {
+								   int[] charFrequencies) {
 		int nonAppearingGenes = 0;
 		for (Integer gene : geneContent){
-			if (charFreqs[gene] == 0)
+			if (gene < 0)
+				nonAppearingGenes++;
+			else if (charFrequencies[gene] == 0)
 				nonAppearingGenes++;
 			if (nonAppearingGenes > maxDelta)
 				return true;
 		}
-        return nonAppearingGenes == geneContent.size();
-    }
+		return nonAppearingGenes == geneContent.size();
+	}
 
 	private int getMaxRefClusterSize() {
 		int maxSize = 0;
 		
-		for (ReferenceCluster cluster : refCluster)
+		for (ReferenceCluster cluster : refClusterList)
 			if (cluster.getSize() > maxSize)
 				maxSize = cluster.getSize();
 		
 		return maxSize;
 	}
 
-	private double[] computeGlobalProbabilityForDifferentCharHits(int alphabetSize,
-			int[] charFrequencies) {
-		double[] charProb = new double[alphabetSize];
+	private double[] computeGlobalProbabilityForDifferentCharHits(int[] charFrequencies) {
+		double[] charProb = new double[charFrequencies.length + charFrequencies[0]];
 		int totalFreq = 0;
-		for (int i=1; i<alphabetSize; i++){
+		for (int i=0; i<charFrequencies[0]; i++){
+			totalFreq++;
+			charProb[i+1] = 1.0 / totalFreq;
+		}
+		for (int i=1; i<charFrequencies.length; i++){
 			totalFreq += charFrequencies[i];
 			if (charFrequencies[i] <= 0.0)
-				charProb[i] = 0.0;
+				charProb[i+charFrequencies[0]] = 0.0;
 			else{
-				charProb[i] = ((double)charFrequencies[i] / totalFreq);
+				charProb[i+charFrequencies[0]] = ((double)charFrequencies[i] / totalFreq);
 			}
 		}
 		return charProb;
 	}
 
-    @Override
-    public void addListener(AlgorithmProgressListener listener) {
-        if (listener != null) {
-            progressListeners.add(listener);
-            listener.algorithmProgressUpdate(new AlgorithmStatusEvent(maxProgressValue, AlgorithmStatusEvent.Task.Init));
-            listener.algorithmProgressUpdate(new AlgorithmStatusEvent(progressValue, AlgorithmStatusEvent.Task.ComputingStatistics));
-        }
-    }
+	@Override
+	public void addListener(AlgorithmProgressListener listener) {
+		if (listener != null) {
+			progressListeners.add(listener);
+			listener.algorithmProgressUpdate(new AlgorithmStatusEvent(maxProgressValue, AlgorithmStatusEvent.Task.Init));
+			listener.algorithmProgressUpdate(new AlgorithmStatusEvent(progressValue, AlgorithmStatusEvent.Task.ComputingStatistics));
+		}
+	}
 
-    @Override
-    public void removeListener(AlgorithmProgressListener listener) {
-        if (listener != null)
-            progressListeners.remove(listener);
-    }
+	@Override
+	public void removeListener(AlgorithmProgressListener listener) {
+		if (listener != null)
+			progressListeners.remove(listener);
+	}
 
-    private void fireProgressUpdateEvent(AlgorithmStatusEvent statusEvent){
-        for (AlgorithmProgressListener listener : progressListeners)
-            listener.algorithmProgressUpdate(statusEvent);
-    }
+	private void fireProgressUpdateEvent(AlgorithmStatusEvent statusEvent){
+		for (AlgorithmProgressListener listener : progressListeners)
+			listener.algorithmProgressUpdate(statusEvent);
+	}
 }

@@ -152,17 +152,22 @@ public class Gui {
 
         JMenu nameWidthChooser = new JMenu("Gene Width");
         ButtonGroup group = new ButtonGroup();
-        JRadioButtonMenuItem radioButtonMenuItem = new JRadioButtonMenuItem(MAX_WIDTH);
-        radioButtonMenuItem.addActionListener(changeGeneWidth);
-        radioButtonMenuItem.setSelected(true);
-        group.add(radioButtonMenuItem);
-        nameWidthChooser.add(radioButtonMenuItem);
+        boolean useMaxLength = true;
         for (int i=4; i<=12; i+=2) {
-            radioButtonMenuItem = new JRadioButtonMenuItem(Integer.toString(i));
+            JRadioButtonMenuItem radioButtonMenuItem = new JRadioButtonMenuItem(Integer.toString(i));
             radioButtonMenuItem.addActionListener(changeGeneWidth);
+            if (i==gecko.DEFAULT_MAX_GENE_NAME_LENGTH) {
+                radioButtonMenuItem.setSelected(true);
+                useMaxLength = false;
+            }
             group.add(radioButtonMenuItem);
             nameWidthChooser.add(radioButtonMenuItem);
         }
+        JRadioButtonMenuItem radioButtonMenuItem = new JRadioButtonMenuItem(MAX_WIDTH);
+        radioButtonMenuItem.addActionListener(changeGeneWidth);
+        radioButtonMenuItem.setSelected(useMaxLength);
+        group.add(radioButtonMenuItem);
+        nameWidthChooser.add(radioButtonMenuItem);
         menuView.add(nameWidthChooser);
 
         JMenu nameChooser = new JMenu("Gene Display Type");
@@ -440,6 +445,7 @@ public class Gui {
 		
 		public void actionPerformed(ActionEvent e) {
 			final JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
+            fc.setAcceptAllFileFilterUsed(false);
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("cog;gck"));
 
 			int state = fc.showOpenDialog( null );

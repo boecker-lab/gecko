@@ -51,6 +51,26 @@ public class DataSet {
         this.colorMap = null;
     }
 
+    public static int[][][] createRunLengthMergedLookup(int[][][] intArray){
+        int[][][] help2 = new int[intArray.length][][];
+        for (int i=0;i<intArray.length;i++){
+            help2[i] = new int[intArray[i].length][];
+            for (int j=0;j<intArray[i].length;j++){
+                List<Integer> help = new ArrayList<>();
+                for (int m=0;m<intArray[i][j].length;m++){
+                    if(intArray[i][j][m]<-1)
+                        help.add(m);
+                }
+                help2[i][j] = new int[help.size()];
+                for (int m=0;m<help.size();m++){
+                    help2[i][j][m]=help.get(m);
+                }
+            }
+        }
+
+        return help2;
+    }
+
     /**
 	 * Generates an int array from the genomes
 	 * @return an int array, containing all the genes
@@ -116,7 +136,7 @@ public class DataSet {
     /**
      * Print statistics of gene family sizes for all genomes
      */
-    private void printGenomeStatistics(){
+    public void printGenomeStatistics(){
         printGenomeStatistics(-1, -1);
     }
 
@@ -125,13 +145,13 @@ public class DataSet {
      * @param genomeSize  The number of genes that is needed for a genome to be reported. -1 will report statistics for all genomes.
      * @param genomeSizeDelta The maximum deviation form the genomeSize for a genome to be reported
      */
-    private void printGenomeStatistics(int genomeSize, int genomeSizeDelta) {
-        int[][] alphabetPerGenome = new int[genomes.length][getAlphabetSize() + 1];
-        String[][] annotations = new String[genomes.length][getAlphabetSize() + 1];
+    public void printGenomeStatistics(int genomeSize, int genomeSizeDelta) {
+        int[][] alphabetPerGenome = new int[genomes.length][getCompleteAlphabetSize() + 1];
+        String[][] annotations = new String[genomes.length][getCompleteAlphabetSize() + 1];
 
         SortedMap<Integer,Integer> summedFamilySizes = new TreeMap<>();
         int nrReportedGenomes = 0;
-        List<Integer> genomeSizes = new ArrayList<Integer>();
+        List<Integer> genomeSizes = new ArrayList<>();
         // Generate family sizes per genome and print it
         for (int n=0; n<genomes.length; n++){
             Genome g = genomes[n];
@@ -186,7 +206,7 @@ public class DataSet {
         System.out.println();
 
         // generate complete family sizes and print it
-        int[] alphabet = new int[getAlphabetSize() + 1];
+        int[] alphabet = new int[getCompleteAlphabetSize() + 1];
         for (Genome g : genomes){
             if (genomeSize != -1 && (g.getTotalGeneNumber() < genomeSize-genomeSizeDelta || g.getTotalGeneNumber() > genomeSize + genomeSizeDelta))
                 continue;
@@ -293,10 +313,6 @@ public class DataSet {
         return unknownGeneFamily;
     }
 
-    public int getNumberOfGeneFamiliesWithMultipleGenes() {
-        return numberOfGeneFamiliesWithMultipleGenes;
-    }
-
     public Map<String,GeneFamily> getGeneLabelMap() {
         Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
         geneFamilyMap.put(unknownGeneFamily.getExternalId(), unknownGeneFamily);
@@ -305,9 +321,12 @@ public class DataSet {
         return geneFamilyMap;
     }
 
-    public int getAlphabetSize() {
-        System.out.println("alphabetSize: " + (geneFamilySet.size() + unknownGeneFamily.getFamilySize()) + " compressed: " + (numberOfGeneFamiliesWithMultipleGenes));
+    public int getCompleteAlphabetSize() {
         return geneFamilySet.size() + unknownGeneFamily.getFamilySize();
+    }
+
+    public int getReducedAlphabetSize() {
+        return numberOfGeneFamiliesWithMultipleGenes;
     }
 
     private Map<GeneFamily, Color> getColorMap() {
