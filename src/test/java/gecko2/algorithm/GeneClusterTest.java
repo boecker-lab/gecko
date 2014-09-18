@@ -20,7 +20,7 @@ public class GeneClusterTest {
         GckFileReader gckFileReader = new GckFileReader(gckFile);
 
         DataSet data = gckFileReader.readData();
-        assertTrue(data.getClusters().get(0).invalidMultiGeneFamilyGeneCluster(data));
-        assertFalse(data.getClusters().get(1).invalidMultiGeneFamilyGeneCluster(data));
+        assertTrue(data.getClusters().get(0).invalidMultiGeneFamilyGeneCluster(4, data.getGenomes()));
+        assertFalse(data.getClusters().get(1).invalidMultiGeneFamilyGeneCluster(4, data.getGenomes()));
     }
 }

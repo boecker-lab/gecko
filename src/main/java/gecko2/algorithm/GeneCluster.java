@@ -538,14 +538,46 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		return this.bestPValue.compareTo(other.bestPValue);
 	}
 
-    public boolean invalidMultiGeneFamilyGeneCluster(DataSet data) {
+    public boolean invalidMultiGeneFamilyGeneCluster(int minClusterSize, Genome[] genomes) {
         Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
-        Genome genome = data.getGenomes()[getRefSeqIndex()];
+        Genome genome = genomes[getRefSeqIndex()];
 
         Set<GeneFamily> nonMergedGeneFamilies = getNonMergedGeneFamilies(seq, genome);
         List<Set<GeneFamily>> mergedGeneFamilies = getMergedGeneFamilies(seq, genome, nonMergedGeneFamilies);
-        return !mergedGeneFamilies.isEmpty();
+        if (!mergedGeneFamilies.isEmpty()) {
+            if (nonMergedGeneFamilies.size() + mergedGeneFamilies.size() < minClusterSize){
+                return true;
+            }
+            //return correctForMergedGeneFamilie(parameters, nonMergedGeneFamilies, mergedGeneFamilies, genomes);
+        }
+        return false;
     }
+
+    /*private boolean correctForMergedGeneFamilie(Parameter parameter, Set<GeneFamily> nonMergedGeneFamilies, List<Set<GeneFamily>> mergedGeneFamilies, Genome[] genomes) {
+        GeneClusterOccurrence occ = getOccurrences()[0];
+        for (int i=0; i<occ.getSubsequences().length; i++){
+            if (occ.getSubsequences()[i].length == 0)
+                continue;
+            if (i == getRefSeqIndex())
+                continue;
+
+            Genome genome = genomes[i];
+            for (Subsequence seq : occ.getSubsequences()[i]){
+                Set<GeneFamily> geneFamilies = getGeneFamiliesOfSubsequence(seq, genome);
+                int nonMissingFamilies = 0;
+                for (GeneFamily geneFamily : geneFamilies){
+                    if (nonMergedGeneFamilies.contains(geneFamily))
+                        nonMissingFamilies++;
+                    else {
+                        for (Set<GeneFamily> gFSet : mergedGeneFamilies){
+                            if (gFSet.contains(geneFamily))
+                                nonMissingFamilies++;
+                        }
+                }}
+            }
+        }
+
+    }*/
 
     private static List<Set<GeneFamily>> getMergedGeneFamilies(Subsequence seq, Genome genome, Set<GeneFamily> nonMergedGeneFamilies){
         List<Set<GeneFamily>> mergedGeneFamilies = new ArrayList<>();
@@ -589,13 +621,167 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return nonMergedGeneFamilies;
     }
 
-	/**
-	 * Returns the tags of the gene in the reference occurrence
-	 * @return the tags of the gene in the reference occurrence
+
+    Set<GeneFamily> getGeneFamiliesOfSubsequence(Subsequence seq, Genome genome){
+        Set<GeneFamily> geneFamilies = new HashSet<>();
+        for (int index = seq.getStart()-1; index < seq.getStop(); index++){
+            geneFamilies.add(genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getGeneFamily());
+        }
+        return geneFamilies;
+    }
+
+    /**
+     * Generates the default/initial sub-selection of cluster occurrences.
+     * @param includeSubOptimalOccurrences if sub-optimal occurrences should also be included
+     * @return an int[] with the index of each cluster occurrence that shall be used.
+     */
+    public int[] getDefaultSubSelection(boolean includeSubOptimalOccurrences) {
+        GeneClusterOccurrence gOcc;
+
+        if (includeSubOptimalOccurrences) {
+            gOcc = getAllOccurrences()[0];
+        }
+        else {
+            gOcc = getOccurrences()[0];
+        }
+
+        int[] subselections = new int[GeckoInstance.getInstance().getGenomes().length];
+
+        for (int i = 0; i < subselections.length; i++) {
+            if (gOcc.getSubsequences()[i].length == 0) {
+                subselections[i] = GeneClusterOccurrence.GENOME_NOT_INCLUDED;
+            }
+            else {
+                subselections[i] = 0;
+            }
+        }
+        return subselections;
+    }
+
+    /**
+	 * Tests, if this gene cluster is similar to the the other gene cluster
+	 * @param other the other gene cluster
+	 * @return if they are similar
 	 */
-	public String getReferenceGeneNames() {
-		return getGeneNames(getRefSeqIndex());
+	private boolean isSimilar(GeneCluster other) {
+		for (int i=0; i < this.bestOccurrences.length; i++) {
+			boolean similar = false;
+			boolean possibleSimilarOcc = true;
+			if (this.bestOccurrences[i] == null || other.bestOccurrences[i] == null)
+				continue;
+			for (int genome=0; genome < this.bestOccurrences[i].getSubsequences().length; genome++) {
+				Subsequence[] subsequences = this.bestOccurrences[i].getSubsequences()[genome];
+				Subsequence[] otherSubsequences = other.bestOccurrences[i].getSubsequences()[genome];
+				if ((subsequences.length == 0) ^ (otherSubsequences.length == 0)) {
+					//possibleSimilarOcc = false;
+					//break; //TODO not sure what is better!
+					continue;
+				}
+				for (Subsequence seq : subsequences) {
+					for (Subsequence oSeq : otherSubsequences) {
+						if (seq.getChromosome() == oSeq.getChromosome()) {
+							if (seq.getStart() >= oSeq.getStart() && seq.getStart() <= oSeq.getStop())
+								similar = true;
+							if (seq.getStop() > oSeq.getStart() && seq.getStop() < oSeq.getStop())
+								similar = true;
+							if (oSeq.getStart() >= seq.getStart() && oSeq.getStart() <= seq.getStop())
+								similar = true;
+							if (oSeq.getStop() > seq.getStart() && oSeq.getStop() < seq.getStop())
+								similar = true;
+						}
+					}
+				}
+			}
+			return (similar && possibleSimilarOcc);
+		}
+		return false;
 	}
+	
+	public static List<GeneCluster> mergeResults(List<GeneCluster> oldResults, List<GeneCluster> additionalResults) {
+		if (oldResults == null)
+			return additionalResults;
+		else if(additionalResults == null)
+			return oldResults;
+		else {
+			int newId = oldResults.size();
+			for (GeneCluster cluster : additionalResults) {
+				cluster.id = newId;
+				oldResults.add(cluster);
+				newId++;
+			}
+            return oldResults;
+		}
+	}
+	
+	private static List<List<GeneCluster>> groupSimilarClusters(GeneCluster[] allClusters) {
+		List<List<GeneCluster>> resultList = new ArrayList<>();
+		
+		for (GeneCluster cluster : allClusters){
+			List<GeneCluster> newGroup = new ArrayList<>();
+			newGroup.add(cluster);
+			
+			Iterator<List<GeneCluster>> listIter = resultList.iterator();
+			while (listIter.hasNext()){
+				List<GeneCluster> groupedClusters = listIter.next();
+				for (GeneCluster groupedCluster : groupedClusters) {
+					if (groupedCluster.isSimilar(cluster)){
+						newGroup.addAll(groupedClusters);
+						listIter.remove();
+						break;
+					}
+				}
+			}
+			resultList.add(newGroup);
+		}
+		
+		return resultList;
+	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GeneCluster that = (GeneCluster) o;
+
+        if (minTotalDist != that.minTotalDist) return false;
+        if (size != that.size) return false;
+        if (!geneFamilies.equals(that.geneFamilies)) return false;
+        if (type != that.type) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = geneFamilies.hashCode();
+        result = 31 * result + size;
+        result = 31 * result + minTotalDist;
+        result = 31 * result + type.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "GeneCluster{" +
+                "id=" + id +
+                ", geneFamilies=" + getGeneFamilyString() +
+                ", size=" + size +
+                ", bestPValue=" + bestPValue +
+                ", minTotalDist=" + minTotalDist +
+                ", refSeqIndex=" + refSeqIndex +
+                '}';
+    }
+
+        /* SOME OUTPUT HELPER STUFF */
+
+    /**
+     * Returns the tags of the gene in the reference occurrence
+     * @return the tags of the gene in the reference occurrence
+     */
+    public String getReferenceGeneNames() {
+        return getGeneNames(getRefSeqIndex());
+    }
 
     public String getGeneNames(int genome_index) {
         if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
@@ -784,169 +970,5 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             }
         }
         return map;
-    }
-
-
-    /**
-     * Generates the default/initial sub-selection of cluster occurrences.
-     * @param includeSubOptimalOccurrences if sub-optimal occurrences should also be included
-     * @return an int[] with the index of each cluster occurrence that shall be used.
-     */
-    public int[] getDefaultSubSelection(boolean includeSubOptimalOccurrences) {
-        GeneClusterOccurrence gOcc;
-
-        if (includeSubOptimalOccurrences) {
-            gOcc = getAllOccurrences()[0];
-        }
-        else {
-            gOcc = getOccurrences()[0];
-        }
-
-        int[] subselections = new int[GeckoInstance.getInstance().getGenomes().length];
-
-        for (int i = 0; i < subselections.length; i++) {
-            if (gOcc.getSubsequences()[i].length == 0) {
-                subselections[i] = GeneClusterOccurrence.GENOME_NOT_INCLUDED;
-            }
-            else {
-                subselections[i] = 0;
-            }
-        }
-        return subselections;
-    }
-
-    /**
-	 * Tests, if this gene cluster is similar to the the other gene cluster
-	 * @param other the other gene cluster
-	 * @return if they are similar
-	 */
-	private boolean isSimilar(GeneCluster other) {
-		for (int i=0; i < this.bestOccurrences.length; i++) {
-			boolean similar = false;
-			boolean possibleSimilarOcc = true;
-			if (this.bestOccurrences[i] == null || other.bestOccurrences[i] == null)
-				continue;
-			for (int genome=0; genome < this.bestOccurrences[i].getSubsequences().length; genome++) {
-				Subsequence[] subsequences = this.bestOccurrences[i].getSubsequences()[genome];
-				Subsequence[] otherSubsequences = other.bestOccurrences[i].getSubsequences()[genome];
-				if ((subsequences.length == 0) ^ (otherSubsequences.length == 0)) {
-					//possibleSimilarOcc = false;
-					//break; //TODO not sure what is better!
-					continue;
-				}
-				for (Subsequence seq : subsequences) {
-					for (Subsequence oSeq : otherSubsequences) {
-						if (seq.getChromosome() == oSeq.getChromosome()) {
-							if (seq.getStart() >= oSeq.getStart() && seq.getStart() <= oSeq.getStop())
-								similar = true;
-							if (seq.getStop() > oSeq.getStart() && seq.getStop() < oSeq.getStop())
-								similar = true;
-							if (oSeq.getStart() >= seq.getStart() && oSeq.getStart() <= seq.getStop())
-								similar = true;
-							if (oSeq.getStop() > seq.getStart() && oSeq.getStop() < seq.getStop())
-								similar = true;
-						}
-					}
-				}
-			}
-			return (similar && possibleSimilarOcc);
-		}
-		return false;
-	}
-
-    public boolean isLinearConserved() {
-        //TODO try only non border genes, there might be one non cluster gene at the border added to the cluster
-        boolean isLinear = true;
-        Subsequence[][] subsequences = this.bestOccurrences[0].getSubsequences();
-        for (int seqnum=0; seqnum<subsequences.length && isLinear; seqnum++) {
-            for (int i=0; i<subsequences[seqnum].length && isLinear; i++) {
-                Subsequence subseq = subsequences[seqnum][i];
-                Chromosome chromosome = GeckoInstance.getInstance().getGenomes()[seqnum].getChromosomes().get(subseq.getChromosome());
-                Gene firstGene = chromosome.getGenes().get(subseq.getStart()-1);
-                for (int j=subseq.getStart(); j<subseq.getStop() && isLinear; j++) {
-                    Gene gene = chromosome.getGenes().get(j);
-                    if (firstGene.getOrientation() != gene.getOrientation() && !gene.isUnknown()) {
-                        isLinear = false;
-                    }
-                }
-            }
-        }
-        return isLinear;
-    }
-	
-	public static List<GeneCluster> mergeResults(List<GeneCluster> oldResults, List<GeneCluster> additionalResults) {
-		if (oldResults == null)
-			return additionalResults;
-		else if(additionalResults == null)
-			return oldResults;
-		else {
-			int newId = oldResults.size();
-			for (GeneCluster cluster : additionalResults) {
-				cluster.id = newId;
-				oldResults.add(cluster);
-				newId++;
-			}
-            return oldResults;
-		}
-	}
-	
-	private static List<List<GeneCluster>> groupSimilarClusters(GeneCluster[] allClusters) {
-		List<List<GeneCluster>> resultList = new ArrayList<>();
-		
-		for (GeneCluster cluster : allClusters){
-			List<GeneCluster> newGroup = new ArrayList<>();
-			newGroup.add(cluster);
-			
-			Iterator<List<GeneCluster>> listIter = resultList.iterator();
-			while (listIter.hasNext()){
-				List<GeneCluster> groupedClusters = listIter.next();
-				for (GeneCluster groupedCluster : groupedClusters) {
-					if (groupedCluster.isSimilar(cluster)){
-						newGroup.addAll(groupedClusters);
-						listIter.remove();
-						break;
-					}
-				}
-			}
-			resultList.add(newGroup);
-		}
-		
-		return resultList;
-	}
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        GeneCluster that = (GeneCluster) o;
-
-        if (minTotalDist != that.minTotalDist) return false;
-        if (size != that.size) return false;
-        if (!geneFamilies.equals(that.geneFamilies)) return false;
-        if (type != that.type) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = geneFamilies.hashCode();
-        result = 31 * result + size;
-        result = 31 * result + minTotalDist;
-        result = 31 * result + type.hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "GeneCluster{" +
-                "id=" + id +
-                ", geneFamilies=" + getGeneFamilyString() +
-                ", size=" + size +
-                ", bestPValue=" + bestPValue +
-                ", minTotalDist=" + minTotalDist +
-                ", refSeqIndex=" + refSeqIndex +
-                '}';
     }
 }
