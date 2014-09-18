@@ -40,6 +40,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
             params.setAlphabetSize(data.getReducedAlphabetSize());
         }
 
+
         List<ReferenceCluster> refCluster = computeReferenceClusters(intArray, params, genomeGrouping, listener);
 
         List<GeneCluster> result = new ArrayList<>(refCluster.size());
@@ -97,12 +98,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 			data = new GenomeList(genomes);
 			param.setAlphabetSize(data.getAlphabetSize());
 		}
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getLowConservedParameters(param, param.getAlphabetSize(), data.size());
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getHighlyConservedParameters(param, param.getAlphabetSize(), data.size());
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getLichtheimiaParameters(param, param.getAlphabetSize(), data.size());
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getStatisticPaperGenomeParameters(param, param.getAlphabetSize(), data.size());
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getFiveProteobacterDeltaTableTestParameters(param.getAlphabetSize(), data.size());
-		
+
 		AlgorithmParameters algoParameters = new AlgorithmParameters(param, param.getAlphabetSize(), data.size());
 		
 		if (!checkParameters(algoParameters)) 
@@ -160,6 +156,8 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
         
 		for (int i=0; i<refGenomeCount; i++)
 			detectReferenceGeneClusterFromSingleGenome(i, refClusterList);
+
+        genomes.removeCalculationFields();
 		
 		long calcTime = System.nanoTime();		
 		System.out.println("Doing Statistics!");

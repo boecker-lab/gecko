@@ -606,6 +606,31 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return builder.toString();
     }
 
+    public List<String> getGeneConservation(int genome_index, boolean allOccurrences) {
+        GeneClusterOccurrence occ = allOccurrences ? this.allOccurrences[0] : bestOccurrences[0];
+        List<String> results = new ArrayList<>(occ.getSubsequences()[genome_index].length);
+
+        for (Subsequence seq : occ.getSubsequences()[genome_index]){
+            Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
+            Set<GeneFamily> containedGenes = new HashSet<>();
+            StringBuilder builder = new StringBuilder();
+            for (int index = seq.getStart()-1; index < seq.getStop(); index++) {
+                Gene gene = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index);
+                if (gene.getGeneFamily().isSingleGeneFamily()) {
+                    builder.append("+ ");
+                } else if (geneFamilies.contains(gene.getGeneFamily())){
+                    containedGenes.add(gene.getGeneFamily());
+                    builder.append(gene.getGeneFamily().getExternalId());
+                    builder.append(" ");
+                } else {
+                    builder.append("+ ");
+                }
+            }
+            results.add(String.format("%d\t%s", containedGenes.size() - geneFamilies.size(), builder.toString()));
+        }
+        return results;
+    }
+
     public String getGeneOrientations(int genome_index) {
         if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
             return "-/-";
