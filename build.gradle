@@ -5,17 +5,6 @@ version = 2.0
 
 mainClassName = 'gecko2.Gecko2'
 
-jar {
-    manifest {
-        attributes 'Main-Class' : mainClassName
-    }
-}
-
-test {
-    testLogging.showStandardStreams = true
-    ignoreFailures = true
-}
-
 repositories {
     mavenLocal()
     mavenCentral()
@@ -30,4 +19,16 @@ dependencies {
     compile 'com.itextpdf:itextpdf:5.5.+'
 
     testCompile 'junit:junit:4.+'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class' : mainClassName
+        attributes "Class-Path": configurations.compile.collect { it.getName() }.join(' ')
+    }
+}
+
+test {
+    testLogging.showStandardStreams = true
+    ignoreFailures = true
 }
