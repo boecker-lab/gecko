@@ -537,7 +537,58 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	public int compareTo(GeneCluster other) {
 		return this.bestPValue.compareTo(other.bestPValue);
 	}
-	
+
+    public boolean invalidMultiGeneFamilyGeneCluster(DataSet data) {
+        Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
+        Genome genome = data.getGenomes()[getRefSeqIndex()];
+
+        Set<GeneFamily> nonMergedGeneFamilies = getNonMergedGeneFamilies(seq, genome);
+        List<Set<GeneFamily>> mergedGeneFamilies = getMergedGeneFamilies(seq, genome, nonMergedGeneFamilies);
+        return !mergedGeneFamilies.isEmpty();
+    }
+
+    private static List<Set<GeneFamily>> getMergedGeneFamilies(Subsequence seq, Genome genome, Set<GeneFamily> nonMergedGeneFamilies){
+        List<Set<GeneFamily>> mergedGeneFamilies = new ArrayList<>();
+
+        String locusTag = "";
+        Set<GeneFamily> locusTagCombinedSet = new HashSet<>();
+        for (int index = seq.getStart()-1; index < seq.getStop(); index++){
+            Gene gene = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index);
+            if (locusTag.equals("") || !locusTag.equals(gene.getTag())){  // new locus tag
+                if (locusTagCombinedSet.size()>1)
+                    mergedGeneFamilies.add(new HashSet<>(locusTagCombinedSet));
+                locusTagCombinedSet.clear();
+            }
+            if (!nonMergedGeneFamilies.contains(gene.getGeneFamily()))
+                locusTagCombinedSet.add(gene.getGeneFamily());
+            locusTag = gene.getTag();
+        }
+        if (locusTagCombinedSet.size()>1)
+            mergedGeneFamilies.add(locusTagCombinedSet);
+        return mergedGeneFamilies;
+    }
+
+    private static Set<GeneFamily> getNonMergedGeneFamilies(Subsequence seq, Genome genome){
+        String locusTag = "";
+        GeneFamily lastGeneFamily = null;
+        Set<GeneFamily> nonMergedGeneFamilies = new HashSet<>();
+        for (int index = seq.getStart()-1; index < seq.getStop(); index++){
+            Gene gene = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index);
+            if (!(locusTag.equals("")) && locusTag.equals(gene.getTag())) {
+                lastGeneFamily=null;
+                locusTag = gene.getTag();
+            } else {
+                if (lastGeneFamily != null)
+                    nonMergedGeneFamilies.add(lastGeneFamily);
+                lastGeneFamily = gene.getGeneFamily();
+                locusTag = gene.getTag();
+            }
+        }
+        if (lastGeneFamily != null)
+            nonMergedGeneFamilies.add(lastGeneFamily);
+        return nonMergedGeneFamilies;
+    }
+
 	/**
 	 * Returns the tags of the gene in the reference occurrence
 	 * @return the tags of the gene in the reference occurrence
