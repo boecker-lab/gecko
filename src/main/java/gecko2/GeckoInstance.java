@@ -1,6 +1,5 @@
 package gecko2;
 
-import gecko2.algo.ReferenceCluster;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algo.status.AlgorithmProgressListener;
 import gecko2.algo.status.AlgorithmStatusEvent;
@@ -31,7 +30,9 @@ public class GeckoInstance {
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
 
     public enum ResultFilter {showFiltered, showAll, showSelected}
-	
+
+    private SwingWorker<List<GeneCluster>, Void> geneClusterSwingWorker = null;
+
 	private boolean libgeckoLoaded;
 	
 	private File currentWorkingDirectoryOrFile;
@@ -379,7 +380,7 @@ public class GeckoInstance {
 	}
 
     public void stopComputation() {
-        //TODO fill
+        geneClusterSwingWorker.cancel(true);
     }
 
     class GeneClusterDetectionTask extends SwingWorker<List<GeneCluster>, Void> implements AlgorithmProgressListener{
@@ -420,6 +421,9 @@ public class GeckoInstance {
                 genomeGroups = BreakPointDistance.groupGenomes(data, groupingFactor, false);
 
             Date before = new Date();
+            if (!mergeResults){
+                data.clearClusters();
+            }
             List<GeneCluster> res = computeClustersJava(data, p, genomeGroups, this);
             Date after = new Date();
             setProgressStatus(100, AlgorithmStatusEvent.Task.Done);
@@ -461,7 +465,10 @@ public class GeckoInstance {
 		lastParameter = p;
         if (gui != null)
 		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
-        SwingWorker<List<GeneCluster>, Void> geneClusterSwingWorker = new GeneClusterDetectionTask(p, mergeResults, genomeGroupingFactor, GeckoInstance.this.getData());
+
+        //p = new Parameter(Parameter.DeltaTable.highly_conserved.getDeltaTable(), Parameter.DeltaTable.highly_conserved.getMinimumSize(), p.getQ(), p.getOperationMode(), p.getRefType());
+
+        geneClusterSwingWorker = new GeneClusterDetectionTask(p, mergeResults, genomeGroupingFactor, GeckoInstance.this.getData());
         geneClusterSwingWorker.execute();
         return geneClusterSwingWorker;
 	}
