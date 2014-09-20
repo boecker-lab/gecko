@@ -626,7 +626,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
                     builder.append("+ ");
                 }
             }
-            results.add(String.format("%d\t%s", containedGenes.size() - geneFamilies.size(), builder.toString()));
+            int missingGenes = geneFamilies.size() - containedGenes.size();
+            results.add(String.format("%d\t%d\t%s", missingGenes, seq.getDist()-missingGenes, builder.toString()));
         }
         return results;
     }
