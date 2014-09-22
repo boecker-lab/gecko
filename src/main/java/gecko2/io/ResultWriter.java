@@ -15,6 +15,7 @@ public class ResultWriter {
         table("txt"),
         geneNameTable("txt"),
         clusterInformation("txt"),
+        referenceClusterTags("csv"),
         latexTable("tex"),
         internalDuplications("txt"),
         pdf("pdf"),
@@ -61,6 +62,9 @@ public class ResultWriter {
                 break;
             case clusterInformation:
                 writtenSuccessfully = writeClusterInformationFile(file, clusters, genomeNames);
+                break;
+            case referenceClusterTags:
+                writtenSuccessfully = writeReferenceClusterTags(file, clusters);
                 break;
             case latexTable:
                 writtenSuccessfully = writeGeneClusterLatexTable(file, clusters);
@@ -144,6 +148,21 @@ public class ResultWriter {
         return true;
     }
 
+    private static boolean writeReferenceClusterTags(File file, List<GeneCluster> clusters) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (GeneCluster cluster : clusters){
+                writer.write(String.format("%d, ", cluster.getId()));
+                writer.write(cluster.getLocusTags(cluster.getRefSeqIndex()));
+                writer.newLine();
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+
     private static boolean writeGeneClusterGeneNameTable(File f, List<GeneCluster> clusters, List<String> genomeNames) {
         int[] genomesForNaming = new int[]{0, 150};
 
@@ -160,7 +179,7 @@ public class ResultWriter {
             }
             writer.newLine();
             for (GeneCluster cluster : clusters) {
-                writer.write(String.format("%d\t%.2f\t%d\t%d", cluster.getId(), cluster.getBestCorrectedScore(), cluster.getGeneFamilies().size(), cluster.getSize()));
+                writer.write(String.format("%d\t%.2f\t%d\t%d", cluster.getId(), cluster.getBestCorrectedScore(), cluster.getNoOfGenesInRefOcc(), cluster.getSize()));
                 for (int i=0; i<genomesForNaming.length; i++){
                     writer.write("\t"+cluster.getGeneNames(genomesForNaming[i]));
                 }

@@ -538,6 +538,12 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		return this.bestPValue.compareTo(other.bestPValue);
 	}
 
+    public int getNoOfGenesInRefOcc() {
+        Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
+
+        return seq.getStop() - seq.getStart() + 1;
+    }
+
     public boolean invalidMultiGeneFamilyGeneCluster(int minClusterSize, Genome[] genomes) {
         Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
         Genome genome = genomes[getRefSeqIndex()];
@@ -863,7 +869,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
                     builder.append("+ ");
                 }
             }
-            results.add(String.format("%d\t%s", containedGenes.size() - geneFamilies.size(), builder.toString()));
+            int missingGenes = geneFamilies.size() - containedGenes.size();
+            results.add(String.format("%d\t%d\t%s", missingGenes, seq.getDist()-missingGenes, builder.toString()));
         }
         return results;
     }
