@@ -18,6 +18,8 @@ import java.util.*;
 public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	private static final long serialVersionUID = -5371037483783752995L;
 
+    private static final String noOCC = "*";
+
 	private int id;
 	private final Set<GeneFamily> geneFamilies;
 	private int size;
@@ -555,7 +557,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
     public String getGeneNames(int genome_index) {
         if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
-            return "-/-";
+            return noOCC;
         Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
         Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
 
@@ -598,7 +600,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
     public String getLocusTags(int genome_index){
         if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
-            return "-/-";
+            return noOCC;
 
         Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
         Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
@@ -641,7 +643,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
     public String getGeneOrientations(int genome_index) {
         if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
-            return "-/-";
+            return noOCC;
 
         Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
         Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
