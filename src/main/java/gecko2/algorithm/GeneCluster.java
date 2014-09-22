@@ -783,6 +783,18 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
         /* SOME OUTPUT HELPER STUFF */
 
+
+    public String getGenomeString() {
+        Subsequence[][] seqs = bestOccurrences[0].getSubsequences();
+        Genome[] genomes = GeckoInstance.getInstance().getGenomes();
+        StringBuilder builder = new StringBuilder();
+        for (int i=0; i<seqs.length; i++) {
+            if (seqs[i].length > 0)
+                builder.append(genomes[i].getName()).append("; ");
+        }
+        return builder.toString();
+    }
+
     /**
      * Returns the tags of the gene in the reference occurrence
      * @return the tags of the gene in the reference occurrence
