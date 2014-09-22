@@ -179,7 +179,7 @@ public class ResultWriter {
             }
             writer.newLine();
             for (GeneCluster cluster : clusters) {
-                writer.write(String.format("%d\t%.2f\t%d\t%d", cluster.getId(), cluster.getBestCorrectedScore(), cluster.getGeneFamilies().size(), cluster.getSize()));
+                writer.write(String.format("%d\t%.2f\t%d\t%d", cluster.getId(), cluster.getBestCorrectedScore(), cluster.getNoOfGenesInRefOcc(), cluster.getSize()));
                 for (int i=0; i<genomesForNaming.length; i++){
                     writer.write("\t"+cluster.getGeneNames(genomesForNaming[i]));
                 }

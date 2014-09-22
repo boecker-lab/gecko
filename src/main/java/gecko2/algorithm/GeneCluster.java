@@ -537,7 +537,14 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	public int compareTo(GeneCluster other) {
 		return this.bestPValue.compareTo(other.bestPValue);
 	}
-	
+
+
+    public int getNoOfGenesInRefOcc() {
+        Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
+
+        return seq.getStop() - seq.getStart() + 1;
+    }
+
 	/**
 	 * Returns the tags of the gene in the reference occurrence
 	 * @return the tags of the gene in the reference occurrence
