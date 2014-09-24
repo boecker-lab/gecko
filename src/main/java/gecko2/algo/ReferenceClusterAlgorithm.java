@@ -156,8 +156,6 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
         
 		for (int i=0; i<refGenomeCount; i++)
 			detectReferenceGeneClusterFromSingleGenome(i, refClusterList);
-
-        genomes.removeCalculationFields();
 		
 		long calcTime = System.nanoTime();		
 		System.out.println("Doing Statistics!");
@@ -167,6 +165,8 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
             cluster.setBestCombined_pValue(BigDecimal.ZERO);
             cluster.setBestCombined_pValueCorrected(BigDecimal.ZERO);
         }
+
+        genomes.removeCalculationFields();
 		
 		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
 		
