@@ -360,9 +360,6 @@ public class CogFileReader implements GeckoDataReader {
 
             if (explode[3].length() > maxNameLength) {
                 maxNameLength = explode[3].length();
-
-                if (explode.length <= 5 && explode[3].length() > maxLocusTagLength)
-                    maxLocusTagLength = explode[3].length();
             }
 
             GeneFamily geneFamily;
