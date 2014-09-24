@@ -146,6 +146,10 @@ public class GeneClusterPicture {
         this(selectedCluster, selectedCluster.getDefaultSubSelection(false));
     }
 
+    public GeneClusterPicture(GeneCluster selectedCluster,GenomePainting.NameType nameType, boolean gnames) {
+        this(selectedCluster, selectedCluster.getDefaultSubSelection(false), nameType, gnames);
+    }
+
     /**
      * Default constructor which sets all important global variable.
      */

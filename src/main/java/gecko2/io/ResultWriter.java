@@ -3,6 +3,7 @@ package gecko2.io;
 import com.itextpdf.text.DocumentException;
 import gecko2.algorithm.*;
 import gecko2.gui.GeneClusterPicture;
+import gecko2.gui.GenomePainting;
 
 import java.io.*;
 import java.util.*;
@@ -100,8 +101,8 @@ public class ResultWriter {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
              GeneClusterToPDFWriter pdfWriter = new GeneClusterToPDFWriter(zipOutputStream)) {
             for (int i=0; i<clusters.size(); i++) {
-                zipOutputStream.putNextEntry(new ZipEntry("cluster" + i + ".pdf"));
-                GeneClusterPicture picture = new GeneClusterPicture(clusters.get(i));
+                zipOutputStream.putNextEntry(new ZipEntry("cluster" + clusters.get(i).getId() + ".pdf"));
+                GeneClusterPicture picture = new GeneClusterPicture(clusters.get(i), GenomePainting.NameType.LOCUS_TAG, true);
                 pdfWriter.write(picture);
                 zipOutputStream.closeEntry();
             }

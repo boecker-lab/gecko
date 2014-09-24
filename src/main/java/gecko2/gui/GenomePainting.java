@@ -36,7 +36,7 @@ public class GenomePainting {
                 case "locus_tag":
                     return LOCUS_TAG;
                 default:
-                    throw new IllegalArgumentException("Only 'r', 'c' or 'm' are supported!");
+                    throw new IllegalArgumentException("Only 'ID', 'Name' or 'locus_tag' are supported!");
             }
         }
     }
