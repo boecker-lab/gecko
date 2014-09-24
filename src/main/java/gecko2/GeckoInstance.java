@@ -230,8 +230,8 @@ public class GeckoInstance {
         dataUpdated();
 	}
 	
-	public void setClusters(List<GeneCluster> clusters) {
-		this.data.setClusters(clusters);
+	public void setClusters(List<GeneCluster> clusters, Parameter parameter) {
+		this.data.setClusters(clusters, parameter);
         handleUpdatedClusterResults();
 	}
 
@@ -428,20 +428,18 @@ public class GeckoInstance {
             Date after = new Date();
             setProgressStatus(100, AlgorithmStatusEvent.Task.Done);
             System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
-            final List<GeneCluster> geneClusters;
-            if (mergeResults)
-                geneClusters = GeneCluster.mergeResults(data.getClusters(), res);
-            else
-                geneClusters = res;
 
-            return geneClusters;
+            return res;
         }
 
         @Override
         public void done() {
             try {
                 List<GeneCluster> results = get();
-                GeckoInstance.this.setClusters(results);
+                if (mergeResults)
+                    GeckoInstance.this.mergeClusters(results, p);
+                else
+                    GeckoInstance.this.setClusters(results, p);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -451,6 +449,10 @@ public class GeckoInstance {
         public void algorithmProgressUpdate(AlgorithmStatusEvent statusEvent) {
             setProgressStatus(statusEvent.getProgress(), statusEvent.getTask());
         }
+    }
+
+    public void mergeClusters(List<GeneCluster> results, Parameter p) {
+        data.mergeClusters(results, p);
     }
 
     /**

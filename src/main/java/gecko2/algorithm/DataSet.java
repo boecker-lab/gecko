@@ -25,23 +25,23 @@ public class DataSet {
     private Map<GeneFamily, Color> colorMap;
 
     public static DataSet getEmptyDataSet() {
-        return new DataSet(null, null, 0, 0, 0, null, null, 0);
+        return new DataSet(null, 0, 0, 0, null, null, 0);
     }
 
     public DataSet(Genome[] genomes, int maxIdLength, int maxNameLength, int maxLocusTagLength, Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily, int numberOfGeneFamiliesWithMultipleGenes) {
-        this(genomes, null, maxIdLength, maxNameLength, maxLocusTagLength, geneFamilySet, unknownGeneFamily, numberOfGeneFamiliesWithMultipleGenes);
+        this(genomes, maxIdLength, maxNameLength, maxLocusTagLength, geneFamilySet, unknownGeneFamily, numberOfGeneFamiliesWithMultipleGenes, null);
     }
 
     public DataSet(Genome[] genomes,
-                   List<GeneCluster> clusters,
                    int maxIdLength,
                    int maxNameLength,
                    int maxLocusTagLength,
                    Set<GeneFamily> geneFamilySet,
                    GeneFamily unknownGeneFamily,
-                   int numberOfGeneFamiliesWithMultipleGenes) {
+                   int numberOfGeneFamiliesWithMultipleGenes,
+                   List<GeneCluster> clusters) {
         this.genomes = genomes;
-        this.setClusters(clusters==null ? new ArrayList<GeneCluster>() : clusters);
+        this.clusters = (clusters==null ? new ArrayList<GeneCluster>() : clusters);
         this.maxIdLength = maxIdLength;
         this.maxNameLength = maxNameLength;
         this.maxLocusTagLength = maxLocusTagLength;
@@ -289,17 +289,31 @@ public class DataSet {
         return clusters;
     }
 
-    public void setClusters(List<GeneCluster> clusters) {
-        this.clusters = clusters;
-        //this.clusters = correctInvalidClusters(clusters, genomes, 3);
+    public void setClusters(List<GeneCluster> clusters, Parameter parameter) {
+        this.clusters = correctInvalidClusters(clusters, genomes, parameter);
     }
 
-    private static List<GeneCluster> correctInvalidClusters(List<GeneCluster> clusters, Genome[] genomes, int minClusterSize){
+    public void clearClusters() {
+        clusters.clear();
+    }
+
+    public void mergeClusters(List<GeneCluster> results, Parameter p) {
+        this.clusters = GeneCluster.mergeResults(clusters, correctInvalidClusters(results, genomes, p));
+    }
+
+    private static List<GeneCluster> correctInvalidClusters(List<GeneCluster> clusters, Genome[] genomes, Parameter parameter){
         if (genomes == null)
             return clusters;
+
+        if (parameter == null)
+            return clusters;
+
+        int minClusterSize = parameter.getMinClusterSize();
+
         List<GeneCluster> cleanedCluster = new ArrayList<>(clusters.size());
         for (GeneCluster cluster : clusters){
             if (!cluster.invalidMultiGeneFamilyGeneCluster(minClusterSize, genomes)){
+                cluster.setId(cleanedCluster.size());
                 cleanedCluster.add(cluster);
             }
         }
@@ -383,9 +397,5 @@ public class DataSet {
         result = 31 * result + (unknownGeneFamily != null ? unknownGeneFamily.hashCode() : 0);
         result = 31 * result + numberOfGeneFamiliesWithMultipleGenes;
         return result;
-    }
-
-    public void clearClusters() {
-        clusters.clear();
     }
 }

@@ -287,7 +287,7 @@ public class GeneClusterTestUtils {
         DataSet actualData = reader.readData();
 
         List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, false, null);
-        actualData.setClusters(javaRes);
+        actualData.setClusters(javaRes, settings.p);
 		
 		compareGeneClusters(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_NONE);
         // Test with memory reduction
@@ -295,7 +295,7 @@ public class GeneClusterTestUtils {
         DataSet reducedData = reducedReader.readData();
 
         List<GeneCluster> reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true, null);
-        reducedData.setClusters(reducedRes);
+        reducedData.setClusters(reducedRes, settings.p);
 
         compareGeneClusters(expectedData.getClusters(), reducedRes, PValueComparison.COMPARE_NONE);
 		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
@@ -322,44 +322,12 @@ public class GeneClusterTestUtils {
         DataSet data = reader.readData();
 
         List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups, null);
-        data.setClusters(javaRes);
+        data.setClusters(javaRes, settings.p);
 
         assertTrue(settings.resultOutputFile.createNewFile());
         DataSetWriter.saveDataSetToFile(data, settings.resultOutputFile);
 	}
 
-    public static void performanceTest(ReferenceClusterTestSettings settings, boolean useMemoryReduction) throws IOException, ParseException {
-        // Test unreduced
-        CogFileReader reader = new CogFileReader(settings.dataFile);
-        DataSet actualData = reader.readData();
-
-        // Test the java implementation
-        int k = 1;
-        //long[][] start = new long [2][k];
-        //7long[][] stop = new long [2][k];
-        for(int i=0;i<k;i++){
-        //    start[0][i] = System.currentTimeMillis();
-            List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, useMemoryReduction, null);
-            actualData.setClusters(javaRes);
-        //    stop[0][i] = System.currentTimeMillis();
-        }
-        int sum = 0;
-        /*long[] erg = new long [k];
-        for(int i=0;i<k;i++){
-            erg[i] = stop[0][i]-start[0][i];
-            sum += erg[i];
-        }
-        double mean = (double)sum/k;
-        Arrays.sort(erg);
-        if (useMemoryReduction)
-            System.out.println("mit Speicher red");
-        else
-            System.out.println("ohne Speicher red");
-        System.out.println("	minimum; " + erg[0]);
-        System.out.println("	arith. Mittelwert; " + mean);
-        System.out.println("	median Mittelwert; " + erg[k/2-1]);
-    */}
-	
 	public static void main(String[] args)
 	{
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
@@ -371,8 +339,7 @@ public class GeneClusterTestUtils {
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionWithSuboptimalOccurrenceD3S5();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionMultipleZerosD3S5();
         try{
-			//generateRefClusterFile(testType);
-            performanceTest(testType, false);
+			generateRefClusterFile(testType);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}

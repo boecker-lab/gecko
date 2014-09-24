@@ -776,7 +776,7 @@ public class Gui {
 							JOptionPane.showMessageDialog(mainframe, "An error occured while reading the annotations!", "Error", JOptionPane.ERROR_MESSAGE);
 						else {
                             List<GeneCluster> clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster);
-							geckoInstance.setClusters(GeneCluster.mergeResults(geckoInstance.getClusters(), clusterWithPValue));
+							geckoInstance.mergeClusters(clusterWithPValue, null);
 						}									
 						break;
 					}
@@ -823,8 +823,8 @@ public class Gui {
 
 		saveSessionAction.setEnabled(false);
 		
-		loadClusterAnnotationsAction.putValue(Action.NAME, "Load cluster annotations...");
 		loadClusterAnnotationsAction.putValue(Action.NAME, "Load clusters...");
+		loadClusterAnnotationsAction.putValue(Action.SHORT_DESCRIPTION, "Load clusters...");
 		loadClusterAnnotationsAction.setEnabled(false);
 		
 		clearSelectionAction.putValue(Action.SHORT_DESCRIPTION, "Clear selection");
