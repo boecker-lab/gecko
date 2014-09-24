@@ -1,12 +1,8 @@
-package gecko2;
+package gecko2.algo;
 
-import gecko2.algo.ReferenceCluster;
-import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algorithm.Parameter;
-import gecko2.testUtils.ExpectedDeltaLocationValues;
-import gecko2.testUtils.ExpectedReferenceClusterValues;
-import gecko2.testUtils.GeneClusterTestUtils.PValueComparison;
-import gecko2.testUtils.ReferenceClusterTestSettings;
+import gecko2.testUtils.*;
+import gecko2.algo.GeneClusterTestUtils.PValueComparison;
 import gecko2.util.LibraryUtils;
 import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import org.junit.BeforeClass;
@@ -18,9 +14,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.zip.DataFormatException;
 
-import static gecko2.testUtils.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
-import static gecko2.testUtils.GeneClusterTestUtils.performReferenceClusterTest;
-import static gecko2.testUtils.GeneClusterTestUtils.performTest;
+import static gecko2.algo.GeneClusterTestUtils.automaticGeneClusterTestFromFile;
+import static gecko2.algo.GeneClusterTestUtils.compareReferenceClusters;
 
 /**
  * The class tests the computeClusters algorithm from the Gecko2 program
@@ -47,20 +42,96 @@ public class ReferenceClusterTest
         }
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 * 
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 * 
-	 */
+	@Test
+    public void testMemoryReductionWithMergedGenes()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, -4, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
+
+        Parameter p = new Parameter(1, 3, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+
+        // def result (using p values from calculated result)
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
+        List<Integer> genes1 = Arrays.asList(-1, 1, 2);
+        int[] minimumDistances = new int[]{1, 0};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
+
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances,
+                        1,
+                        0,
+                        2,
+                        expectedDeltaLocationValues
+                )
+        };
+
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+    }
+
+    @Test
+    public void testMemoryReductionClusterWithMergedGenes()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, 0}}, {{0, 2, -2, 1, 0}}};
+
+        Parameter p = new Parameter(2, 3, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+
+        // def result (using p values from calculated result)
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 2);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
+        List<Integer> genes1 = Arrays.asList(-1, -1, 1, 2);
+        int[] minimumDistances = new int[]{2, 0};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
+
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances,
+                        1,
+                        0,
+                        2,
+                        expectedDeltaLocationValues
+                )
+        };
+
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+    }
+	
+    @Test
+    public void testMemoryReduction()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, -1, -1, -1, -1, 3, 4, 0}}, {{0, 3, 2, -1, 1, 4, 0}}};
+
+        Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+
+        // def result (using p values from calculated result)
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
+        List<Integer> genes1 = Arrays.asList(-1, 1, 2);
+        int[] minimumDistances = new int[]{1, 0};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
+
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances,
+                        1,
+                        0,
+                        2,
+                        expectedDeltaLocationValues
+                )
+        };
+
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+    }
+
 	@Test
 	public void testComputeClusters1() 
 	{
@@ -69,10 +140,7 @@ public class ReferenceClusterTest
 			
 		// def parameters
 			
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -93,34 +161,47 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
+    @Test
+    public void testComputeClusters1_memoryReduction()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, 3, -1, 0}}, {{0, 1, 2, 3, -1, 0}}};
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
+        // def parameters
+        Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+
+        // def result (using p values from calculated result)
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
+        List<Integer> genes1 = Arrays.asList(1, 2, 3);
+        int[] minimumDistances = new int[]{0, 0};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues = {{dLoc1_1},{dLoc1_2}};
+
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances,
+                        0,
+                        0,
+                        2,
+                        expectedDeltaLocationValues
+                )
+        };
+
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+    }
+
 	@Test
 	public void testComputeClusters2()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 1, 2, 6, 5, 4, 0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -156,35 +237,61 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
+	@Test
+	public void testComputeClusters2_memoryReduction()
+	{
+		// def array for computation
+		int genomes[][][] = {{{0, 1, 2, 3, -1, 0}}, {{0, 1, 2, -1, 3, -1, 0}}};
 
+        Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
+        // def result 1
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 4, 1);
+        List<Integer> genes1 = Arrays.asList(1, 2, 3);
+        int[] minimumDistances1 = new int[]{0, 1};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_2}};
+
+        // def result 2
+        ExpectedDeltaLocationValues dLoc2_1 = new ExpectedDeltaLocationValues(0, 1, 3, 1);
+        ExpectedDeltaLocationValues dLoc2_2 = new ExpectedDeltaLocationValues(0, 1, 4, 0);
+        List<Integer> genes2 = Arrays.asList(-1, 1, 2, 3);
+        int[] minimumDistances2 = new int[]{1, 0};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues2 = {{dLoc2_1},{dLoc2_2}};
+
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances1,
+                        0,
+                        0,
+                        2,
+                        expectedDeltaLocationValues1),
+                new ExpectedReferenceClusterValues(
+                        genes2,
+                        minimumDistances2,
+                        1,
+                        0,
+                        2,
+                        expectedDeltaLocationValues2
+                )
+        };
+
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+	}
+
 	@Test
 	public void testComputeClusters3()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}, {{0, 1, 2, 5, 4, 0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -220,32 +327,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 */
 	@Test
 	public void testComputeClusters3InvertedGenomes()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 4, 0}}, {{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -267,33 +358,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: g
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters3WithInvertedGenomesSingleRef()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 4, 0}}, {{0, 1, 2, 5, 3, 0}, {0, 3, 3, 1, 2, 5, 6, 0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -315,33 +389,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters4()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 8, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 7, 5, 4, 0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -393,34 +450,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters5()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 8, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 5, 4, 0}, {0,11, 10, 7, 2, 1, 5, 0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -458,34 +497,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: dsub2, sub4
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters6()
 	{
 		// def array for computationsub2, sub4
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}, {0, 3, 10, 1, 2, 5, 6, 0}}, {{0, 9, 1, 2, 8, 5, 4, 0}, {0, 7, 11, 11, 2, 1, 12, 5, 0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -555,35 +576,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 3
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters7()
 	{
 		// def array for computationsub2, sub4
 		int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11, 6, 7, 0}}};
 
-		Parameter p = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(0, 3, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -605,35 +607,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 3
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters8()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
-		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(1, 3, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 4, 6, 0);
@@ -671,34 +654,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2 (cluster isn't contained in genome 3)
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters9()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 4, 6, 0);
@@ -736,34 +701,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2 (cluster isn't contained in genome 3)
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters10()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 7, 5, 11,0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 4, 6, 0);
@@ -784,34 +731,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2 (cluster isn't contained in genome 1)
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters11()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 7, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11,0}}};
 
-		Parameter p = new Parameter(0, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(0, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 2, 4, 0);
@@ -832,33 +761,16 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2 (cluster isn't contained in genome 3)
-	 * 		contigSpanning: false
-	 */
 	@Test
 	public void testComputeClusters12()
 	{
 		// def array for computation
 		int genomes[][][] = {{{0,13, 4, 12, 1, 2, 7, 5, 3, 0}}, {{0, 9, 1, 2, 5, 6, 4, 0}}, {{0, 8, 10, 1, 2, 5, 11,0}}};
 
-		Parameter p = new Parameter(1, 3, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 4, 7, 0);
@@ -896,22 +808,9 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 2
-	 * 		delta: 1
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 */
 	@Test
 	public void testComputeClusters13()
 	{
@@ -919,10 +818,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 0}}, {{0, 1, 2, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(1, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(1, 2, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
@@ -943,23 +839,9 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one with two chromosomes)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClusters14()
 	{
@@ -967,10 +849,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 3, 0}}, {{0, 1, 2, 0}}, {{0, 2, 3, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(1, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(1, 3, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -1006,7 +885,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
 	/**
@@ -1030,10 +909,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 1, 2, 0}}, {{0, 3, 4, 5, 4, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(0, 2, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(0, 2, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
@@ -1054,23 +930,9 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 2 (one chromosome)
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: d
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 2
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClustersRefInRefWithErrors()
 	{
@@ -1078,10 +940,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 3, 2, 5, 1, 2, 0}}, {{0, 3, 4, 5, 4, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(1, 3, 1, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p);
+		Parameter p = new Parameter(1, 3, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
@@ -1102,12 +961,34 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
+
+    @Test
+    public void memoryReductionFromFileTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
+        ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
+
+        automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
+    }
+
+    @Test
+    public void memoryReductionBugFromFileTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
+        ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.memoryReductionBugD2S5Q2();
+
+        automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
+    }
+
+    @Test
+    public void memoryReductionWithSuboptimalOccurrenceD3S5() throws URISyntaxException, IOException, DataFormatException, ParseException {
+        ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.memoryReductionWithSuboptimalOccurrenceD3S5();
+
+        automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
+    }
 
 	@Test
 	public void fiveProteobacterReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
+
 		automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
 	}
 
@@ -1119,39 +1000,25 @@ public class ReferenceClusterTest
 	}
 
 	@Test
-	public void testQuorumParamterJava()
+	public void testQuorumParameterJava()
 	{
 		// def array for computationsub2, sub4
 		int genomes[][][] = {{{0, 1, 2, 3, 0}}, {{0, 1, 2, 3, 0}}, {{0, 1, 3, 0}}};
 
 		// def parameters
-		Parameter maxQuorumParamters = new Parameter(0, 3, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter maxQuorumParameters = new Parameter(0, 3, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
 		// result of computation
-		List<ReferenceCluster> maxQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, maxQuorumParamters);
+		List<ReferenceCluster> maxQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, maxQuorumParameters);
 
-		Parameter noQuorumParameters = new Parameter(0, 3, 0, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter noQuorumParameters = new Parameter(0, 3, 0, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
 		// result of computation
 		List<ReferenceCluster> noQuorumResult = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, noQuorumParameters);
 
-		performReferenceClusterTest(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
+		compareReferenceClusters(maxQuorumResult, noQuorumResult, PValueComparison.COMPARE_ALL);
 	}
 
-	/**
-	 * Method for testing the computeClusters method which is provided by the external library libgecko2
-	 *
-	 * Parameter set:
-	 * 		genomes: 3
-	 * 		cluster size: 3
-	 * 		delta: 0
-	 * 		operation mode: r
-	 * 		refType: 0
-	 * 		qtype: QUORUM_NO_COST
-	 * 		q (number of genomes where cluster appears): 3
-	 * 		contigSpanning: false
-	 *
-	 */
 	@Test
 	public void testComputeClustersWithGroupedGenomes()
 	{
@@ -1169,10 +1036,7 @@ public class ReferenceClusterTest
 		genomeGroups.add(set2);
 
 		// def parameters
-		Parameter p = new Parameter(0, 2, 2, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
-
-        // Test the java implementation
-        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
+		Parameter p = new Parameter(0, 2, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
@@ -1209,7 +1073,7 @@ public class ReferenceClusterTest
                 )
         };
 
-        performTest(referenceClusterValues, javaRes, PValueComparison.COMPARE_NONE);
+        GeneClusterTestUtils.performTest(p, genomes, genomeGroups, referenceClusterValues);
 	}
 }
 

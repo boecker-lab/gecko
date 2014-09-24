@@ -51,7 +51,7 @@ public class CogFileReader implements GeckoDataReader {
 	/**
 	 * Pattern list for getGenomeName and getChromosomeName
 	 */
-	private static final Pattern nameSplitPattern = Pattern.compile(",|chrom(?:osome)?|(?:mega)?plasmid|scaffold|(?:super)?cont(?:ig)?|unmap(?:ped)?|chr[_ ]?\\d+|complete genome", Pattern.CASE_INSENSITIVE);
+	private static final Pattern nameSplitPattern = Pattern.compile(",|[\\s[-_]]chrom(?:osome)?|[\\s[-_]](?:mega)?plasmid|[\\s[-_]]scaffold|[\\s[-_]](?:super)?cont(?:ig)?|[\\s[-_]]unmap(?:ped)?|[\\s[-_]]chr[_ ]?\\d+|[\\s[-_]]complete genome", Pattern.CASE_INSENSITIVE);
 
 
     /**

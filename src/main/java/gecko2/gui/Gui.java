@@ -50,11 +50,6 @@ public class Gui {
 		return gcSelector;
 	}
 	
-	public GeneClusterDisplay getGcDisplay() {
-		
-		return gcDisplay;
-	}
-	
 	private Gui() {
 		this.gecko = GeckoInstance.getInstance();
 		this.gecko.setGui(this);
@@ -157,17 +152,22 @@ public class Gui {
 
         JMenu nameWidthChooser = new JMenu("Gene Width");
         ButtonGroup group = new ButtonGroup();
-        JRadioButtonMenuItem radioButtonMenuItem = new JRadioButtonMenuItem(MAX_WIDTH);
-        radioButtonMenuItem.addActionListener(changeGeneWidth);
-        radioButtonMenuItem.setSelected(true);
-        group.add(radioButtonMenuItem);
-        nameWidthChooser.add(radioButtonMenuItem);
+        boolean useMaxLength = true;
         for (int i=4; i<=12; i+=2) {
-            radioButtonMenuItem = new JRadioButtonMenuItem(Integer.toString(i));
+            JRadioButtonMenuItem radioButtonMenuItem = new JRadioButtonMenuItem(Integer.toString(i));
             radioButtonMenuItem.addActionListener(changeGeneWidth);
+            if (i==gecko.DEFAULT_MAX_GENE_NAME_LENGTH) {
+                radioButtonMenuItem.setSelected(true);
+                useMaxLength = false;
+            }
             group.add(radioButtonMenuItem);
             nameWidthChooser.add(radioButtonMenuItem);
         }
+        JRadioButtonMenuItem radioButtonMenuItem = new JRadioButtonMenuItem(MAX_WIDTH);
+        radioButtonMenuItem.addActionListener(changeGeneWidth);
+        radioButtonMenuItem.setSelected(useMaxLength);
+        group.add(radioButtonMenuItem);
+        nameWidthChooser.add(radioButtonMenuItem);
         menuView.add(nameWidthChooser);
 
         JMenu nameChooser = new JMenu("Gene Display Type");
@@ -430,21 +430,22 @@ public class Gui {
 	/*
 	 * The following section contains the actions that the user can trigger
 	 */
-	
+
 	private final Action stopComputationAction = new AbstractAction() {
 
 		private static final long serialVersionUID = -6567239762573695048L;
 
 		public void actionPerformed(ActionEvent e) {
-			gecko.getLastParameter().setRun(false);
-		}	
+			gecko.stopComputation();
+		}
 	};
-	
+
 	private final Action importGenomesAction = new AbstractAction() {
 		private static final long serialVersionUID = -7418023194238092616L;
 		
 		public void actionPerformed(ActionEvent e) {
 			final JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
+            fc.setAcceptAllFileFilterUsed(false);
 			fc.addChoosableFileFilter(new FileUtils.GenericFilter("cog;gck"));
 
 			int state = fc.showOpenDialog( null );
@@ -775,7 +776,7 @@ public class Gui {
 							JOptionPane.showMessageDialog(mainframe, "An error occured while reading the annotations!", "Error", JOptionPane.ERROR_MESSAGE);
 						else {
                             List<GeneCluster> clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster);
-							geckoInstance.setClusters(GeneCluster.mergeResults(geckoInstance.getClusters(), clusterWithPValue));
+							geckoInstance.mergeClusters(clusterWithPValue, null);
 						}									
 						break;
 					}
@@ -822,8 +823,8 @@ public class Gui {
 
 		saveSessionAction.setEnabled(false);
 		
-		loadClusterAnnotationsAction.putValue(Action.NAME, "Load cluster annotations...");
 		loadClusterAnnotationsAction.putValue(Action.NAME, "Load clusters...");
+		loadClusterAnnotationsAction.putValue(Action.SHORT_DESCRIPTION, "Load clusters...");
 		loadClusterAnnotationsAction.setEnabled(false);
 		
 		clearSelectionAction.putValue(Action.SHORT_DESCRIPTION, "Clear selection");

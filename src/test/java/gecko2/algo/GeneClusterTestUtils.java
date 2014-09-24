@@ -1,16 +1,17 @@
-package gecko2.testUtils;
+package gecko2.algo;
 
 import gecko2.GeckoInstance;
 import gecko2.algo.DeltaLocation;
 import gecko2.algo.ReferenceCluster;
-import gecko2.algorithm.DataSet;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.Subsequence;
+import gecko2.algo.ReferenceClusterAlgorithm;
+import gecko2.algorithm.*;
 import gecko2.io.CogFileReader;
 import gecko2.io.DataSetWriter;
 import gecko2.io.GckFileReader;
 import gecko2.io.GeckoDataReader;
+import gecko2.testUtils.ExpectedDeltaLocationValues;
+import gecko2.testUtils.ExpectedReferenceClusterValues;
+import gecko2.testUtils.ReferenceClusterTestSettings;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -18,21 +19,24 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.DataFormatException;
 
 import static org.junit.Assert.*;
 
-
-/**
- * This class implements static methods for storing a GeneCluster array in a file and reading from a file.
- * 
- * @author Hans-Martin Haase <hans-martin.haase@uni-jena.de>
- * @version 0.10
- *
- */
 public class GeneClusterTestUtils {
-	
-	public enum PValueComparison {
+
+    public static void performTest(Parameter p, int[][][] genomes, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
+        performTest(p, genomes, null, expectedReferenceClusters);
+    }
+
+    public static void performTest(Parameter p, int[][][] genomes, List<Set<Integer>> genomeGroups, ExpectedReferenceClusterValues[] expectedReferenceClusters) {
+        // Test the java implementation
+        List<ReferenceCluster> javaRes = ReferenceClusterAlgorithm.computeReferenceClusters(genomes, p, genomeGroups);
+        compareReferenceClusters(expectedReferenceClusters, javaRes, PValueComparison.COMPARE_NONE);
+    }
+
+    public enum PValueComparison {
 		COMPARE_ALL,
 		COMPARE_UNCORRECTED,
 		COMPARE_NONE
@@ -197,7 +201,7 @@ public class GeneClusterTestUtils {
 	 */
 	private static void compareGeneClusters(GeneCluster expected, GeneCluster actual, PValueComparison pValueComp) {
 		assertEquals(expected.getId(), actual.getId());
-		assertEquals(expected.getGeneFamilies(), actual.getGeneFamilies());
+        assertEquals(expected.getGeneFamilies(), actual.getGeneFamilies());
 		assertEquals(expected.getSize(), actual.getSize());
 		assertEquals(expected.isMatch(), actual.isMatch());
 		if (pValueComp != PValueComparison.COMPARE_NONE)
@@ -229,7 +233,7 @@ public class GeneClusterTestUtils {
      * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
      */
-    public static void performTest(ExpectedReferenceClusterValues[] expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
+    public static void compareReferenceClusters(ExpectedReferenceClusterValues[] expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
     {
         assertEquals(expected.length, actual.size());
 
@@ -246,7 +250,7 @@ public class GeneClusterTestUtils {
      * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
      */
-    public static void performReferenceClusterTest(List<ReferenceCluster> expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
+    public static void compareReferenceClusters(List<ReferenceCluster> expected, List<ReferenceCluster> actual, PValueComparison pValueComp)
     {
         assertEquals(expected.size(), actual.size());
 
@@ -263,35 +267,42 @@ public class GeneClusterTestUtils {
 	 * @param actual actual GeneCluster array
      * @param pValueComp how pValues shall be compared (all, only uncorrected, or none)
 	 */
-	public static void performTest(List<GeneCluster> expected, List<GeneCluster> actual, PValueComparison pValueComp)
+	public static void compareGeneClusters(List<GeneCluster> expected, List<GeneCluster> actual, PValueComparison pValueComp)
 	{
 		assertEquals(expected.size(), actual.size());
 		
 		for(int i = 0; i < expected.size(); i++)
 		{
-			compareGeneClusters(expected.get(i), actual.get(i), pValueComp);
+            compareGeneClusters(expected.get(i), actual.get(i), pValueComp);
 		}
 	}
 	
-	static public void automaticGeneClusterTestFromFile(ReferenceClusterTestSettings settings, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
+	public static void automaticGeneClusterTestFromFile(ReferenceClusterTestSettings settings, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
+        // Expected Results
         assertNotNull(settings.expectedResultFile);
         GeckoDataReader resultReader = new GckFileReader(settings.expectedResultFile);
         DataSet expectedData = resultReader.readData();
-
-
+        // Test unreduced
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet actualData = reader.readData();
 
-        List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, null);
-        actualData.setClusters(javaRes);
+        List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, false, null);
+        actualData.setClusters(javaRes, settings.p);
 		
-		performTest(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_ALL);
-		
+		compareGeneClusters(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_NONE);
+        // Test with memory reduction
+        CogFileReader reducedReader = new CogFileReader(settings.dataFile);
+        DataSet reducedData = reducedReader.readData();
+
+        List<GeneCluster> reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true, null);
+        reducedData.setClusters(reducedRes, settings.p);
+
+        compareGeneClusters(expectedData.getClusters(), reducedRes, PValueComparison.COMPARE_NONE);
 		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
 			//GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(actualData, settings.p);
 		
 			// Test the java implementation
-			//performTest(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
+			//compareReferenceClusters(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
 		}
 	}
 			
@@ -311,18 +322,22 @@ public class GeneClusterTestUtils {
         DataSet data = reader.readData();
 
         List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups, null);
-        data.setClusters(javaRes);
+        data.setClusters(javaRes, settings.p);
 
         assertTrue(settings.resultOutputFile.createNewFile());
         DataSetWriter.saveDataSetToFile(data, settings.resultOutputFile);
 	}
-	
+
 	public static void main(String[] args)
 	{
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionBugD2S5Q2();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q2Grouping();
-        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
+        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
-        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionWithSuboptimalOccurrenceD3S5();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionMultipleZerosD3S5();
         try{
 			generateRefClusterFile(testType);
 		} catch (IOException | ParseException e) {

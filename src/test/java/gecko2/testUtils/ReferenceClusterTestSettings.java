@@ -1,5 +1,6 @@
 package gecko2.testUtils;
 
+import gecko2.algo.GeneClusterTestUtils;
 import gecko2.algorithm.Parameter;
 
 import java.io.File;
@@ -12,19 +13,78 @@ import java.util.Set;
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
 public class ReferenceClusterTestSettings {
-    Parameter p;
-    File dataFile;
-    File expectedResultFile;
-    File resultOutputFile;
-    List<Set<Integer>> genomeGroups;
+    public Parameter p;
+    public File dataFile;
+    public File expectedResultFile;
+    public File resultOutputFile;
+    public List<Set<Integer>> genomeGroups;
+
+    public static ReferenceClusterTestSettings memoryReductionDataD2S4Q2() {
+        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
+        settings.p = new Parameter(
+                2,
+                4,
+                2,
+                Parameter.OperationMode.reference,
+                Parameter.ReferenceType.allAgainstAll
+        );
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/memoryReductionData.cog").getFile());
+
+        settings.expectedResultFile = null;
+        if (GeneClusterTestUtils.class.getResource("/memoryReductionDataD2S4Q2.gck") != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/memoryReductionDataD2S4Q2.gck").getFile());
+
+        settings.resultOutputFile = new File("src/test/resources/memoryReductionDataD2S4Q2.gck");
+        settings.genomeGroups = null;
+        return settings;
+    }
+
+    public static ReferenceClusterTestSettings memoryReductionBugD2S5Q2() {
+        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
+        settings.p = new Parameter(
+                2,
+                5,
+                2,
+                Parameter.OperationMode.reference,
+                Parameter.ReferenceType.allAgainstAll
+        );
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/memoryReductionBug.cog").getFile());
+
+        settings.expectedResultFile = null;
+        if (GeneClusterTestUtils.class.getResource("/memoryReductionBugD2S5Q2.gck") != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/memoryReductionBugD2S5Q2.gck").getFile());
+
+        settings.resultOutputFile = new File("src/test/resources/memoryReductionBugD2S5Q2.gck");
+        settings.genomeGroups = null;
+        return settings;
+    }
+
+    public static ReferenceClusterTestSettings memoryReductionWithSuboptimalOccurrenceD3S5() {
+        ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
+        settings.p = new Parameter(
+                3,
+                5,
+                2,
+                Parameter.OperationMode.reference,
+                Parameter.ReferenceType.genome
+        );
+        settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/mRWithSuboptimalOccurrence.cog").getFile());
+
+        settings.expectedResultFile = null;
+        if (GeneClusterTestUtils.class.getResource("/mRWithSuboptimalOccurrenceD3S5.gck") != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/mRWithSuboptimalOccurrenceD3S5.gck").getFile());
+
+        settings.resultOutputFile = new File("src/test/resources/mRWithSuboptimalOccurrenceD3S5.gck");
+        settings.genomeGroups = null;
+        return settings;
+    }
 
     public static ReferenceClusterTestSettings fiveProteobacterDeltaTable() {
         ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
         settings.p = new Parameter(
-                new int[][]{{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {1,1,1}, {2,2,2}, {3,3,3}, {5,5,5}},
+                Parameter.DeltaTable.test_five_proteobacter.getDeltaTable(),
                 4,
                 4,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.allAgainstAll
         );
@@ -45,7 +105,6 @@ public class ReferenceClusterTestSettings {
                 3,
                 6,
                 4,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.allAgainstAll
         );
@@ -66,7 +125,6 @@ public class ReferenceClusterTestSettings {
                 3,
                 6,
                 2,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.allAgainstAll
         );
@@ -98,7 +156,6 @@ public class ReferenceClusterTestSettings {
                 5,
                 8,
                 10,
-                Parameter.QUORUM_NO_COST,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.genome
         );

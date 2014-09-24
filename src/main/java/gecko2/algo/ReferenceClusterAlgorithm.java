@@ -3,8 +3,11 @@ package gecko2.algo;
 import gecko2.algo.status.AlgorithmProgressListener;
 import gecko2.algo.status.AlgorithmProgressProvider;
 import gecko2.algo.status.AlgorithmStatusEvent;
+import gecko2.algorithm.DataSet;
+import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Parameter;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
@@ -14,9 +17,43 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	private final int nrOfGenomeGroups;
 	private final boolean useGenomeGrouping;
 
-    private List<AlgorithmProgressListener> progressListeners;
+    private final List<AlgorithmProgressListener> progressListeners;
     private int maxProgressValue;
     private int progressValue;
+
+    /**
+     * Computes reference gene clusters for the given dataset and the given parameters
+     * @param data the genomes
+     * @param params the parameters
+     * @param useMemoryReduction if memory reduction should be used
+     * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
+     * @param listener the progress listener
+     * @return the gene clusters
+     */
+    public static List<GeneCluster> computeReferenceClusters(DataSet data, Parameter params, boolean useMemoryReduction, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
+        int[][][] intArray;
+        if (!useMemoryReduction) {
+            intArray = data.toIntArray();
+            params.setAlphabetSize(data.getCompleteAlphabetSize());
+        } else {
+            intArray = data.toReducedIntArray();
+            params.setAlphabetSize(data.getReducedAlphabetSize());
+        }
+
+        List<ReferenceCluster> refCluster = computeReferenceClusters(intArray, params, genomeGrouping, listener);
+
+        List<GeneCluster> result = new ArrayList<>(refCluster.size());
+
+        if (useMemoryReduction){
+            int[][][] runLengthMergedLookup = DataSet.createRunLengthMergedLookup(intArray);
+            for (ReferenceCluster cluster : refCluster)
+                cluster.correctMergedPositions(runLengthMergedLookup, intArray);
+        }
+        for (int i = 0; i < refCluster.size(); i++)
+            result.add(new GeneCluster(i, refCluster.get(i), data));
+
+        return result;
+    }
 	
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
@@ -24,20 +61,9 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	 * @param param the parameters
 	 * @return the gene clusters
 	 */
-	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param) {
+	static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param) {
 		return computeReferenceClusters(genomes, param, null, null);
 	}
-
-    /**
-     * Computes reference gene clusters for the given list of genomes and the given parameters
-     * @param genomes the genomes
-     * @param param the parameters
-     * @param listener the progress listener
-     * @return the gene clusters
-     */
-    public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, AlgorithmProgressListener listener) {
-        return computeReferenceClusters(genomes, param, null, listener);
-    }
 
     /**
      * Computes reference gene clusters for the given list of genomes and the given parameters
@@ -46,9 +72,11 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
      * @param genomeGrouping each set contains the index of all genomes that contribute to quorum and p-value only once
      * @return the gene clusters
      */
-    public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
+    static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping) {
         return computeReferenceClusters(genomes, param, genomeGrouping, null);
     }
+
+
 
 	/**
 	 * Computes reference gene clusters for the given list of genomes and the given parameters
@@ -58,7 +86,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
      * @param listener the progress listener
 	 * @return the gene clusters
 	 */
-	public static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
+	private static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
 		if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
 
@@ -69,12 +97,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 			data = new GenomeList(genomes);
 			param.setAlphabetSize(data.getAlphabetSize());
 		}
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getLowConservedParameters(param, param.getAlphabetSize(), data.size());
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getHighlyConservedParameters(param, param.getAlphabetSize(), data.size());
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getLichtheimiaParameters(param, param.getAlphabetSize(), data.size());
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getStatisticPaperGenomeParameters(param, param.getAlphabetSize(), data.size());
-		//AlgorithmParameters algoParameters = AlgorithmParameters.getFiveProteobacterDeltaTableTestParameters(param.getAlphabetSize(), data.size());
-		
+
 		AlgorithmParameters algoParameters = new AlgorithmParameters(param, param.getAlphabetSize(), data.size());
 		
 		if (!checkParameters(algoParameters)) 
@@ -83,9 +106,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 		ReferenceClusterAlgorithm refClusterAlgorithm = new ReferenceClusterAlgorithm(data, algoParameters, genomeGrouping);
         refClusterAlgorithm.addListener(listener);
 		
-		List<ReferenceCluster> refCluster = refClusterAlgorithm.computeRefClusters();
-
-        return refCluster;
+		return refClusterAlgorithm.computeRefClusters();
 	}
 	
     private static boolean checkParameters(AlgorithmParameters param) {
@@ -112,7 +133,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
         progressListeners = new ArrayList<>();
         for (int i=0; i < ((param.useSingleReference()) ? 1 : genomes.size()); i++) {
             for (Chromosome chr : genomes.get(i))
-                maxProgressValue += chr.size();
+                maxProgressValue += chr.getEffectiveGeneNumber();
         }
         progressValue = 0;
 	}
@@ -131,15 +152,18 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 		int refGenomeCount = 1;
 		if (!param.useSingleReference())
 			refGenomeCount = genomes.size();
-
+        
 		for (int i=0; i<refGenomeCount; i++)
 			detectReferenceGeneClusterFromSingleGenome(i, refClusterList);
 		
 		long calcTime = System.nanoTime();		
 		System.out.println("Doing Statistics!");
 		
-		for (ReferenceCluster cluster : refClusterList)
-			cluster.setGeneContent(genomes);
+		for (ReferenceCluster cluster : refClusterList) {
+            cluster.setGeneContent(genomes);
+            cluster.setBestCombined_pValue(BigDecimal.ZERO);
+            cluster.setBestCombined_pValueCorrected(BigDecimal.ZERO);
+        }
 		
 		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
 		
@@ -173,34 +197,32 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	}
 	
 	private void detectReferenceGeneClusterFromSingleChromosome(int referenceGenomeNr, Chromosome referenceChromosome, List<ReferenceCluster> refClusterList){
-		for (int l = 1; l <= referenceChromosome.size(); l++){
+		for (int l = 1; l <= referenceChromosome.getEffectiveGeneNumber(); l++){
             fireProgressUpdateEvent(new AlgorithmStatusEvent(progressValue++, AlgorithmStatusEvent.Task.ComputingClusters));
-			genomes.updateLeftBorder(l, referenceChromosome, referenceGenomeNr, param);
+			genomes.updateLeftBorder(l, referenceChromosome, referenceGenomeNr);
 			Pattern pattern = new Pattern(genomes.getAlphabetSize(), genomes.size(), param, referenceGenomeNr, referenceChromosome, l);
 			
-			// Gene does not occure in any other Genome and does not occure in chr[i,...]
-			if (referenceChromosome.getNextOCC(l) > referenceChromosome.size() && genomes.zeroOccs(referenceGenomeNr, referenceChromosome.getNr(), l, param.searchRefInRef()))
+			// Gene does not occur in any other Genome and does not occur in chr[i,...]
+			if (referenceChromosome.getGene(l) < 0 || (referenceChromosome.getNextOCC(l) > referenceChromosome.getEffectiveGeneNumber() && genomes.zeroOccs(referenceGenomeNr, referenceChromosome.getNr(), l, param.searchRefInRef())))
 				continue;
 			
 			int r = l;
 			int[] noOccCount = new int[genomes.size()];
-			List<ListOfDeltaLocations> oldLists = new ArrayList<ListOfDeltaLocations>(genomes.size());
+			List<ListOfDeltaLocations> oldLists = new ArrayList<>(genomes.size());
 			for (int i=0; i<genomes.size(); i++)
 				oldLists.add(new ListOfDeltaLocations());
 			
 			while(pattern.updateToNextI_ref(r)) {
 				r = pattern.getRightBorder();
-				
-				for (ListOfDeltaLocations dLocList : oldLists)
+
+                for (ListOfDeltaLocations dLocList : oldLists)
 					dLocList.removeNonInheritableElements(genomes, pattern.getLastChar(), param.getMaximumDelta());
 				
 				for (int i=0; i<genomes.size(); i++){
 					if (param.searchRefInRef() && i==genomes.size()-1){
-						if (genomes.get(i).noOccOutsideInterval(pattern.getLastChar(), l, r, referenceChromosome.getNr()))
-							noOccCount[i]++;
+                        noOccCount[i] += genomes.get(i).noOccOutsideInterval(pattern.getLastChar(), l, r, referenceChromosome.getNr());
 					} else {
-						if (genomes.get(i).noOcc(pattern.getLastChar()))
-							noOccCount[i]++;
+                        noOccCount[i] += genomes.get(i).noOcc(pattern.getLastChar());
 					}
 				}
 				
@@ -216,7 +238,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 				
 				for (int k=0; k<genomes.size(); k++){
 					if(k != referenceGenomeNr){
-						ListOfDeltaLocations newList = pattern.computeNewOptimalDeltaLocations(genomes.get(k), pattern.getLastChar(), pattern.getSize(), param);
+                        ListOfDeltaLocations newList = pattern.computeNewOptimalDeltaLocations(genomes.get(k), param);
 						
 						if (param.searchRefInRef() && k == genomes.size()-1){
 							newList.removeRefDLocReferenceHit(pattern, referenceChromosome.getNr());
@@ -241,7 +263,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 						occursInValid_dLocs(refdLoc.leftMostEssentialChar(referenceChromosome), oldLists, referenceGenomeNr) &&
 						occursInValid_dLocs(refdLoc.rightMostEssentialChar(referenceChromosome), oldLists, referenceGenomeNr)) {
 					
-					List<ListOfDeltaLocations> listCopy = new ArrayList<ListOfDeltaLocations>(genomes.size());
+					List<ListOfDeltaLocations> listCopy = new ArrayList<>(genomes.size());
 					
 					for (int i=0; i<genomes.size(); i++)
 						listCopy.add((oldLists.get(i).getOptimalCopy()));
@@ -267,6 +289,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 				otherClusterIt.remove();
 			}
 		}
+		
 		refClusterList.add(newCluster);
 		return true;
 	}

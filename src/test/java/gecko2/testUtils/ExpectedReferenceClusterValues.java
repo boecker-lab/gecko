@@ -15,16 +15,10 @@ public class ExpectedReferenceClusterValues {
     private final int chrNr;
     private final int coveredGenomes;
     private final ExpectedDeltaLocationValues[][] allDeltaLocations;
+    private final int size;
 
     public ExpectedReferenceClusterValues(List<Integer> geneContent, int[] minimumDistances, int genomeNr, int chrNr, int coveredGenomes, ExpectedDeltaLocationValues[][] allDeltaLocations) {
-        this.geneContent = geneContent;
-        this.bestCombined_pValue = null;
-        this.bestCombined_pValueCorrected = null;
-        this.minimumDistances = minimumDistances;
-        this.genomeNr = genomeNr;
-        this.chrNr = chrNr;
-        this.coveredGenomes = coveredGenomes;
-        this.allDeltaLocations = allDeltaLocations;
+        this(geneContent, null, null, minimumDistances, genomeNr, chrNr, coveredGenomes, allDeltaLocations);
     }
 
     public ExpectedReferenceClusterValues(List<Integer> geneContent, BigDecimal bestCombined_pValue, BigDecimal bestCombined_pValueCorrected, int[] minimumDistances, int genomeNr, int chrNr, int coveredGenomes, ExpectedDeltaLocationValues[][] allDeltaLocations) {
@@ -36,6 +30,14 @@ public class ExpectedReferenceClusterValues {
         this.chrNr = chrNr;
         this.coveredGenomes = coveredGenomes;
         this.allDeltaLocations = allDeltaLocations;
+        int tmpSize = 0;
+        for (Integer i : geneContent){
+            if (i<0)
+                tmpSize -= i;
+            else
+                tmpSize++;
+        }
+        this.size = tmpSize;
     }
 
     public List<Integer> getGeneContent() {
@@ -43,7 +45,7 @@ public class ExpectedReferenceClusterValues {
     }
 
     public int getSize() {
-        return geneContent.size();
+        return size;
     }
 
     public BigDecimal getBestCombined_pValue() {

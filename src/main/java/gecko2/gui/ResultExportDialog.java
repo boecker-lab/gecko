@@ -54,7 +54,7 @@ public class ResultExportDialog extends JDialog {
 			}
 		});
 		final JComboBox<ResultFilter> resultFilterComboBox = new JComboBox<>(ResultFilter.values());
-		final JComboBox<ExportType> exportTypeCompoBox = new JComboBox<>(ExportType.values());
+		final JComboBox<ExportType> exportTypeCompoBox = new JComboBox<>(ExportType.getSupported());
 
         contentBuilder.append(new JLabel("Choose Export Type"), exportTypeCompoBox);
         contentBuilder.nextLine();

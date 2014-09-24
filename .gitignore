@@ -7,5 +7,6 @@
 .externalToolBuilders/
 
 build/
+/bin
 gradle/
 

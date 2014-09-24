@@ -13,37 +13,6 @@ class GenomeList {
     private final int alphabetSize;
     
     private boolean containsReferenceCopy;
-
-    /**
-     * Constructor for generating a SetOfSequences from a lists of Integers.
-     * @param genomes the lists of Integers.
-     */
-    GenomeList(List<List<List<Integer>>> genomes) {
-        SortedSet<Integer> genes = new TreeSet<Integer>();
-        int alphSize = 0;
-        int i = 0;
-        this.genomes = new ArrayList<Genome>(genomes.size());
-        for (List<List<Integer>> genome : genomes) {
-            List<Chromosome> chromosomes = new ArrayList<Chromosome>(genome.size());
-            int j=0;
-            for (List<Integer> chromosome : genome) {
-                for (Integer gene : chromosome) {
-                    if (gene.equals(0))
-                        throw new IllegalArgumentException("0 genes not permitted!");
-                    if (genes.add(gene))
-                        alphSize++;
-                }
-                chromosomes.add(new Chromosome(chromosome, j));
-                j++;
-            }
-            Genome g = new Genome(i, chromosomes);
-            this.genomes.add(g);
-            i++;
-        }
-        this.alphabetSize = alphSize;
-        this.containsReferenceCopy = false;
-    }
-    
     /**
      * Constructor for generating a SetOfSequences from an array of integer with given alphabet size.
      * @param genomes the lists of Integers.
@@ -51,9 +20,9 @@ class GenomeList {
      */
     GenomeList(int[][][] genomes, int alphabetSize) {
         int i = 0;
-        this.genomes = new ArrayList<Genome>(genomes.length);
+        this.genomes = new ArrayList<>(genomes.length);
         for (int[][] genome : genomes) {
-            List<Chromosome> chromosomes = new ArrayList<Chromosome>(genome.length);
+            List<Chromosome> chromosomes = new ArrayList<>(genome.length);
             int j=0;
             for (int[] chromosome : genome) {
                 chromosomes.add(new Chromosome(chromosome, j, false));
@@ -82,7 +51,7 @@ class GenomeList {
             int j=0;
             for (int[] chromosome : genome) {
                 for (Integer gene : chromosome) {
-                	if (genes.add(gene))
+                	if (gene >= 0 && genes.add(gene))
                 		alphSize++;
                 }
                 chromosomes.add(new Chromosome(chromosome, j, false));
@@ -165,22 +134,13 @@ class GenomeList {
      * @param leftBorder the new left border of the pattern.
      * @param refChr the reference chromosome.
      * @param refGenomeNr the number of the genome the reference chromosome is located on.
-     * @param param the parameters the algorithm is started with.
      */
-    public void updateLeftBorder(int leftBorder, Chromosome refChr, int refGenomeNr, AlgorithmParameters param) {
+    public void updateLeftBorder(int leftBorder, Chromosome refChr, int refGenomeNr) {
         rank.updateRank(refChr, leftBorder, alphabetSize);  //TODO rank really in seqSet? Alternative Rank in Pattern
-        this.updateL(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
-        this.updateR(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
-        this.updateL_R_prime(refGenomeNr, leftBorder, param.getMaximumDelta(), refChr.getGene(leftBorder - 1));
-    }
 
-	/**
-     * Returns the rank value of an character.
-     * @param character the character who's value shall be returned.
-     * @return the value of the character
-     */
-    public int getRank(int character) {
-        return rank.getRank(character);
+        this.updateL(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
+        this.updateR(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
+        this.updateL_R_prime(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
     }
     
     public boolean zeroOccs(int refGenomeNr, int refChrNr, int position, boolean searchRefInRef){
@@ -193,7 +153,7 @@ class GenomeList {
     		if (searchRefInRef && l == genomes.size()-1){
     			//TODO refInRef
     		} else {
-    			if (!genomes.get(l).noOcc(c))
+    			if (genomes.get(l).noOcc(c) == 0)
     				return false;
     		}
     	}
@@ -207,17 +167,19 @@ class GenomeList {
      * The array rank is used to determine unmarked characters.
      * @param refGenomeNr the number of the current reference genome.
      * @param i the start position of the current reference interval on the reference chromosome.
-     * @param maxDist the maximal possible distance for a valid gene cluster.
      * @param c_old the character that was last added to the reference interval.
      */
-    private void updateL(int refGenomeNr, int i, int maxDist, int c_old) {  //TODO parallel?
+    private void updateL(int refGenomeNr, int i, int c_old) {  //TODO parallel?
         for (int k=0; k<this.size(); k++) {
-            /*if (k==refGenomeNr) {               // TODO really remove? not needed for the reference sequence
+            if (k==refGenomeNr) {
                     continue;
-            }*/
+            }
 
             for (Chromosome chr: genomes.get(k)) {
-                chr.updateL(rank, i, maxDist, c_old);
+                if (i==1)
+                    chr.computeL(rank);
+                else if (c_old >= 0)
+                    chr.updateL(rank, c_old);
             }
         }
     }
@@ -229,55 +191,31 @@ class GenomeList {
      * The array rank is used to determine unmarked characters.
      * @param refGenomeNr the number of the current reference genome.
      * @param i the start position of the current reference interval on the reference chromosome.
-     * @param maxDist the maximal possible distance for a valid gene cluster.
      * @param c_old the character that was last added to the reference interval.
      */
-    private void updateR(int refGenomeNr, int i, int maxDist, int c_old){
+    private void updateR(int refGenomeNr, int i, int c_old){
         for (int k=0; k<this.size(); k++) {
-            /*if (k==refGenomeNr) {               // not needed for the reference sequence
-                    continue;
-            }*/
+            if (k==refGenomeNr)
+                continue;
 
-            for (Chromosome chr: genomes.get(k)) {
-                chr.updateR(rank, i, maxDist, c_old);
-            }
+            for (Chromosome chr: genomes.get(k))
+                if (i==1)
+                    chr.computeR(rank);
+                else if (c_old >= 0)
+                    chr.updateR(rank, c_old);
         }
     }
     
-    private void updateL_R_prime(int refGenomeNr, int leftBorder, int delta,
-			int gene) {
+    private void updateL_R_prime(int refGenomeNr, int leftBorder, int gene) {
 		for (int k=0; k<this.size(); k++) {
 			if (k != refGenomeNr) {
 				for (Chromosome c: genomes.get(k)) {
-					c.updateL_R_prime(rank, leftBorder, delta, gene, alphabetSize);
+					c.updateL_R_prime(rank, leftBorder, gene, alphabetSize);
 				}
 			}
 		}
 		
 	}
-
-    /**
-     * Tests if the interval [l,r] on the chromosome chr is optimal.
-     * @param chr the chromosome the interval is located on.
-     * @param lastChar the character that was last added to the interval.
-     * @param l the left border of the interval.
-     * @param r the right border of the interval.
-     * @return true if the interval is optimal, else false.
-     */
-    public boolean isOptimalInterval(Chromosome chr, int lastChar, int l, int r) {
-        return rank.isOptimalInterval(chr, lastChar, l, r);
-    }
-    
-    int[][] charFrequencies() {
-    	int[][] charFreq = new int[genomes.size()][alphabetSize+1];
-    	
-    	for (int k=0; k<genomes.size(); k++)
-    		for (Chromosome chr : genomes.get(k))
-    			for (int i=0; i<chr.size()+1; i++)  // Correct for not counted 0 termination
-    				charFreq[k][chr.getGene(i)]++;
- 
-    	return charFreq;
-    }
 
     @Override public String toString() {
         StringBuilder b = new StringBuilder(String.format("Alphabet size: %1$d%n", alphabetSize));

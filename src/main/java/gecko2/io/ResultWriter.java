@@ -3,6 +3,7 @@ package gecko2.io;
 import com.itextpdf.text.DocumentException;
 import gecko2.algorithm.*;
 import gecko2.gui.GeneClusterPicture;
+import gecko2.gui.GenomePainting;
 
 import java.io.*;
 import java.util.*;
@@ -13,6 +14,9 @@ public class ResultWriter {
 	public enum ExportType {
         clusterData("txt"),
         table("txt"),
+        geneNameTable("txt"),
+        clusterInformation("txt"),
+        referenceClusterTags("csv"),
         latexTable("tex"),
         internalDuplications("txt"),
         pdf("pdf"),
@@ -24,6 +28,18 @@ public class ResultWriter {
 
         ExportType(String defaultFileExtension) {
             this.defaultFileExtension = defaultFileExtension;
+        }
+
+        /**
+         * Wrapper method for values() that only returns the currently supported subset of values
+         * @return the supported subset of values
+         */
+        public static ExportType[] getSupported() {
+            // Support all values
+            return values();
+
+            // Support only a subset of values
+            //return new ExportType[]{clusterData, table, latexTable, pdf, multiPdf};
         }
     }
 	
@@ -41,6 +57,15 @@ public class ResultWriter {
                 break;
             case table:
                 writtenSuccessfully = writeGeneClusterTable(file, clusters);
+                break;
+            case geneNameTable:
+                writtenSuccessfully = writeGeneClusterGeneNameTable(file, clusters, genomeNames);
+                break;
+            case clusterInformation:
+                writtenSuccessfully = writeClusterInformationFile(file, clusters, genomeNames);
+                break;
+            case referenceClusterTags:
+                writtenSuccessfully = writeReferenceClusterTags(file, clusters);
                 break;
             case latexTable:
                 writtenSuccessfully = writeGeneClusterLatexTable(file, clusters);
@@ -76,8 +101,8 @@ public class ResultWriter {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
              GeneClusterToPDFWriter pdfWriter = new GeneClusterToPDFWriter(zipOutputStream)) {
             for (int i=0; i<clusters.size(); i++) {
-                zipOutputStream.putNextEntry(new ZipEntry("cluster" + i + ".pdf"));
-                GeneClusterPicture picture = new GeneClusterPicture(clusters.get(i));
+                zipOutputStream.putNextEntry(new ZipEntry("cluster" + clusters.get(i).getId() + ".pdf"));
+                GeneClusterPicture picture = new GeneClusterPicture(clusters.get(i), GenomePainting.NameType.LOCUS_TAG, true);
                 pdfWriter.write(picture);
                 zipOutputStream.closeEntry();
             }
@@ -91,7 +116,7 @@ public class ResultWriter {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
             for (int i=0; i<clusters.size(); i++) {
                 GeneCluster cluster = clusters.get(i);
-                writer.write(String.format("%d\t%d\t%d\t%d\t%d\t%.1f\t%.2f\t%.2f\t%.4g\t%.4g\t%s%n", i+1, cluster.getGeneFamilies().size(), cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getBestPValue(), cluster.getBestPValueCorrected(), cluster.getReferenceGeneNames()));
+                writer.write(String.format("%d\t%d\t%d\t%d\t%d\t%.1f\t%.2f\t%.2f\t%.4g\t%.4g\t%s%n", cluster.getId(), cluster.getGeneFamilies().size(), cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getBestPValue(), cluster.getBestPValueCorrected(), cluster.getReferenceGeneNames()));
             }
             //writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
         } catch (IOException e) {
@@ -101,19 +126,94 @@ public class ResultWriter {
         return true;
 	}
 
+    private static boolean writeClusterInformationFile(File f, List<GeneCluster> clusters, List<String> genomeNames) {
+        boolean useAllOccurrences = true;
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
+            for (GeneCluster cluster : clusters){
+                writer.write(String.format("Cluster ID: %d\t p-Value: %.2f\n", cluster.getId(), cluster.getBestCorrectedScore()));
+                GeneClusterOccurrence occ = useAllOccurrences ? cluster.getAllOccurrences()[0] : cluster.getOccurrences()[0];
+                for (int i=0; i<occ.getSubsequences().length; i++) {
+                    if (occ.getSubsequences()[i].length == 0)
+                        continue;
+                    List<String> geneConservation = cluster.getGeneConservation(i, useAllOccurrences);
+                    for (int j=0; j<occ.getSubsequences()[i].length; j++){
+                        writer.write(String.format("%s\t%s\n" , genomeNames.get(i), geneConservation.get(j)));
+                    }
+                }
+                writer.write("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean writeReferenceClusterTags(File file, List<GeneCluster> clusters) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (GeneCluster cluster : clusters){
+                writer.write(String.format("%d, ", cluster.getId()));
+                writer.write(cluster.getLocusTags(cluster.getRefSeqIndex()));
+                writer.newLine();
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+
+    private static boolean writeGeneClusterGeneNameTable(File f, List<GeneCluster> clusters, List<String> genomeNames) {
+        int[] genomesForNaming = new int[]{0, 150};
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
+            writer.write("ID \t corrected pValue \t No of genes \t No of genomes");
+            for (int i=0; i<genomesForNaming.length; i++){
+                writer.write("\t" + genomeNames.get(genomesForNaming[i]));
+            }
+            for (int i=0; i<genomesForNaming.length; i++){
+                writer.write("\t" + genomeNames.get(genomesForNaming[i]));
+            }
+            for (int i=0; i<genomesForNaming.length; i++){
+                writer.write("\t" + genomeNames.get(genomesForNaming[i]));
+            }
+            writer.newLine();
+            for (GeneCluster cluster : clusters) {
+                writer.write(String.format("%d\t%.2f\t%d\t%d", cluster.getId(), cluster.getBestCorrectedScore(), cluster.getNoOfGenesInRefOcc(), cluster.getSize()));
+                for (int i=0; i<genomesForNaming.length; i++){
+                    writer.write("\t"+cluster.getGeneNames(genomesForNaming[i]));
+                }
+                for (int i=0; i<genomesForNaming.length; i++){
+                    writer.write("\t"+cluster.getGeneOrientations(genomesForNaming[i]));
+                }
+                for (int i=0; i<genomesForNaming.length; i++){
+                    writer.write("\t"+cluster.getLocusTags(genomesForNaming[i]));
+                }
+                writer.write("\t"+cluster.getGenomeString());
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
 	private static boolean writeGeneClusterLatexTable(File f, List<GeneCluster> clusters) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
             //writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
             for (int i=0; i<clusters.size(); i++) {
                 GeneCluster cluster = clusters.get(i);
-                writer.write(String.format("%d & %d & %d & %d & %d & %.1f & %.2f & %.2f & %s \\\\%n", i+1, cluster.getGeneFamilies().size(), cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getReferenceGeneNames()));
-                System.out.println(String.format("%d\t%.8g\t%.8g", i+1, cluster.getBestPValue(), cluster.getBestPValueCorrected()));
+                writer.write(String.format("%d & %d & %d & %d & %d & %.1f & %.2f & %.2f & %s \\\\%n", cluster.getId(), cluster.getGeneFamilies().size(), cluster.getSize(), cluster.getMinPWDist(), cluster.getMaxPWDist(), cluster.getAvgPWDist(), cluster.getBestScore(), cluster.getBestCorrectedScore(), cluster.getReferenceGeneNames()));
+                System.out.println(String.format("%d\t%.8g\t%.8g", cluster.getId(), cluster.getBestPValue(), cluster.getBestPValueCorrected()));
             }
-            return true;
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
+        return true;
 	}
 
 	private static boolean writeGeneClusterOutput(File f, List<GeneCluster> clusters, List<String> genomeNames) {

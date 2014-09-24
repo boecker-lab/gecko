@@ -93,10 +93,14 @@ class Pattern {
     private void addToPattern(int c, int r) {
         this.lastChar = c;
         this.r = r;
-        pSize++;
-        occ[c]++;
-        IntArray.increaseAll(minDist);              // increase minDist to each sequence
-        minDist[refGenomeNr]--;   // but the reference sequence by 1
+        if (c>=0) {
+            occ[c]++;
+            pSize++;
+        }
+        else
+            pSize-=c;
+        IntArray.increaseAll(minDist);
+        minDist[refGenomeNr]--;
         IntArray.reset(maxRemDist, -1);
     }
 
@@ -106,23 +110,28 @@ class Pattern {
      * @return true if the pattern could be expanded successfully.
      */
     public boolean updateToNextI_ref(int i) {
-        if (i > refChr.size())                                 // If end of sequence reached
+        if (i > refChr.getEffectiveGeneNumber())                                 // If end of sequence reached
             return false;
         int c = refChr.getGene(i);
-        if (refChr.getGene(getLeftBorder() - 1) == c)          // If pattern no longer left maximal
+        if (c >= 0 && refChr.getGene(getLeftBorder() - 1) == c)          // If pattern no longer left maximal
             return false;
-        while (nrOccurrences(refChr.getGene(i + 1)) > 0 || refChr.getGene(i + 1) == c) // expand until the pattern is right maximal
+
+        while (i < refChr.getEffectiveGeneNumber() && refChr.getGene(i + 1) > 0
+                && (nrOccurrences(refChr.getGene(i + 1)) > 0 || refChr.getGene(i + 1) == c)) // expand until the pattern is right maximal
             i++;
 
         addToPattern(c, i);
         return true;
     }
     
-    public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, int character, int pSize, AlgorithmParameters param) {
+    public ListOfDeltaLocations computeNewOptimalDeltaLocations(Genome genome, AlgorithmParameters param) {
     	ListOfDeltaLocations newList = new ListOfDeltaLocations();
-    	
+
+		if (lastChar<0)
+			return newList;
+		
     	for (Chromosome chr : genome){
-    		int[] pos = chr.getPOS(character);
+    		int[] pos = chr.getPOS(lastChar);
     		if (pos.length == 0)
     			continue;
     		
@@ -136,52 +145,54 @@ class Pattern {
                         dLeft--;
 
                     int interveningChars = dLeft - 1;
-
+                    
                     for (int dRight = 1; dRight <= param.getMaximumDelta() + 1; dRight++) {
-                        if (dRight > 1 && chr.getR(charPos, dRight) == chr.getR(charPos, dRight - 1))
-                            break;
+                        int leftBorder = chr.getL(charPos, dLeft);
+                        int rightBorder = chr.getR(charPos, dRight);
 
-                        if (dRight > 1)  // Teste ob neues unmarkiertes Zeichen R[dRight-1] schon im Intervall vorkommt
-                            if (chr.getPrevOCC(chr.getR(charPos, dRight - 1)) < Math.max(1, chr.getL(charPos, dLeft)))
+                        if (dRight > 1)  // Check if new unmarked char R[dRight-1] is already contained in the interval
+                            if (chr.getPrevOCC(chr.getR(charPos, dRight - 1)) < Math.max(1, leftBorder))
                             	interveningChars++;
+
+                        if (dRight > 1 && chr.getR(charPos, dRight) == chr.getR(charPos, dRight - 1))  // either right end of genome, could break
+                            continue;  // or merged non occ gene (-x : x>1), so interveningChars++ and continue
 
                         // test total distance
                         if (interveningChars > param.getMaximumDelta())
                             break;
 
                         // test maximality
-                        if (chr.getNextOCC(chr.getL(charPos, dLeft)) < chr.getR(charPos, dRight))
+                        if (chr.getNextOCC(leftBorder) < rightBorder)
                             break;
 
-                        if (chr.getPrevOCC(chr.getR(charPos, dRight)) > chr.getL(charPos, dLeft))
+                        if (chr.getPrevOCC(rightBorder) > leftBorder)
                             continue;
 
                         // test compactness
-                        if (chr.getNUMDiff(chr.getL(charPos, dLeft) + 1, chr.getR(charPos, dRight) - 1, chr.getL_prime(charPos, dLeft), chr.getR_prime(charPos, dRight)) != 0)
+                        if (chr.getNUMDiff(leftBorder + 1, rightBorder - 1, chr.getL_prime(charPos, dLeft), chr.getR_prime(charPos, dRight)) != 0)
                             continue;
 
-                        int charSetSize = chr.getNUM(chr.getL(charPos, dLeft) + 1, chr.getR(charPos, dRight) - 1);
+                        int charSetSize = chr.getNUM(leftBorder + 1, rightBorder - 1);
                         int missingChars =  pSize - charSetSize + interveningChars;
                         int dist = missingChars + interveningChars;
 
                         assert (dist >= 0);
 
                         if (dist <= param.getMaximumDelta() && interveningChars <= param.getMaximumInsertions() && missingChars <= param.getMaximumDeletions()) {
-                            assert (chr.getR(charPos, dRight) - 1 <= chr.size());
+                            assert (rightBorder - 1 <= chr.getEffectiveGeneNumber());
 
-                            DeltaLocation newDeltaLoc = new DeltaLocation(genome.getNr(), chr.getNr(), chr.getL(charPos, dLeft) + 1, chr.getR(charPos, dRight) - 1, dist, missingChars, interveningChars, charSetSize, charSetSize - interveningChars, !param.useDeltaTable());
+                            DeltaLocation newDeltaLoc = new DeltaLocation(genome.getNr(), chr.getNr(), leftBorder + 1, rightBorder - 1, dist, missingChars, interveningChars, charSetSize, charSetSize - interveningChars, !param.useDeltaTable());
                             newList.insertDeltaLocation(newDeltaLoc);
                         }
                     }
                 }
             }
     	}
-    	return newList;
+        return newList;
     }
 
     @Override public String toString() {
-        StringBuilder b = new StringBuilder(String.format("Pattern: RefGenomeNr: %1$d, L: %2$d, R: %3$d, lastChar: %4$d, %n", refGenomeNr, l, r, lastChar));
-        b.append(Arrays.toString(occ));
-        return b.toString();
+        return String.format("Pattern: RefGenomeNr: %1$d, L: %2$d, R: %3$d, lastChar: %4$d, %n", refGenomeNr, l, r, lastChar)
+                + Arrays.toString(occ);
     }
 }

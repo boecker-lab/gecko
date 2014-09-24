@@ -1,6 +1,5 @@
 package gecko2.algo.util;
 
-import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,29 +68,6 @@ public class IntArray{
         if (value!=0)       // new int[] are filled with 0 by default.
         	Arrays.fill(values, value);
         return values;
-    }
-
-    /**
-     * Factory method that creates a new instance of IntArray from an IntArray with an increased size.
-     * @param otherIntArray the IntArray that is copied.
-     * @param leftIncrease the increase left of the IntArray.
-     * @param rightIncrease the increase right of the IntArray.
-     * @return new instance of IntArray.
-     */
-    public static int[] newIntArry(int[] otherIntArray, int leftIncrease, int rightIncrease) {
-        if (leftIncrease < 0 || rightIncrease < 0) throw new InvalidParameterException("left and right increase have to be positive");
-        int[] iA = new int[otherIntArray.length+leftIncrease+rightIncrease];
-        System.arraycopy(otherIntArray, 0, iA, leftIncrease, otherIntArray.length);
-        return iA;
-    }
-
-    /**
-     * Factory method, that returns an new instance of IntArray that holds the values from an List<Integer>.
-     * @param list the list of Integer who's values the IntArray will store.
-     * @return the new instance of IntArray.
-     */
-    public static int[] newIntArray(List<Integer> list) {
-        return newIntArray(list, false);
     }
 
     /**

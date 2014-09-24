@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static gecko2.testUtils.GeneClusterTestUtils.assertEqualsBigDecimal;
+import static gecko2.algo.GeneClusterTestUtils.assertEqualsBigDecimal;
 import static org.junit.Assert.*;
 
 public class ClusterAnnotationReaderTest {
@@ -125,7 +125,7 @@ public class ClusterAnnotationReaderTest {
 		assertNotNull(clusters);
 		assertEquals(12, clusters.size());
 
-		Parameter p = new Parameter(1, 4, 3, Parameter.QUORUM_NO_COST, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
+		Parameter p = new Parameter(1, 4, 3, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll);
 
         List<GeneCluster> res = GeckoInstance.computeClustersJava(data, p, null);
 		

@@ -35,6 +35,7 @@ public class GckFileReader implements GeckoDataReader {
 	 * Storing place for the gene clusters.
 	 */
 	private List<GeneCluster> clusters;
+    private List<Parameter> parameters;
 	
 	/**
 	 * Storing place for the length of the longest id.
@@ -83,13 +84,13 @@ public class GckFileReader implements GeckoDataReader {
         }
         return new DataSet(
                 genomes,
-                clusters,
                 maxIdLength,
                 maxNameLength,
                 maxLocusTagLength,
                 geneFamilySet,
                 unknownGeneFamily,
-                numberOfGeneFamiliesWithMultipleGenes
+                numberOfGeneFamiliesWithMultipleGenes,
+                clusters
         );
     }
 
@@ -166,7 +167,7 @@ public class GckFileReader implements GeckoDataReader {
                         orientation = Gene.GeneOrientation.UNSIGNED;
                 }
 
-                Gene newGene = new Gene(split[4], split[2], geneFamily, orientation, split[3]);
+                Gene newGene = new Gene(split[4].trim(), split[2].trim(), geneFamily, orientation, split[3].trim());
                 maxIdLength = Math.max(maxIdLength, (split[1].length()));
                 maxLocusTagLength = Math.max(maxLocusTagLength, newGene.getTag().length());
                 maxNameLength = Math.max(maxNameLength, newGene.getName().length());

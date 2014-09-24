@@ -100,37 +100,37 @@ public class CogFileReaderTest {
 		Gene gen122 = new Gene("rplP", geneFamilies[6], Gene.GeneOrientation.POSITIVE, "ribosomal protein L16");
 		
 		// Shorty3
-		Gene gen13 = new Gene("smb ", geneFamilies[9], Gene.GeneOrientation.NEGATIVE, "small protein B");
+		Gene gen13 = new Gene("smb", geneFamilies[9], Gene.GeneOrientation.NEGATIVE, "small protein B");
 		Gene gen23 = new Gene("----", geneFamilies[2], Gene.GeneOrientation.NEGATIVE, "hypothetical protein");
 		Gene gen33 = new Gene("----", geneFamilies[4], Gene.GeneOrientation.POSITIVE, "hypothetical protein");
 		Gene gen43 = new Gene("----", geneFamilies[0], Gene.GeneOrientation.POSITIVE, "putative protein");
-		Gene gen53 = new Gene("nsd ", geneFamilies[3], Gene.GeneOrientation.NEGATIVE, "nucleotide sugar dehydrogenase");
+		Gene gen53 = new Gene("nsd", geneFamilies[3], Gene.GeneOrientation.NEGATIVE, "nucleotide sugar dehydrogenase");
 		Gene gen63 = new Gene("----", geneFamilies[10], Gene.GeneOrientation.POSITIVE, "hypothetical protein");
 		Gene gen73 = new Gene("----", geneFamilies[10], Gene.GeneOrientation.POSITIVE, "hypothetical protein");
 		Gene gen83 = new Gene("abcT8", geneFamilies[1], Gene.GeneOrientation.POSITIVE, "ABC transporter");
 		Gene gen93 = new Gene("serS", geneFamilies[3], Gene.GeneOrientation.NEGATIVE, "seryl-tRNA synthetase");
 		Gene gen103 = new Gene("glmS", geneFamilies[2], Gene.GeneOrientation.POSITIVE, "glucosamine-fructose-6-phosphate aminotransferase");
 		Gene gen113 = new Gene("argD", geneFamilies[5], Gene.GeneOrientation.NEGATIVE, "N-acetylornithine aminotransferase");
-		Gene gen123 = new Gene("nsd ", geneFamilies[0], Gene.GeneOrientation.NEGATIVE, "nucleotide sugar dehydrogenase");
+		Gene gen123 = new Gene("nsd", geneFamilies[0], Gene.GeneOrientation.NEGATIVE, "nucleotide sugar dehydrogenase");
 		Gene gen133 = new Gene("rodA", geneFamilies[4], Gene.GeneOrientation.NEGATIVE, "rod shape determining protein RodA");
 		Gene gen143 = new Gene("rodA", geneFamilies[11], Gene.GeneOrientation.NEGATIVE, "rod shape determining protein RodA");
 		
 		// Shorty4 C1
-		Gene gen14 = new Gene("smb ", geneFamilies[6], Gene.GeneOrientation.NEGATIVE, "small protein B");
-		Gene gen24 = new Gene("smb ", geneFamilies[6], Gene.GeneOrientation.NEGATIVE, "small protein B");
+		Gene gen14 = new Gene("smb", geneFamilies[6], Gene.GeneOrientation.NEGATIVE, "small protein B");
+		Gene gen24 = new Gene("smb", geneFamilies[6], Gene.GeneOrientation.NEGATIVE, "small protein B");
 		Gene gen34 = new Gene("----", geneFamilies[3], Gene.GeneOrientation.NEGATIVE, "hypothetical protein");
 		Gene gen44 = new Gene("----", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "hypothetical protein");
 		Gene gen54 = new Gene("----", geneFamilies[1], Gene.GeneOrientation.POSITIVE, "putative protein");
-		Gene gen64 = new Gene("nsd ", geneFamilies[2], Gene.GeneOrientation.NEGATIVE, "nucleotide sugar dehydrogenase");
+		Gene gen64 = new Gene("nsd", geneFamilies[2], Gene.GeneOrientation.NEGATIVE, "nucleotide sugar dehydrogenase");
 		Gene gen74 = new Gene("----", geneFamilies[0], Gene.GeneOrientation.POSITIVE, "hypothetical protein");
 		Gene gen84 = new Gene("abcT8", geneFamilies[11], Gene.GeneOrientation.POSITIVE, "ABC transporter");
 		
 		// Shorty4 C2
-		Gene gen15 = new Gene("smb ", geneFamilies[8], Gene.GeneOrientation.NEGATIVE, "small protein B");
+		Gene gen15 = new Gene("smb", geneFamilies[8], Gene.GeneOrientation.NEGATIVE, "small protein B");
 		Gene gen25 = new Gene("----", geneFamilies[0], Gene.GeneOrientation.NEGATIVE, "hypothetical protein");
 		Gene gen35 = new Gene("----", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "hypothetical protein");
 		Gene gen45 = new Gene("----", geneFamilies[7], Gene.GeneOrientation.POSITIVE, "putative protein");
-		Gene gen55 = new Gene("nsd ", geneFamilies[4], Gene.GeneOrientation.NEGATIVE, "nucleotide sugar dehydrogenase");
+		Gene gen55 = new Gene("nsd", geneFamilies[4], Gene.GeneOrientation.NEGATIVE, "nucleotide sugar dehydrogenase");
 		Gene gen65 = new Gene("----", geneFamilies[11], Gene.GeneOrientation.POSITIVE, "hypothetical protein");
 		Gene gen75 = new Gene("abcT8", geneFamilies[4], Gene.GeneOrientation.POSITIVE, "ABC transporter");
 		
@@ -379,13 +379,32 @@ public class CogFileReaderTest {
         // Then
         assertArrayEquals(expected, genomes);
     }
+    
+    @Test
+    public void testFileReaderToReducedGenomeGroupIntArrayWithUnHomologous() throws IOException, ParseException{
+        // Given
+        File inputFile = new File(getClass().getResource("/unHomologueGenes.cog").getFile());
+        int[][][] expected = new int[][][] {
+                {{0,-6,2,1,1,3,0}},
+                {{0,-1,2,3,0}}
+        };
 
+        // When
+        CogFileReader reader = new CogFileReader(inputFile);
+        DataSet data = reader.readData();
+
+        int[][][] genomes = data.toReducedIntArray();
+
+        // Then
+        assertArrayEquals(expected, genomes);
+    }
+    
     @Test
     public void testFileReaderToReducedGenomeIntArrayWithUnHomologous() throws IOException, ParseException{
         // Given
         File inputFile = new File(getClass().getResource("/unHomologueGenes.cog").getFile());
         int[][][] expected = new int[][][] {
-                {{0,-1,-1,-1,-1,-1,-1,2,1,1,3,0}},
+                {{0,-6,2,1,1,3,0}},
                 {{0,-1,2,3,0}}
         };
 
