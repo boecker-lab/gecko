@@ -33,32 +33,6 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	// The index of the subsequence containing the reference genecluster
 	private final int refSeqIndex;
 
-    /**
-     * Wrapper constructor for the c library
-     * @param id
-     * @param bestOccurrences
-     * @param allOccurrences
-     * @param geneFamilies
-     * @param bestPValue
-     * @param bestPValueCorrected
-     * @param minTotalDist
-     * @param refSeqIndex
-     * @param type
-     */
-	/*public GeneCluster(int id,
-			GeneClusterOccurrence[] bestOccurrences, 
-			GeneClusterOccurrence[] allOccurrences,
-			double bestPValueBase,
-			int bestPValueExp,
-			double bestPValueCorrectedBase,
-			int bestPValueCorrectedExp,
-			int minTotalDist, 
-			int refSeqIndex,
-			char type) 
-	{
-		this(id, bestOccurrences, allOccurrences, (new BigDecimal(bestPValueBase)).scaleByPowerOfTen(bestPValueExp), (new BigDecimal(bestPValueCorrectedBase)).scaleByPowerOfTen(bestPValueCorrectedExp), minTotalDist, refSeqIndex, Parameter.OperationMode.getOperationModeFromChar(type));
-	}*/
-		
 	public GeneCluster(int id, 
 			GeneClusterOccurrence[] bestOccurrences, 
 			GeneClusterOccurrence[] allOccurrences,

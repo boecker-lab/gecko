@@ -290,7 +290,8 @@ public class DataSet {
     }
 
     public void setClusters(List<GeneCluster> clusters) {
-        this.clusters = correctInvalidClusters(clusters, genomes, 3);
+        this.clusters = clusters;
+        //this.clusters = correctInvalidClusters(clusters, genomes, 3);
     }
 
     private static List<GeneCluster> correctInvalidClusters(List<GeneCluster> clusters, Genome[] genomes, int minClusterSize){
