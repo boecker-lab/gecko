@@ -704,7 +704,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		}
 		return false;
 	}
-
+	
 	public static List<GeneCluster> mergeResults(List<GeneCluster> oldResults, List<GeneCluster> additionalResults) {
 		if (oldResults == null)
 			return additionalResults;
@@ -720,14 +720,14 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             return oldResults;
 		}
 	}
-
+	
 	private static List<List<GeneCluster>> groupSimilarClusters(GeneCluster[] allClusters) {
 		List<List<GeneCluster>> resultList = new ArrayList<>();
-
+		
 		for (GeneCluster cluster : allClusters){
 			List<GeneCluster> newGroup = new ArrayList<>();
 			newGroup.add(cluster);
-
+			
 			Iterator<List<GeneCluster>> listIter = resultList.iterator();
 			while (listIter.hasNext()){
 				List<GeneCluster> groupedClusters = listIter.next();
@@ -741,7 +741,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 			}
 			resultList.add(newGroup);
 		}
-
+		
 		return resultList;
 	}
 

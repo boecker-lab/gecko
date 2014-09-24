@@ -41,7 +41,7 @@ public class DataSet {
                    GeneFamily unknownGeneFamily,
                    int numberOfGeneFamiliesWithMultipleGenes) {
         this.genomes = genomes;
-        this.clusters = clusters==null ? new ArrayList<GeneCluster>() : clusters;
+        this.setClusters(clusters==null ? new ArrayList<GeneCluster>() : clusters);
         this.maxIdLength = maxIdLength;
         this.maxNameLength = maxNameLength;
         this.maxLocusTagLength = maxLocusTagLength;
@@ -290,7 +290,19 @@ public class DataSet {
     }
 
     public void setClusters(List<GeneCluster> clusters) {
-        this.clusters = clusters;
+        this.clusters = correctInvalidClusters(clusters, genomes, 3);
+    }
+
+    private static List<GeneCluster> correctInvalidClusters(List<GeneCluster> clusters, Genome[] genomes, int minClusterSize){
+        if (genomes == null)
+            return clusters;
+        List<GeneCluster> cleanedCluster = new ArrayList<>(clusters.size());
+        for (GeneCluster cluster : clusters){
+            if (!cluster.invalidMultiGeneFamilyGeneCluster(minClusterSize, genomes)){
+                cleanedCluster.add(cluster);
+            }
+        }
+        return cleanedCluster;
     }
 
     public int getMaxIdLength() {

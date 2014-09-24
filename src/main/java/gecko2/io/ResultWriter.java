@@ -190,6 +190,7 @@ public class ResultWriter {
                 for (int i=0; i<genomesForNaming.length; i++){
                     writer.write("\t"+cluster.getLocusTags(genomesForNaming[i]));
                 }
+                writer.write("\t"+cluster.getGenomeString());
                 writer.newLine();
             }
 

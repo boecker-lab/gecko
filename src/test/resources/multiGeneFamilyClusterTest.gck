@@ -1,0 +1,54 @@
+<genomes>
+<genome>
+Shorty 1
+<chromosome>
+
++	1	fusA	elongation factor EF-G	fusA	2
++	2	fusA	elongation factor EF-G	fusA	2
++	3	fusA	elongation factor EF-G	fusA	2
++	4	tufA1	elongation factor EF-Tu	tufA1	2
++	0	rpsJ	ribosomal protein S10	rpsJ	1
++	0	rplC	ribosomal protein L03	rplC	1
++	5	rplD	ribosomal protein L04	rplD	3
++	6	rplD	ribosomal protein L04	rplD	2
++	7	rplW	ribosomal protein L23	rplW	2
++	5	rpsJ	ribosomal protein S10	rpsJ	3
++	8	fusB	elongation factor EF-G	fusA	2
+</chromosome>
+</genome>
+<genome>
+Shorty 2
+<chromosome>
+
++	1	fusA	elongation factor EF-G	fusA	2
++	2	tufA1	elongation factor EF-Tu	tufA1	2
++	3	rpsJ	ribosomal protein S10	rpsJ	2
++	4	rplC	ribosomal protein L03	rplC	2
++	0	rplD	ribosomal protein L04	rplD	1
++	5	rplW	ribosomal protein L23	rplW	3
++	6	rplB	ribosomal protein L02	rplB	2
++	7	rpsS	ribosomal protein S19	rpsS	2
++	8	rplV	ribosomal protein L22	rplV	2
+</chromosome>
+</genome>
+</genomes>
+<clusters>
+<cluster>
+0	0	r	0	0.059894304385996777195799722903757356107234954833984375	3.95302408947578729492278171164798550307750701904296875000000
+[4, 3, 2, 1]
+<occ>
+0	0.059894304385996777195799722903757356107234954833984375	2	0
+0	0	0	1	4	1
+1	0	0	1	4	0.059894304385996778583578503685203031636774539947509765625
+</occ>
+</cluster>
+<cluster>
+1	0	r	0	0.059894304385996777195799722903757356107234954833984375	3.95302408947578729492278171164798550307750701904296875000000
+[8, 7, 6, 5]
+<occ>
+0	0.059894304385996777195799722903757356107234954833984375	2	0
+0	0	0	7	11	1
+1	0	0	6	9	0.059894304385996778583578503685203031636774539947509765625
+</occ>
+</cluster>
+</clusters>
