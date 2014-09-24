@@ -39,7 +39,7 @@ public class Gene implements Serializable {
 	}
 	
 	public Gene(String name, GeneFamily geneFamily, GeneOrientation orientation, String annotation) {
-        this(name, name, geneFamily, orientation, annotation);
+        this(name, "", geneFamily, orientation, annotation);
 	}
 	
 	public Gene(String name, String tag, GeneFamily geneFamily, GeneOrientation orientation, String annotation) {
