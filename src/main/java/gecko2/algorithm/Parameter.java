@@ -89,7 +89,7 @@ public class Parameter {
     }
 
     public enum DeltaTable {
-        highly_conserved, low_conserved, the_methode_high_dist, lichtheimia, lichtheimia_inner, statistic_paper, test_five_proteobacter;
+        highly_conserved, low_conserved, the_methode_high_dist, the_methode_higher_dist, lichtheimia, lichtheimia_inner, statistic_paper, test_five_proteobacter;
 
         public int[][] getDeltaTable() {
             switch (this) {
@@ -99,6 +99,8 @@ public class Parameter {
                     return new int[][]{{0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {2, 1, 2}, {3, 2, 3}, {3, 3, 3}, {4, 3, 4}, {5, 3, 5}, {6, 4, 6}};
                 case the_methode_high_dist:
                     return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {2, 1, 2}, {3, 2, 3}, {4, 2, 4}, {6, 3, 6}, {8, 4, 8}, {10, 5, 10}};
+                case the_methode_higher_dist:
+                    return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {2, 1, 2}, {3, 1, 3}, {4, 2, 4}, {5, 3, 5}, {6, 3, 6}, {8, 4, 8}, {10, 5, 10}};
                 case lichtheimia:
                     return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
                 case lichtheimia_inner:
