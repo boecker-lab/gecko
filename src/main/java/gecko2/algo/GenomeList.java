@@ -224,4 +224,13 @@ class GenomeList {
         }
         return b.toString();
     }
+
+    public void removeCalculationFields() {
+        for (Genome g : genomes) {
+            for (Chromosome chr : g) {
+                chr.removeCalculationFields();
+            }
+        }
+        rank = null;
+    }
 }

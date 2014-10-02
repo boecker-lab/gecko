@@ -645,4 +645,19 @@ class Chromosome {
     @Override public String toString() {
         return String.format("Chromosome Nr: %1$d => %2$s", nr, Arrays.toString(genes));
     }
+
+    /**
+     * Removes all fields used only in computation of gene clusters, so they can be garbage collected
+     */
+    public void removeCalculationFields() {
+        this.pos = null;
+
+        this.L = null;
+        this.R = null;
+        this.L_prime = null;
+        this.R_prime = null;
+
+        this.prevOcc = null;
+        this.nextOcc = null;
+    }
 }
