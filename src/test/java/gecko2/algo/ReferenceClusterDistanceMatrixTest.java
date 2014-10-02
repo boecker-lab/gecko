@@ -292,6 +292,6 @@ public class ReferenceClusterDistanceMatrixTest {
 	public void fiveProteobacterReferenceClusterWithDistanceMatrixTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
 
-        automaticGeneClusterTestFromFile(settings, false);
+        automaticGeneClusterTestFromFile(settings);
 	}
 }

@@ -277,7 +277,7 @@ public class GeneClusterTestUtils {
 		}
 	}
 	
-	public static void automaticGeneClusterTestFromFile(ReferenceClusterTestSettings settings, boolean libGeckoLoaded) throws IOException, DataFormatException, ParseException {
+	public static void automaticGeneClusterTestFromFile(ReferenceClusterTestSettings settings) throws IOException, DataFormatException, ParseException {
         // Expected Results
         assertNotNull(settings.expectedResultFile);
         GeckoDataReader resultReader = new GckFileReader(settings.expectedResultFile);
@@ -298,12 +298,6 @@ public class GeneClusterTestUtils {
         reducedData.setClusters(reducedRes, settings.p);
 
         compareGeneClusters(expectedData.getClusters(), reducedRes, PValueComparison.COMPARE_NONE);
-		if (libGeckoLoaded && settings.p.getDelta() >= 0 && settings.genomeGroups == null){
-			//GeneCluster[] res = GeckoInstance.getInstance().computeClustersLibgecko(actualData, settings.p);
-		
-			// Test the java implementation
-			//compareReferenceClusters(res, javaRes, PValueComparison.COMPARE_UNCORRECTED);
-		}
 	}
 			
 	/**
