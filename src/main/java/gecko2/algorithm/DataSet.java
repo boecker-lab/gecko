@@ -398,8 +398,4 @@ public class DataSet {
         result = 31 * result + numberOfGeneFamiliesWithMultipleGenes;
         return result;
     }
-
-    public void clearClusters() {
-        clusters.clear();
-    }
 }
