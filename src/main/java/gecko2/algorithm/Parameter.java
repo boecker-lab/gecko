@@ -122,6 +122,8 @@ public class Parameter {
                     return 3;
                 case the_methode_high_dist:
                     return 2;
+                case the_methode_higher_dist:
+                    return 3;
                 case lichtheimia:
                     return 3;
                 case lichtheimia_inner:
