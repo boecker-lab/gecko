@@ -238,9 +238,9 @@ public class CogFileReader implements GeckoDataReader {
         Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
 
         try (CountedReader reader = new CountedReader(new FileReader(inputFile))){
-            this.maxIdLength = -1;
-            this.maxNameLength = -1;
-            this.maxLocusTagLength = -1;
+            this.maxIdLength = 0;
+            this.maxNameLength = 0;
+            this.maxLocusTagLength = 0;
 
             for (GenomeOccurrence occ : occs) {
                 if (!occ.isFlagged())

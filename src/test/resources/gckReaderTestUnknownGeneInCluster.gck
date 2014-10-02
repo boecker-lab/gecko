@@ -3,21 +3,21 @@
 Shorty 1
 <chromosome>
 
-+	1	fusA	elongation factor EF-G	fusA	2
-+	2	tufA1	elongation factor EF-Tu	tufA1	2
-+	0	rpsJ	ribosomal protein S10	rpsJ	1
-+	4	rplC	ribosomal protein L03	rplC	2
-+	5	rplD	ribosomal protein L04	rplD	2
++	1		elongation factor EF-G	fusA	2
++	2		elongation factor EF-Tu	tufA1	2
++	0		ribosomal protein S10	rpsJ	1
++	4		ribosomal protein L03	rplC	2
++	5		ribosomal protein L04	rplD	2
 </chromosome>
 </genome>
 <genome>
 Shorty 2
 <chromosome>
 
-+	1	fusA	elongation factor EF-G	fusA	2
-+	2	tufA1	elongation factor EF-Tu	tufA1	2
-+	4	rpsJ	ribosomal protein S10	rpsJ	2
-+	5	rplC	ribosomal protein L03	rplC	2
++	1		elongation factor EF-G	fusA	2
++	2		elongation factor EF-Tu	tufA1	2
++	4		ribosomal protein S10	rpsJ	2
++	5		ribosomal protein L03	rplC	2
 </chromosome>
 </genome>
 </genomes>

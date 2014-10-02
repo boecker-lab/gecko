@@ -3,80 +3,80 @@
 Shorty 1
 <chromosome>
 
-+	1	fusA	elongation factor EF-G	fusA	8
-+	2	tufA1	elongation factor EF-Tu	tufA1	3
-+	3	rpsJ	ribosomal protein S10	rpsJ	6
-+	4	rplC	ribosomal protein L03	rplC	9
-+	5	rplD	ribosomal protein L04	rplD	6
-+	6	rplW	ribosomal protein L23	rplW	3
-+	3	rpsJ	ribosomal protein S10	rpsJ	6
-+	1	fusA	elongation factor EF-G	fusA	8
++	1		elongation factor EF-G	fusA	8
++	2		elongation factor EF-Tu	tufA1	3
++	3		ribosomal protein S10	rpsJ	6
++	4		ribosomal protein L03	rplC	9
++	5		ribosomal protein L04	rplD	6
++	6		ribosomal protein L23	rplW	3
++	3		ribosomal protein S10	rpsJ	6
++	1		elongation factor EF-G	fusA	8
 </chromosome>
 </genome>
 <genome>
 Shorty 2
 <chromosome>
 
-+	7	fusA	elongation factor EF-G	fusA	4
-+	4	tufA1	elongation factor EF-Tu	tufA1	9
-+	3	rpsJ	ribosomal protein S10	rpsJ	6
-+	1	rplC	ribosomal protein L03	rplC	8
-+	8	rplD	ribosomal protein L04	rplD	2
-+	4	rplW	ribosomal protein L23	rplW	9
-+	5	rplB	ribosomal protein L02	rplB	6
-+	4	rpsS	ribosomal protein S19	rpsS	9
-+	1	rplV	ribosomal protein L22	rplV	8
-+	6	rpsC	ribosomal protein S03	rpsC	3
-+	9	rplP	ribosomal protein L16	rplP	2
-+	7	rplP	ribosomal protein L16	rplP	4
-+	14	----	hypothetical protein	----	1
--	0	smb 	small protein B	smb 	1
--	0	smb 	small protein C	smb 	1
++	7		elongation factor EF-G	fusA	4
++	4		elongation factor EF-Tu	tufA1	9
++	3		ribosomal protein S10	rpsJ	6
++	1		ribosomal protein L03	rplC	8
++	8		ribosomal protein L04	rplD	2
++	4		ribosomal protein L23	rplW	9
++	5		ribosomal protein L02	rplB	6
++	4		ribosomal protein S19	rpsS	9
++	1		ribosomal protein L22	rplV	8
++	6		ribosomal protein S03	rpsC	3
++	9		ribosomal protein L16	rplP	2
++	7		ribosomal protein L16	rplP	4
++	14		hypothetical protein	----	1
+-	0		small protein B	smb	1
+-	0		small protein C	smb	1
 </chromosome>
 </genome>
 <genome>
 Shorty 3
 <chromosome>
 
--	0	smb 	small protein B	smb 	1
--	3	----	hypothetical protein	----	6
-+	5	----	hypothetical protein	----	6
-+	1	----	putative protein	----	8
--	4	nsd 	nucleotide sugar dehydrogenase	nsd 	9
-+	11	----	hypothetical protein	----	2
-+	11	----	hypothetical protein	----	2
-+	2	abcT8	ABC transporter	abcT8	3
--	4	serS	seryl-tRNA synthetase	serS	9
-+	3	glmS	glucosamine-fructose-6-phosphate aminotransferase	glmS	6
--	6	argD	N-acetylornithine aminotransferase	argD	3
--	1	nsd 	nucleotide sugar dehydrogenase	nsd 	8
--	5	rodA	rod shape determining protein RodA	rodA	6
--	12	rodA	rod shape determining protein RodA	rodA	3
+-	0		small protein B	smb	1
+-	3		hypothetical protein	----	6
++	5		hypothetical protein	----	6
++	1		putative protein	----	8
+-	4		nucleotide sugar dehydrogenase	nsd	9
++	11		hypothetical protein	----	2
++	11		hypothetical protein	----	2
++	2		ABC transporter	abcT8	3
+-	4		seryl-tRNA synthetase	serS	9
++	3		glucosamine-fructose-6-phosphate aminotransferase	glmS	6
+-	6		N-acetylornithine aminotransferase	argD	3
+-	1		nucleotide sugar dehydrogenase	nsd	8
+-	5		rod shape determining protein RodA	rodA	6
+-	12		rod shape determining protein RodA	rodA	3
 </chromosome>
 </genome>
 <genome>
 Shorty 4
 <chromosome>
 chromosome I
--	7	smb 	small protein B	smb 	4
--	7	smb 	small protein B	smb 	4
--	4	----	hypothetical protein	----	9
-+	4	----	hypothetical protein	----	9
-+	2	----	putative protein	----	3
--	3	nsd 	nucleotide sugar dehydrogenase	nsd 	6
-+	1	----	hypothetical protein	----	8
-+	12	abcT8	ABC transporter	abcT8	3
+-	7		small protein B	smb	4
+-	7		small protein B	smb	4
+-	4		hypothetical protein	----	9
++	4		hypothetical protein	----	9
++	2		putative protein	----	3
+-	3		nucleotide sugar dehydrogenase	nsd	6
++	1		hypothetical protein	----	8
++	12		ABC transporter	abcT8	3
 </chromosome>
 <chromosome>
 chromosome II
--	9	smb 	small protein B	smb 	2
--	1	----	hypothetical protein	----	8
-+	4	----	hypothetical protein	----	9
-+	8	----	putative protein	----	2
--	5	nsd 	nucleotide sugar dehydrogenase	nsd 	6
-+	12	----	hypothetical protein	----	3
-+	5	abcT8	ABC transporter	abcT8	6
-+	13	----	hypothetical protein	----	1
+-	9		small protein B	smb	2
+-	1		hypothetical protein	----	8
++	4		hypothetical protein	----	9
++	8		putative protein	----	2
+-	5		nucleotide sugar dehydrogenase	nsd	6
++	12		hypothetical protein	----	3
++	5		ABC transporter	abcT8	6
++	13		hypothetical protein	----	1
 </chromosome>
 </genome>
 </genomes>

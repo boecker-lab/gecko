@@ -26,22 +26,6 @@ import static gecko2.algo.GeneClusterTestUtils.compareReferenceClusters;
  */
 public class ReferenceClusterTest 
 {
-    private static boolean libGeckoLoaded = false;
-	/**
-	 * The method adds libgecko2 to the library path.
-	 * 
-	 */
-	@BeforeClass
-	public static void loadLibGecko2()
-	{
-        try {
-            LibraryUtils.loadLibrary("libgecko2");
-            libGeckoLoaded = true;
-        } catch (PlatformNotSupportedException | IOException e) {
-            libGeckoLoaded = false;
-        }
-	}
-
 	@Test
     public void testMemoryReductionWithMergedGenes()
     {
@@ -968,35 +952,35 @@ public class ReferenceClusterTest
     public void memoryReductionFromFileTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
 
-        automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
+        automaticGeneClusterTestFromFile(settings);
     }
 
     @Test
     public void memoryReductionBugFromFileTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.memoryReductionBugD2S5Q2();
 
-        automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
+        automaticGeneClusterTestFromFile(settings);
     }
 
     @Test
     public void memoryReductionWithSuboptimalOccurrenceD3S5() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.memoryReductionWithSuboptimalOccurrenceD3S5();
 
-        automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
+        automaticGeneClusterTestFromFile(settings);
     }
 
 	@Test
 	public void fiveProteobacterReferenceClusterTest() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
 
-		automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
+		automaticGeneClusterTestFromFile(settings);
 	}
 
 	@Test
 	public void fiveProteobacterReferenceClusterTestWithGrouping() throws URISyntaxException, IOException, DataFormatException, ParseException {
         ReferenceClusterTestSettings settings = ReferenceClusterTestSettings.fiveProteobacterD3S6Q2Grouping();
 
-		automaticGeneClusterTestFromFile(settings, libGeckoLoaded);
+		automaticGeneClusterTestFromFile(settings);
 	}
 
 	@Test
