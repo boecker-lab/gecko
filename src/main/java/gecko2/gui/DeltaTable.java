@@ -107,12 +107,12 @@ public class DeltaTable extends JPanel{
     private static class DeltaTableTableModel extends AbstractTableModel {
         private static final long serialVersionUID = 769826863674743708L;
 
-        private static final short COL_D_LOSS = 0;
-        private static final short COL_D_ADD = 1;
+        private static final short COL_D_ADD = 0;
+        private static final short COL_D_LOSS = 1;
         private static final short COL_D_SUM = 2;
         private static final short COL_SIZE = 3;
 
-        private final String[] columnNames = {"D_LOSS", "D_ADD", "D_SUM", "Size"};
+        private final String[] columnNames = {"D_ADD","D_LOSS", "D_SUM", "Size"};
         private java.util.List<int[]> deltaValues;
 
         public DeltaTableTableModel(int[][] values) {
