@@ -3,22 +3,34 @@ USER MANUAL
 
 1. Installation
 
-Java 7 (http://www.java.com/) is needed to run Gecko2
+Java 7 is needed to run Gecko2.
+Java 7 and installation instructions are available from http://www.java.com
 
 2. Gecko2
 
 Given a set of genomes in which each gene is assigned to a family
 of homologous genes, Gecko2 detects sets of genes that appear in an
 approximately conserved neighborhood among the genomes.
+
 A typical Gecko session is divided into three parts: genome selection,
 cluster detection, manual evaluation of predictions. These parts are
 described in the following in more detail.
 
-Gecko2 can either be run in commandline mode, '-h' will give all possible
-parameters. Or it can be used in GUI mode, if started without any
-parameters.
+2.1 Starting Gecko2
 
-2.1 Data
+Windows: To start Gecko2, go to the bin directory and execute Gecko2.bat
+For Linux and OS X: To start Gecko2, go to the bin directory and execute Gecko2
+
+As an alternative, you can directly start the Gecko2.jar located in lib with
+java -jar lib/Gecko2-2.1.jar. In this case, you may need to increase the maximum
+heap space with java -Xmx6G -jar lib/Gecko2-2.1.jar
+
+Gecko2 can either be run in commandline mode, '-h' will give all possible
+parameters, that you can, or need to supply.
+Or it can be used in GUI mode, if started without any
+parameters, or just a *.gck or *.cog input file that will be automatically loaded.
+
+2.2 Data
 
 For Gecko2, the basic requirement is that the genomes are given as
 sequences of strings where each character represents a certain family
@@ -82,7 +94,7 @@ then visualized in a genome browser, allowing to inspect the genomes,
 contained genes, and gene annotations.
 
 
-4.2 Cluster Detection
+2.3 Cluster Detection
 
 When clicking the 'start computation" button, the user is asked to
 select a search mode, as well as global and model-dependent parameters
@@ -110,7 +122,7 @@ pasted when e. g. copying a cluster from the result list of a previous
 run of Gecko2.  After all parameters are set, computation can be started
 by clicking the 'OK' button.
 
-4.3 Graphical Evaluation
+2.4 Graphical Evaluation
 
 After completion of computations, results are shown in tabular form
 below the genome browser. The table contains the list of all predicted
