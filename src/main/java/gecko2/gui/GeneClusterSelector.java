@@ -31,7 +31,6 @@ import java.util.List;
 public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataListener {
 	private static final long serialVersionUID = -4860132931042035952L;
 
-    //private java.util.List<GeneCluster> clusters;
 	private final JCheckBox showSuboptimalCheckBox;
 	private final JTable table;
     private EventList<GeneCluster> displayedTableData;
@@ -328,7 +327,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
                     for (Subsequence s : subseqs) {
                         //TODO GeneCluster should know their genomes?
                         for (Gene g : GeckoInstance.getInstance().getGenomes()[genome].getSubsequence(s)) {
-                            baseList.add(g.getSummary());
+                            baseList.add(g.getFilterString());
                         }
                     }
                 }
