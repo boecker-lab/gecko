@@ -334,7 +334,7 @@ public class GeneClusterPicture {
 	private int paintGene(Graphics g, Gene gene, boolean partOfCluster, int x, int y) {
 		Color currentColor = getColor(gene.getGeneFamily());
 		
-		return GenomePainting.paintGene(g, gene, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
+		return GenomePainting.paintGene(g, gene, false, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
 	}
 	
 	public void paint(Graphics g){

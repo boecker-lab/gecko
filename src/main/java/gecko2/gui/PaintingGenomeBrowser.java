@@ -1,5 +1,6 @@
 package gecko2.gui;
 
+import com.google.common.collect.Lists;
 import gecko2.GeckoInstance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
@@ -26,6 +27,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 
 	private String maxLengthString;
 	private GenomePainting.NameType nameType;
+    private boolean flipped;
 
 	/**
 	 * The genes that will be highlighted.
@@ -41,6 +43,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		this.genome = g;
 		this.parent = parent;
         this.nameType = nameType;
+        this.flipped = false;
 		
 		FlowLayout flowlayout = new FlowLayout(FlowLayout.LEFT);
 		flowlayout.setHgap(0);
@@ -103,7 +106,12 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 			scrollPosition += genome.getChromosomes().get(i).getGenes().size() * getGeneWidth();
 		}
 		scrollPosition += getChromosomeEndingWidth();
-		scrollPosition += geneIndex * getGeneWidth();
+
+        if (!flipped)
+		    scrollPosition += geneIndex * getGeneWidth();
+        else
+            scrollPosition += (genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1 - geneIndex) * getGeneWidth();
+
 		scrollPosition += getGeneWidth()/2; // center on the middle of the gene
 		return scrollPosition;
 	}
@@ -115,7 +123,8 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 			position -= getChromosomeEndingWidth();
 			if (position <= 0)
 				return null;
-			for (Gene gene : chr.getGenes()){
+            java.util.List<Gene> listView = flipped ? Lists.reverse(chr.getGenes()) : chr.getGenes();
+            for (Gene gene : listView){
 				position -= getGeneWidth();
 				if (position <= 0)
 					return gene;
@@ -146,14 +155,13 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	
 	@Override
 	public boolean isFlipped() {
-		// TODO Auto-generated method stub
-		return false;
+		return flipped;
 	}
 
 	@Override
 	public void flip() {
-		// TODO Auto-generated method stub
-		
+        this.flipped = !this.flipped;
+        this.revalidate();
 	}
 
 	@Override
@@ -225,8 +233,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			//TODO evlt Bild speicher und nicht immer neu zeichnen
-			GenomePainting.paintGenomeWithCluster(g, genome, highlights, nameType, highlightColor, borderSpace, vgap, getGeneElementWidth(), gecko.getGeneElementHight(), hgap, vgap);
+			GenomePainting.paintGenomeWithCluster(g, genome, flipped, highlights, nameType, highlightColor, borderSpace, vgap, getGeneElementWidth(), gecko.getGeneElementHight(), hgap, vgap);
 		}
 	}
 	
@@ -246,7 +253,10 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 			});
 		}
 	}
-	
+
+    /**
+     * Mouse listener for the GenomeBrowser
+     */
 	private class PaintingGenomeBrowserMouseListener extends MouseInputAdapter {
 		
 		private int clickXPos;
@@ -255,8 +265,25 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		public void mousePressed(MouseEvent e) {
 			this.clickXPos = e.getX();
 		}
-		
-		@Override
+
+
+        @Override
+        public void mouseClicked(MouseEvent event)
+        {
+            if (event.getClickCount() == 2) {
+                Gene gene = getGeneAtPosition(event.getX());
+                if (event.isShiftDown()){
+                    PaintingGenomeBrowser.this.flip();
+                }
+                if (!event.isShiftDown() && gene != null){
+                    parent.centerCurrentClusterAt(gene.getGeneFamily());
+                }
+            }
+        }
+
+
+
+        @Override
 		public void mouseDragged(MouseEvent e) {
 			int diff = e.getX()-this.clickXPos;
 			adjustScrollPosition(-diff);

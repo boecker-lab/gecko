@@ -391,7 +391,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
 	@Override
 	public void centerCurrentClusterAt(GeneFamily geneFamily) {
-		int[] subselections 		= lastLocationEvent.getsubselection();
+        int[] subselections 		= lastLocationEvent.getsubselection();
 		GeneClusterOccurrence gOcc 	= lastLocationEvent.getgOcc();
 		
 		int[] positions = new int[gOcc.getSubsequences().length];
@@ -399,7 +399,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		ArrayList<Integer> minus = new ArrayList<>();
 		ArrayList<Integer> plus = new ArrayList<>();
 		for (int i=0; i<positions.length;i++) {
-			// If genome i is not in the cluser, skip
+			// If genome i is not in the cluster, skip
 			if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
 				continue;
 			List<Chromosome> genes = gecko.getGenomes()[i].getChromosomes();
