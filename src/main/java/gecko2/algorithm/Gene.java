@@ -98,6 +98,30 @@ public class Gene implements Serializable {
 		return annotation;
 	}
 
+    /**
+     * Returns a String of all search terms of the gene, blank separated
+     * @return
+     */
+    public String getFilterString() {
+        StringBuilder builder = new StringBuilder();
+        if (annotation != null && annotation != ""){
+            builder.append(annotation);
+            builder.append(" ");
+        }
+        if (name != null && name != ""){
+            builder.append(name);
+            builder.append(" ");
+        }
+        if (tag != null && tag != ""){
+            builder.append(tag);
+            builder.append(" ");
+        }
+        if (!geneFamily.getExternalId().equals(GeneFamily.UNKNOWN_GENE_ID))
+            builder.append(geneFamily.getExternalId());
+        return builder.toString();
+    }
+
+
 	public String getSummary() {
 		if (annotation==null)
 			if (name!=null && !name.equals("----")) {

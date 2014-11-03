@@ -11,7 +11,13 @@ import java.util.List;
 class Genome implements Iterable<Chromosome> {
     private final List<Chromosome> chromosomes;
     private final int nr;
-    private final int length;
+
+    /**
+     *  Needed for statistics calculations.
+     *  Position 0 contains the total length of the genome.
+     *  Positions i contains the total number of intervals of length i that fit into the genome.
+     */
+    private final List<Integer> possibleIntervalsPerIntervalLength;
 
     /**
      * 
@@ -24,14 +30,16 @@ class Genome implements Iterable<Chromosome> {
         int l = 0;
         for (Chromosome chr : chromosomes)
             l += chr.getTotalGeneNumber();
-        length = l;
+        possibleIntervalsPerIntervalLength = new ArrayList<>();
+        possibleIntervalsPerIntervalLength.add(l);
 	}
 
     public Genome(int nr, Chromosome chromosome) {
         this.chromosomes = new ArrayList<>(1);
         this.chromosomes.add(chromosome);
         this.nr = nr;
-        length = chromosome.getTotalGeneNumber();
+        possibleIntervalsPerIntervalLength = new ArrayList<>();
+        possibleIntervalsPerIntervalLength.add(chromosome.getTotalGeneNumber());
     }
     
     public Genome(Genome other) {
@@ -39,7 +47,7 @@ class Genome implements Iterable<Chromosome> {
     	for (Chromosome chr : other.chromosomes)
     		this.chromosomes.add(new Chromosome(chr));
     	this.nr = other.nr;
-    	this.length = other.length;
+        possibleIntervalsPerIntervalLength = new ArrayList<>(other.possibleIntervalsPerIntervalLength);
     }
 
 	public Chromosome get(int nr) {
@@ -55,9 +63,25 @@ class Genome implements Iterable<Chromosome> {
      * @return the length.
      */
     public int getLength() {
-        return length;
-    }   
-    
+        return possibleIntervalsPerIntervalLength.get(0);
+    }
+
+    public int getNrOfPossibleIntervals(int intervalLength) {
+        if (possibleIntervalsPerIntervalLength.size() <= intervalLength) {
+            for (int i=possibleIntervalsPerIntervalLength.size(); i<=intervalLength; i++){
+                possibleIntervalsPerIntervalLength.add(computePossibleIntervals(i));
+            }
+        }
+        return possibleIntervalsPerIntervalLength.get(intervalLength);
+    }
+
+    private int computePossibleIntervals(int intervalLength) {
+        int possibleIntervals = 0;
+        for (Chromosome chr : chromosomes)
+            possibleIntervals += Math.max(0, chr.getTotalGeneNumber()-intervalLength+1);
+        return possibleIntervals;
+    }
+
     /**
      * Checks if the character c does not occur on the genome
      * @param c the character

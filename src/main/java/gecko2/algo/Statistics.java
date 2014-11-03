@@ -303,7 +303,7 @@ class Statistics implements AlgorithmProgressProvider {
 					dLoc.setpValue(1.0);                                         // does not need p-value
 				else {
 					// For individual distance bound
-					dLoc.setpValue(prob_C_has_approxOccInGenome(dLoc.getDistance(), genomes.get(genomeNr).getLength(), cluster.getGeneContent(), pPlusTable, charFrequencies));
+					dLoc.setpValue(prob_C_has_approxOccInGenome(dLoc.getDistance(), genomes.get(genomeNr), cluster.getGeneContent(), pPlusTable, charFrequencies));
 					// For global distance bound
 					//dLoc.setpValue(prob_C_has_approxOccInGenome(cluster.getMaxDistance(), genomes.get(genomeNr).getLength(), genomes.getAlphabetSize(), cluster.getGeneContent(), pPlusTable, charFrequencies));
 				}
@@ -311,22 +311,24 @@ class Statistics implements AlgorithmProgressProvider {
 		}
 	}
 	
-	private double prob_C_has_approxOccInGenome(int delta, int totalLength,
+	private double prob_C_has_approxOccInGenome(int delta, Genome genome,
 			List<Integer> geneContent, PTable pPlusTable, int[] charFrequencies) {
 
 		if (noDLocPossible(geneContent, delta, charFrequencies))
 			return 0.0;
 		
 		double[] localCharProb = computeLocalCharProb(geneContent, charFrequencies);
-		double probOfC = elementOfC_Prob(geneContent, charFrequencies, totalLength);
+		double probOfC = elementOfC_Prob(geneContent, charFrequencies, genome.getLength());
 		
 		PTable pTable = new PTable(localCharProb, geneContent.size(), geneContent.size(), random);
 		
 		double log = 0.0;
 		int L = Math.max(1, geneContent.size()-delta);
 		boolean notEqual = true;
-		while (notEqual && L<=totalLength){
-			double newLog = log + (totalLength-L+1)*Math.log1p(-1.0*q_L_delta(delta, L, probOfC, geneContent.size(), pTable, pPlusTable));
+		while (notEqual){
+            if (genome.getNrOfPossibleIntervals(L) == 0)
+                break;
+			double newLog = log + genome.getNrOfPossibleIntervals(L)*Math.log1p(-1.0*q_L_delta(delta, L, probOfC, geneContent.size(), pTable, pPlusTable));
 			
 			if (L >= geneContent.size())
 				notEqual = !Precision.equalsWithRelativeTolerance(log, newLog, 0.0000001);

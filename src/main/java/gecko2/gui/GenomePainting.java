@@ -1,5 +1,6 @@
 package gecko2.gui;
 
+import com.google.common.collect.Lists;
 import gecko2.GeckoInstance;
 import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
@@ -8,6 +9,8 @@ import gecko2.algorithm.Genome;
 
 import javax.swing.*;
 import java.awt.*;
+import java.security.InvalidParameterException;
+
 
 public class GenomePainting {
 	
@@ -115,6 +118,7 @@ public class GenomePainting {
      * the orientation is generated from the gene id (id < 0 = NEGATIVE, id > 0 = POSITIVE)
      * @param g the Graphics
      * @param gene the gene
+     * @param flipped if the gene shall be painted flipped
      * @param nameType the type of name information that shall be used
      * @param backgroundColor the color of the background
      * @param color the color of the gene arrow
@@ -126,16 +130,17 @@ public class GenomePainting {
      * @param vgap the vertical gap size
      * @return the x coordinate after the painting
      */
-    public static int paintGene(Graphics g, Gene gene, NameType nameType, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
-        return paintGene(g, gene, nameType, gene.getOrientation(), backgroundColor, color, x, y, width, height, hgap, vgap);
+    public static int paintGene(Graphics g, Gene gene, boolean flipped, NameType nameType, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
+        return paintGene(g, gene, flipped, nameType, gene.getOrientation(), backgroundColor, color, x, y, width, height, hgap, vgap);
     }
 
     /**
      * Paints one gene, the gene text is automatically generated from the gene id, the gecko gene label map and the nameType
      * @param g the Graphics
      * @param gene the gene
+     * @param flipped if the gene shall be painted flipped
      * @param nameType the type of name information that shall be used
-     *  @param orientation the orientation of the gene, NEGATIVE, POSITIVE, or UNSIGNED
+     * @param orientation the orientation of the gene, NEGATIVE, POSITIVE, or UNSIGNED
      * @param backgroundColor the color of the background
      * @param color the color of the gene arrow
      * @param x the x coordinate
@@ -146,7 +151,7 @@ public class GenomePainting {
      * @param vgap the vertical gap size
      * @return the x coordinate after the painting
      */
-    public static int paintGene(Graphics g, Gene gene, NameType nameType, Gene.GeneOrientation orientation, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
+    public static int paintGene(Graphics g, Gene gene, boolean flipped, NameType nameType, Gene.GeneOrientation orientation, Color backgroundColor, Color color, int x, int y, int width, int height, int hgap, int vgap) {
         String name = "";
         switch (nameType) {
             case ID: name = gene.getExternalId();
@@ -156,25 +161,26 @@ public class GenomePainting {
             case LOCUS_TAG: name = gene.getTag();
                 break;
         }
-        return paintGene(g, orientation, backgroundColor, color, name, x, y, width, height, hgap, vgap);
+        return paintGene(g, flipped, orientation, backgroundColor, color, name, x, y, width, height, hgap, vgap);
     }
 
-	/**
-	  * Paints one gene
-	  * @param g the Graphics
-	  * @param geneOrientation the orientation of the gene,
-	  * @param backgroundColor the color of the background
-	  * @param color the color of the gene arrow
-	  * @param text the text in the gene box
-	  * @param x the x coordinate
-	  * @param y the y coordinate
-	  * @param width the width of the gene box
-	  * @param height the height of the gene box
-	  * @param hgap the size of the gap next to the gene
-	  * @param vgap the vertical gap size
-	  * @return the x coordinate after the painting
-	  */
-	public static int paintGene(Graphics g, Gene.GeneOrientation geneOrientation, Color backgroundColor, Color color, String text, int x, int y, int width, int height, int hgap, int vgap) {
+    /**
+     * Paints one gene
+     * @param g the Graphics
+     * @param flipped if the gene shall be painted flipped
+     * @param geneOrientation the orientation of the gene,
+     * @param backgroundColor the color of the background
+     * @param color the color of the gene arrow
+     * @param text the text in the gene box
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param width the width of the gene box
+     * @param height the height of the gene box
+     * @param hgap the size of the gap next to the gene
+     * @param vgap the vertical gap size
+     * @return the x coordinate after the painting
+     */
+	public static int paintGene(Graphics g, boolean flipped, Gene.GeneOrientation geneOrientation, Color backgroundColor, Color color, String text, int x, int y, int width, int height, int hgap, int vgap) {
 		g.setColor(color);
 		
 		int returnX = x + width + 2 * hgap;
@@ -190,7 +196,7 @@ public class GenomePainting {
 		x += hgap;
 		
 		// check the id the first time to know whether we have to paint the triangle to the left side
-		if (geneOrientation == Gene.GeneOrientation.NEGATIVE) {
+		if ((flipped && geneOrientation == Gene.GeneOrientation.POSITIVE) || (!flipped && geneOrientation == Gene.GeneOrientation.NEGATIVE)) {
 			int xPoints[] = {x , x + ARROWSIZE, x + width, x + width, x + ARROWSIZE};
 			int yPoints[] = {y + (height / 2), y + height, y + height, y, y};
 			g.fillPolygon(xPoints, yPoints, 5);
@@ -199,7 +205,7 @@ public class GenomePainting {
 		}
 		
 		// check the id to know whether we have to paint the triangle to the right side
-		if (geneOrientation == Gene.GeneOrientation.POSITIVE) {
+		if ((flipped && geneOrientation == Gene.GeneOrientation.NEGATIVE) || (!flipped && geneOrientation == Gene.GeneOrientation.POSITIVE)) {
 			int xPoints[] = {x , x + width - ARROWSIZE, x + width, x + width - ARROWSIZE, x};
 			int yPoints[] = {y + height, y + height,y + (height / 2), y, y};
 			g.fillPolygon(xPoints, yPoints, 5);
@@ -292,10 +298,11 @@ public class GenomePainting {
 	 * @param height the height of one gene
 	 * @param hgap the size of the gap between genes
 	 * @param vgap the vertical gap size
+     * @param flipped if the genome shall be painted inverse
 	 */
-	public static void paintGenome(Graphics g, Genome genome, NameType nameType, int x, int y, int width, int height, int hgap, int vgap) {
+	public static void paintGenome(Graphics g, Genome genome, boolean flipped, NameType nameType, int x, int y, int width, int height, int hgap, int vgap) {
 		for (Chromosome chr : genome.getChromosomes()) {
-			x = paintChromosome(g, chr, nameType, x, y, width, height, hgap, vgap);
+			x = paintChromosome(g, chr, flipped, nameType, x, y, width, height, hgap, vgap);
 		}
 	}
 	
@@ -303,7 +310,7 @@ public class GenomePainting {
 	 * Paints the Genome
 	 * @param g the used Graphics
 	 * @param genome the Genome
-	 * @param highlights the chromsome index, start and end gene of the area that will be highlighted
+	 * @param highlights the chromosome index, start and end gene of the area that will be highlighted
      * @param nameType what information shall be painted in each gene
 	 * @param x the x coordinate to start the painting at
 	 * @param y the y coordinate to start the painting at
@@ -312,16 +319,16 @@ public class GenomePainting {
 	 * @param hgap the size of the gap between genes
 	 * @param vgap the vertical gap size
 	 */
-	public static void paintGenomeWithCluster(Graphics g, Genome genome, int[] highlights, NameType nameType, Color highlightColor, int x, int y, int width, int height, int hgap, int vgap) {
+	public static void paintGenomeWithCluster(Graphics g, Genome genome, boolean flipped, int[] highlights, NameType nameType, Color highlightColor, int x, int y, int width, int height, int hgap, int vgap) {
 		if (highlights == null || highlights.length != 3)
-			paintGenome(g, genome, nameType, x, y, width, height, hgap, vgap);
+			paintGenome(g, genome, flipped, nameType, x, y, width, height, hgap, vgap);
 		else {
 			for (int i=0; i<genome.getChromosomes().size(); i++) {
 				Chromosome chr = genome.getChromosomes().get(i);
 				if (i != highlights[0])
-					x = paintChromosomeGrey(g, chr, nameType, x, y, width, height, hgap, vgap);
+					x = paintChromosomeGrey(g, chr, flipped, nameType, x, y, width, height, hgap, vgap);
 				else
-					x = paintChromosomeWithCluster(g, chr, highlights[1], highlights[2], nameType, highlightColor, x, y, width, height, hgap, vgap);
+					x = paintChromosomeWithCluster(g, chr, flipped, highlights[1], highlights[2], nameType, highlightColor, x, y, width, height, hgap, vgap);
 			}
 		}
 	}
@@ -337,15 +344,10 @@ public class GenomePainting {
 	 * @param height the height of one gene
 	 * @param hgap the size of the gap between genes
 	 * @param vgap the vertical gap size
+     * @param flipped if the chromosome shall be painted inverse
 	 */
-	private static int paintChromosome(Graphics g, Chromosome chromosome, NameType nameType, int x, int y, int width, int height, int hgap, int vgap){
-		x = paintChromosomeStart(g, x, y, width, height, hgap);
-		for (Gene gene : chromosome.getGenes()) {
-			x = paintGene(g, gene, nameType, Color.WHITE, getColor(gene), x, y, width, height, hgap, vgap);
-		}
-		x = paintChromosomeEnd(g, x, y, width, height, hgap);
-		
-		return x;
+	private static int paintChromosome(Graphics g, Chromosome chromosome, boolean flipped, NameType nameType, int x, int y, int width, int height, int hgap, int vgap){
+        return paintChromosome(g, chromosome, flipped, -1, -1, false, nameType, null, x, y, width, height, hgap, vgap);
 	}
 	
 	/**
@@ -359,21 +361,17 @@ public class GenomePainting {
 	 * @param height the height of one gene
 	 * @param hgap the size of the gap between genes
  	 * @param vgap the vertical gap size
+     * @param flipped if the chromosome shall be painted inverse
 	 */
-	private static int paintChromosomeGrey(Graphics g, Chromosome chromosome, NameType nameType, int x, int y, int width, int height, int hgap, int vgap){
-		x = paintChromosomeStart(g, x, y, width, height, hgap);
-		for (Gene gene : chromosome.getGenes()) {
-			x = paintGene(g, gene, nameType, Color.WHITE, getGreyValueColor(gene), x, y, width, height, hgap, vgap);
-		}
-		x = paintChromosomeEnd(g, x, y, width, height, hgap);
-		
-		return x;
+	private static int paintChromosomeGrey(Graphics g, Chromosome chromosome, boolean flipped, NameType nameType, int x, int y, int width, int height, int hgap, int vgap){
+        return paintChromosome(g, chromosome, flipped, -1, -1, true, nameType, null, x, y, width, height, hgap, vgap);
+
 	}
 	
 	/**
-	 * Paints the Chromosome with grey value gene colors
+	 * Paints the Chromosome with highlighted cluster, the rest has grey value gene colors
 	 * @param g the used Graphics
-	 * @param chr the Chromosome
+     * @param chromosome the Chromosome
 	 * @param start the start gene of the cluster
 	 * @param stop the end gene of the cluster
      * @param nameType what information shall be painted in each gene
@@ -384,22 +382,57 @@ public class GenomePainting {
 	 * @param height the height of one gene
 	 * @param hgap the size of the gap between genes
  	 * @param vgap the vertical gap size
+     * @param flipped if the chromosome shall be painted inverse
 	 */
-	private static int paintChromosomeWithCluster(Graphics g, Chromosome chr,
+	private static int paintChromosomeWithCluster(Graphics g, Chromosome chromosome, boolean flipped,
 			int start, int stop, NameType nameType, Color highlightColor, int x, int y, int width,
 			int height, int hgap, int vgap) {
-		x = paintChromosomeStart(g, x, y, width, height, hgap);
-		for (int i=0; i<chr.getGenes().size(); i++) {
-			Gene gene = chr.getGenes().get(i);
-			if (i>=start && i<=stop)
-				x = paintGene(g, gene, nameType, highlightColor, getColor(gene), x, y, width, height, hgap, vgap);
-			else
-				x = paintGene(g, gene, nameType, Color.WHITE, getGreyValueColor(gene), x, y, width, height, hgap, vgap);
-		}
-		x = paintChromosomeEnd(g, x, y, width, height, hgap);
-		
-		return x;
+        return paintChromosome(g, chromosome, flipped, start, stop, true, nameType, highlightColor, x, y, width, height, hgap, vgap);
 	}
+
+    /**
+     * Paints the Chromosome with all possible options.
+     * Used by all chromosome painting methods.
+     * @param g the used Graphics
+     * @param chromosome the Chromosome
+     * @param start the start gene of the cluster, -1 if no cluster
+     * @param stop the end gene of the cluster, -1 if no cluster
+     * @param useGrayValues if gray values shall be used for the painting, outside the cluster, if a cluster is contained
+     * @param nameType what information shall be painted in each gene
+     * @param highlightColor the color the cluster background is color with, null if no cluster
+     * @param x the x coordinate to start the painting at
+     * @param y the y coordinate to start the painting at
+     * @param width the width of one gene
+     * @param height the height of one gene
+     * @param hgap the size of the gap between genes
+     * @param vgap the vertical gap size
+     * @param flipped if the chromosome shall be painted inverse
+     */
+    private static int paintChromosome(Graphics g, Chromosome chromosome, boolean flipped, int start, int stop, boolean useGrayValues, NameType nameType, Color highlightColor, int x, int y, int width,
+                                       int height, int hgap, int vgap) {
+        if (highlightColor == null && !(start == -1 && stop==-1))
+            throw new InvalidParameterException("Invalid Parameters, highlightColor == null and not start and stop == -1");
+
+        x = paintChromosomeStart(g, x, y, width, height, hgap);
+
+        java.util.List<Gene> listView = flipped ? Lists.reverse(chromosome.getGenes()) : chromosome.getGenes();
+        if (flipped && start != -1 && stop != -1){
+            int tmpStart = start;
+            start = chromosome.getGenes().size() - 1 - stop;
+            stop = chromosome.getGenes().size() - 1 - tmpStart;
+        }
+
+        for (int i=0; i<listView.size(); i++) {
+            Gene gene = listView.get(i);
+            if (i>=start && i<=stop)
+                x = paintGene(g, gene, flipped, nameType, highlightColor, getColor(gene), x, y, width, height, hgap, vgap);
+            else
+                x = paintGene(g, gene, flipped, nameType, Color.WHITE, useGrayValues ? getGreyValueColor(gene) : getColor(gene), x, y, width, height, hgap, vgap);
+        }
+
+        x = paintChromosomeEnd(g, x, y, width, height, hgap);
+        return x;
+    }
 
     public static class GeneIcon implements Icon {
         private final GeneFamily geneFamily;
@@ -419,7 +452,7 @@ public class GenomePainting {
          */
         @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
-            paintGene(g, Gene.GeneOrientation.UNSIGNED, Color.WHITE, getColor(geneFamily), geneFamily.getExternalId(), x, y, width, height, 0, 0);
+            paintGene(g, false, Gene.GeneOrientation.UNSIGNED, Color.WHITE, getColor(geneFamily), geneFamily.getExternalId(), x, y, width, height, 0, 0);
         }
 
         /**

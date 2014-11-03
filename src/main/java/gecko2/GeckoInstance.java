@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.RunnableFuture;
 
 public class GeckoInstance {
 	private static GeckoInstance instance;
@@ -244,7 +245,12 @@ public class GeckoInstance {
         updateReducedDataAndSelection();
         GeckoInstance.this.fireDataChanged();
         if (GeckoInstance.this.gui != null) {
-            GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
+            SwingUtilities.invokeLater(new Runnable(){
+                @Override
+                public void run() {
+                    GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
+                }
+            });
         }
     }
 
