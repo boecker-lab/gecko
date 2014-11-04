@@ -28,6 +28,9 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	private String maxLengthString;
 	private GenomePainting.NameType nameType;
     private boolean flipped;
+    private int geneIndex;
+    private int chromosomeIndex;
+
 
 	/**
 	 * The genes that will be highlighted.
@@ -44,6 +47,8 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		this.parent = parent;
         this.nameType = nameType;
         this.flipped = false;
+        this.geneIndex = -1;
+        this.chromosomeIndex = -1;
 		
 		FlowLayout flowlayout = new FlowLayout(FlowLayout.LEFT);
 		flowlayout.setHgap(0);
@@ -89,12 +94,16 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 
 	@Override
 	public void adjustScrollPosition(int value) {
+        this.chromosomeIndex = -1;
+        this.geneIndex = -1;
 		this.getHorizontalScrollBar().setValue(this.getHorizontalScrollBar().getValue() + value);
 		parent.fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
 	}
 	
 	@Override
 	public void scrollToPosition(int chromosomeIndex, int geneIndex) {
+        this.chromosomeIndex = chromosomeIndex;
+        this.geneIndex = geneIndex;
 		this.getHorizontalScrollBar().setValue(getScrollPosition(chromosomeIndex, geneIndex));
 		parent.fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
 	}
@@ -115,7 +124,12 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		scrollPosition += getGeneWidth()/2; // center on the middle of the gene
 		return scrollPosition;
 	}
-	
+
+    /**
+     * Returns the gene at the given x positions
+     * @param position
+     * @return
+     */
 	private Gene getGeneAtPosition(int position) {
 		position -= borderSpace;  // Ignore left border
 		
@@ -135,7 +149,12 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		}
 		return null;
 	}
-	
+
+    /**
+     * Returns the chromosome at the given x position
+     * @param position
+     * @return
+     */
 	private Chromosome getChromosomeAtPosition(int position) {
 		position -= borderSpace;  // Ignore left border
 		
@@ -162,6 +181,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	public void flip() {
         this.flipped = !this.flipped;
         this.revalidate();
+        this.repaint();
 	}
 
 	@Override
@@ -245,12 +265,22 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 			borderSpace = (int)PaintingGenomeBrowser.this.getSize().getWidth();
 			canvas.setPreferredSize(new Dimension (getCanvasWidth(), getGBHeight()));
 			PaintingGenomeBrowser.this.revalidate();
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					PaintingGenomeBrowser.this.adjustScrollPosition(offset);					
-				}
-			});
+			PaintingGenomeBrowser.this.repaint();
+            if (geneIndex >= 0 && chromosomeIndex >= 0){
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        PaintingGenomeBrowser.this.scrollToPosition(chromosomeIndex, geneIndex);
+                    }
+                });
+            } else {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        PaintingGenomeBrowser.this.adjustScrollPosition(offset);
+                    }
+                });
+            }
 		}
 	}
 
@@ -274,6 +304,9 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
                 Gene gene = getGeneAtPosition(event.getX());
                 if (event.isShiftDown()){
                     PaintingGenomeBrowser.this.flip();
+                    PaintingGenomeBrowser.this.getHorizontalScrollBar().setValue(getMaximumValue()- borderSpace - getScrollValue());
+                    PaintingGenomeBrowser.this.repaint();
+                    parent.fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
                 }
                 if (!event.isShiftDown() && gene != null){
                     parent.centerCurrentClusterAt(gene.getGeneFamily());
