@@ -91,6 +91,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         geneList = new ArrayList<>();
         genomeIndexInGeneList = new ArrayList<>();
         geneIdAtTablePosition = new HashMap<>();
+        gOcc = null;
     }
 
 	@Override

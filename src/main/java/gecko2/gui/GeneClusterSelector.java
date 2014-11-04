@@ -308,6 +308,11 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         box.addActionListener(includeExcludeMatcherEditor);
     }
 
+    public void clearSelection() {
+        table.clearSelection();
+        fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
+    }
+
     private static class GeneClusterTextFilterator implements TextFilterator<GeneCluster> {
         /**
          * Gets the specified object as a list of Strings. These Strings

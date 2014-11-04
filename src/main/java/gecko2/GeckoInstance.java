@@ -280,6 +280,8 @@ public class GeckoInstance {
     }
 
     public void setGeckoInstanceData(final DataSet data) {
+        if (gui != null)
+            gui.clearSelection();
         this.data = data;
         this.updateReducedDataAndSelection();
         if (gui != null) {

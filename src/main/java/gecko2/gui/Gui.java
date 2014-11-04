@@ -336,11 +336,15 @@ public class Gui {
 		}
 	}
 
-	
-	/*
-	 * The users possibilities to interact with the ui depending on the current
-	 * state of the application are handled here
-	 */
+    public void clearSelection() {
+        getGcSelector().clearSelection();
+    }
+
+
+    /*
+     * The users possibilities to interact with the ui depending on the current
+     * state of the application are handled here
+     */
 	public enum Mode {
         /**
          * The application is currently performing the gene cluster computation
@@ -361,11 +365,11 @@ public class Gui {
 		,PREPARING_COMPUTATION
 		,FINISHING_COMPUTATION}
 	
-	private void changeMode(final String text,
-			final boolean icon,
-			final boolean stopAndProgress,
-			final boolean importGenomes,
-			final boolean clusterBrowserActive){
+	private void changeGuiMode(final String text,
+                               final boolean icon,
+                               final boolean stopAndProgress,
+                               final boolean importGenomes,
+                               final boolean clusterBrowserActive){
 		if (icon)
 		{
 			this.waitingAnimation = createImageIcon("images/loading.gif");
@@ -399,25 +403,26 @@ public class Gui {
 	public void changeMode(Mode mode) {
         switch (mode) {
 			case COMPUTING:
-				changeMode("Computing gene clusters...", false, true, false, false);
+				changeGuiMode("Computing gene clusters...", false, true, false, false);
 				break;
             case DOING_STATISTICS:
-                changeMode("Computing cluster statistics...", false, true, false, false);
+                changeGuiMode("Computing cluster statistics...", false, true, false, false);
                 break;
 			case SESSION_IDLE:
-				changeMode("Ready", false, false, true, true);
+				changeGuiMode("Ready", false, false, true, true);
 				break;
 			case NO_SESSION:
-				changeMode("Ready", false, false, true, false);
+				changeGuiMode("Ready", false, false, true, false);
 				break;
 			case READING_GENOMES:
-				changeMode("Reading genomes...", true, false, false, false);
+                gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
+				changeGuiMode("Reading genomes...", true, false, false, false);
 				break;
 			case PREPARING_COMPUTATION:
-				changeMode("Preparing data...", true, false, false, false);
+				changeGuiMode("Preparing data...", true, false, false, false);
 				break;
 			case FINISHING_COMPUTATION:
-				changeMode("Finishing...", true, false, false, false);
+				changeGuiMode("Finishing...", true, false, false, false);
 				break;
 		}
 	}
@@ -456,6 +461,8 @@ public class Gui {
 					// Check what type of file we are opening
 					if (FileUtils.getExtension(fc.getSelectedFile()).equals("cog")) {
 						gecko.setCurrentWorkingDirectoryOrFile(fc.getSelectedFile());
+                        GeckoInstance.getInstance().getGui().changeMode(Gui.Mode.READING_GENOMES);
+
 						CogFileReader reader = new CogFileReader(fc.getSelectedFile());
 						reader.importGenomesOccs();
 						selectAndImportGenomes(reader);
