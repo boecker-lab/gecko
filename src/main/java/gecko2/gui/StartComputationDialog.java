@@ -25,10 +25,10 @@ import java.util.Map;
 public class StartComputationDialog extends JDialog {
 	private static final long serialVersionUID = -5635614016950101153L;
 
-    private static final int COMBO_HEIGHT = 30;
-    private static final int COMBO_WIDTH = 180;
-    private static final int V_GAP = 1;
-    private static final int H_GAP = 1;
+    static final int COMBO_HEIGHT = 30;
+    static final int COMBO_WIDTH = 180;
+    static final int V_GAP = 1;
+    static final int H_GAP = 1;
 
 	private int quorum;
 	private Parameter.OperationMode opMode;
@@ -48,19 +48,19 @@ public class StartComputationDialog extends JDialog {
         this.opMode = Parameter.OperationMode.reference;
         this.refType = Parameter.ReferenceType.allAgainstAll;
         this.distanceSpinner = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
-        this.sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
+        this.sizeSpinner = new JSpinner(new SpinnerNumberModel(7, 0, Integer.MAX_VALUE, 1));
 
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-		panel.setPreferredSize(new Dimension(430,360));
+		panel.setPreferredSize(new Dimension(430,400));
 
         final JTabbedPane tabbedDistancePane = new JTabbedPane();
-        tabbedDistancePane.addTab("Single Distance", getDistancePanel(new Dimension(410, 60)));
-        tabbedDistancePane.add("Distance Table", new DeltaTable(new Dimension(410, 60)));
+        tabbedDistancePane.addTab("Single Distance", getDistancePanel(new Dimension(410, 6*COMBO_HEIGHT)));
+        tabbedDistancePane.add("Distance Table", new DeltaTable(new Dimension(410, 6*COMBO_HEIGHT)));
         panel.add(tabbedDistancePane);
 
 		final JPanel gridPanel = new JPanel();
-		gridPanel.setPreferredSize(new Dimension(410, 6*(COMBO_HEIGHT+V_GAP)));
-        GridLayout gridLayout = new GridLayout(6, 2, H_GAP, V_GAP);
+		gridPanel.setPreferredSize(new Dimension(410, 5*(COMBO_HEIGHT+V_GAP)));
+        GridLayout gridLayout = new GridLayout(5, 2, H_GAP, V_GAP);
 		gridPanel.setLayout(gridLayout);
 
         sizeSpinner.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
@@ -86,10 +86,6 @@ public class StartComputationDialog extends JDialog {
         mergeResults = new JCheckBox("Merge Results");
         mergeResults.setPreferredSize(new Dimension(100, COMBO_HEIGHT));
         mergeResults.setSelected(false);
-
-        JLabel sizeLabel = new JLabel("Minimum cluster size: ", JLabel.LEFT);
-        gridPanel.add(sizeLabel);
-        gridPanel.add(sizeSpinner);
 		
 		JLabel minimumNumberOfGenomesLabel = new JLabel("Minimum # of genomes: ", JLabel.LEFT);
 		gridPanel.add(minimumNumberOfGenomesLabel);
@@ -219,6 +215,7 @@ public class StartComputationDialog extends JDialog {
 		
 		JPanel lowerpanel = new JPanel();
 		lowerpanel.setLayout(new BoxLayout(lowerpanel,BoxLayout.X_AXIS));
+        lowerpanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		lowerpanel.setPreferredSize(new Dimension(300,50));
 		Action okAction = new AbstractAction("OK") {
 		
@@ -240,7 +237,7 @@ public class StartComputationDialog extends JDialog {
                     } else {
                         parameter = new Parameter(
                                 deltaTable.getDeltaTable(),
-                                (Integer) sizeSpinner.getValue(),
+                                deltaTable.getMinimumClusterSize(),
                                 quorum,
                                 opMode,
                                 refType);
@@ -293,8 +290,8 @@ public class StartComputationDialog extends JDialog {
 		cancelAction.putValue(Action.NAME, "Cancel");
 		JButton cancelButton = new JButton(cancelAction);
 		lowerpanel.add(Box.createHorizontalGlue());
-		lowerpanel.add(cancelButton);
 		lowerpanel.add(okButton);
+		lowerpanel.add(cancelButton);
 		
 		panel.add(lowerpanel);
 		this.add(panel);
@@ -303,12 +300,16 @@ public class StartComputationDialog extends JDialog {
 	}
 
     private JPanel getDistancePanel(Dimension dimension) {
-        JPanel distancePanel = new JPanel(new GridLayout(1, 2, H_GAP, V_GAP));
-        distancePanel.setPreferredSize(new Dimension((int)dimension.getWidth(), COMBO_HEIGHT));
+        JPanel distancePanel = new JPanel(new GridLayout(2, 2, H_GAP, V_GAP));
+        distancePanel.setPreferredSize(new Dimension((int)dimension.getWidth(), 2*(COMBO_HEIGHT+V_GAP)));
         distanceSpinner.setPreferredSize(new Dimension(COMBO_WIDTH, COMBO_HEIGHT));
         JLabel distanceLabel = new JLabel("Maximum distance: ", JLabel.LEFT);
         distancePanel.add(distanceLabel);
         distancePanel.add(distanceSpinner);
+
+        JLabel sizeLabel = new JLabel("Minimum cluster size: ", JLabel.LEFT);
+        distancePanel.add(sizeLabel);
+        distancePanel.add(sizeSpinner);
 
         JPanel panel = new JPanel();
         GridBagLayout layout = new GridBagLayout();
