@@ -1,6 +1,8 @@
 package gecko2.io;
 
 import gecko2.algorithm.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ClusterAnnotationReader {
+    private static final Logger logger = LoggerFactory.getLogger(ClusterAnnotationReader.class);
+
 	private final File f;
 	private final DataSet data;
 	private final List<GeneCluster> currentClusters;
@@ -55,49 +59,43 @@ public class ClusterAnnotationReader {
 	}
 		
 	private boolean readClusterAnnotations() {
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(f));
-			try {
-				boolean inCluster = false;
-				GeneClusterBuilder clusterBuilder = null;
-				Map<Genome, List<Subsequence> > subseqs = new HashMap<>();
-				for (String line; (line = reader.readLine()) != null; ) {
-					if (!inCluster) {
-						clusterBuilder = searchNewClusterStart(line);
-						if (clusterBuilder != null)
-							inCluster = true;
-					} else {
-						if (line.equals("in chromosomes:"))
-							continue;
-						if (!parseNextOccurrence(line, subseqs)) {
-							inCluster = false;
-							clusterBuilder.completeCluster(subseqs);
-							if (clusterBuilder != null)
-								newClusters.add(clusterBuilder.build());
-							else {
-								System.err.println(String.format("Could not complete cluster before line: %s", line));
-								return false;
-							}
-							subseqs.clear();
-						}
-					}
-				}
-				if (inCluster) {
-					clusterBuilder.completeCluster(subseqs);
-					if (clusterBuilder != null)
-						newClusters.add(clusterBuilder.build());
-					else {
-						System.err.println("Could not complete last cluster");
-						return false;
-					}
-					subseqs.clear();
-				}
-			} finally {
-				reader.close();
-			}
-			
-		} catch (IOException | ParseException | NumberFormatException e) {
-			e.printStackTrace();
+		try (BufferedReader reader = new BufferedReader(new FileReader(f))){
+            boolean inCluster = false;
+            GeneClusterBuilder clusterBuilder = null;
+            Map<Genome, List<Subsequence> > subseqs = new HashMap<>();
+            for (String line; (line = reader.readLine()) != null; ) {
+                if (!inCluster) {
+                    clusterBuilder = searchNewClusterStart(line);
+                    if (clusterBuilder != null)
+                        inCluster = true;
+                } else {
+                    if (line.equals("in chromosomes:"))
+                        continue;
+                    if (!parseNextOccurrence(line, subseqs)) {
+                        inCluster = false;
+                        clusterBuilder.completeCluster(subseqs);
+                        if (clusterBuilder != null)
+                            newClusters.add(clusterBuilder.build());
+                        else {
+                            System.err.println(String.format("Could not complete cluster before line: %s", line));
+                            return false;
+                        }
+                        subseqs.clear();
+                    }
+                }
+            }
+            if (inCluster) {
+                clusterBuilder.completeCluster(subseqs);
+                if (clusterBuilder != null)
+                    newClusters.add(clusterBuilder.build());
+                else {
+                    System.err.println("Could not complete last cluster");
+                    return false;
+                }
+                subseqs.clear();
+            }
+        } catch (IOException | ParseException | NumberFormatException e) {
+			logger.warn("Unable to read clusters", e);
 			return false;
 		}
 		currentClusters.addAll(newClusters);

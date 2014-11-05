@@ -3,6 +3,8 @@ package gecko2.io;
 import gecko2.algorithm.*;
 import gecko2.exceptions.LinePassedException;
 import gecko2.util.SortUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.ParseException;
@@ -16,6 +18,7 @@ import java.util.regex.Pattern;
  * The code is originally from GeckoInstance.java and is modified.
  */
 public class CogFileReader implements GeckoDataReader {
+    private static final Logger logger = LoggerFactory.getLogger(CogFileReader.class);
 	/**
 	 * Storing place for the geneLabelMap 
 	 */
@@ -215,7 +218,7 @@ public class CogFileReader implements GeckoDataReader {
 			if (e instanceof FileNotFoundException)	{
 				throw (FileNotFoundException) e;
 			}
-			e.printStackTrace();
+			logger.warn("File read error", e);
 		}
 	}
 	

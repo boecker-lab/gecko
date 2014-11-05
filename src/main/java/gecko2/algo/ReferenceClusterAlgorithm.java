@@ -88,7 +88,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	 * @return the gene clusters
 	 */
 	private static List<ReferenceCluster> computeReferenceClusters(int[][][] genomes, Parameter param, List<Set<Integer>> genomeGrouping, AlgorithmProgressListener listener) {
-		if (!param.useJavaAlgorithm())
+        if (!param.useJavaAlgorithm())
 			throw new IllegalArgumentException("invalid parameters");
 
         GenomeList data;

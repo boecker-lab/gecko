@@ -1,6 +1,8 @@
 package gecko2.io;
 
 import gecko2.algorithm.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,8 +19,8 @@ import java.util.List;
  * @author Hans-Martin Haase <hans-martin dot haase at uni-jena dot de>
  * @version 0.03
  */
-public class DataSetWriter
-{
+public class DataSetWriter{
+    private static final Logger logger = LoggerFactory.getLogger(DataSetWriter.class);
 
     final static String SEPERATOR = "\t";
 
@@ -52,7 +54,7 @@ public class DataSetWriter
 
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Unable to write dataset", e);
             returnValue = false;
         }
         return returnValue;

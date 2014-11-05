@@ -5,6 +5,8 @@ import gecko2.algorithm.Chromosome;
 import gecko2.algorithm.Gene;
 import gecko2.algorithm.Genome;
 import gecko2.event.BrowserContentEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -18,12 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GenomeBrowser extends AbstractGenomeBrowser {
-	
+    private static final long serialVersionUID = 7086043901343368118L;
+    private static final Logger logger = LoggerFactory.getLogger(GenomeBrowser.class);
 	private final static Color BG_COLOR_FLIPPED = Color.ORANGE;
 	
 	private final FlowLayout flowlayout;
-	
-	private static final long serialVersionUID = 7086043901343368118L;
 	private final Genome genome;
 	private List<GeneElement> genElements[];
 	private final JPanel contentPanel;
@@ -413,12 +414,8 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 
 					}
 				});
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (InvocationTargetException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (InterruptedException | InvocationTargetException e) {
+				logger.error("Scroll error", e);
 			}
 
 			// Do the scrolling
@@ -437,12 +434,8 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 							parent.fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
 						}
 					});
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (InterruptedException | InvocationTargetException e) {
+                    logger.error("Scroll error", e);
 				}
 			} else {
 				int sleepTime = 10;
@@ -464,7 +457,7 @@ public class GenomeBrowser extends AbstractGenomeBrowser {
 					try {
 						Thread.sleep(sleepTime);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+                        logger.error("Scroll error", e);
 					}
 //					if (i<absunits-1500)
 //						steps = absunits-1000;

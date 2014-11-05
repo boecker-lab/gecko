@@ -6,6 +6,8 @@ import gecko2.gui.util.ColorUtils;
 import gecko2.io.CogFileReader;
 import gecko2.io.GenomeOccurrence;
 import gecko2.util.SortUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -26,8 +28,9 @@ import java.util.concurrent.ExecutionException;
 
 
 public class GenomeSelector extends JDialog {
-
 	private static final long serialVersionUID = -8491964493540715101L;
+    private static final Logger logger = LoggerFactory.getLogger(GenomeSelector.class);
+
     private final CogFileReader reader;
     private DataSet data;
 	private final List<GenomeOccurrence> occs;
@@ -173,7 +176,8 @@ public class GenomeSelector extends JDialog {
                         try {
                             get();
                         } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
+                            JOptionPane.showMessageDialog(GenomeSelector.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                            logger.error("Unable to read genomes", e);
                         }
                         GeckoInstance.getInstance().setGeckoInstanceData(data);
                     }

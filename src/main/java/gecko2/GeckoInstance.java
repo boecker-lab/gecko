@@ -11,6 +11,8 @@ import gecko2.gui.Gui;
 import gecko2.gui.StartComputationDialog;
 import gecko2.io.ResultWriter;
 import gecko2.io.ResultWriter.ExportType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -22,6 +24,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RunnableFuture;
 
 public class GeckoInstance {
+    private static final Logger logger = LoggerFactory.getLogger(GeckoInstance.class);
+
 	private static GeckoInstance instance;
 
     private DataSet data;
@@ -435,8 +439,7 @@ public class GeckoInstance {
             List<GeneCluster> res = computeClustersJava(data, p, genomeGroups, this);
             Date after = new Date();
             setProgressStatus(100, AlgorithmStatusEvent.Task.Done);
-            System.err.println("Time required for computation: "+(after.getTime()-before.getTime())/1000F+"s");
-
+            logger.info("Time required for computation: {}s", (after.getTime() - before.getTime()) / 1000F);
             return res;
         }
 
@@ -449,7 +452,8 @@ public class GeckoInstance {
                 else
                     GeckoInstance.this.setClusters(results, p);
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                JOptionPane.showMessageDialog(gui.getMainframe(), e.getMessage(), "Error computing gene clusters", JOptionPane.ERROR_MESSAGE);
+                logger.error("Error in cluster computation", e);
             }
         }
 

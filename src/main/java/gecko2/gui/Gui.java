@@ -8,6 +8,8 @@ import gecko2.io.CogFileReader;
 import gecko2.io.DataSetWriter;
 import gecko2.io.GckFileReader;
 import gecko2.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class Gui {
+    private static final Logger logger = LoggerFactory.getLogger(Gui.class);
     private static final String MAX_WIDTH = "Max Width";
 	
 	private final GeckoInstance gecko;
@@ -507,7 +510,8 @@ public class Gui {
                                     try {
                                         get();
                                     } catch (InterruptedException | ExecutionException e) {
-                                        e.printStackTrace();
+                                        JOptionPane.showMessageDialog(mainframe, e.getMessage(), "Exception Occurred", JOptionPane.ERROR_MESSAGE);
+                                        logger.error("Reader error", e);
                                     }
                                     GeckoInstance.getInstance().setGeckoInstanceData(data);
                                 }
@@ -660,19 +664,15 @@ public class Gui {
 			
 			// fix the url for gecko just linking to the bioinformatic page
 			if (Desktop.isDesktopSupported()) {
-				
 				Desktop desktop = Desktop.getDesktop();
 				
 				try {
-					
 					desktop.browse(new URI("http://bio.informatik.uni-jena.de/"));
 				} 
 				catch (IOException e) {
-					
 					new JOptionPane("This option requires a internet connection.", JOptionPane.ERROR_MESSAGE);	
 				} 
 				catch (URISyntaxException e) {
-					
 					new JOptionPane("Wrong URI syntax.", JOptionPane.ERROR_MESSAGE);
 				}
 			}

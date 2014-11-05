@@ -6,6 +6,8 @@ import gecko2.algorithm.GeneCluster;
 import gecko2.gui.GenomePainting.NameType;
 import gecko2.io.GeneClusterToPDFWriter;
 import gecko2.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -28,6 +30,7 @@ import java.io.IOException;
  * @version 0.15
  */
 public class GeneClusterExportDialog extends JDialog {
+    private static final Logger logger = LoggerFactory.getLogger(GeneClusterExportDialog.class);
 
 	/**
 	 * Random serial version UID
@@ -229,7 +232,9 @@ public class GeneClusterExportDialog extends JDialog {
                             GeneClusterExportDialog.this.setVisible(false);
                         }
                     }  catch (IOException | DocumentException e) {
-                        e.printStackTrace();
+                        if (GeckoInstance.getInstance().getGui() != null)
+                            JOptionPane.showMessageDialog(GeneClusterExportDialog.this, "Error in output", "Error", JOptionPane.ERROR_MESSAGE);
+                        logger.warn("Unable to write picture", e);
                     }
                 }
             }

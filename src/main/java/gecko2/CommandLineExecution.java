@@ -4,6 +4,8 @@ import gecko2.algorithm.GeneCluster;
 import gecko2.algorithm.Genome;
 import gecko2.algorithm.Parameter;
 import gecko2.io.DataSetWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.concurrent.TimeUnit;
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
 public class CommandLineExecution {
+    private static final Logger logger = LoggerFactory.getLogger(CommandLineExecution.class);
+
     public static void runAlgorithm(CommandLineOptions options) {
         Parameter.ReferenceType refType;
         if (options.getReferenceGenomeName().equals(""))
@@ -46,7 +50,7 @@ public class CommandLineExecution {
         try{
             worker.get(); // Blocks until worker is done()
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            logger.error("Error in cluster detection!", e);
         }
 
         // Remove outfile

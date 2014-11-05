@@ -4,6 +4,8 @@ import com.itextpdf.text.DocumentException;
 import gecko2.algorithm.*;
 import gecko2.gui.GeneClusterPicture;
 import gecko2.gui.GenomePainting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -11,6 +13,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ResultWriter {
+    private static final Logger logger = LoggerFactory.getLogger(ResultWriter.class);
+
 	public enum ExportType {
         clusterData("txt"),
         table("txt"),
@@ -95,7 +99,7 @@ public class ResultWriter {
         try (GeneClusterToPDFWriter pdfWriter = new GeneClusterToPDFWriter(new BufferedOutputStream(new FileOutputStream(file)))) {
             pdfWriter.write(pictures);
         } catch (IOException | DocumentException e) {
-            e.printStackTrace();
+            logger.warn("Write error", e);
             return false;
         }
         return true;
@@ -111,7 +115,8 @@ public class ResultWriter {
                 zipOutputStream.closeEntry();
             }
         } catch (IOException | DocumentException e) {
-            e.printStackTrace();
+            logger.warn("Write error", e);
+            return false;
         }
         return true;
     }
@@ -125,7 +130,7 @@ public class ResultWriter {
             }
             //writer.write("No of genes & No of genomes & min. $\\delta$ & max. $\\delta$ & avg. $\\delta$ & pValue & corrected pValue & \\\\\n");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Write error", e);
             return false;
         }
         return true;
@@ -150,7 +155,7 @@ public class ResultWriter {
                 writer.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Write error", e);
             return false;
         }
         return true;
@@ -170,7 +175,7 @@ public class ResultWriter {
                 writer.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Write error", e);
             return false;
         }
         return true;
@@ -184,7 +189,7 @@ public class ResultWriter {
                 writer.newLine();
             }
         } catch (IOException e){
-            e.printStackTrace();
+            logger.warn("Write error", e);
             return false;
         }
         return true;
@@ -222,7 +227,7 @@ public class ResultWriter {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Write error", e);
             return false;
         }
         return true;
@@ -237,7 +242,7 @@ public class ResultWriter {
                 System.out.println(String.format("%d\t%.8g\t%.8g", cluster.getId(), cluster.getBestPValue(), cluster.getBestPValueCorrected()));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Write error", e);
             return false;
         }
         return true;
@@ -554,7 +559,7 @@ public class ResultWriter {
             }
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Write error", e);
             return false;
         }
 	}
@@ -739,7 +744,7 @@ public class ResultWriter {
             }
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Write error", e);
             return false;
         }
 	}
@@ -843,7 +848,7 @@ public class ResultWriter {
 			writer.close();
 			return true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.warn("Write error", e);
 			return false;
 		}
 	}

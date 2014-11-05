@@ -1,6 +1,7 @@
 package gecko2;
 
 import gecko2.algorithm.DataSet;
+import gecko2.exceptions.DefaultUncaughtExceptionHandler;
 import gecko2.gui.Gui;
 import gecko2.io.CogFileReader;
 import gecko2.io.GckFileReader;
@@ -9,6 +10,8 @@ import gecko2.util.LibraryUtils;
 import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.File;
@@ -17,16 +20,17 @@ import java.io.PrintStream;
 import java.text.ParseException;
 
 public class Gecko2 {
+    private static final Logger logger = LoggerFactory.getLogger(Gecko2.class);
 
-	public static void main (String[] args) {
+    public static void main (String[] args) {
+        GeckoInstance instance = null;
+        Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
         String lcOSName = System.getProperty("os.name").toLowerCase();
-        System.err.println("You are running "+
-                System.getProperty("os.arch")+
-                "-Java on "+System.getProperty("os.name"));
+        logger.info("You are running {}-Java on {}", System.getProperty("os.arch"), System.getProperty("os.name"));
 
         /*
-         * Check for command line parameters
-         */
+            * Check for command line parameters
+            */
         CommandLineOptions options = new CommandLineOptions();
         CmdLineParser parser = new CmdLineParser(options);
 
@@ -44,9 +48,9 @@ public class Gecko2 {
             return;
         }
 
-        /*
-         * Only for Mac
-         */
+            /*
+            * Only for Mac
+            */
         boolean IS_MAC = lcOSName.startsWith("mac os x");
 
         if (IS_MAC) {
@@ -56,21 +60,13 @@ public class Gecko2 {
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Throwable t) {}
-
-        /*
-         * Try to load libgecko
-         */
-		boolean libgeckoLoaded = false;
-
-        try {
-            LibraryUtils.loadLibrary("libgecko2");
-            libgeckoLoaded = true;
-        } catch (PlatformNotSupportedException | IOException e) {
-            //System.err.println("Not able to load c library! Using Java only version");
+        } catch (ClassNotFoundException | UnsupportedLookAndFeelException | InstantiationException | IllegalAccessException e) {
+            logger.warn("Unable to set look and feel", e);
         }
 
-        GeckoInstance instance = GeckoInstance.getInstance();
+        boolean libgeckoLoaded = false;
+
+        instance = GeckoInstance.getInstance();
         instance.setGeckoInstanceData(DataSet.getEmptyDataSet());
         instance.setLibgeckoLoaded(libgeckoLoaded);
 
@@ -105,18 +101,17 @@ public class Gecko2 {
             }
             try {
                 DataSet data = reader.readData();
-                GeckoInstance.getInstance().setCurrentWorkingDirectoryOrFile(infile);
-                GeckoInstance.getInstance().setGeckoInstanceData(data);
+                instance.setCurrentWorkingDirectoryOrFile(infile);
+                instance.setGeckoInstanceData(data);
             } catch (IOException | ParseException e) {
-                e.printStackTrace();
+                logger.error("Unable to load file {}!", infile, e);
             }
         }
 
         if (args.length > 1) {
             CommandLineExecution.runAlgorithm(options);
         }
-
-	}
+    }
 
     private static void printUsage(PrintStream out, CmdLineParser parser) {
         printUsage(out, parser, "");
