@@ -42,7 +42,12 @@ public class CommandLineExecution {
             genomes[index] = first;
         }
 
-        Parameter parameter = new Parameter(options.getMaxDistance(), options.getMinClusterSize(), options.getMinCoveredGenomes(), options.getOperationMode(), refType);
+        Parameter parameter;
+        if (options.getMaxDistance() >= 0)
+            parameter = new Parameter(options.getMaxDistance(), options.getMinClusterSize(), options.getMinCoveredGenomes(), options.getOperationMode(), refType);
+        else
+            parameter = new Parameter(options.getDistanceTable(), options.getMinClusterSize(), options.getMinCoveredGenomes(), options.getOperationMode(), refType);
+
 
         // compute the clusters
         SwingWorker<List<GeneCluster>, Void> worker = GeckoInstance.getInstance().performClusterDetection(parameter, false, options.getGenomeGroupingFactor());

@@ -37,6 +37,7 @@ public class Gecko2 {
         if (args.length > 1) {
             try {
                 parser.parseArgument(args);
+                options.validate(parser);
             } catch (CmdLineException e) {
                 printUsage(System.err, parser, e);
                 return;
