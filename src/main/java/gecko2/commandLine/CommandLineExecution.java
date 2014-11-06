@@ -1,8 +1,9 @@
-package gecko2;
+package gecko2.commandLine;
 
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.Genome;
-import gecko2.algorithm.Parameter;
+import gecko2.GeckoInstance;
+import gecko2.datastructures.GeneCluster;
+import gecko2.datastructures.Genome;
+import gecko2.datastructures.Parameter;
 import gecko2.io.DataSetWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)

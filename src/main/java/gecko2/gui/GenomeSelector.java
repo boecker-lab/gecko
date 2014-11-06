@@ -1,7 +1,7 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.DataSet;
+import gecko2.datastructures.DataSet;
 import gecko2.gui.util.ColorUtils;
 import gecko2.io.CogFileReader;
 import gecko2.io.GenomeOccurrence;

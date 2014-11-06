@@ -1,4 +1,4 @@
-package gecko2.algorithm;
+package gecko2.datastructures;
 
 /**
  * Gene family id information.

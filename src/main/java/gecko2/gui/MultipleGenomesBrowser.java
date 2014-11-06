@@ -1,7 +1,7 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 import gecko2.event.*;
 
 import javax.swing.*;

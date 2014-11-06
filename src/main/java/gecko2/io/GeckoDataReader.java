@@ -1,6 +1,6 @@
 package gecko2.io;
 
-import gecko2.algorithm.DataSet;
+import gecko2.datastructures.DataSet;
 
 import java.io.IOException;
 import java.text.ParseException;

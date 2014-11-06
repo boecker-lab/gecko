@@ -1,4 +1,4 @@
-package gecko2.algorithm.util;
+package gecko2.datastructures.util;
 
 /**
  * A mutable integer class

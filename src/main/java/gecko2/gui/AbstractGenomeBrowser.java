@@ -1,6 +1,6 @@
 package gecko2.gui;
 
-import gecko2.algorithm.Genome;
+import gecko2.datastructures.Genome;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,11 +1,8 @@
 package gecko2.algo;
 
-import gecko2.algorithm.Parameter;
+import gecko2.datastructures.Parameter;
 import gecko2.testUtils.*;
 import gecko2.algo.GeneClusterTestUtils.PValueComparison;
-import gecko2.util.LibraryUtils;
-import gecko2.util.LibraryUtils.PlatformNotSupportedException;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;

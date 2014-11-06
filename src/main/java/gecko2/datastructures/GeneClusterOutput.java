@@ -1,4 +1,4 @@
-package gecko2.algorithm;
+package gecko2.datastructures;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

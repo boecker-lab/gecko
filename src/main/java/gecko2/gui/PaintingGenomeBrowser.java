@@ -2,9 +2,9 @@ package gecko2.gui;
 
 import com.google.common.collect.Lists;
 import gecko2.GeckoInstance;
-import gecko2.algorithm.Chromosome;
-import gecko2.algorithm.Gene;
-import gecko2.algorithm.Genome;
+import gecko2.datastructures.Chromosome;
+import gecko2.datastructures.Gene;
+import gecko2.datastructures.Genome;
 import gecko2.event.BrowserContentEvent;
 
 import javax.swing.*;

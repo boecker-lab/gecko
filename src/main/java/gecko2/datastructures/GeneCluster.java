@@ -1,4 +1,4 @@
-package gecko2.algorithm;
+package gecko2.datastructures;
 
 import gecko2.GeckoInstance;
 import gecko2.algo.DeltaLocation;

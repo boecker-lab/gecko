@@ -1,7 +1,7 @@
 package gecko2.io;
 
 import com.itextpdf.text.DocumentException;
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 import gecko2.gui.GeneClusterPicture;
 import gecko2.gui.GenomePainting;
 import org.slf4j.Logger;

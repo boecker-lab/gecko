@@ -7,10 +7,9 @@ import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.*;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import ca.odell.glazedlists.swt.*;
 import gecko2.GeckoInstance;
 import gecko2.GeckoInstance.ResultFilter;
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 import gecko2.event.*;
 
 import javax.swing.*;

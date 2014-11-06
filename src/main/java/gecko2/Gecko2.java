@@ -1,13 +1,13 @@
 package gecko2;
 
-import gecko2.algorithm.DataSet;
+import gecko2.datastructures.DataSet;
+import gecko2.commandLine.CommandLineExecution;
+import gecko2.commandLine.CommandLineOptions;
 import gecko2.exceptions.DefaultUncaughtExceptionHandler;
 import gecko2.gui.Gui;
 import gecko2.io.CogFileReader;
 import gecko2.io.GckFileReader;
 import gecko2.io.GeckoDataReader;
-import gecko2.util.LibraryUtils;
-import gecko2.util.LibraryUtils.PlatformNotSupportedException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;

@@ -1,6 +1,6 @@
 package gecko2.io;
 
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

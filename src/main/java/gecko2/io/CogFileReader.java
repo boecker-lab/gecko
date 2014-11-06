@@ -1,6 +1,6 @@
 package gecko2.io;
 
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 import gecko2.exceptions.LinePassedException;
 import gecko2.util.SortUtils;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
 package gecko2.event;
 
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneClusterOccurrence;
+import gecko2.datastructures.GeneCluster;
+import gecko2.datastructures.GeneClusterOccurrence;
 
 /**
  * 

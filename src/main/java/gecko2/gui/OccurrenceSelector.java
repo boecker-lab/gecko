@@ -1,8 +1,8 @@
 package gecko2.gui;
 
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.Parameter;
+import gecko2.datastructures.GeneCluster;
+import gecko2.datastructures.GeneClusterOccurrence;
+import gecko2.datastructures.Parameter;
 import gecko2.event.ClusterSelectionEvent;
 import gecko2.event.ClusterSelectionListener;
 import gecko2.event.LocationSelectionEvent;

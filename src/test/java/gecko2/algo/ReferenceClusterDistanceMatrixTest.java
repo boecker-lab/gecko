@@ -1,6 +1,6 @@
 package gecko2.algo;
 
-import gecko2.algorithm.Parameter;
+import gecko2.datastructures.Parameter;
 import gecko2.testUtils.ExpectedDeltaLocationValues;
 import gecko2.testUtils.ExpectedReferenceClusterValues;
 import gecko2.algo.GeneClusterTestUtils.PValueComparison;

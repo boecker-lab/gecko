@@ -1,6 +1,6 @@
 package gecko2.algo;
 
-import gecko2.algorithm.Parameter;
+import gecko2.datastructures.Parameter;
 
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)

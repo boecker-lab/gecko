@@ -1,6 +1,6 @@
 package gecko2.gui;
 
-import gecko2.algorithm.Parameter;
+import gecko2.datastructures.Parameter;
 import gecko2.gui.util.JTableSelectAll;
 
 import javax.swing.*;

@@ -1,6 +1,6 @@
 package gecko2.io;
 
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 
 import java.io.BufferedReader;
 import java.io.File;

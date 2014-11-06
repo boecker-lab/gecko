@@ -1,8 +1,8 @@
 package gecko2.gui;
 
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.GeneFamily;
-import gecko2.algorithm.Genome;
+import gecko2.datastructures.GeneCluster;
+import gecko2.datastructures.GeneFamily;
+import gecko2.datastructures.Genome;
 import gecko2.event.BrowserContentListener;
 import gecko2.event.ClusterSelectionListener;
 import gecko2.gui.MultipleGenomesBrowser.ScrollListener;

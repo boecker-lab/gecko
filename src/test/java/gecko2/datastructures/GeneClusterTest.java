@@ -1,4 +1,4 @@
-package gecko2.algorithm;
+package gecko2.datastructures;
 
 import gecko2.io.GckFileReader;
 import org.junit.Test;

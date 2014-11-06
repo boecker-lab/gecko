@@ -1,7 +1,7 @@
 package gecko2.io;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 import org.junit.Before;
 import org.junit.Test;
 

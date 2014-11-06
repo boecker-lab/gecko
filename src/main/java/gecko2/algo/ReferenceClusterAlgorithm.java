@@ -3,9 +3,9 @@ package gecko2.algo;
 import gecko2.algo.status.AlgorithmProgressListener;
 import gecko2.algo.status.AlgorithmProgressProvider;
 import gecko2.algo.status.AlgorithmStatusEvent;
-import gecko2.algorithm.DataSet;
-import gecko2.algorithm.GeneCluster;
-import gecko2.algorithm.Parameter;
+import gecko2.datastructures.DataSet;
+import gecko2.datastructures.GeneCluster;
+import gecko2.datastructures.Parameter;
 
 import java.math.BigDecimal;
 import java.util.*;

@@ -1,8 +1,8 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.DataSet;
-import gecko2.algorithm.GeneCluster;
+import gecko2.datastructures.DataSet;
+import gecko2.datastructures.GeneCluster;
 import gecko2.io.ClusterAnnotationReader;
 import gecko2.io.CogFileReader;
 import gecko2.io.DataSetWriter;

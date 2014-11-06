@@ -4,7 +4,7 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
 import gecko2.GeckoInstance;
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 import gecko2.util.PrintUtils;
 
 import javax.swing.*;

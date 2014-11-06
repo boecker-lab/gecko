@@ -1,10 +1,7 @@
 package gecko2.algo;
 
 import gecko2.GeckoInstance;
-import gecko2.algo.DeltaLocation;
-import gecko2.algo.ReferenceCluster;
-import gecko2.algo.ReferenceClusterAlgorithm;
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 import gecko2.io.CogFileReader;
 import gecko2.io.DataSetWriter;
 import gecko2.io.GckFileReader;

@@ -1,8 +1,8 @@
 package gecko2.gui;
 
 import gecko2.GeckoInstance;
-import gecko2.algorithm.GeneClusterOccurrence;
-import gecko2.algorithm.Subsequence;
+import gecko2.datastructures.GeneClusterOccurrence;
+import gecko2.datastructures.Subsequence;
 import gecko2.event.*;
 
 import javax.swing.*;

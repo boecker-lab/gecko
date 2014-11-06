@@ -1,6 +1,6 @@
-package gecko2.algorithm;
+package gecko2.datastructures;
 
-import gecko2.algorithm.util.MutableInteger;
+import gecko2.datastructures.util.MutableInteger;
 
 import java.awt.*;
 import java.util.*;

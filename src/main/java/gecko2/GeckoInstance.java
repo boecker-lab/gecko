@@ -3,7 +3,7 @@ package gecko2;
 import gecko2.algo.ReferenceClusterAlgorithm;
 import gecko2.algo.status.AlgorithmProgressListener;
 import gecko2.algo.status.AlgorithmStatusEvent;
-import gecko2.algorithm.*;
+import gecko2.datastructures.*;
 import gecko2.event.DataEvent;
 import gecko2.event.DataListener;
 import gecko2.gui.GenomePainting;
@@ -21,7 +21,6 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.RunnableFuture;
 
 public class GeckoInstance {
     private static final Logger logger = LoggerFactory.getLogger(GeckoInstance.class);

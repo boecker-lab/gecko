@@ -1,6 +1,6 @@
-package gecko2;
+package gecko2.commandLine;
 
-import gecko2.algorithm.Parameter;
+import gecko2.datastructures.Parameter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;

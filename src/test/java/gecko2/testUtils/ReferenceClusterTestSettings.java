@@ -1,7 +1,7 @@
 package gecko2.testUtils;
 
 import gecko2.algo.GeneClusterTestUtils;
-import gecko2.algorithm.Parameter;
+import gecko2.datastructures.Parameter;
 
 import java.io.File;
 import java.util.ArrayList;

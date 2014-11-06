@@ -1,6 +1,6 @@
 package gecko2.event;
 
-import gecko2.algorithm.GeneCluster;
+import gecko2.datastructures.GeneCluster;
 
 import java.util.EventObject;
 
