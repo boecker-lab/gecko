@@ -33,7 +33,13 @@ public class GeckoInstance {
 
 	public native GeneCluster[] computeReferenceStatistics(int[][][] genomes, Parameter params, GeneCluster[] cluster, GeckoInstance gecko);
 
-    public enum ResultFilter {showFiltered, showAll, showSelected}
+    public enum ResultFilter {
+        showFiltered,
+        showAll,
+        showSelected;
+
+        public static final String types = "showFiltered, showAll, showSelected";
+    }
 
     private SwingWorker<List<GeneCluster>, Void> geneClusterSwingWorker = null;
 

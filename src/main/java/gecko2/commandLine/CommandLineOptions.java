@@ -1,6 +1,8 @@
 package gecko2.commandLine;
 
+import gecko2.GeckoInstance;
 import gecko2.datastructures.Parameter;
+import gecko2.io.ResultWriter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -10,10 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.kohsuke.args4j.spi.Messages.*;
 
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)
@@ -44,12 +45,12 @@ public class CommandLineOptions {
     @Option(name="-gGF", aliases = "--genomeGroupingFactor", usage = "All genomes with lower breakpoint distance are treated as one group.")
     private double genomeGroupingFactor = 1.1;
 
-    @Option(name="-o", aliases = "--operationMode", usage = "The operation mode, [reference] cluster (default), [median] gene cluster, or [center] gene cluster.")
+    //@Option(name="-o", aliases = "--operationMode", usage = "The operation mode, [reference] cluster (default), [median] gene cluster, or [center] gene cluster.")
     private Parameter.OperationMode operationMode = Parameter.OperationMode.reference;
 
     @Option(name="-r", aliases = "--referenceGenomeName", usage = "Name of the reference genome.\n" +
             "If not set all genomes are used as reference.\n" +
-            "The name has to be uniquely contained in a single genome.")
+            "The name has to be uniquely contained at the beginning of a single genome.")
     private String referenceGenomeName = "";
 
     /*
@@ -64,8 +65,13 @@ public class CommandLineOptions {
             "Has to be a single string, so either contained in \"\" or not containing any blanks.")
     private List<Integer> genomeList = null;
 
-    @Option(name="-out", aliases = "--Outfile", required = true, usage = "The output file.")
+    @Option(name="-out", aliases = "--Outfile", required = true, usage = "The output .gck file for later use with the gui.")
     private File outfile = null;
+
+    @Option(name="-rO", aliases = "--resultOutput", usage = "Write the filtered clusters to a File in different formats.\n" +
+            "ExportType must be one of: " + ResultWriter.ExportType.types + "\n" +
+            "ResultFilter must be one of: " + GeckoInstance.ResultFilter.types, handler = OutputOptionHandler.class)
+    private List<OutputOption> outputOptions;
 
     /*
      * Others
@@ -158,13 +164,13 @@ public class CommandLineOptions {
                 String[] singleValues = cleanedString.split(",");
 
                 if (singleValues.length != 4) {
-                    CmdLineException e = new CmdLineException(owner, Messages.ILLEGAL_OPERAND, params.getParameter(-1), full);
+                    CmdLineException e = new CmdLineException(owner, ILLEGAL_OPERAND, params.getParameter(-1), full);
                     logger.warn("Malformed parameters at {}", singleValues, e);
                     throw e;
                 } try {
                     int size = Integer.parseInt(singleValues[3].trim());
                     if (size < 0 || mapping.containsKey(size)){
-                        CmdLineException e = new CmdLineException(owner, Messages.ILLEGAL_OPERAND, params.getParameter(-1), full);
+                        CmdLineException e = new CmdLineException(owner, ILLEGAL_OPERAND, params.getParameter(-1), full);
                         logger.warn("Size < 0 or duplicate size {}", size, e);
                         throw e;
                     }
@@ -198,7 +204,7 @@ public class CommandLineOptions {
 
         @Override
         public String getDefaultMetaVariable() {
-            return "<[N,N,N,N],...>";
+            return "<[N,N,N,N],[N,N,N,N],...>";
         }
     }
 
@@ -225,5 +231,66 @@ public class CommandLineOptions {
     }
 
 
+    /**
+     * Option handler for reading output options, similar to @link{StringArrayOptionHandler}
+     */
+    public static class OutputOptionHandler extends OptionHandler<OutputOption> {
+        public OutputOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super OutputOption> setter) {
+            super(parser, option, setter);
+        }
 
+        @Override
+        public int parseArguments(Parameters params) throws CmdLineException {
+            int counter=0;
+            File file = null;
+            ResultWriter.ExportType exportType = null;
+            GeckoInstance.ResultFilter filterType = null;
+
+            for (; counter<params.size(); counter++) {
+                String param = params.getParameter(counter);
+
+                if(param.startsWith("-")) {
+                    break;
+                }
+                try {
+                    switch (counter) {
+                        case 0:
+                            exportType = ResultWriter.ExportType.valueOf(param.trim());
+                            break;
+                        case 1:
+                            filterType = GeckoInstance.ResultFilter.valueOf(param.trim());
+                            break;
+                        case 2:
+                            file = new File(param);
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (IllegalArgumentException e){
+                    StringBuilder builder = new StringBuilder();
+                    for (int i=0; i<=counter; i++)
+                        builder.append(" ").append(params.getParameter(i));
+                    CmdLineException ex = new CmdLineException(owner,  String.format("%s is not a valid value for %s", params.getParameter(counter), counter==0 ? "ExportType" : "ResultFilter"), e);
+                    logger.warn("Malformed parameters for {}{} at {}", params.getParameter(-1), builder.toString(), params.getParameter(counter), ex);
+                    throw ex;
+                }
+            }
+            if (counter != 3){
+                StringBuilder builder = new StringBuilder();
+                for (int i=0; i<counter; i++)
+                    builder.append(" ").append(params.getParameter(i));
+                CmdLineException e = new CmdLineException(owner, ILLEGAL_OPERAND, params.getParameter(-1), builder.toString());
+                logger.warn("Malformed parameters for {}, more or less than 3 at \"{}\"", params.getParameter(-1), builder.toString(), e);
+                throw e;
+            }
+            setter.addValue(new OutputOption(file, exportType, filterType));
+
+            return counter;
+        }
+
+        @Override
+        public String getDefaultMetaVariable() {
+            return "<ExportType ResultFilter FILE>";
+        }
+    }
 }

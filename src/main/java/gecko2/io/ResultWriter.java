@@ -29,6 +29,9 @@ public class ResultWriter {
 
         private String defaultFileExtension;
 
+        public static final String types = "clusterData, table, geneNameTable, clusterInformation, " +
+                "clusterGenomeInformation, referenceClusterTags, latexTable, internalDuplications, pdf, multiPdf";
+
         public String getDefaultFileExtension() {return defaultFileExtension;}
 
         ExportType(String defaultFileExtension) {
