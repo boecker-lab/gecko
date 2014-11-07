@@ -837,6 +837,15 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return builder.toString();
     }
 
+    /**
+     * A list of strings, that indicate how well the cluster occs in the given genome are conserved.
+     * Each string starts with the number of missing genes, then the number of additional genes and
+     * finally for each gene in the cluster "+" if it is missing in the reference occ, or a singleton
+     * gene, or the external gene family id.
+     * @param genome_index
+     * @param allOccurrences
+     * @return
+     */
     public List<String> getGeneConservation(int genome_index, boolean allOccurrences) {
         GeneClusterOccurrence occ = allOccurrences ? this.allOccurrences[0] : bestOccurrences[0];
         List<String> results = new ArrayList<>(occ.getSubsequences()[genome_index].length);
