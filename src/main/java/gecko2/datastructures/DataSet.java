@@ -267,6 +267,13 @@ public class DataSet {
         return genomes;
     }
 
+    public List<String> getGenomeNames() {
+        List<String> genomeNames = new ArrayList<>(genomes.length);
+        for (Genome genome : genomes)
+            genomeNames.add(genome.getName());
+        return genomeNames;
+    }
+
     public void reorderGenomes(int index) {
         Genome first = genomes[0];
         genomes[0] = genomes[index];

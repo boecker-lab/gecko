@@ -56,7 +56,7 @@ public class CommandLineOptions {
     /*
      * Files
      */
-    @Option(name="-in", aliases = "--Infile", usage = "The .gck or .cog input file.")
+    @Option(name="-in", aliases = "--Infile", required = true, usage = "The .gck or .cog input file.")
     private File infile = null;
 
 
@@ -65,13 +65,13 @@ public class CommandLineOptions {
             "Has to be a single string, so either contained in \"\" or not containing any blanks.")
     private List<Integer> genomeList = null;
 
-    @Option(name="-out", aliases = "--Outfile", required = true, usage = "The output .gck file for later use with the gui.")
+    @Option(name="-out", aliases = "--Outfile", usage = "The output .gck file for later use with the gui.")
     private File outfile = null;
 
     @Option(name="-rO", aliases = "--resultOutput", usage = "Write the filtered clusters to a File in different formats.\n" +
             "ExportType must be one of: " + ResultWriter.ExportType.types + "\n" +
             "ResultFilter must be one of: " + GeckoInstance.ResultFilter.types, handler = OutputOptionHandler.class)
-    private List<OutputOption> outputOptions;
+    private List<OutputOption> outputOptions = new ArrayList<>();
 
     /*
      * Others
@@ -123,6 +123,10 @@ public class CommandLineOptions {
 
     public File getOutfile() {
         return outfile;
+    }
+
+    public List<OutputOption> getOutputOptions() {
+        return outputOptions;
     }
 
     public boolean useGui() {

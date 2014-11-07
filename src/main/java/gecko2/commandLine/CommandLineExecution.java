@@ -5,10 +5,12 @@ import gecko2.datastructures.GeneCluster;
 import gecko2.datastructures.Genome;
 import gecko2.datastructures.Parameter;
 import gecko2.io.DataSetWriter;
+import gecko2.io.ResultWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -52,16 +54,28 @@ public class CommandLineExecution {
         // compute the clusters
         SwingWorker<List<GeneCluster>, Void> worker = GeckoInstance.getInstance().performClusterDetection(parameter, false, options.getGenomeGroupingFactor());
         try{
-            worker.get(); // Blocks until worker is done()
+            List<GeneCluster> results = worker.get(); // Blocks until worker is done()
+            GeckoInstance.getInstance().setClusters(results, parameter);
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Error in cluster detection!", e);
         }
 
-        // Remove outfile
-        if (options.getOutfile().exists())
-            options.getOutfile().delete();
+        File outfile = options.getOutfile();
+        if (outfile != null) {
+            // Remove outfile
+            if (outfile.exists())
+                outfile.delete();
 
-        // Save session
-        DataSetWriter.saveDataSetToFile(GeckoInstance.getInstance().getData(), options.getOutfile());
+            // Save session
+            DataSetWriter.saveDataSetToFile(GeckoInstance.getInstance().getData(), options.getOutfile());
+        }
+        List<OutputOption> outputOptions = options.getOutputOptions();
+        for (OutputOption outputOption : outputOptions) {
+            outfile = outputOption.getFile();
+            // Remove outfile
+            if (outfile.exists())
+                outfile.delete();
+            ResultWriter.exportResultsToFile(outfile, outputOption.getType(), outputOption.getFilter());
+        }
     }
 }

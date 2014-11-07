@@ -1,6 +1,7 @@
 package gecko2.io;
 
 import com.itextpdf.text.DocumentException;
+import gecko2.GeckoInstance;
 import gecko2.datastructures.*;
 import gecko2.gui.GeneClusterPicture;
 import gecko2.gui.GenomePainting;
@@ -50,7 +51,12 @@ public class ResultWriter {
             //return new ExportType[]{clusterData, table, latexTable, pdf, multiPdf};
         }
     }
-	
+
+    public static boolean exportResultsToFile(File file, ExportType type, GeckoInstance.ResultFilter filter) {
+        GeckoInstance gecko = GeckoInstance.getInstance();
+        return exportResultsToFile(file, gecko.getClusterList(filter), gecko.getData().getGenomeNames(), type);
+    }
+
 	public static boolean exportResultsToFile(File file, List<GeneCluster> clusters, List<String> genomeNames, ExportType type) {
         Collections.sort(clusters, new Comparator<GeneCluster>() {
             @Override

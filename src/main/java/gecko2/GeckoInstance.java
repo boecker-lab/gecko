@@ -470,6 +470,7 @@ public class GeckoInstance {
 
     public void mergeClusters(List<GeneCluster> results, Parameter p) {
         data.mergeClusters(results, p);
+        handleUpdatedClusterResults();
     }
 
     /**
@@ -561,9 +562,6 @@ public class GeckoInstance {
 	
 	public boolean exportResultsToFile(File f, ResultFilter filter, ExportType type) {
         setCurrentWorkingDirectoryOrFile(f);
-		List<String> genomeNames = new ArrayList<>(data.getGenomes().length);
-		for (Genome genome : data.getGenomes())
-			genomeNames.add(genome.getName());
-		return ResultWriter.exportResultsToFile(f, getClusterList(filter), genomeNames, type);
+        return ResultWriter.exportResultsToFile(f, type, filter);
 	}
 }
