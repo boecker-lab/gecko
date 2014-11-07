@@ -38,7 +38,7 @@ public class GeckoInstance {
         showAll,
         showSelected;
 
-        public static final String types = "showFiltered, showAll, showSelected";
+        public static final String types = "showFiltered, showAll";
     }
 
     private SwingWorker<List<GeneCluster>, Void> geneClusterSwingWorker = null;
