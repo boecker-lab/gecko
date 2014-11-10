@@ -25,6 +25,9 @@ public class CommandLineOptions {
     /*
      * Algorithm parameters
      */
+    @Option(name = "-nC", aliases = "--noComputation", usage = "Don't compute clusters, only read data an write output.")
+    private boolean noComputation = false;
+
     @Option(name="-d", aliases = "--distance", usage = "The maximum allowed distance.")
     private int maxDistance = -1;
 
@@ -36,8 +39,8 @@ public class CommandLineOptions {
             handler = DistanceTableOptionHandler.class)
     private int[][] distanceTable;
 
-    @Option(name="-s", aliases = "--size", required = true, usage = "The minimum cluster size.")
-    private int minClusterSize;
+    @Option(name="-s", aliases = "--size", usage = "The minimum cluster size.")
+    private int minClusterSize = -1;
 
     @Option(name="-q", aliases = "--quorum", usage = "The minimum number of covered genomes.")
     private int minCoveredGenomes = 0;
@@ -133,6 +136,10 @@ public class CommandLineOptions {
         return gui;
     }
 
+    public boolean noComputation() {
+        return noComputation;
+    }
+
     public boolean showHelp() {
         return help;
     }
@@ -142,12 +149,19 @@ public class CommandLineOptions {
      * @return
      */
     public void validate(CmdLineParser parser) throws CmdLineException {
-        if (gui)
-            return;
-        if ((distanceTable == null || distanceTable.length == 0) && (maxDistance < 0))
-            throw new CmdLineException(parser, "Not running gui and missing either \"-d\" or \"-dT\" or distance < 0.");
-        if ((distanceTable != null && distanceTable.length > 0) && (maxDistance >= 0))
-            throw new CmdLineException(parser, "Not running gui and both \"-d\" and \"-dT\" set.");
+        if (gui && distanceTable == null && maxDistance < 0 && minClusterSize < 0){
+            noComputation = true;
+        }
+        if (!noComputation){
+            if ((distanceTable == null || distanceTable.length == 0) && (maxDistance < 0))
+                throw new CmdLineException(parser, "Not running gui or no computation and missing either \"-d\" or \"-dT\" or distance < 0.");
+            if ((distanceTable != null && distanceTable.length > 0) && (maxDistance >= 0))
+                throw new CmdLineException(parser, "Not running gui or no computation and both \"-d\" and \"-dT\" set.");
+            if (minClusterSize < 0) {
+                throw new CmdLineException(parser, "Not running gui or no computation and minimum cluster size < 0.");
+            }
+        }
+
     }
 
     public static class DistanceTableOptionHandler extends OptionHandler<int[][]> {
