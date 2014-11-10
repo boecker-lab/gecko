@@ -104,26 +104,18 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	public void hideNonClusteredGenomes(boolean filter)
 	{
 		// filter is only active if a cluster was selected
-		if (this.getSelectedCluster() != null)
-		{
-			if (!filterNonContainedGenomes && filter)
-			{
+		if (this.getSelectedCluster() != null) {
+			if (!filterNonContainedGenomes && filter) {
 				// activation branch
-				for (int i = 0; i < this.getSelectedCluster().getOccurrences()[0].getSubsequences().length; i++)
-				{
-					if (this.getSelectedCluster().getOccurrences()[0].getSubsequences()[i].length == 0)
-					{	
+				for (int i = 0; i < this.getSelectedCluster().getOccurrences()[0].getSubsequences().length; i++) {
+					if (this.getSelectedCluster().getOccurrences()[0].getSubsequences()[i].length == 0) {
 						this.centerpanel.getComponent(i).setVisible(false);
 						this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() - getGenomeBrowserHeight()));
 					}
 				}
-				
 				this.validate();
-			}
-			else
-			{
-				if (filterNonContainedGenomes && !filter)
-				{
+			} else {
+				if (filterNonContainedGenomes && !filter) {
                     for (Component component : this.centerpanel.getComponents()) {
                         if (!component.isVisible()) {
                             component.setVisible(true);
