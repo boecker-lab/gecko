@@ -75,8 +75,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         referenceGeneTable.getTableHeader().setReorderingAllowed(false);
         referenceGeneTable.getTableHeader().setFont(referenceGeneTable.getTableHeader().getFont().deriveFont(10.0f));
         final TableColumnModel referenceTableColumnModel = referenceGeneTable.getColumnModel();
-        //referenceTableColumnModel.getColumn(1).setPreferredWidth(60); // Index
-        referenceTableColumnModel.getColumn(1).setMaxWidth(60); // Index
+        referenceTableColumnModel.getColumn(1).setPreferredWidth(65); // Index
+        referenceTableColumnModel.getColumn(1).setMaxWidth(65); // Index
         referenceTableColumnModel.getColumn(2).setPreferredWidth(200);
 
         annotationTable = new JTable(new GeneAnnotationTableModel());
