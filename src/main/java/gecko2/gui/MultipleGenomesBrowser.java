@@ -197,10 +197,8 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * this is the id of the genome.
 	 * @return a JComboBox for the use in a GenomeBrowser
 	 */
-	private JComboBox createComboBox(int genomeBrowsersSize, int height) {
+	private JComboBox createComboBox(int genomeBrowsersSize) {
 		JComboBox<GenomeFilterMode> box = new JComboBox<>(GenomeFilterMode.values());
-		box.setPreferredSize(new Dimension(100, height));
-		box.setMaximumSize(box.getPreferredSize());
 		box.setName(Integer.toString(genomeBrowsersSize - 1));
         gecko.getGui().getGcSelector().addIncludeExcludeFilterComboBox(box);
 		return box;
@@ -230,15 +228,23 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		gb.addComponentListener(genomeBrowserComponentListener);
 		this.genomeBrowsers.add(gb);
 		JPanel boxPanel = new JPanel();
-		
+
 		boxPanel.setBackground(gb.getBackground());
 		boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
-		NumberInRectangle n = new NumberInRectangle(genomeBrowsers.size(), gb.getBackground());
-		JComboBox box = createComboBox(genomeBrowsers.size(), getGenomeBrowserHeight());
+
+        JLabel genomeName = new JLabel(g.getName());
+        genomeName.setFont(genomeName.getFont().deriveFont(10.0f));
+        genomeName.setBackground(gb.getBackground());
+        genomeName.setOpaque(true);
+        JScrollPane scrollPane = new JScrollPane(genomeName, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(Integer.MAX_VALUE, 5));
+        scrollPane.setPreferredSize(new Dimension(100, getGenomeBrowserHeight()));
+
+		JComboBox box = createComboBox(genomeBrowsers.size());
 		boxPanel.add(box);
-		boxPanel.add(new JToolBar.Separator(new Dimension(1, getGenomeBrowserHeight())));
-		boxPanel.add(n);
-		boxPanel.add(Box.createRigidArea(new Dimension(4, 0)));
+		boxPanel.add(Box.createRigidArea(new Dimension(2, 0)));
+		boxPanel.add(scrollPane);
+		boxPanel.add(Box.createRigidArea(new Dimension(2, 0)));
 		boxPanel.add(gb);
 		GBNavigator nav = new GBNavigator(boxPanel, genomeBrowsers.size() - 1);
 		this.gbNavigators.add(nav);
@@ -283,10 +289,12 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			sizeReference.addComponentListener(componentListener);
 			this.setBackground(Color.WHITE);
 			prev.putClientProperty("JButton.buttonType", "bevel");
+            prev.addActionListener(this);
+            prev.setMargin(new Insets(0,0,0,0));
 			next.putClientProperty("JButton.buttonType", "bevel");
 			next.addActionListener(this);
-			prev.addActionListener(this);
-			this.sizeReference = sizeReference;
+            next.setMargin(new Insets(0,0,0,0));
+            this.sizeReference = sizeReference;
 			this.setLayout(new GridLayout(1, 2));
 			this.add(prev);
 			this.add(next);
