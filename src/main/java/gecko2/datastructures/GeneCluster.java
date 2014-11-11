@@ -755,8 +755,24 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
                 '}';
     }
 
-        /* SOME OUTPUT HELPER STUFF */
+    /* SOME OUTPUT HELPER STUFF */
 
+    /**
+     * Returns the gene of the given occ, in the given genome and the given subselection.
+     * @param occ
+     * @param genomeIndex
+     * @param subselection
+     * @return
+     */
+    public List<Gene> getGenes(GeneClusterOccurrence occ, int genomeIndex, int subselection){
+        List<Gene> genes = new ArrayList<>();
+        Subsequence seq = occ.getSubsequences()[genomeIndex][subselection];
+        Genome genome = GeckoInstance.getInstance().getGenomes()[genomeIndex];
+        for (int index = seq.getStart()-1; index < seq.getStop(); index++){
+            genes.add(genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index));
+        }
+        return genes;
+    }
 
     public String getGenomeString() {
         Subsequence[][] seqs = bestOccurrences[0].getSubsequences();

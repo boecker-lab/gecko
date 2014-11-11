@@ -193,7 +193,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             JLabel referenceGenes = new JLabel("Reference Genes:");
             referenceGenes.setFont(boldFont);
             masterPanel.add(referenceGenes);
-            masterPanel.add(Box.createVerticalStrut(10));
+            masterPanel.add(Box.createVerticalStrut(5));
             JPanel panel = new JPanel();
             panel.setLayout(new BorderLayout());
             panel.add(referenceGeneTable.getTableHeader(), BorderLayout.NORTH);
@@ -274,19 +274,29 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         tableColumnModel.getColumn(0).setPreferredWidth(geneWidth);
         tableColumnModel.getColumn(0).setMaxWidth(geneWidth);
 
-        for (Map.Entry<GeneFamily, Gene[]> entry : annotations.entrySet()) {
-            Gene[] genes = entry.getValue();
-            int occsInGenomes = 0;
-            for (int i=0;i<genes.length;i++) {
-                if (genes[i] != null)
-                    occsInGenomes++;
+        List<Gene> genes = cluster.getGenes(gOcc, cluster.getRefSeqIndex(), subselections[cluster.getRefSeqIndex()]);
+        for (Gene gene : genes) {
+            ReferenceGeneInfo info;
+            if (gene.getGeneFamily().isSingleGeneFamily()){
+                info = new ReferenceGeneInfo(gene.getGeneFamily(), 1, gene);
+            } else {
+                Gene[] geneArray = annotations.get(gene.getGeneFamily());
+                int occsInGenomes = 0;
+                if (geneArray != null) {
+                    for (int i=0;i<geneArray.length;i++) {
+                        if (geneArray[i] != null)
+                            occsInGenomes++;
+                    }
+                } else {
+                    occsInGenomes = 1;
+                }
+                info = new ReferenceGeneInfo(gene.getGeneFamily(), occsInGenomes, gene);
             }
-            ReferenceGeneInfo info = new ReferenceGeneInfo(entry.getKey(), occsInGenomes, genes[cluster.getRefSeqIndex()]);
             referenceGeneList.add(info);
         }
     }
     
-    private static class ReferenceGeneInfo{
+    public static class ReferenceGeneInfo{
         public final GeneFamily geneFamily;
         public final int occsInGenomes;
         public final Gene refGene;
