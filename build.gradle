@@ -16,7 +16,7 @@ dependencies {
     compile 'args4j:args4j:2.0.+'
     compile 'colt:colt:1.2+'
     compile 'org.apache.commons:commons-math3:3.2'
-    compile 'com.jgoodies:jgoodies-forms:1.8.+'
+    compile 'com.jgoodies:jgoodies-forms:1.7.+'
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.+'
     compile 'com.itextpdf:itextpdf:5.5.+'
     compile 'com.google.guava:guava:18.0'
