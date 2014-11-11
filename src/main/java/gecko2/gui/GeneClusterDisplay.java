@@ -46,13 +46,10 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     private final JTable annotationTable;
     // end local?
 	
-	private static final String VALUES_TITLE = "Global cluster information:";
-
-	private static final String GENES_TITLE = "Genes in this Cluster:";
-	
 	public GeneClusterDisplay() {
 		masterPanel = new JPanel();		
 		masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
+        masterPanel.setAlignmentX(LEFT_ALIGNMENT);
 		masterPanel.setBackground(Color.WHITE);
 		this.setViewportView(masterPanel);
 
@@ -144,31 +141,12 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 		masterPanel.removeAll();
 		if (geneList.size() != 0) {
 
-			/*
-			 * Involed Chromosomes
-			 */
-			JLabel invChrTitle = new JLabel("Involved chromosomes");
-			invChrTitle.setFont(boldFont);
-            invChrTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-			masterPanel.add(invChrTitle);
-
-            masterPanel.add(Box.createVerticalStrut(5));
-
-            masterPanel.add(chromosomeNameTable);
-			masterPanel.add(Box.createVerticalStrut(5));
-			
-			/*
+            /*
 			 * Global data
 			 */
-			JPanel title1 = new JPanel();
-			title1.setBackground(masterPanel.getBackground());
-			title1.setLayout(new BoxLayout(title1,BoxLayout.X_AXIS));
-			JLabel valTitle = new JLabel(VALUES_TITLE);
-			valTitle.setFont(boldFont);
-			title1.add(valTitle);
-			title1.add(Box.createHorizontalGlue());
-            title1.setAlignmentX(Component.LEFT_ALIGNMENT);
-			masterPanel.add(title1);
+            JLabel valTitle = new JLabel("Global cluster information:");
+            valTitle.setFont(boldFont);
+            masterPanel.add(valTitle);
 
             JPanel totalDistancePanel = generateGeneralGenomeInformationPanel("Best total distance: " + gOcc.getTotalDist());
             totalDistancePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -178,15 +156,11 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             bestScorePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             masterPanel.add(bestScorePanel);
 
-			masterPanel.add(Box.createVerticalStrut(5));
+            masterPanel.add(Box.createVerticalStrut(5));
 
-			/*
+            /*
 			 * Local distances to median/center
 			 */
-			JPanel title3 = new JPanel();
-			title3.setBackground(masterPanel.getBackground());
-			title3.setLayout(new BoxLayout(title3,BoxLayout.X_AXIS));
-
             JLabel distanceLabel = new JLabel();
             if (cluster.getType() == Parameter.OperationMode.median)
                 distanceLabel.setText("Distance to median per dataset:");
@@ -195,38 +169,43 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             else
                 distanceLabel.setText("Distance to reference gene set per dataset:");
             distanceLabel.setFont(boldFont);
-            title3.add(distanceLabel);
+            masterPanel.add(distanceLabel);
+            masterPanel.add(Box.createVerticalStrut(5));
 
-			title3.add(Box.createHorizontalGlue());
-            title3.setAlignmentX(Component.LEFT_ALIGNMENT);
-			masterPanel.add(title3);
-			masterPanel.add(Box.createVerticalStrut(5));
-
-			JPanel cpanel = generateChromosomeDistancePanel();
+            JPanel cpanel = generateChromosomeDistancePanel();
             cpanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             masterPanel.add(cpanel);
-			masterPanel.add(Box.createVerticalStrut(5));
+            masterPanel.add(Box.createVerticalStrut(5));
+
+            /*
+             * Reference Genes
+             */
 			
 			/*
 			 * List of genes
 			 */
-			JPanel title2 = new JPanel();
-			title2.setBackground(masterPanel.getBackground());
-			title2.setLayout(new BoxLayout(title2,BoxLayout.X_AXIS));
-
-            TextLabel label = new TextLabel(GENES_TITLE);
-            label.setFont(boldFont);
-            title2.add(label);
-			
-			title2.add(Box.createHorizontalGlue());
-
-            title2.setAlignmentX(Component.LEFT_ALIGNMENT);
-			masterPanel.add(title2);
+            TextLabel genesInClusterLabel = new TextLabel("Genes in this Cluster:");
+            genesInClusterLabel.setFont(boldFont);
+			masterPanel.add(genesInClusterLabel);
 			masterPanel.add(Box.createVerticalStrut(10));
 
             masterPanel.add(annotationTable);
 
 			masterPanel.add(Box.createHorizontalGlue());
+
+            masterPanel.add(Box.createVerticalStrut(5));
+
+            /*
+			 * Involed Chromosomes
+			 */
+            JLabel invChrTitle = new JLabel("Involved chromosomes");
+            invChrTitle.setFont(boldFont);
+            invChrTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+            masterPanel.add(invChrTitle);
+
+            masterPanel.add(Box.createVerticalStrut(5));
+
+            masterPanel.add(chromosomeNameTable);
 		}
 		this.repaint();
 		this.revalidate();
