@@ -26,8 +26,10 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     private static final Font boldFont = new JLabel().getFont().deriveFont(Font.BOLD);
 
 	private final JPanel masterPanel;
+
 	private GeneCluster cluster;
 	private GeneClusterOccurrence gOcc;
+    private int[] subselections;
 
     private String maxLengthString;
     private int geneWidth;
@@ -40,9 +42,11 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
     private List<Gene> geneList;
     private List<Integer> genomeIndexInGeneList;
     private Map<Integer, GeneFamily> geneIdAtTablePosition;
+    private List<ReferenceGeneInfo> referenceGeneList;
 
     // local?
     private final JTable chromosomeNameTable;
+    private final JTable referenceGeneTable;
     private final JTable annotationTable;
     // end local?
 	
@@ -62,6 +66,18 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         chromosomeNameTableColumnModel.getColumn(0).setPreferredWidth(50); // Index
         chromosomeNameTableColumnModel.getColumn(0).setMaxWidth(50); // Index
         chromosomeNameTableColumnModel.getColumn(1).setPreferredWidth(200);
+
+        referenceGeneTable = new JTable(new ReferenceGeneTableModel());
+        referenceGeneTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        referenceGeneTable.setShowGrid(false);
+        referenceGeneTable.setAlignmentX(Component.LEFT_ALIGNMENT);
+        referenceGeneTable.setDefaultRenderer(GeneFamily.class, new GeneRenderer());
+        referenceGeneTable.getTableHeader().setReorderingAllowed(false);
+        referenceGeneTable.getTableHeader().setFont(referenceGeneTable.getTableHeader().getFont().deriveFont(10.0f));
+        final TableColumnModel referenceTableColumnModel = referenceGeneTable.getColumnModel();
+        //referenceTableColumnModel.getColumn(1).setPreferredWidth(60); // Index
+        referenceTableColumnModel.getColumn(1).setMaxWidth(60); // Index
+        referenceTableColumnModel.getColumn(2).setPreferredWidth(200);
 
         annotationTable = new JTable(new GeneAnnotationTableModel());
         annotationTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -89,6 +105,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         genomeIndexInGeneList = new ArrayList<>();
         geneIdAtTablePosition = new HashMap<>();
         gOcc = null;
+        subselections = null;
+        referenceGeneList = new ArrayList<>();
     }
 
 	@Override
@@ -99,23 +117,15 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         GeckoInstance gecko = GeckoInstance.getInstance();
 
-		this.cluster = l.getSelection();
+		cluster = l.getSelection();
 
         reset();
 
-		if (this.cluster!=null) {
-			int[] subselections = l.getsubselection();
-            this.gOcc = l.getgOcc();
+		if (cluster!=null) {
+			subselections = l.getsubselection();
+            gOcc = l.getgOcc();
 
-            Map<GeneFamily, Gene[]> annotations = l.getSelection().generateAnnotations(l.getgOcc(),
-                    l.getsubselection());
-
-            setMaxLengthStringWidth(GeneCluster.getMaximumIdLength(annotations));
-            final TableColumnModel annotationTableColumnModel = annotationTable.getColumnModel();
-            annotationTableColumnModel.getColumn(0).setPreferredWidth(geneWidth); // Index
-            annotationTableColumnModel.getColumn(0).setMaxWidth(geneWidth); // Index
-
-            this.setAnnotationData(annotations);
+            this.setGeneData();
 
             for (int i=0; i<subselections.length; i++){
                 if (subselections[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED && gOcc.getSubsequences()[i][subselections[i]].isValid()) {
@@ -180,23 +190,30 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             /*
              * Reference Genes
              */
+            JLabel referenceGenes = new JLabel("Reference Genes:");
+            referenceGenes.setFont(boldFont);
+            masterPanel.add(referenceGenes);
+            masterPanel.add(Box.createVerticalStrut(10));
+            JPanel panel = new JPanel();
+            panel.setLayout(new BorderLayout());
+            panel.add(referenceGeneTable.getTableHeader(), BorderLayout.NORTH);
+            panel.add(referenceGeneTable, BorderLayout.CENTER);
+            panel.setAlignmentX(LEFT_ALIGNMENT);
+            masterPanel.add(panel);
+            masterPanel.add(Box.createVerticalStrut(5));
 			
 			/*
 			 * List of genes
 			 */
-            TextLabel genesInClusterLabel = new TextLabel("Genes in this Cluster:");
+            JLabel genesInClusterLabel = new JLabel("Genes in this Cluster:");
             genesInClusterLabel.setFont(boldFont);
 			masterPanel.add(genesInClusterLabel);
 			masterPanel.add(Box.createVerticalStrut(10));
-
             masterPanel.add(annotationTable);
-
-			masterPanel.add(Box.createHorizontalGlue());
-
             masterPanel.add(Box.createVerticalStrut(5));
 
             /*
-			 * Involed Chromosomes
+			 * Involved Chromosomes
 			 */
             JLabel invChrTitle = new JLabel("Involved chromosomes");
             invChrTitle.setFont(boldFont);
@@ -219,7 +236,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         f.setVgap(1);
         cpanel.setLayout(f);
         cpanel.setBackground(masterPanel.getBackground());
-        TextLabel textLabel = new TextLabel(text);
+        JLabel textLabel = new JLabel(text);
         textLabel.setFont(monoFont);
         cpanel.add(textLabel);
         return cpanel;
@@ -234,7 +251,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         for (int i=0; i<subsequences.size(); i++) {
             cpanel.add(new NumberInRectangle(genomeIndexMapping.get(i)+1, getBackground(), chromosomes.get(i).getChromosomeMouseListener()));
-            TextLabel textLabel = new TextLabel(Integer.toString(subsequences.get(i).getDist()));
+            JLabel textLabel = new JLabel(Integer.toString(subsequences.get(i).getDist()));
             textLabel.setFont(monoFont);
             cpanel.add(textLabel);
             cpanel.add(Box.createHorizontalStrut(5));
@@ -242,7 +259,50 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         return cpanel;
     }
 
-    private void setAnnotationData(Map<GeneFamily, Gene[]> annotations) {
+
+    private void setGeneData() {
+        Map<GeneFamily, Gene[]> annotations = cluster.generateAnnotations(gOcc,
+                subselections);
+        setMaxLengthStringWidth(GeneCluster.getMaximumIdLength(annotations));
+
+        this.setAnnotationTable(annotations);
+        this.setReferenceTable(annotations);
+    }
+
+    private void setReferenceTable(Map<GeneFamily, Gene[]> annotations) {
+        final TableColumnModel tableColumnModel = referenceGeneTable.getColumnModel();
+        tableColumnModel.getColumn(0).setPreferredWidth(geneWidth);
+        tableColumnModel.getColumn(0).setMaxWidth(geneWidth);
+
+        for (Map.Entry<GeneFamily, Gene[]> entry : annotations.entrySet()) {
+            Gene[] genes = entry.getValue();
+            int occsInGenomes = 0;
+            for (int i=0;i<genes.length;i++) {
+                if (genes[i] != null)
+                    occsInGenomes++;
+            }
+            ReferenceGeneInfo info = new ReferenceGeneInfo(entry.getKey(), occsInGenomes, genes[cluster.getRefSeqIndex()]);
+            referenceGeneList.add(info);
+        }
+    }
+    
+    private static class ReferenceGeneInfo{
+        public final GeneFamily geneFamily;
+        public final int occsInGenomes;
+        public final Gene refGene;
+
+        private ReferenceGeneInfo(GeneFamily geneFamily, int occsInGenomes, Gene refGene) {
+            this.geneFamily = geneFamily;
+            this.occsInGenomes = occsInGenomes;
+            this.refGene = refGene;
+        }
+    }
+
+    private void setAnnotationTable(Map<GeneFamily, Gene[]> annotations) {
+        final TableColumnModel annotationTableColumnModel = annotationTable.getColumnModel();
+        annotationTableColumnModel.getColumn(0).setPreferredWidth(geneWidth);
+        annotationTableColumnModel.getColumn(0).setMaxWidth(geneWidth);
+
         for (Map.Entry<GeneFamily, Gene[]> entry : annotations.entrySet()) {
             geneIdAtTablePosition.put(geneList.size(), entry.getKey());
             Gene[] genes = entry.getValue();
@@ -255,22 +315,8 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             }
         }
     }
-	
-	private class TextLabel extends JLabel {
-		/**
-		 * Random generated serialization UID
-		 */
-		private static final long serialVersionUID = -741356610359230027L;
-
-		public TextLabel(String s) {
-			super(s);
-			setBorder(null);
-			setBackground(Color.WHITE);
-		}
-	}
 
     private class ChromosomeNameTableModel extends AbstractTableModel {
-
         private static final long serialVersionUID = -3306238610287868813L;
 
         private final Class<?>[] columns = {NumberInRectangle.NumberIcon.class, String.class};
@@ -303,8 +349,46 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         }
     }
 
-    private class GeneAnnotationTableModel extends AbstractTableModel {
+    private class ReferenceGeneTableModel extends AbstractTableModel {
+        private final Class<?>[] columns = {GeneFamily.class, Integer.class, String.class};
+        private final String[] tableHeaders = {"Gene", "#Genomes", "Annotation"};
 
+        @Override
+        public int getRowCount() {
+            return referenceGeneList.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return columns.length;
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex)	{
+            return this.columns[columnIndex];
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            switch (columnIndex) {
+                case 0:
+                    return referenceGeneList.get(rowIndex).geneFamily;
+                case 1:
+                    return referenceGeneList.get(rowIndex).occsInGenomes;
+                case 2:
+                    return referenceGeneList.get(rowIndex).refGene.getSummary();
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public String getColumnName(int columnIndex) {
+            return tableHeaders[columnIndex];
+        }
+    }
+
+    private class GeneAnnotationTableModel extends AbstractTableModel {
         private static final long serialVersionUID = -3306238610287868813L;
 
         private final Class<?>[] columns = {GeneFamily.class, NumberInRectangle.NumberIcon.class, String.class};
