@@ -229,7 +229,7 @@ public class ResultWriter {
         int[] genomesForNaming = new int[]{0, 150};
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
-            writer.write("ID \t No of genes \t No of genomes");
+            writer.write("ID \t corrected pValue \t No of genes \t No of genomes");
             for (int i=0; i<genomesForNaming.length; i++){
                 writer.write("\t" + genomeNames.get(genomesForNaming[i]));
             }
@@ -241,7 +241,7 @@ public class ResultWriter {
             }
             writer.newLine();
             for (GeneCluster cluster : clusters) {
-                writer.write(String.format("%d\t%d\t%d", cluster.getId(), cluster.getGeneFamilies().size(), cluster.getSize()));
+                writer.write(String.format("%d\t%.2f\t%d\t%d", cluster.getId(), cluster.getBestCorrectedScore(), cluster.getNoOfGenesInRefOcc(), cluster.getSize()));
                 for (int i=0; i<genomesForNaming.length; i++){
                     writer.write("\t"+cluster.getGeneNames(genomesForNaming[i]));
                 }
