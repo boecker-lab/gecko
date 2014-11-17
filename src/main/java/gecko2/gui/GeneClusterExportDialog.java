@@ -1,6 +1,6 @@
 package gecko2.gui;
 
-import com.itextpdf.text.DocumentException;
+import com.lowagie.text.DocumentException;
 import gecko2.GeckoInstance;
 import gecko2.datastructures.GeneCluster;
 import gecko2.gui.GenomePainting.NameType;

@@ -1,15 +1,16 @@
 package gecko2.io;
 
-import com.itextpdf.awt.PdfGraphics2D;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfTemplate;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Image;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfGraphics2D;
+import com.lowagie.text.pdf.PdfTemplate;
+import com.lowagie.text.pdf.PdfWriter;
 import gecko2.gui.GeneClusterPicture;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -79,7 +80,7 @@ public class GeneClusterToPDFWriter implements AutoCloseable {
             clusterPDF.newPage();
             // open pdf for writing
             PdfTemplate template = cb.createTemplate(clusterPicture.getPageWidth(), clusterPicture.getPageHeight());
-            PdfGraphics2D g = new PdfGraphics2D(template, clusterPicture.getPageWidth(), clusterPicture.getPageHeight());
+            Graphics2D g = template.createGraphics(clusterPicture.getPageWidth(), clusterPicture.getPageHeight());
             clusterPicture.paint(g);
             g.dispose();
             Image image = Image.getInstance(template);
