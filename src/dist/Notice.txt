@@ -1,0 +1,18 @@
+=========================================================================
+=========================================================================
+
+
+This product includes the following other software:
+
+args4j (http://http://args4j.kohsuke.org)
+Colt (https://dst.lbl.gov/ACSSoftware/colt/)
+commons-math (http://commons.apache.org/proper/commons-math/)
+jgoodies-forms (http://www.jgoodies.com/freeware/libraries/forms/)
+glazedlists (http://www.glazedlists.com/)
+itext (https://github.com/ymasory/iText-4.2.0)
+guava (https://code.google.com/p/guava-libraries/)
+Logback (http://logback.qos.ch)
+SLF4J (http://www.slf4j.org)
+Junit (http://www.junit.org)
+
+For licenses see the LICENSE file.
