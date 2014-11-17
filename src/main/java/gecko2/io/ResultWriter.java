@@ -115,7 +115,7 @@ public class ResultWriter {
     private static boolean writeGeneClusterToPdf(File file, List<GeneCluster> clusters) {
         List<GeneClusterPicture> pictures = new ArrayList<>(clusters.size());
         for (GeneCluster cluster : clusters)
-            pictures.add(new GeneClusterPicture(cluster));
+            pictures.add(new GeneClusterPicture(cluster, GenomePainting.NameType.LOCUS_TAG, true));
 
         try (GeneClusterToPDFWriter pdfWriter = new GeneClusterToPDFWriter(new BufferedOutputStream(new FileOutputStream(file)))) {
             pdfWriter.write(pictures);
