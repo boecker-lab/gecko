@@ -9,7 +9,6 @@ import javax.swing.event.EventListenerList;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -129,7 +128,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
     @Override
     public GeneClusterLocationSelection getClusterSelection() {
-        return null;
+        return new GeneClusterLocationSelection(selectedCluster, getSubselection(), isFlipped(), centerGenes);
     }
 
     @Override

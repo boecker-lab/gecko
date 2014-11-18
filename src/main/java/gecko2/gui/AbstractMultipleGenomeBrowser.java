@@ -30,8 +30,6 @@ public abstract class AbstractMultipleGenomeBrowser extends JPanel implements Cl
 	public abstract int getScrollWidth();
 	public abstract int getScrollValue(int genomeIndex);
     public abstract GeneClusterLocationSelection getClusterSelection();
-	//public abstract int[] getSubselection();
-	//public abstract GeneCluster getSelectedCluster();
 	public abstract void changeGeneElementHight(int adjustment);
 	public abstract void hideNonClusteredGenomes(boolean hide);
 }

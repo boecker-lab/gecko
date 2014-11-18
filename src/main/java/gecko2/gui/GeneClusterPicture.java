@@ -366,7 +366,7 @@ public class GeneClusterPicture {
 						break;
 					} else {
 						boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop(); 
-						x = paintGene(g, this.genomes[i].getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), partOfCluster, x, y);			
+						x = paintGene(g, this.genomes[i].getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), partOfCluster, x, y);
 					}
 					geneIndex++;
 				}

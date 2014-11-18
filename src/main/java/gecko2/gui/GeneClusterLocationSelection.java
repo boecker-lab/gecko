@@ -8,10 +8,10 @@ import gecko2.datastructures.GeneCluster;
 public class GeneClusterLocationSelection {
     private final GeneCluster cluster;
     private final int[] subselection;
-    private final boolean flipped;
+    private final boolean[] flipped;
     private final int[] centerGene;
 
-    public GeneClusterLocationSelection(GeneCluster cluster, int[] subselection, boolean flipped, int[] centerGene) {
+    public GeneClusterLocationSelection(GeneCluster cluster, int[] subselection, boolean[] flipped, int[] centerGene) {
         this.cluster = cluster;
         this.subselection = subselection;
         this.flipped = flipped;
@@ -26,7 +26,7 @@ public class GeneClusterLocationSelection {
         return subselection;
     }
 
-    public boolean isFlipped() {
+    public boolean[] isFlipped() {
         return flipped;
     }
 
