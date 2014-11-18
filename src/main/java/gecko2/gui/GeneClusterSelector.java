@@ -255,9 +255,9 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
                 if (gcs.isEmpty())
                     return;
                 GeneCluster gc = gcs.get(0);
-				if (mgb.getSelectedCluster() == null || !gc.equals(mgb.getSelectedCluster()))
+				if (mgb.getClusterSelection() == null || !gc.equals(mgb.getClusterSelection().getCluster()))
 					fireSelectionEvent(true);
-				GeneClusterExportDialog d = new GeneClusterExportDialog(GeckoInstance.getInstance().getGui().getMainframe(), mgb.getSelectedCluster(), mgb.getSubselection(), mgb.getAlignmentGeneFamily());
+				GeneClusterExportDialog d = new GeneClusterExportDialog(GeckoInstance.getInstance().getGui().getMainframe(), mgb.getClusterSelection());
 				d.setVisible(true);
 			}
 		});
@@ -300,7 +300,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         cm.getColumn(COL_SCORE_CORRECTED).setPreferredWidth(60); // corrected pValue
         cm.getColumn(COL_GENES).setPreferredWidth(200); // Genes
 
-        fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
+        fireSelectionEvent(new LocationSelectionEvent(this, null, false, null));
     }
 
     public void addIncludeExcludeFilterComboBox(JComboBox box) {
@@ -309,7 +309,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 
     public void clearSelection() {
         table.clearSelection();
-        fireSelectionEvent(new LocationSelectionEvent(this, null, null, null));
+        fireSelectionEvent(new LocationSelectionEvent(this, null, false, null));
     }
 
     private static class GeneClusterTextFilterator implements TextFilterator<GeneCluster> {
@@ -325,14 +325,12 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
          */
         @Override
         public void getFilterStrings(List<String> baseList, GeneCluster cluster) {
-            for (GeneClusterOccurrence gOcc : cluster.getAllOccurrences()) {
-                for (int genome = 0; genome < gOcc.getSubsequences().length; genome++) {
-                    Subsequence[] subseqs = gOcc.getSubsequences()[genome];
-                    for (Subsequence s : subseqs) {
-                        //TODO GeneCluster should know their genomes?
-                        for (Gene g : GeckoInstance.getInstance().getGenomes()[genome].getSubsequence(s)) {
-                            baseList.add(g.getFilterString());
-                        }
+            for (int genome = 0; genome < cluster.getOccurrences(true).getSubsequences().length; genome++) {
+                Subsequence[] subseqs = cluster.getOccurrences(true).getSubsequences()[genome];
+                for (Subsequence s : subseqs) {
+                    //TODO GeneCluster should know their genomes?
+                    for (Gene g : GeckoInstance.getInstance().getGenomes()[genome].getSubsequence(s)) {
+                        baseList.add(g.getFilterString());
                     }
                 }
             }
@@ -428,18 +426,12 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 		} 
 		else {
 			showSuboptimalCheckBox.setVisible(true);
-
-            GeneClusterOccurrence gOcc;
-			if (showSuboptimalCheckBox.isSelected())
-				gOcc = gc.getAllOccurrences()[0];
-			else
-				gOcc = gc.getOccurrences()[0];
 			
 			int[] subSelections = gc.getDefaultSubSelection(showSuboptimalCheckBox.isSelected());
 			
 			fireSelectionEvent(new LocationSelectionEvent(GeneClusterSelector.this,
 					gc,
-					gOcc,
+					showSuboptimalCheckBox.isSelected(),
 					subSelections,
 					instant));
 		}

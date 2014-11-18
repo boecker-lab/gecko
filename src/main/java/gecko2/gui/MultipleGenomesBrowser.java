@@ -43,7 +43,10 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 */
 	private GeneCluster selectedCluster = null;
 
-    private GeneFamily alignmentGeneFamily = null;
+    /**
+     * The genes from the current subselection the cluster is aligned to
+     */
+    private int[] centerGenes = null;
 
     /**
      * What name is shown for each gene
@@ -82,17 +85,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		this.addKeyListener(this.wheelListener);
 		this.addMouseWheelListener(this.wheelListener);
 	}
-	
-	/**
-	 * Getter for the variable selectedCluster.
-	 * 
-	 * @return a GenCluster objectgenomeIndex
-	 */
-	@Override
-	public GeneCluster getSelectedCluster() 
-	{
-		return selectedCluster;
-	}
 
 	/**
 	 * This method implements a filter for the mgb. It removes the GenomeBrowers for the genomes
@@ -103,14 +95,13 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * @param filter true if the filter should be activated else false to turn it off
 	 */
 	@Override
-	public void hideNonClusteredGenomes(boolean filter)
-	{
+	public void hideNonClusteredGenomes(boolean filter)	{
 		// filter is only active if a cluster was selected
-		if (this.getSelectedCluster() != null) {
+		if (this.selectedCluster != null) {
 			if (!filterNonContainedGenomes && filter) {
 				// activation branch
-				for (int i = 0; i < this.getSelectedCluster().getOccurrences()[0].getSubsequences().length; i++) {
-					if (this.getSelectedCluster().getOccurrences()[0].getSubsequences()[i].length == 0) {
+				for (int i = 0; i < this.selectedCluster.getOccurrences(true).getSubsequences().length; i++) {
+					if (this.selectedCluster.getOccurrences(true).getSubsequences()[i].length == 0) {
 						this.centerpanel.getComponent(i).setVisible(false);
 						this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() - getGenomeBrowserHeight()));
 					}
@@ -132,16 +123,16 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	}
 
     @Override
-    public GeneFamily getAlignmentGeneFamily() {
-        return alignmentGeneFamily;
-    }
-
-    @Override
 	public int getScrollValue(int genomeIndex) {
 		return genomeBrowsers.get(genomeIndex).getScrollValue();
 	}
-	
-	@Override
+
+    @Override
+    public GeneClusterLocationSelection getClusterSelection() {
+        return null;
+    }
+
+    @Override
 	public ScrollListener getWheelListener() {
 		return wheelListener;
 	}
@@ -262,91 +253,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
 		this.revalidate();
 	}
-	
-	private class GBNavigator  extends JPanel implements ActionListener {
-		
-		/**
-		 * Random generated serialization UID
-		 */
-		private static final long serialVersionUID = -1597716317000549154L;
-		private final JButton prev=new JButton("<");
-        private final JButton next=new JButton(">");
-		private final JComponent sizeReference;
-		private final int genome;
-		
-		private final ComponentListener componentListener = new ComponentAdapter() {
-			@Override
-			public void componentResized(java.awt.event.ComponentEvent e) {
-				GBNavigator.this.invalidate();
-				GBNavigator.this.getParent().doLayout();
-				GBNavigator.this.doLayout();
-			}
-		};
-		
-		public JButton getPrev() {
-			return prev;
-		}
-		
-		public JButton getNext() {
-			return next;
-		}
-		
-		public GBNavigator(JComponent sizeReference, int genome) {
-			this.genome = genome;
-			sizeReference.addComponentListener(componentListener);
-			this.setBackground(Color.WHITE);
-			prev.putClientProperty("JButton.buttonType", "bevel");
-            prev.addActionListener(this);
-            prev.setMargin(new Insets(0,0,0,0));
-			next.putClientProperty("JButton.buttonType", "bevel");
-			next.addActionListener(this);
-            next.setMargin(new Insets(0,0,0,0));
-            this.sizeReference = sizeReference;
-			this.setLayout(new GridLayout(1, 2));
-			this.add(prev);
-			this.add(next);
-		}
-		
-		@Override
-		public Dimension getMaximumSize() {
-			return getMinimumSize();
-		}
-		
-		@Override
-		public Dimension getMinimumSize() {
-			if (sizeReference!=null) {
-				Dimension d = super.getMinimumSize();
-				return new Dimension((int) d.getWidth(),sizeReference.getHeight());
-			} else
-				return new Dimension(0,0);
-			
-		}
-		
-		@Override
-		public Dimension getPreferredSize() {
-			return getMinimumSize();
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (e.getSource()==next) {
-				int[] subselections = lastLocationEvent.getsubselection();
-				subselections[genome] = subselections[genome] + 1;
-				fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this, 
-						lastLocationEvent.getSelection(), 
-						lastLocationEvent.getgOcc(), 
-						subselections));
-			} else if (e.getSource()==prev) {
-				int[] subselections = lastLocationEvent.getsubselection();
-				subselections[genome] = subselections[genome] - 1;
-				fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this, 
-						lastLocationEvent.getSelection(), 
-						lastLocationEvent.getgOcc(), 
-						subselections));
-			}
-		}
-		
-	}
 
 	@Override
 	public void clear() {
@@ -398,30 +304,22 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
 	@Override
 	public void centerCurrentClusterAt(GeneFamily geneFamily) {
-        alignmentGeneFamily         = geneFamily;
-        int[] subselections 		= lastLocationEvent.getsubselection();
-		GeneClusterOccurrence gOcc 	= lastLocationEvent.getgOcc();
-		
-		int[] positions = new int[gOcc.getSubsequences().length];
-		Arrays.fill(positions, -1);
-		ArrayList<Integer> minus = new ArrayList<>();
+        int[] subselections = lastLocationEvent.getsubselection();
+		boolean includeSubOptimalOccurrences = lastLocationEvent.includeSubOptimalOccurrences();
+
+		centerGenes = selectedCluster.getGeneFamilyPositions(geneFamily, subselections, includeSubOptimalOccurrences);
+        ArrayList<Integer> minus = new ArrayList<>();
 		ArrayList<Integer> plus = new ArrayList<>();
-		for (int i=0; i<positions.length;i++) {
+		for (int i=0; i<centerGenes.length;i++) {
 			// If genome i is not in the cluster, skip
-			if (subselections[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+			if (centerGenes[i] == -1)
 				continue;
 			List<Chromosome> genes = gecko.getGenomes()[i].getChromosomes();
-			Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
-			for (int j=s.getStart()-1;j<s.getStop();j++) {
-				if (genes.get(s.getChromosome()).getGenes().get(j).getGeneFamily().equals(alignmentGeneFamily)) {
-					positions[i] = j;
-					if (genes.get(s.getChromosome()).getGenes().get(j).getOrientation().equals(Gene.GeneOrientation.NEGATIVE))
-						minus.add(i);
-					else
-						plus.add(i);
-					break;
-				}
-			}
+			Subsequence s = selectedCluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselections[i]];
+            if (genes.get(s.getChromosome()).getGenes().get(centerGenes[i]).getOrientation().equals(Gene.GeneOrientation.NEGATIVE))
+                minus.add(i);
+            else
+                plus.add(i);
 		}
 		if (minus.size()>plus.size()) {
 			for (Integer i : plus) 
@@ -434,10 +332,10 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			for (Integer i : plus) 
 				if (genomeBrowsers.get(i).isFlipped()) genomeBrowsers.get(i).flip();
 		}
-		for (int i=0;i<positions.length;i++)
-			if (positions[i]!=-1) scrollToPosition(i, 
-					gOcc.getSubsequences()[i][subselections[i]].getChromosome(), 
-					positions[i]);
+		for (int i=0;i<centerGenes.length;i++)
+			if (centerGenes[i]!=-1) scrollToPosition(i,
+					selectedCluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselections[i]].getChromosome(),
+                    centerGenes[i]);
 	}
 	
 	/**
@@ -485,16 +383,16 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		}
 	}
 	
-	private void visualizeCluster(GeneCluster gc, GeneClusterOccurrence gOcc, int[] subselection) {
+	private void visualizeCluster(GeneCluster gc, boolean includeSuboptimalOccs, int[] subselection) {
 		clearHighlight();
 		if (gc.getType()== Parameter.OperationMode.reference)
 			rightPanel.setVisible(true);
 		else
 			rightPanel.setVisible(false);
-		updateButtons(gOcc,subselection);
+		updateButtons(gc.getOccurrences(includeSuboptimalOccs),subselection);
 		for (int i=0;i<subselection.length;i++) {
 			if (subselection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) continue;
-			Subsequence s = gOcc.getSubsequences()[i][subselection[i]];
+			Subsequence s = gc.getOccurrences(includeSuboptimalOccs).getSubsequences()[i][subselection[i]];
 //			if (s==null) continue; // must actually not be the case
 
 
@@ -561,9 +459,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
             // save the currently selected cluster for the filter function
             selectedCluster = e.getSelection();
-
-            // no longer aligned by gene family
-            alignmentGeneFamily = null;
+            centerGenes = null;
 
 			// deactivate the filter if active
 			this.hideNonClusteredGenomes(false);
@@ -573,7 +469,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 				this.hideNonClusteredGenomes(stat);
 			
 			if (e.getSelection()!=null)
-				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.getgOcc(), lastLocationEvent.getsubselection());
+				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.includeSubOptimalOccurrences(), lastLocationEvent.getsubselection());
 		}
 	}
 
@@ -603,8 +499,103 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		return lineLengths;
 	}
 
+    private boolean[] isFlipped() {
+        boolean[] flipped = new boolean[genomeBrowsers.size()];
+        for (int i=0; i<genomeBrowsers.size(); i++)
+            flipped[i] = genomeBrowsers.get(i).isFlipped();
+        return flipped;
+    }
+
 	@Override
 	public boolean isFlipped(int genomeIndex) {
 		return genomeBrowsers.get(genomeIndex).isFlipped();
 	}
+
+    /**
+     * Allows navigation to the different occurrences of one cluster on one genome
+     */
+    private class GBNavigator  extends JPanel implements ActionListener {
+
+        /**
+         * Random generated serialization UID
+         */
+        private static final long serialVersionUID = -1597716317000549154L;
+        private final JButton prev=new JButton("<");
+        private final JButton next=new JButton(">");
+        private final JComponent sizeReference;
+        private final int genome;
+
+        private final ComponentListener componentListener = new ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                GBNavigator.this.invalidate();
+                GBNavigator.this.getParent().doLayout();
+                GBNavigator.this.doLayout();
+            }
+        };
+
+        public JButton getPrev() {
+            return prev;
+        }
+
+        public JButton getNext() {
+            return next;
+        }
+
+        public GBNavigator(JComponent sizeReference, int genome) {
+            this.genome = genome;
+            sizeReference.addComponentListener(componentListener);
+            this.setBackground(Color.WHITE);
+            prev.putClientProperty("JButton.buttonType", "bevel");
+            prev.addActionListener(this);
+            prev.setMargin(new Insets(0,0,0,0));
+            next.putClientProperty("JButton.buttonType", "bevel");
+            next.addActionListener(this);
+            next.setMargin(new Insets(0,0,0,0));
+            this.sizeReference = sizeReference;
+            this.setLayout(new GridLayout(1, 2));
+            this.add(prev);
+            this.add(next);
+        }
+
+        @Override
+        public Dimension getMaximumSize() {
+            return getMinimumSize();
+        }
+
+        @Override
+        public Dimension getMinimumSize() {
+            if (sizeReference!=null) {
+                Dimension d = super.getMinimumSize();
+                return new Dimension((int) d.getWidth(),sizeReference.getHeight());
+            } else
+                return new Dimension(0,0);
+
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            return getMinimumSize();
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource()==next) {
+                int[] subselections = lastLocationEvent.getsubselection();
+                subselections[genome] = subselections[genome] + 1;
+                fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this,
+                        lastLocationEvent.getSelection(),
+                        lastLocationEvent.includeSubOptimalOccurrences(),
+                        subselections));
+            } else if (e.getSource()==prev) {
+                int[] subselections = lastLocationEvent.getsubselection();
+                subselections[genome] = subselections[genome] - 1;
+                fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this,
+                        lastLocationEvent.getSelection(),
+                        lastLocationEvent.includeSubOptimalOccurrences(),
+                        subselections));
+            }
+        }
+
+    }
 }

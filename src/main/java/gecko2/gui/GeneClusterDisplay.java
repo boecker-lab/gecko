@@ -28,7 +28,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 	private final JPanel masterPanel;
 
 	private GeneCluster cluster;
-	private GeneClusterOccurrence gOcc;
+	private boolean includeSubOptimalOccurrences;
     private int[] subselections;
 
     private String maxLengthString;
@@ -104,7 +104,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         geneList = new ArrayList<>();
         genomeIndexInGeneList = new ArrayList<>();
         geneIdAtTablePosition = new HashMap<>();
-        gOcc = null;
+        includeSubOptimalOccurrences = false;
         subselections = null;
         referenceGeneList = new ArrayList<>();
     }
@@ -123,13 +123,13 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
 		if (cluster!=null) {
 			subselections = l.getsubselection();
-            gOcc = l.getgOcc();
+            includeSubOptimalOccurrences = l.includeSubOptimalOccurrences();
 
             this.setGeneData();
 
             for (int i=0; i<subselections.length; i++){
-                if (subselections[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED && gOcc.getSubsequences()[i][subselections[i]].isValid()) {
-                    Subsequence subseq =  gOcc.getSubsequences()[i][subselections[i]];
+                if (subselections[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED && cluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselections[i]].isValid()) {
+                    Subsequence subseq =  cluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselections[i]];
                     subsequences.add(subseq);
                     chromosomes.add(gecko.getGenomes()[i].getChromosomes().get(subseq.getChromosome()));
                     genomeIndexBackmap.put(i, genomeIndexMapping.size());
@@ -158,11 +158,11 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             valTitle.setFont(boldFont);
             masterPanel.add(valTitle);
 
-            JPanel totalDistancePanel = generateGeneralGenomeInformationPanel("Best total distance: " + gOcc.getTotalDist());
+            JPanel totalDistancePanel = generateGeneralGenomeInformationPanel("Best total distance: " + cluster.getOccurrences(includeSubOptimalOccurrences).getTotalDist());
             totalDistancePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             masterPanel.add(totalDistancePanel);
 
-            JPanel bestScorePanel = generateGeneralGenomeInformationPanel("         Best score: " + gOcc.getBestScore());
+            JPanel bestScorePanel = generateGeneralGenomeInformationPanel("         Best score: " + cluster.getOccurrences(includeSubOptimalOccurrences).getBestScore());
             bestScorePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             masterPanel.add(bestScorePanel);
 
@@ -261,7 +261,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
 
     private void setGeneData() {
-        Map<GeneFamily, Gene[]> annotations = cluster.generateAnnotations(gOcc,
+        Map<GeneFamily, Gene[]> annotations = cluster.generateAnnotations(includeSubOptimalOccurrences,
                 subselections);
         setMaxLengthStringWidth(GeneCluster.getMaximumIdLength(annotations));
 
@@ -274,7 +274,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         tableColumnModel.getColumn(0).setPreferredWidth(geneWidth);
         tableColumnModel.getColumn(0).setMaxWidth(geneWidth);
 
-        List<Gene> genes = cluster.getGenes(gOcc, cluster.getRefSeqIndex(), subselections[cluster.getRefSeqIndex()]);
+        List<Gene> genes = cluster.getGenes(includeSubOptimalOccurrences, cluster.getRefSeqIndex(), subselections[cluster.getRefSeqIndex()]);
         for (Gene gene : genes) {
             ReferenceGeneInfo info;
             if (gene.getGeneFamily().isSingleGeneFamily()){

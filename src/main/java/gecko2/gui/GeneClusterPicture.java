@@ -47,8 +47,7 @@ public class GeneClusterPicture {
 	/**
 	 * The selected gene cluster
 	 */
-	private final GeneCluster selectedCluster;
-	private final int[] subselection;
+	private final GeneClusterLocationSelection clusterSelection;
 	
 	/**
 	 * All input genomes from gecko instance
@@ -142,8 +141,8 @@ public class GeneClusterPicture {
 	 */
 	private static final int NR_ADDITIONAL_GENES = 1;
 
-    public GeneClusterPicture(GeneCluster selectedCluster,GenomePainting.NameType nameType, boolean gnames) {
-        this(selectedCluster, selectedCluster.getDefaultSubSelection(false), nameType, gnames);
+    public GeneClusterPicture(GeneCluster selectedCluster, GenomePainting.NameType nameType, boolean gnames) {
+        this(selectedCluster.getDefaultLocationSelection(false), nameType, gnames);
     }
 
 	/**
@@ -151,19 +150,18 @@ public class GeneClusterPicture {
 	 * gNames and geneCode depend on the users choice.
 	 *
      * @param nameType either id, name or locus_tag
-     * @param gnames true if the genome name shall be replace the number
+     * @param gnames true if the genome name shall replace the number
      */
-	public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection, GenomePainting.NameType nameType, boolean gnames) {
+	public GeneClusterPicture(GeneClusterLocationSelection clusterLocation, GenomePainting.NameType nameType, boolean gnames) {
 		this.gecko = GeckoInstance.getInstance();
-		this.selectedCluster = selectedCluster;
-		this.subselection = subselection;
+		this.clusterSelection = clusterLocation;
 		this.genomes = gecko.getGenomes();
 		this.gNames = gnames;
 		this.setNameType(nameType);
 	}
 	
     private int[] getSubselection() {
-        return subselection;
+        return clusterSelection.getSubselection();
     }
 
 	/**
@@ -172,9 +170,9 @@ public class GeneClusterPicture {
 	private void setRefPaintGenom() {		
 		refPaintLength = 0;
 		
-		for (int i = 0; i < this.selectedCluster.getOccurrences()[0].getSubsequences().length; i++) {			
+		for (int i = 0; i < this.clusterSelection.getCluster().getOccurrences(false).getSubsequences().length; i++) {
 			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
-				Subsequence subsequence = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]];
+				Subsequence subsequence = this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]];
 				int size = subsequence.getStop() - subsequence.getStart() + 1;
 				
 				if (size > refPaintLength) {		
@@ -222,17 +220,17 @@ public class GeneClusterPicture {
 		maxSubseqLength = 0;
 		
 		for (int i = 0; i < gecko.getGenomes().length; i++) {	
-			if (this.selectedCluster.getOccurrences()[0].getSubsequences()[i].length > 0) {
+			if (this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i].length > 0) {
                 if (getSubselection()[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
                     continue;
 
 				if (gecko.getGenomes()[i].getName().length() > maxGenomeNameLength)
 					maxGenomeNameLength = (byte) gecko.getGenomes()[i].getName().length();
 
-				if (this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]].isValid()) {
-					int start = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]].getStart();
-					int stop = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]].getStop();
-					int chrom = this.selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]].getChromosome();
+				if (this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]].isValid()) {
+					int start = this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]].getStart();
+					int stop = this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]].getStop();
+					int chrom = this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]].getChromosome();
 					
 					for (int k = start -1; k < stop; k++) {
 						if (stop-start+1 > maxSubseqLength)
@@ -253,7 +251,7 @@ public class GeneClusterPicture {
 	
 	private void resetPageSize() {
 		calcLengths(nameType);
-		this.pageHeight = selectedCluster.getSize() * (this.elemHeight + 2 * this.vgap);
+		this.pageHeight = clusterSelection.getCluster().getSize() * (this.elemHeight + 2 * this.vgap);
 				
 		// we have to set the width here in the constructor it does not work
 		if (this.nameType != GenomePainting.NameType.ID)
@@ -284,7 +282,7 @@ public class GeneClusterPicture {
 		else
 			name = Integer.toString(genomeIndex + 1);
 			
-		boolean refSeq = (this.selectedCluster.getRefSeqIndex() == genomeIndex);
+		boolean refSeq = (this.clusterSelection.getCluster().getRefSeqIndex() == genomeIndex);
 		
 		return GenomePainting.paintGenomeHeader(g, name, refSeq, x, y, this.nameWidth, this.elemHeight);
 	}
@@ -341,7 +339,7 @@ public class GeneClusterPicture {
 		for (int i = 0; i < this.genomes.length; i++) {
 			// if the length is 0 the genome isn't contained in the cluster
 			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
-				Subsequence subsequence = selectedCluster.getOccurrences()[0].getSubsequences()[i][getSubselection()[i]];
+				Subsequence subsequence = clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]];
 				int x = 2;
 				
 				x = paintGenomeHeader(g, i, x, y);

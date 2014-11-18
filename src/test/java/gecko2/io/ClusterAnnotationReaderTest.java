@@ -56,43 +56,40 @@ public class ClusterAnnotationReaderTest {
 				
 				if (comparePValues)
 					assertEqualsBigDecimal(expectedCluster.getBestPValue(), actualCluster.getBestPValue(), 14);
-				
-				for (int i=0; i<actualCluster.getAllOccurrences().length; i++){
-					assertEquals(expectedCluster.getAllOccurrences()[i].getTotalDist(), actualCluster.getAllOccurrences()[i].getTotalDist());
-					Subsequence[][] expSub = expectedCluster.getAllOccurrences()[i].getSubsequences();
-					Subsequence[][] actSub = actualCluster.getAllOccurrences()[i].getSubsequences();
-					
-					assertEquals(expSub.length, actSub.length);
-					for (int j=0; j<actSub.length; j++) {
-						if (expSub[j].length != actSub[j].length)
-							System.out.println("TEST");
-						assertEquals(expSub[j].length, actSub[j].length);
-						for (int k=0; k<actSub[j].length; k++){
-							assertEquals(expSub[j][k].getChromosome(), actSub[j][k].getChromosome());
-							assertEquals(expSub[j][k].getDist(), actSub[j][k].getDist());
-							assertEquals(expSub[j][k].getStart(), actSub[j][k].getStart());
-							assertEquals(expSub[j][k].getStop(), actSub[j][k].getStop());
-							if (comparePValues)
-								assertEqualsBigDecimal(expSub[j][k].getpValue(), actSub[j][k].getpValue(), 14);
-						}
-					}
-				}
-				for (int i=0; i<actualCluster.getOccurrences().length; i++){
-					assertEquals(expectedCluster.getOccurrences()[i].getTotalDist(), actualCluster.getOccurrences()[i].getTotalDist());
-					Subsequence[][] expSub = expectedCluster.getOccurrences()[i].getSubsequences();
-					Subsequence[][] actSub = actualCluster.getOccurrences()[i].getSubsequences();
-					
-					assertEquals(expSub.length, actSub.length);
-					for (int j=0; j<actSub.length; j++) {
-						assertEquals(expSub[j].length, actSub[j].length);
-						for (int k=0; k<actSub[j].length; k++){
-							assertEquals(expSub[j][k].getChromosome(), actSub[j][k].getChromosome());
-							assertEquals(expSub[j][k].getDist(), actSub[j][k].getDist());
-							assertEquals(expSub[j][k].getStart(), actSub[j][k].getStart());
-							assertEquals(expSub[j][k].getStop(), actSub[j][k].getStop());
-						}
-					}
-				}	
+
+                assertEquals(expectedCluster.getOccurrences(true).getTotalDist(), actualCluster.getOccurrences(true).getTotalDist());
+                Subsequence[][] expSub = expectedCluster.getOccurrences(true).getSubsequences();
+                Subsequence[][] actSub = actualCluster.getOccurrences(true).getSubsequences();
+
+                assertEquals(expSub.length, actSub.length);
+                for (int j=0; j<actSub.length; j++) {
+                    if (expSub[j].length != actSub[j].length)
+                        System.out.println("TEST");
+                    assertEquals(expSub[j].length, actSub[j].length);
+                    for (int k=0; k<actSub[j].length; k++){
+                        assertEquals(expSub[j][k].getChromosome(), actSub[j][k].getChromosome());
+                        assertEquals(expSub[j][k].getDist(), actSub[j][k].getDist());
+                        assertEquals(expSub[j][k].getStart(), actSub[j][k].getStart());
+                        assertEquals(expSub[j][k].getStop(), actSub[j][k].getStop());
+                        if (comparePValues)
+                            assertEqualsBigDecimal(expSub[j][k].getpValue(), actSub[j][k].getpValue(), 14);
+                    }
+                }
+
+                assertEquals(expectedCluster.getOccurrences(false).getTotalDist(), actualCluster.getOccurrences(false).getTotalDist());
+                expSub = expectedCluster.getOccurrences(false).getSubsequences();
+                actSub = actualCluster.getOccurrences(false).getSubsequences();
+
+                assertEquals(expSub.length, actSub.length);
+                for (int j=0; j<actSub.length; j++) {
+                    assertEquals(expSub[j].length, actSub[j].length);
+                    for (int k=0; k<actSub[j].length; k++){
+                        assertEquals(expSub[j][k].getChromosome(), actSub[j][k].getChromosome());
+                        assertEquals(expSub[j][k].getDist(), actSub[j][k].getDist());
+                        assertEquals(expSub[j][k].getStart(), actSub[j][k].getStart());
+                        assertEquals(expSub[j][k].getStop(), actSub[j][k].getStop());
+                    }
+                }
 			}
 			assertTrue(String.format("No matching cluster for %s found!", actualCluster.toString()), match);
 		}

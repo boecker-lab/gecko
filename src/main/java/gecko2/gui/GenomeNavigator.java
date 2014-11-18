@@ -195,7 +195,8 @@ public class GenomeNavigator extends JPanel implements DataListener,BrowserConte
 		if ((!(e instanceof LocationSelectionEvent)) || e.getSelection()==null)
 			this.gOcc=null;
 		else {
-			this.gOcc = ((LocationSelectionEvent)e).getgOcc();
+            LocationSelectionEvent ev = (LocationSelectionEvent)e;
+			this.gOcc = ev.getSelection().getOccurrences(ev.includeSubOptimalOccurrences());
 		}
 		repaint();				
 	}

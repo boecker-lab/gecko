@@ -3,6 +3,7 @@ package gecko2.datastructures;
 import gecko2.GeckoInstance;
 import gecko2.algo.DeltaLocation;
 import gecko2.algo.ReferenceCluster;
+import gecko2.gui.GeneClusterLocationSelection;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -27,15 +28,15 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	private final BigDecimal bestPValue;
 	private final BigDecimal bestPValueCorrected;
 	private int minTotalDist;
-	private final GeneClusterOccurrence[] bestOccurrences;
-	private final GeneClusterOccurrence[] allOccurrences;
+	private final GeneClusterOccurrence bestOccurrences;
+	private final GeneClusterOccurrence allOccurrences;
 	private final Parameter.OperationMode type;
 	// The index of the subsequence containing the reference genecluster
 	private final int refSeqIndex;
 
 	public GeneCluster(int id, 
-			GeneClusterOccurrence[] bestOccurrences, 
-			GeneClusterOccurrence[] allOccurrences,
+			GeneClusterOccurrence bestOccurrences,
+			GeneClusterOccurrence allOccurrences,
             Set<GeneFamily> geneFamilies,
             BigDecimal bestPValue,
 			BigDecimal bestPValueCorrected,
@@ -46,8 +47,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		match=true;
 		//TODO check if this right
 		size=0;
-		if (allOccurrences!=null && allOccurrences.length!=0)
-			for (Subsequence[] subSeqs : allOccurrences[0].getSubsequences())
+		if (allOccurrences!=null)
+			for (Subsequence[] subSeqs : allOccurrences.getSubsequences())
 				if (subSeqs.length>0) size++;
 
 		this.bestPValue = bestPValue;
@@ -101,19 +102,17 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             bestSubseqs[i]=bestSub.toArray(new Subsequence[bestSub.size()]);
             allSubseqs[i]=allSub.toArray(new Subsequence[allSub.size()]);
         }
-        this.bestOccurrences = new GeneClusterOccurrence[1];
-        this.bestOccurrences[0] = new GeneClusterOccurrence(0, bestSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
-        this.allOccurrences = new GeneClusterOccurrence[1];
-        this.allOccurrences[0] = new GeneClusterOccurrence(0, allSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
+        this.bestOccurrences = new GeneClusterOccurrence(0, bestSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
+        this.allOccurrences = new GeneClusterOccurrence(0, allSubseqs, refCluster.getBestCombined_pValue(), minTotalDist, refCluster.getCoveredGenomes());
     }
 	
 	public Parameter.OperationMode getType() {
 		return type;
 	}
-	
-	public GeneClusterOccurrence[] getAllOccurrences() {
-		return allOccurrences;
-	}
+
+    public GeneClusterOccurrence getOccurrences(boolean includeSubOptimalOccurrences){
+        return includeSubOptimalOccurrences ? allOccurrences : bestOccurrences;
+    }
 	
 	public BigDecimal getBestPValue() {
 		return bestPValue;
@@ -165,23 +164,17 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 		return refSeqIndex;
 	}
 	
-	public GeneClusterOccurrence[] getOccurrences() {
-		return bestOccurrences;
-	}
-	
 	public int getMinRefSeqLength() {
 		if (refSeqIndex < 0)
 			return -1;
 		int minLength = Integer.MAX_VALUE;
-		for (GeneClusterOccurrence occ : bestOccurrences){
-			if (refSeqIndex >= occ.getSubsequences().length)
-				return -1;
-			Subsequence[] refSeqs = occ.getSubsequences()[refSeqIndex];
-			for (Subsequence seq : refSeqs){
-				if (seq.getDist() == 0)
-					minLength = Math.min(minLength, (seq.getStop() - seq.getStart()) + 1);
-			}
-		}
+        if (refSeqIndex >= bestOccurrences.getSubsequences().length)
+            return -1;
+        Subsequence[] refSeqs = bestOccurrences.getSubsequences()[refSeqIndex];
+        for (Subsequence seq : refSeqs){
+            if (seq.getDist() == 0)
+                minLength = Math.min(minLength, (seq.getStop() - seq.getStart()) + 1);
+        }
 		if (minLength == Integer.MAX_VALUE)
 			return -1;
 		return minLength;
@@ -193,12 +186,10 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 */
 	public int getMaxPWDist(){
 		int maxPWDist = -1;
-		for (GeneClusterOccurrence occ : allOccurrences){
-			for (Subsequence[] refSeqs : occ.getSubsequences())
-				for (Subsequence seq : refSeqs){
-					maxPWDist = Math.max(maxPWDist, seq.getDist());
-				}
-		}
+        for (Subsequence[] refSeqs : allOccurrences.getSubsequences())
+            for (Subsequence seq : refSeqs){
+                maxPWDist = Math.max(maxPWDist, seq.getDist());
+            }
 		return maxPWDist;
 	}
 	
@@ -208,16 +199,14 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 */
 	public int getMinPWDist(){
 		int minPWDist = minTotalDist;
-		for (GeneClusterOccurrence occ : allOccurrences){
-			for (int i=0; i<occ.getSubsequences().length; i++){
-				if (i == refSeqIndex)
-					continue;
-				Subsequence[] refSeqs = occ.getSubsequences()[i];
-				for (Subsequence seq : refSeqs){
-					minPWDist = Math.min(minPWDist, seq.getDist());
-				}
-			}
-		}
+        for (int i=0; i<allOccurrences.getSubsequences().length; i++){
+            if (i == refSeqIndex)
+                continue;
+            Subsequence[] refSeqs = allOccurrences.getSubsequences()[i];
+            for (Subsequence seq : refSeqs){
+                minPWDist = Math.min(minPWDist, seq.getDist());
+            }
+        }
 		return minPWDist;
 	}
 	
@@ -227,27 +216,25 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 */
 	public double getAvgPWDist(){
 		double avgDist = minTotalDist;
-		for (GeneClusterOccurrence occ : allOccurrences){
-			int avgPVDist = 0;
-			int seqs = 0;
-			
-			for (int i=0; i<occ.getSubsequences().length; i++){
-				if (i == refSeqIndex)
-					continue;
-				Subsequence[] refSeqs = occ.getSubsequences()[i];
-				int minDist = 0;
-				if (refSeqs.length != 0){
-					minDist = minTotalDist;
-					for (Subsequence seq : refSeqs){
-						minDist = Math.min(minDist, seq.getDist());
-					}
-					seqs++;
-				}
-				avgPVDist += minDist;
-				
-			}
-			avgDist = Math.min(avgDist, (double)avgPVDist/seqs);
-		}
+        int avgPVDist = 0;
+        int seqs = 0;
+
+        for (int i=0; i<allOccurrences.getSubsequences().length; i++){
+            if (i == refSeqIndex)
+                continue;
+            Subsequence[] refSeqs = allOccurrences.getSubsequences()[i];
+            int minDist = 0;
+            if (refSeqs.length != 0){
+                minDist = minTotalDist;
+                for (Subsequence seq : refSeqs){
+                    minDist = Math.min(minDist, seq.getDist());
+                }
+                seqs++;
+            }
+            avgPVDist += minDist;
+
+        }
+        avgDist = Math.min(avgDist, (double)avgPVDist/seqs);
 		
 		return avgDist;
 	}
@@ -292,12 +279,10 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
      * @return
      */
     public boolean hasNoOccurrenceInGenomes(Set<Integer> genomes){
-        for (GeneClusterOccurrence occ : getAllOccurrences()) {
-            for (Integer genomeIndex : genomes) {
-                for (int i = 0; i < occ.getSubsequences()[genomeIndex].length; i++) {
-                    if (occ.getSubsequences()[genomeIndex][i].isValid()) {
-                        return false;
-                    }
+        for (Integer genomeIndex : genomes) {
+            for (int i = 0; i < allOccurrences.getSubsequences()[genomeIndex].length; i++) {
+                if (allOccurrences.getSubsequences()[genomeIndex][i].isValid()) {
+                    return false;
                 }
             }
         }
@@ -312,11 +297,9 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
     public boolean hasOccurrenceInAllGenomes(Set<Integer> genomes){
         for (Integer genomeIndex : genomes) {
             boolean hasOccurrence = false;
-            for (GeneClusterOccurrence occ : getAllOccurrences()) {
-                for (int i = 0; i < occ.getSubsequences()[genomeIndex].length; i++) {
-                    if (occ.getSubsequences()[genomeIndex][i].isValid()) {
-                        hasOccurrence = true;
-                    }
+            for (int i = 0; i < allOccurrences.getSubsequences()[genomeIndex].length; i++) {
+                if (allOccurrences.getSubsequences()[genomeIndex][i].isValid()) {
+                    hasOccurrence = true;
                 }
             }
             if (!hasOccurrence)
@@ -329,20 +312,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * Generates a @link GeneClusterOutput object, that contains all information about the gene cluster.
 	 * @return a GeneClusterOutput object
 	 */
-	public GeneClusterOutput generateGeneClusterOutput() {
-		return generateGeneClusterOutput(true);
-	}
-	
-	/**
-	 * Generates a @link GeneClusterOutput object, that contains all information about the gene cluster.
-	 * @return a GeneClusterOutput object
-	 */
-	public GeneClusterOutput generateGeneClusterOutput(boolean onlyBestOccs) {
-		GeneClusterOccurrence occ;
-		if (onlyBestOccs)
-			occ = this.getOccurrences()[0];
-		else
-			occ = this.getAllOccurrences()[0];
+	public GeneClusterOutput generateGeneClusterOutput(boolean includeSubOptimalOccurrences) {
+		GeneClusterOccurrence occ = getOccurrences(includeSubOptimalOccurrences);
 		
 		GeneClusterOutput.Builder builder = new GeneClusterOutput.Builder(occ.getSubsequences().length, this.id);
 		builder.pValue(this.getBestPValue());
@@ -387,7 +358,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 			}
 		}
 		builder.chromosomes(chromosomes);
-		Map<GeneFamily, Gene[][]> annotations = generateAnnotations(occ);
+		Map<GeneFamily, Gene[][]> annotations = generateAnnotations(includeSubOptimalOccurrences);
 		
 		Map<GeneFamily, Gene[][]> newAnnotations = new HashMap<>();
 		for (Map.Entry<GeneFamily, Gene[][]> entry : annotations.entrySet())
@@ -502,10 +473,8 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	
 	private int getNumberOfIntervals() {
 		int numberOfIntervals = 0;
-		for (GeneClusterOccurrence occ : allOccurrences) {
-			for (Subsequence[] subseqs : occ.getSubsequences())
-				numberOfIntervals += subseqs.length;
-		}
+        for (Subsequence[] subseqs : allOccurrences.getSubsequences())
+            numberOfIntervals += subseqs.length;
 		return numberOfIntervals;
 	}
 	
@@ -515,13 +484,13 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	}
 
     public int getNoOfGenesInRefOcc() {
-        Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
+        Subsequence seq = bestOccurrences.getSubsequences()[getRefSeqIndex()][0];
 
         return seq.getStop() - seq.getStart() + 1;
     }
 
     public boolean invalidMultiGeneFamilyGeneCluster(int minClusterSize, Genome[] genomes) {
-        Subsequence seq = bestOccurrences[0].getSubsequences()[getRefSeqIndex()][0];
+        Subsequence seq = bestOccurrences.getSubsequences()[getRefSeqIndex()][0];
         Genome genome = genomes[getRefSeqIndex()];
 
         Set<GeneFamily> nonMergedGeneFamilies = getNonMergedGeneFamilies(seq, genome);
@@ -612,20 +581,44 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return geneFamilies;
     }
 
+    public GeneClusterLocationSelection getDefaultLocationSelection(boolean includeSubOptimalOccurrences){
+        int[] subSelection = getDefaultSubSelection(includeSubOptimalOccurrences);
+        GeneFamily geneFamily = getBestConservedGeneFamily();
+        int[] centerGenes = getGeneFamilyPositions(geneFamily, subSelection, includeSubOptimalOccurrences);
+        return null;
+    }
+
+    private GeneFamily getBestConservedGeneFamily() {
+        return null;
+    }
+
+    public int[] getGeneFamilyPositions(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences){
+        GeneClusterOccurrence gOcc = getOccurrences(includeSubOptimalOccurrences);
+        int[] centerGenes = new int[gOcc.getSubsequences().length];
+        Arrays.fill(centerGenes, -1);
+        for (int i=0; i<centerGenes.length;i++) {
+            // If genome i is not in the cluster, skip
+            if (subSelection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                continue;
+            List<Chromosome> genes = GeckoInstance.getInstance().getGenomes()[i].getChromosomes();
+            Subsequence s = gOcc.getSubsequences()[i][subSelection[i]];
+            for (int j=s.getStart()-1;j<s.getStop();j++) {
+                if (genes.get(s.getChromosome()).getGenes().get(j).getGeneFamily().equals(geneFamily)) {
+                    centerGenes[i] = j;
+                    break;
+                }
+            }
+        }
+        return centerGenes;
+    }
+
     /**
      * Generates the default/initial sub-selection of cluster occurrences.
      * @param includeSubOptimalOccurrences if sub-optimal occurrences should also be included
      * @return an int[] with the index of each cluster occurrence that shall be used.
      */
     public int[] getDefaultSubSelection(boolean includeSubOptimalOccurrences) {
-        GeneClusterOccurrence gOcc;
-
-        if (includeSubOptimalOccurrences) {
-            gOcc = getAllOccurrences()[0];
-        }
-        else {
-            gOcc = getOccurrences()[0];
-        }
+        GeneClusterOccurrence gOcc = getOccurrences(includeSubOptimalOccurrences);
 
         int[] subselections = new int[GeckoInstance.getInstance().getGenomes().length];
 
@@ -646,37 +639,34 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 	 * @return if they are similar
 	 */
 	private boolean isSimilar(GeneCluster other) {
-		for (int i=0; i < this.bestOccurrences.length; i++) {
-			boolean similar = false;
-			boolean possibleSimilarOcc = true;
-			if (this.bestOccurrences[i] == null || other.bestOccurrences[i] == null)
-				continue;
-			for (int genome=0; genome < this.bestOccurrences[i].getSubsequences().length; genome++) {
-				Subsequence[] subsequences = this.bestOccurrences[i].getSubsequences()[genome];
-				Subsequence[] otherSubsequences = other.bestOccurrences[i].getSubsequences()[genome];
-				if ((subsequences.length == 0) ^ (otherSubsequences.length == 0)) {
-					//possibleSimilarOcc = false;
-					//break; //TODO not sure what is better!
-					continue;
-				}
-				for (Subsequence seq : subsequences) {
-					for (Subsequence oSeq : otherSubsequences) {
-						if (seq.getChromosome() == oSeq.getChromosome()) {
-							if (seq.getStart() >= oSeq.getStart() && seq.getStart() <= oSeq.getStop())
-								similar = true;
-							if (seq.getStop() > oSeq.getStart() && seq.getStop() < oSeq.getStop())
-								similar = true;
-							if (oSeq.getStart() >= seq.getStart() && oSeq.getStart() <= seq.getStop())
-								similar = true;
-							if (oSeq.getStop() > seq.getStart() && oSeq.getStop() < seq.getStop())
-								similar = true;
-						}
-					}
-				}
-			}
-			return (similar && possibleSimilarOcc);
-		}
-		return false;
+        boolean similar = false;
+        boolean possibleSimilarOcc = true;
+        if (this.bestOccurrences == null || other.bestOccurrences == null)
+            return false;
+        for (int genome=0; genome < this.bestOccurrences.getSubsequences().length; genome++) {
+            Subsequence[] subsequences = this.bestOccurrences.getSubsequences()[genome];
+            Subsequence[] otherSubsequences = other.bestOccurrences.getSubsequences()[genome];
+            if ((subsequences.length == 0) ^ (otherSubsequences.length == 0)) {
+                //possibleSimilarOcc = false;
+                //break; //TODO not sure what is better!
+                continue;
+            }
+            for (Subsequence seq : subsequences) {
+                for (Subsequence oSeq : otherSubsequences) {
+                    if (seq.getChromosome() == oSeq.getChromosome()) {
+                        if (seq.getStart() >= oSeq.getStart() && seq.getStart() <= oSeq.getStop())
+                            similar = true;
+                        if (seq.getStop() > oSeq.getStart() && seq.getStop() < oSeq.getStop())
+                            similar = true;
+                        if (oSeq.getStart() >= seq.getStart() && oSeq.getStart() <= seq.getStop())
+                            similar = true;
+                        if (oSeq.getStop() > seq.getStart() && oSeq.getStop() < seq.getStop())
+                            similar = true;
+                    }
+                }
+            }
+        }
+        return (similar && possibleSimilarOcc);
 	}
 	
 	public static List<GeneCluster> mergeResults(List<GeneCluster> oldResults, List<GeneCluster> additionalResults) {
@@ -759,14 +749,14 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
     /**
      * Returns the gene of the given occ, in the given genome and the given subselection.
-     * @param occ
+     * @param includeSubOptimalOccurrences
      * @param genomeIndex
      * @param subselection
      * @return
      */
-    public List<Gene> getGenes(GeneClusterOccurrence occ, int genomeIndex, int subselection){
+    public List<Gene> getGenes(boolean includeSubOptimalOccurrences, int genomeIndex, int subselection){
         List<Gene> genes = new ArrayList<>();
-        Subsequence seq = occ.getSubsequences()[genomeIndex][subselection];
+        Subsequence seq = getOccurrences(includeSubOptimalOccurrences).getSubsequences()[genomeIndex][subselection];
         Genome genome = GeckoInstance.getInstance().getGenomes()[genomeIndex];
         for (int index = seq.getStart()-1; index < seq.getStop(); index++){
             genes.add(genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index));
@@ -775,7 +765,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
     }
 
     public String getGenomeString() {
-        Subsequence[][] seqs = bestOccurrences[0].getSubsequences();
+        Subsequence[][] seqs = bestOccurrences.getSubsequences();
         Genome[] genomes = GeckoInstance.getInstance().getGenomes();
         StringBuilder builder = new StringBuilder();
         for (int i=0; i<seqs.length; i++) {
@@ -794,9 +784,9 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
     }
 
     public String getGeneNames(int genome_index) {
-        if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
+        if (bestOccurrences.getSubsequences()[genome_index].length == 0)
             return noOCC;
-        Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
+        Subsequence seq = bestOccurrences.getSubsequences()[genome_index][0];
         Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
 
         SortedMap<String, List<String>> nameMap = new TreeMap<>();
@@ -837,10 +827,10 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
     }
 
     public String getLocusTags(int genome_index){
-        if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
+        if (bestOccurrences.getSubsequences()[genome_index].length == 0)
             return noOCC;
 
-        Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
+        Subsequence seq = bestOccurrences.getSubsequences()[genome_index][0];
         Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
 
         StringBuilder builder = new StringBuilder();
@@ -863,7 +853,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
      * @return
      */
     public List<String> getGeneConservation(int genome_index, boolean allOccurrences) {
-        GeneClusterOccurrence occ = allOccurrences ? this.allOccurrences[0] : bestOccurrences[0];
+        GeneClusterOccurrence occ = getOccurrences(allOccurrences);
         List<String> results = new ArrayList<>(occ.getSubsequences()[genome_index].length);
 
         for (Subsequence seq : occ.getSubsequences()[genome_index]){
@@ -889,10 +879,10 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
     }
 
     public String getGeneOrientations(int genome_index) {
-        if (bestOccurrences[0].getSubsequences()[genome_index].length == 0)
+        if (bestOccurrences.getSubsequences()[genome_index].length == 0)
             return noOCC;
 
-        Subsequence seq = bestOccurrences[0].getSubsequences()[genome_index][0];
+        Subsequence seq = bestOccurrences.getSubsequences()[genome_index][0];
         Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
 
         StringBuilder builder = new StringBuilder();
@@ -927,10 +917,10 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
      * a gene with that id does not occur in the subsequence (that is refered by the GeneCluster)
      * of that genome.
      */
-    public Map<GeneFamily, Gene[]> generateAnnotations(GeneClusterOccurrence gOcc, int[] subselection) {
+    public Map<GeneFamily, Gene[]> generateAnnotations(boolean includeSubOptimalOccurrences, int[] subselection) {
         GeckoInstance instance = GeckoInstance.getInstance();
 
-        Subsequence[][] subsequences = gOcc.getSubsequences();
+        Subsequence[][] subsequences = getOccurrences(includeSubOptimalOccurrences).getSubsequences();
         HashMap<GeneFamily, Gene[]> map = new HashMap<>();
         for (GeneFamily gene : geneFamilies) {
             if (!gene.isSingleGeneFamily())
@@ -963,9 +953,9 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return maxIdLength;
     }
 
-    public Map<GeneFamily, Gene[][]> generateAnnotations(GeneClusterOccurrence gOcc) {
+    public Map<GeneFamily, Gene[][]> generateAnnotations(boolean includeSubOptimalOccurrences) {
         GeckoInstance instance = GeckoInstance.getInstance();
-        Subsequence[][] subsequences = gOcc.getSubsequences();
+        Subsequence[][] subsequences = getOccurrences(includeSubOptimalOccurrences).getSubsequences();
         HashMap<GeneFamily, Gene[][]> map = new HashMap<>();
         for (GeneFamily geneFamily : geneFamilies) {
             if (!geneFamily.isSingleGeneFamily()) {

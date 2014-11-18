@@ -97,20 +97,18 @@ public class DataSetWriter{
             out.newLine();
             out.write(cluster.getGeneFamilyString());
             out.newLine();
-            for (GeneClusterOccurrence occ : cluster.getAllOccurrences()) {
-                out.write(OCC_START);
-                out.newLine();
-                out.write(occ.getId() + SEPERATOR + occ.getBestpValue() + SEPERATOR + occ.getSupport() + SEPERATOR + occ.getTotalDist());
-                out.newLine();
-                for (int i=0; i<occ.getSubsequences().length; i++) {
-                    for (Subsequence sub : occ.getSubsequences()[i]){
-                        out.write(i + SEPERATOR + sub.getChromosome() + SEPERATOR + sub.getDist() + SEPERATOR + sub.getStart() + SEPERATOR + sub.getStop() + SEPERATOR + sub.getpValue());
-                        out.newLine();
-                    }
+            out.write(OCC_START);
+            out.newLine();
+            out.write(cluster.getOccurrences(true).getId() + SEPERATOR + cluster.getOccurrences(true).getBestpValue() + SEPERATOR + cluster.getOccurrences(true).getSupport() + SEPERATOR + cluster.getOccurrences(true).getTotalDist());
+            out.newLine();
+            for (int i=0; i<cluster.getOccurrences(true).getSubsequences().length; i++) {
+                for (Subsequence sub : cluster.getOccurrences(true).getSubsequences()[i]){
+                    out.write(i + SEPERATOR + sub.getChromosome() + SEPERATOR + sub.getDist() + SEPERATOR + sub.getStart() + SEPERATOR + sub.getStop() + SEPERATOR + sub.getpValue());
+                    out.newLine();
                 }
-                out.write(OCC_END);
-                out.newLine();
             }
+            out.write(OCC_END);
+            out.newLine();
             out.write(CLUSTER_END);
             out.newLine();
         }

@@ -78,14 +78,6 @@ public class Gui {
 		mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		mainframe.setPreferredSize(startDimension);
 		mainframe.setLayout(new BorderLayout());
-		
-		// The Splitpane that contains the two selectors (GeneClusterSelector
-		// and OccurrenceSelector)
-		JSplitPane selectorSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		selectorSplitPane.setTopComponent(this.gcSelector);
-		OccurrenceSelector occurrenceSelector = new OccurrenceSelector();
-		selectorSplitPane.setBottomComponent(occurrenceSelector);
-		this.gcSelector.addSelectionListener(occurrenceSelector);
 				
 		// SplitPane arrangements
 		// splits the gui in the vertical half
@@ -95,7 +87,7 @@ public class Gui {
 		// splits the gui in horizontal half
         JSplitPane vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		vertSplit.setResizeWeight(0.5);
-		vertSplit.setTopComponent(selectorSplitPane);
+		vertSplit.setTopComponent(this.gcSelector);
 		
 		vertSplit.setBottomComponent(gcDisplay);
 
@@ -121,7 +113,6 @@ public class Gui {
 		gecko.addDataListener(navigator);
 		
 		mgb.addBrowserContentListener(navigator);
-		occurrenceSelector.addSelectionListener(mgb);
 		
 		JScrollPane navigatorScroll = new JScrollPane(navigator);
 		
@@ -277,11 +268,9 @@ public class Gui {
 
 		
 		// Listener stuff
-		occurrenceSelector.addSelectionListener(gcDisplay);
 		gcSelector.addSelectionListener(gcDisplay);
 		gcSelector.addSelectionListener(navigator);
 		gcSelector.addSelectionListener(mgb);
-		occurrenceSelector.addSelectionListener(navigator);
 		mgb.addSelectionListener(gcDisplay);
 
 		

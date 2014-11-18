@@ -83,13 +83,14 @@ public class GeneClusterExportDialog extends JDialog {
 	 * The preview area on the gui
 	 */
 	private final Preview prev;
-	
-	/**
-	 * Constructor sets the elements of the dialog.
-	 *
-	 * @param parent the parent frame
-	 */
-	public GeneClusterExportDialog (final Frame parent, GeneCluster cluster, int[] subselection, GeneFamily alignmentGeneFamily) {
+
+    /**
+     * Constructor sets the elements of the dialog.
+     *
+     * @param parent the parent frame
+     * @param clusterSelection the cluster selection
+     */
+	public GeneClusterExportDialog (final Frame parent, GeneClusterLocationSelection clusterSelection) {
 
 		// Setup the dialog window
 		super(parent,"Export gene cluster");
@@ -346,7 +347,7 @@ public class GeneClusterExportDialog extends JDialog {
 		this.add(mainPanel1, BorderLayout.WEST); 
 		
 		// create a scrollPanel with the cluster image
-		clusterPics = new GeneClusterPicture(cluster, subselection, (NameType)geneNamingComboBox.getSelectedItem(), useGenomeNamesCheckBox.isSelected());
+		clusterPics = new GeneClusterPicture(clusterSelection, (NameType)geneNamingComboBox.getSelectedItem(), useGenomeNamesCheckBox.isSelected());
 		prev = new Preview(clusterPics.createImage());
 		JScrollPane previewScroll = new JScrollPane(prev);
 		previewScroll.setEnabled(true);

@@ -16,24 +16,24 @@ public class LocationSelectionEvent extends ClusterSelectionEvent {
 	private static final long serialVersionUID = -7045332477999665994L;
 	
 	private final int[] subselection;
-	private final GeneClusterOccurrence gOcc;
+	private final boolean includeSubOptimalOccurrences;
 	
-	public LocationSelectionEvent(Object source, GeneCluster gc, GeneClusterOccurrence gOcc, int[] subselection, boolean instant) {
+	public LocationSelectionEvent(Object source, GeneCluster gc, boolean includeSubOptimalOccurrences, int[] subselection, boolean instant) {
 		super(source, gc, instant);
-		this.gOcc = gOcc;
+		this.includeSubOptimalOccurrences = includeSubOptimalOccurrences;
 		this.subselection = subselection;
 	}
 	
-	public LocationSelectionEvent(Object source, GeneCluster gc, GeneClusterOccurrence gOcc, int[] subselection) {
-		this(source,gc,gOcc,subselection,false);
+	public LocationSelectionEvent(Object source, GeneCluster gc, boolean includeSubOptimalOccurrences, int[] subselection) {
+		this(source,gc,includeSubOptimalOccurrences,subselection,false);
 	}
 	
 	public int[] getsubselection() {
 		return subselection;
 	}
 	
-	public GeneClusterOccurrence getgOcc() {
-		return gOcc;
+	public boolean includeSubOptimalOccurrences() {
+		return includeSubOptimalOccurrences;
 	}
 
 }

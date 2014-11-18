@@ -192,9 +192,13 @@ public class GckFileReader implements GeckoDataReader {
                     builder.readGenes(reader);
                     break;
                 case DataSetWriter.OCC_START:
+                    if (genomes == null || genomes.length<0)
+                        throw new ParseException("No genomes read before cluster occ!", 0);
                     if (builder == null)
                         throw new ParseException("Not in cluster at occ start!", 0);
-                    builder.addOcc(readOcc(reader));
+                    if (builder.allOccs != null || builder.bestOccs != null)
+                        throw new ParseException("Multiple cluster occs not supported!", 0);
+                    builder.readOcc(reader, genomes.length);
                     break;
                 case DataSetWriter.CLUSTER_END:
                     if (builder == null)
@@ -222,8 +226,8 @@ public class GckFileReader implements GeckoDataReader {
         final BigDecimal pValue;
         final BigDecimal pValueCorr;
         Set<GeneFamily> genes;
-        List<GeneClusterOccurrence> bestOccList;
-        List<GeneClusterOccurrence> allOccList;
+        GeneClusterOccurrence bestOccs;
+        GeneClusterOccurrence allOccs;
         private final Map<String, GeneFamily> geneFamilyMap;
         private final GeneFamily unknownGeneFamily;
 
@@ -244,7 +248,7 @@ public class GckFileReader implements GeckoDataReader {
             this.unknownGeneFamily = unknownGeneFamily;
         }
 
-        void readGenes(BufferedReader reader) throws IOException, ParseException {
+        private void readGenes(BufferedReader reader) throws IOException, ParseException {
             String line = reader.readLine().trim();
             String[] genes = line.substring(1, line.length()-1).split(",");
             this.genes = new HashSet<>();
@@ -262,14 +266,62 @@ public class GckFileReader implements GeckoDataReader {
             }
         }
 
+        private void readOcc(BufferedReader reader, int numberOfGenomes) throws IOException, ParseException {
+            boolean continueReading = true;
+            int id;
+            BigDecimal pValue;
+            int totalDist;
+            int support;
+
+            String line = reader.readLine().trim();
+            String[] occInfo = line.split(DataSetWriter.SEPERATOR);
+            if (occInfo.length != 4)
+                throw new ParseException("Maleformed line: " + line, 0);
+
+            id = Integer.parseInt(occInfo[0]);
+            pValue = new BigDecimal(occInfo[1]);
+            support = Integer.parseInt(occInfo[2]);
+            totalDist = Integer.parseInt(occInfo[3]);
+
+            int[] numberOfSubseq = new int[numberOfGenomes];
+
+            List<Subsequence> subsequenceList = new ArrayList<>();
+
+            while(continueReading) {
+                line = reader.readLine().trim();
+                if (line.equals(DataSetWriter.OCC_END))
+                    continueReading = false;
+                else {
+                    String[] sline = line.split(DataSetWriter.SEPERATOR);
+                    if (sline.length != 6)
+                        throw new ParseException("Maleformed line: " + line, 0);
+                    subsequenceList.add(new Subsequence(Integer.parseInt(sline[3]), Integer.parseInt(sline[4]), Integer.parseInt(sline[1]), Integer.parseInt(sline[2]), new BigDecimal(sline[5])));
+                    numberOfSubseq[Integer.parseInt(sline[0])]++;
+                }
+            }
+
+            Subsequence[][] subsequences = new Subsequence[numberOfGenomes][];
+
+            int listIndex = 0;
+            for (int i=0; i<subsequences.length; i++) {
+                subsequences[i] = new Subsequence[numberOfSubseq[i]];
+                for (int j=0; j<subsequences[i].length; j++) {
+                    subsequences[i][j] = subsequenceList.get(listIndex);
+                    listIndex++;
+                }
+            }
+            allOccs = new GeneClusterOccurrence(id, subsequences, pValue, totalDist, support);
+            bestOccs = allOccs.getBestOccurrence();
+        }
+
         GeneCluster build() throws ParseException{
             if (genes == null)
                 throw new ParseException("Missing genes when trying to complete cluster!", 0);
-            if (allOccList == null || bestOccList == null)
+            if (allOccs == null || bestOccs == null)
                 throw new ParseException("Missing occs when trying to complete cluster!", 0);
             return new GeneCluster(id,
-                    bestOccList.toArray(new GeneClusterOccurrence[bestOccList.size()]),
-                    allOccList.toArray(new GeneClusterOccurrence[allOccList.size()]),
+                    bestOccs,
+                    allOccs,
                     genes,
                     pValue,
                     pValueCorr,
@@ -277,62 +329,6 @@ public class GckFileReader implements GeckoDataReader {
                     refSeqIndex,
                     mode);
         }
-
-        void addOcc(GeneClusterOccurrence occ) {
-            if (allOccList == null) {
-                allOccList = new ArrayList<>();
-                bestOccList = new ArrayList<>();
-            }
-            allOccList.add(occ);
-            bestOccList.add(occ.getBestOccurrence());
-        }
-    }
-
-    private GeneClusterOccurrence readOcc(BufferedReader reader) throws IOException, ParseException {
-        boolean continueReading = true;
-        int id;
-        BigDecimal pValue;
-        int totalDist;
-        int support;
-
-        String line = reader.readLine().trim();
-        String[] occInfo = line.split(DataSetWriter.SEPERATOR);
-        if (occInfo.length != 4)
-            throw new ParseException("Maleformed line: " + line, 0);
-
-        id = Integer.parseInt(occInfo[0]);
-        pValue = new BigDecimal(occInfo[1]);
-        support = Integer.parseInt(occInfo[2]);
-        totalDist = Integer.parseInt(occInfo[3]);
-
-        int[] numberOfSubseq = new int[genomes.length];
-
-        List<Subsequence> subsequenceList = new ArrayList<>();
-
-        while(continueReading) {
-            line = reader.readLine().trim();
-            if (line.equals(DataSetWriter.OCC_END))
-                continueReading = false;
-            else {
-                String[] sline = line.split(DataSetWriter.SEPERATOR);
-                if (sline.length != 6)
-                    throw new ParseException("Maleformed line: " + line, 0);
-                subsequenceList.add(new Subsequence(Integer.parseInt(sline[3]), Integer.parseInt(sline[4]), Integer.parseInt(sline[1]), Integer.parseInt(sline[2]), new BigDecimal(sline[5])));
-                numberOfSubseq[Integer.parseInt(sline[0])]++;
-            }
-        }
-
-        Subsequence[][] subsequences = new Subsequence[genomes.length][];
-
-        int listIndex = 0;
-        for (int i=0; i<subsequences.length; i++) {
-            subsequences[i] = new Subsequence[numberOfSubseq[i]];
-            for (int j=0; j<subsequences[i].length; j++) {
-                subsequences[i][j] = subsequenceList.get(listIndex);
-                listIndex++;
-            }
-        }
-        return new GeneClusterOccurrence(id, subsequences, pValue, totalDist, support);
     }
 
     /**

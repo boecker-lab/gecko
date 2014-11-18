@@ -208,19 +208,8 @@ public class GeneClusterTestUtils {
 		assertEquals(expected.getMinTotalDist(), actual.getMinTotalDist());
 		assertEquals(expected.getType(), actual.getType());
 		assertEquals(expected.getRefSeqIndex(), actual.getRefSeqIndex());
-		
-		assertEquals(expected.getOccurrences().length, actual.getOccurrences().length);
-		
-		for(int i = 0; i < actual.getOccurrences().length; i++)
-		{
-			compareOccurrence(expected.getOccurrences()[i], actual.getOccurrences()[i], pValueComp);
-		}		
-		
-		assertEquals(expected.getAllOccurrences().length, actual.getAllOccurrences().length);
-		for(int i = 0; i < actual.getAllOccurrences().length; i++)
-		{
-			compareOccurrence(expected.getAllOccurrences()[i], actual.getAllOccurrences()[i], pValueComp);
-		}
+        compareOccurrence(expected.getOccurrences(false), actual.getOccurrences(false), pValueComp);
+		compareOccurrence(expected.getOccurrences(true), actual.getOccurrences(true), pValueComp);
 	}
 
     /**

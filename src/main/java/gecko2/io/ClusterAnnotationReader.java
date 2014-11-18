@@ -164,8 +164,8 @@ public class ClusterAnnotationReader {
 
         int minTotalDistance;
         Set<GeneFamily> genes;
-        GeneClusterOccurrence[] bestOccs;
-        GeneClusterOccurrence[] allOccs;
+        GeneClusterOccurrence bestOccs;
+        GeneClusterOccurrence allOccs;
 
         public GeneClusterBuilder(int id, BigDecimal pValue, BigDecimal pValueCorr, int refSeqIndex, DataSet data, Map<Integer, Integer> genomeIndexMap) throws ParseException{
             this.id = id;
@@ -235,8 +235,8 @@ public class ClusterAnnotationReader {
                     minTotalDistance += minDistance;
                 }
             }
-            allOccs = new GeneClusterOccurrence[]{new GeneClusterOccurrence(0, allSeqs, pValue, minTotalDistance, support)};
-            bestOccs = new GeneClusterOccurrence[]{new GeneClusterOccurrence(0, bestSeqs, pValue, minTotalDistance, support)};
+            allOccs = new GeneClusterOccurrence(0, allSeqs, pValue, minTotalDistance, support);
+            bestOccs = new GeneClusterOccurrence(0, bestSeqs, pValue, minTotalDistance, support);
         }
 
         GeneCluster build() throws ParseException {
