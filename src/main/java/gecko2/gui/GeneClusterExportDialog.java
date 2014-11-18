@@ -3,6 +3,7 @@ package gecko2.gui;
 import com.lowagie.text.DocumentException;
 import gecko2.GeckoInstance;
 import gecko2.datastructures.GeneCluster;
+import gecko2.datastructures.GeneFamily;
 import gecko2.gui.GenomePainting.NameType;
 import gecko2.io.GeneClusterToPDFWriter;
 import gecko2.util.FileUtils;
@@ -88,7 +89,7 @@ public class GeneClusterExportDialog extends JDialog {
 	 *
 	 * @param parent the parent frame
 	 */
-	public GeneClusterExportDialog (final Frame parent, GeneCluster cluster, int[] subselection) {
+	public GeneClusterExportDialog (final Frame parent, GeneCluster cluster, int[] subselection, GeneFamily alignmentGeneFamily) {
 
 		// Setup the dialog window
 		super(parent,"Export gene cluster");
@@ -345,7 +346,7 @@ public class GeneClusterExportDialog extends JDialog {
 		this.add(mainPanel1, BorderLayout.WEST); 
 		
 		// create a scrollPanel with the cluster image
-		clusterPics = new GeneClusterPicture(cluster, subselection);
+		clusterPics = new GeneClusterPicture(cluster, subselection, (NameType)geneNamingComboBox.getSelectedItem(), useGenomeNamesCheckBox.isSelected());
 		prev = new Preview(clusterPics.createImage());
 		JScrollPane previewScroll = new JScrollPane(prev);
 		previewScroll.setEnabled(true);

@@ -142,19 +142,8 @@ public class GeneClusterPicture {
 	 */
 	private static final int NR_ADDITIONAL_GENES = 1;
 
-    public GeneClusterPicture(GeneCluster selectedCluster) {
-        this(selectedCluster, selectedCluster.getDefaultSubSelection(false));
-    }
-
     public GeneClusterPicture(GeneCluster selectedCluster,GenomePainting.NameType nameType, boolean gnames) {
         this(selectedCluster, selectedCluster.getDefaultSubSelection(false), nameType, gnames);
-    }
-
-    /**
-     * Default constructor which sets all important global variable.
-     */
-    public GeneClusterPicture(GeneCluster selectedCluster, int[] subselection) {
-        this(selectedCluster, subselection, GenomePainting.NameType.ID, false);
     }
 
 	/**

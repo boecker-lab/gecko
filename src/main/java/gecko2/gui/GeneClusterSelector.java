@@ -257,7 +257,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
                 GeneCluster gc = gcs.get(0);
 				if (mgb.getSelectedCluster() == null || !gc.equals(mgb.getSelectedCluster()))
 					fireSelectionEvent(true);
-				GeneClusterExportDialog d = new GeneClusterExportDialog(GeckoInstance.getInstance().getGui().getMainframe(), mgb.getSelectedCluster(), mgb.getSubselection());
+				GeneClusterExportDialog d = new GeneClusterExportDialog(GeckoInstance.getInstance().getGui().getMainframe(), mgb.getSelectedCluster(), mgb.getSubselection(), mgb.getAlignmentGeneFamily());
 				d.setVisible(true);
 			}
 		});

@@ -43,6 +43,8 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 */
 	private GeneCluster selectedCluster = null;
 
+    private GeneFamily alignmentGeneFamily = null;
+
     /**
      * What name is shown for each gene
      */
@@ -128,8 +130,13 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		}
 		filterNonContainedGenomes = filter;
 	}
-	
-	@Override
+
+    @Override
+    public GeneFamily getAlignmentGeneFamily() {
+        return alignmentGeneFamily;
+    }
+
+    @Override
 	public int getScrollValue(int genomeIndex) {
 		return genomeBrowsers.get(genomeIndex).getScrollValue();
 	}
@@ -391,6 +398,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
 	@Override
 	public void centerCurrentClusterAt(GeneFamily geneFamily) {
+        alignmentGeneFamily         = geneFamily;
         int[] subselections 		= lastLocationEvent.getsubselection();
 		GeneClusterOccurrence gOcc 	= lastLocationEvent.getgOcc();
 		
@@ -405,7 +413,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			List<Chromosome> genes = gecko.getGenomes()[i].getChromosomes();
 			Subsequence s = gOcc.getSubsequences()[i][subselections[i]];
 			for (int j=s.getStart()-1;j<s.getStop();j++) {
-				if (genes.get(s.getChromosome()).getGenes().get(j).getGeneFamily().equals(geneFamily)) {
+				if (genes.get(s.getChromosome()).getGenes().get(j).getGeneFamily().equals(alignmentGeneFamily)) {
 					positions[i] = j;
 					if (genes.get(s.getChromosome()).getGenes().get(j).getOrientation().equals(Gene.GeneOrientation.NEGATIVE))
 						minus.add(i);
@@ -426,7 +434,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			for (Integer i : plus) 
 				if (genomeBrowsers.get(i).isFlipped()) genomeBrowsers.get(i).flip();
 		}
-		for (int i=0;i<positions.length;i++) //TODO REFIX THIS
+		for (int i=0;i<positions.length;i++)
 			if (positions[i]!=-1) scrollToPosition(i, 
 					gOcc.getSubsequences()[i][subselections[i]].getChromosome(), 
 					positions[i]);
@@ -553,6 +561,9 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
             // save the currently selected cluster for the filter function
             selectedCluster = e.getSelection();
+
+            // no longer aligned by gene family
+            alignmentGeneFamily = null;
 
 			// deactivate the filter if active
 			this.hideNonClusteredGenomes(false);
