@@ -62,22 +62,11 @@ public class GeneClusterPicture {
 	private boolean gNames = false;
 
     private GenomePainting.NameType nameType = null;
-	
-	/**
-	 * Stores the current data from GeckoInstance.
-	 */
-	private final GeckoInstance gecko;
-	
-	/**
-	 * Stores the number of the genome with the longest cluster. This is needed to calculate
-	 * the centering of the other genomes.
-	 */
-	private int refPaintGenome;
-	
-	/**
-	 * Stores the length of the longest cluster.
-	 */
-	private int refPaintLength;
+
+    /**
+     * The maximum number of genes in any subSequence
+     */
+    private int maxSubseqLength;
 
 	/**
 	 * Default height of the gene elements
@@ -119,11 +108,6 @@ public class GeneClusterPicture {
 	 */
 	private int maxGenomeNameLength;
 	
-	/**
-	 * The maximum number of genes in any subsequence
-	 */
-	private int maxSubseqLength;
-	
 	private int nameWidth;
 	
 	/**
@@ -139,7 +123,7 @@ public class GeneClusterPicture {
 	/**
 	 * The number of additional genes that is shown on each side of the longest cluster occurrence.
 	 */
-	private static final int NR_ADDITIONAL_GENES = 1;
+	private static final int NR_ADDITIONAL_GENES = 0;
 
     public GeneClusterPicture(GeneCluster selectedCluster, GenomePainting.NameType nameType, boolean gnames) {
         this(selectedCluster.getDefaultLocationSelection(false), nameType, gnames);
@@ -153,9 +137,8 @@ public class GeneClusterPicture {
      * @param gnames true if the genome name shall replace the number
      */
 	public GeneClusterPicture(GeneClusterLocationSelection clusterLocation, GenomePainting.NameType nameType, boolean gnames) {
-		this.gecko = GeckoInstance.getInstance();
 		this.clusterSelection = clusterLocation;
-		this.genomes = gecko.getGenomes();
+		this.genomes = GeckoInstance.getInstance().getGenomes();
 		this.gNames = gnames;
 		this.setNameType(nameType);
 	}
@@ -163,25 +146,6 @@ public class GeneClusterPicture {
     private int[] getSubselection() {
         return clusterSelection.getSubselection();
     }
-
-	/**
-	 * This method find the genome with the longest sequence in the cluster.
-	 */
-	private void setRefPaintGenom() {		
-		refPaintLength = 0;
-		
-		for (int i = 0; i < this.clusterSelection.getSubsequenceLength(); i++) {
-			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
-				Subsequence subsequence = this.clusterSelection.getSubsequence(i);
-				int size = subsequence.getStop() - subsequence.getStart() + 1;
-				
-				if (size > refPaintLength) {		
-					refPaintLength = size;
-					refPaintGenome = i;
-				}				
-			}
-		}
-	}
 	
 	/**
 	 * Setter for the variable gNames. Recreates the images.
@@ -217,7 +181,7 @@ public class GeneClusterPicture {
 	private void calcLengths(GenomePainting.NameType nameType) {
 		maxGeneCodeLength = 0;
 		maxGenomeNameLength = 0;
-		maxSubseqLength = 0;
+		maxSubseqLength = clusterSelection.getMaxClusterLocationWidth();
 		
 		for (int i = 0; i < clusterSelection.getSubsequenceLength(); i++) {
             if (getSubselection()[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
@@ -229,9 +193,6 @@ public class GeneClusterPicture {
             Subsequence subSequence = clusterSelection.getSubsequence(i);
             if (subSequence.isValid()){
                 for (int k = subSequence.getStart() - 1; k < subSequence.getStop(); k++){
-                    if (subSequence.getStop()-subSequence.getStart()+1 > maxSubseqLength)
-                        maxSubseqLength = subSequence.getStop()-subSequence.getStart()+1;
-
                     Gene gene = genomes[i].getChromosomes().get(subSequence.getChromosome()).getGenes().get(k);
                     if (nameType == GenomePainting.NameType.NAME)
                         if (gene.getName().length() > maxGeneCodeLength)
@@ -252,7 +213,7 @@ public class GeneClusterPicture {
 		if (this.nameType != GenomePainting.NameType.ID)
 			this.elemWidth = this.maxGeneCodeLength * 8 + 8;
 		else 	
-			this.elemWidth = gecko.getMaxLength(GenomePainting.NameType.ID) * 7 + 12;
+			this.elemWidth = GeckoInstance.getInstance().getMaxLength(GenomePainting.NameType.ID) * 7 + 12;
 		
 		if (gNames)
 			this.nameWidth = 7 * maxGenomeNameLength + 4;
@@ -263,10 +224,6 @@ public class GeneClusterPicture {
 	}
 	
 	public void paint(Graphics g){
-		this.setRefPaintGenom();
-		// half cluster sequence + 1 if number of genes in the sequence is no straight
-		boolean refEven = refPaintLength % 2 == 0;
-
 		int y = 2;
 		
 		// create a white background
@@ -277,38 +234,7 @@ public class GeneClusterPicture {
 		for (int i = 0; i < clusterSelection.getSubsequenceLength(); i++) {
 			// if the length is 0 the genome isn't contained in the cluster
 			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
-				Subsequence subsequence = clusterSelection.getSubsequence(i);
-				int x = 2;
-				
-				x = paintGenomeHeader(g, i, x, y);
-				
-				// determine start setOff if not in refPaintGenome
-				int setOff = NR_ADDITIONAL_GENES;
-				if (this.refPaintGenome != i) {
-					int seqLength = subsequence.getStop() - subsequence.getStart() + 1;
-					if (refEven)
-						setOff = NR_ADDITIONAL_GENES + refPaintLength/2 - (seqLength/2 + seqLength%2);
-					else
-						setOff = NR_ADDITIONAL_GENES + refPaintLength/2 - seqLength/2;
-				}
-				
-				int geneIndex = subsequence.getStart() - 1 - setOff; // Paint setOff many additional genes (or gaps) that are not part of the cluster
-				
-				for (int paintIndex = 0; paintIndex < refPaintLength + 2 * NR_ADDITIONAL_GENES; paintIndex++) {
-					if (geneIndex < -1)  // first gene is at index 0
-						x += elemWidth + 2 * hgap;
-					else if (geneIndex == -1)
-						x = paintChromosomeStart(g, x, y);
-					else if (geneIndex >= genomes[i].getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
-						x = paintChromosomeEnd(g, x, y);
-						break;
-					} else {
-						boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop(); 
-						x = paintGene(g, this.genomes[i].getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), partOfCluster, x, y);
-					}
-					geneIndex++;
-				}
-				
+                paintGenome(g, i, y);
 				// move to the next line
 				y = y + elemHeight + 2 * vgap;
 			}
@@ -363,6 +289,33 @@ public class GeneClusterPicture {
 	public int getPageHeight() {
 		return pageHeight;
 	}
+
+    private void paintGenome(Graphics g, int genomeIndex, int y){
+        Subsequence subsequence = clusterSelection.getSubsequence(genomeIndex);
+        int x = 2;
+
+        x = paintGenomeHeader(g, genomeIndex, x, y);
+
+        // determine start setOff if not in refPaintGenome
+        int setOff = NR_ADDITIONAL_GENES + clusterSelection.getGeneOffset(genomeIndex);
+
+        int geneIndex = subsequence.getStart() - 1 - setOff; // Paint setOff many additional genes (or gaps) that are not part of the cluster
+
+        for (int paintIndex = 0; paintIndex < maxSubseqLength + 2 * NR_ADDITIONAL_GENES; paintIndex++) {
+            if (geneIndex < -1)  // first gene is at index 0
+                x += elemWidth + 2 * hgap;
+            else if (geneIndex == -1)
+                x = paintChromosomeStart(g, x, y);
+            else if (geneIndex >= genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
+                paintChromosomeEnd(g, x, y);
+                break;
+            } else {
+                boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
+                x = paintGene(g, this.genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), partOfCluster, x, y);
+            }
+            geneIndex++;
+        }
+    }
 
     /**
      * Paints the header of the genome. If gNames is set, paints the name, otherwise paints the number.

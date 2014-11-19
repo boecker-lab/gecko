@@ -45,7 +45,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
     /**
      * The genes from the current subselection the cluster is aligned to
      */
-    private int[] centerGenes = null;
+    private int[] alignmentGenes = null;
 
     /**
      * What name is shown for each gene
@@ -128,7 +128,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
     @Override
     public GeneClusterLocationSelection getClusterSelection() {
-        return new GeneClusterLocationSelection(selectedCluster, getSubselection(), lastLocationEvent.includeSubOptimalOccurrences(), isFlipped(), centerGenes);
+        return new GeneClusterLocationSelection(selectedCluster, getSubselection(), lastLocationEvent.includeSubOptimalOccurrences(), isFlipped(), alignmentGenes);
     }
 
     @Override
@@ -306,16 +306,17 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
         int[] subselections = lastLocationEvent.getsubselection();
 		boolean includeSubOptimalOccurrences = lastLocationEvent.includeSubOptimalOccurrences();
 
-		centerGenes = selectedCluster.getGeneFamilyPositions(geneFamily, subselections, includeSubOptimalOccurrences);
+		int[] alignmentGenesGlobal = selectedCluster.getGeneFamilyChromosomePositions(geneFamily, subselections, includeSubOptimalOccurrences);
+        alignmentGenes = selectedCluster.getGeneFamilyClusterPositions(geneFamily, subselections, includeSubOptimalOccurrences);
         ArrayList<Integer> minus = new ArrayList<>();
 		ArrayList<Integer> plus = new ArrayList<>();
-		for (int i=0; i<centerGenes.length;i++) {
+		for (int i=0; i< alignmentGenesGlobal.length;i++) {
 			// If genome i is not in the cluster, skip
-			if (centerGenes[i] == -1)
+			if (alignmentGenesGlobal[i] == -1)
 				continue;
 			List<Chromosome> genes = gecko.getGenomes()[i].getChromosomes();
 			Subsequence s = selectedCluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselections[i]];
-            if (genes.get(s.getChromosome()).getGenes().get(centerGenes[i]).getOrientation().equals(Gene.GeneOrientation.NEGATIVE))
+            if (genes.get(s.getChromosome()).getGenes().get(alignmentGenesGlobal[i]).getOrientation().equals(Gene.GeneOrientation.NEGATIVE))
                 minus.add(i);
             else
                 plus.add(i);
@@ -331,10 +332,10 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			for (Integer i : plus) 
 				if (genomeBrowsers.get(i).isFlipped()) genomeBrowsers.get(i).flip();
 		}
-		for (int i=0;i<centerGenes.length;i++)
-			if (centerGenes[i]!=-1) scrollToPosition(i,
+		for (int i=0;i< alignmentGenesGlobal.length;i++)
+			if (alignmentGenesGlobal[i]!=-1) scrollToPosition(i,
 					selectedCluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselections[i]].getChromosome(),
-                    centerGenes[i]);
+                    alignmentGenesGlobal[i]);
 	}
 	
 	/**
@@ -458,7 +459,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
             // save the currently selected cluster for the filter function
             selectedCluster = e.getSelection();
-            centerGenes = null;
+            alignmentGenes = null;
 
 			// deactivate the filter if active
 			this.hideNonClusteredGenomes(false);

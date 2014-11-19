@@ -584,7 +584,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
     public GeneClusterLocationSelection getDefaultLocationSelection(boolean includeSubOptimalOccurrences){
         int[] subSelection = getDefaultSubSelection(includeSubOptimalOccurrences);
         GeneFamily geneFamily = getBestConservedGeneFamily();
-        int[] centerGenes = getGeneFamilyPositions(geneFamily, subSelection, includeSubOptimalOccurrences);
+        int[] centerGenes = getGeneFamilyChromosomePositions(geneFamily, subSelection, includeSubOptimalOccurrences);
         return null;
     }
 
@@ -592,7 +592,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return null;
     }
 
-    public int[] getGeneFamilyPositions(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences){
+    public int[] getGeneFamilyChromosomePositions(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences){
         GeneClusterOccurrence gOcc = getOccurrences(includeSubOptimalOccurrences);
         int[] centerGenes = new int[gOcc.getSubsequences().length];
         Arrays.fill(centerGenes, -1);
@@ -605,6 +605,27 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             for (int j=s.getStart()-1;j<s.getStop();j++) {
                 if (genes.get(s.getChromosome()).getGenes().get(j).getGeneFamily().equals(geneFamily)) {
                     centerGenes[i] = j;
+                    break;
+                }
+            }
+        }
+        return centerGenes;
+    }
+
+    public int[] getGeneFamilyClusterPositions(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences) {
+        GeneClusterOccurrence gOcc = getOccurrences(includeSubOptimalOccurrences);
+        int[] centerGenes = new int[gOcc.getSubsequences().length];
+        Arrays.fill(centerGenes, -1);
+        for (int i=0; i<centerGenes.length;i++) {
+            // If genome i is not in the cluster, skip
+            if (subSelection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                continue;
+            List<Chromosome> genes = GeckoInstance.getInstance().getGenomes()[i].getChromosomes();
+            Subsequence s = gOcc.getSubsequences()[i][subSelection[i]];
+            int localPosition = 0;
+            for (int j=s.getStart()-1;j<s.getStop();j++, localPosition++) {
+                if (genes.get(s.getChromosome()).getGenes().get(j).getGeneFamily().equals(geneFamily)) {
+                    centerGenes[i] = localPosition;
                     break;
                 }
             }

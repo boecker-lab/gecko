@@ -12,14 +12,21 @@ public class GeneClusterLocationSelection {
     private final int[] subselection;
     private final boolean includeSubOptimalOccurrences;
     private final boolean[] flipped;
-    private final int[] centerGene;
+    private final int[] alignmentGene;
 
-    public GeneClusterLocationSelection(GeneCluster cluster, int[] subselection, boolean includeSubOptimalOccurrences, boolean[] flipped, int[] centerGene) {
+    private int refPaintGenome;
+    private int paintWidth;
+    private int leftPaintWidth;
+    private int[] paintOffset;
+
+    public GeneClusterLocationSelection(GeneCluster cluster, int[] subselection, boolean includeSubOptimalOccurrences, boolean[] flipped, int[] alignmentGene) {
         this.cluster = cluster;
         this.subselection = subselection;
         this.includeSubOptimalOccurrences = includeSubOptimalOccurrences;
         this.flipped = flipped;
-        this.centerGene = centerGene;
+        this.alignmentGene = alignmentGene;
+        this.refPaintGenome = -1;
+        this.paintWidth = -1;
     }
 
     public GeneCluster getCluster() {
@@ -38,8 +45,8 @@ public class GeneClusterLocationSelection {
         return flipped;
     }
 
-    public int[] getCenterGene() {
-        return centerGene;
+    public int[] getAlignmentGene() {
+        return alignmentGene;
     }
 
     public Subsequence getSubsequence(int i){
@@ -50,5 +57,76 @@ public class GeneClusterLocationSelection {
 
     public int getSubsequenceLength() {
         return cluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences().length;
+    }
+
+    private void computePaintWidths(){
+        if (alignmentGene == null) {
+            paintWidth = 0;
+            for (int i = 0; i < getSubsequenceLength(); i++) {
+                if (subselection[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                    continue;
+                Subsequence subSequence = getSubsequence(i);
+                int newWidth = subSequence.getStop() - subSequence.getStart() + 1;
+                if (newWidth > paintWidth) {
+                    paintWidth = newWidth;
+                    refPaintGenome = i;
+                }
+            }
+        } else {
+            leftPaintWidth = 0;
+            int rigthWidth = 0;
+            for (int i=0; i < getSubsequenceLength(); i++) {
+                if (subselection[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                    continue;
+                Subsequence subSequence = getSubsequence(i);
+                int width = subSequence.getStop() - subSequence.getStart() + 1;
+                if (alignmentGene[i] != -1) {
+                    leftPaintWidth = Math.max(alignmentGene[i], leftPaintWidth);
+                    rigthWidth = Math.max(width - alignmentGene[i], rigthWidth);
+                } else {
+                    paintWidth = Math.max(width, paintWidth);
+
+                }
+            }
+            leftPaintWidth = Math.max(leftPaintWidth, paintWidth/2);
+            paintWidth = Math.max(leftPaintWidth + rigthWidth, paintWidth);
+        }
+    }
+
+    private void computePaintOffsets() {
+        if (paintWidth < 0)
+            computePaintWidths();
+        paintOffset = new int[getSubsequenceLength()];
+        for (int i = 0; i < getSubsequenceLength(); i++) {
+            if (subselection[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                continue;
+            if (alignmentGene == null || alignmentGene[i] == -1) {
+                Subsequence subSequence = getSubsequence(i);
+                int seqLength = subSequence.getStop() - subSequence.getStart() + 1;
+                // half cluster sequence + 1 if number of genes in the sequence is no straight
+                if (paintWidth % 2 == 0)
+                    paintOffset[i] = paintWidth/2 - (seqLength/2 + seqLength%2);
+                else
+                    paintOffset[i] = paintWidth/2 - seqLength/2;
+            } else {
+                paintOffset[i] = leftPaintWidth-alignmentGene[i];
+            }
+        }
+    }
+
+    /**
+     * Gives the width (number of genes) of the cluster location, taking into account the gene alignment
+     * @return
+     */
+    public int getMaxClusterLocationWidth(){
+        if (paintWidth < 0)
+            computePaintWidths();
+        return paintWidth;
+    }
+
+    public int getGeneOffset(int genomeIndex) {
+        if (paintOffset == null)
+            computePaintOffsets();
+        return paintOffset[genomeIndex];
     }
 }
