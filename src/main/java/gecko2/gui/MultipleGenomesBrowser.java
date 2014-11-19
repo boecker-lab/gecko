@@ -128,7 +128,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
     @Override
     public GeneClusterLocationSelection getClusterSelection() {
-        return new GeneClusterLocationSelection(selectedCluster, getSubselection(), isFlipped(), centerGenes);
+        return new GeneClusterLocationSelection(selectedCluster, getSubselection(), lastLocationEvent.includeSubOptimalOccurrences(), isFlipped(), centerGenes);
     }
 
     @Override

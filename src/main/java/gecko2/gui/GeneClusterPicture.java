@@ -170,9 +170,9 @@ public class GeneClusterPicture {
 	private void setRefPaintGenom() {		
 		refPaintLength = 0;
 		
-		for (int i = 0; i < this.clusterSelection.getCluster().getOccurrences(false).getSubsequences().length; i++) {
+		for (int i = 0; i < this.clusterSelection.getSubsequenceLength(); i++) {
 			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
-				Subsequence subsequence = this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]];
+				Subsequence subsequence = this.clusterSelection.getSubsequence(i);
 				int size = subsequence.getStop() - subsequence.getStart() + 1;
 				
 				if (size > refPaintLength) {		
@@ -219,32 +219,27 @@ public class GeneClusterPicture {
 		maxGenomeNameLength = 0;
 		maxSubseqLength = 0;
 		
-		for (int i = 0; i < gecko.getGenomes().length; i++) {	
-			if (this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i].length > 0) {
-                if (getSubselection()[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
-                    continue;
+		for (int i = 0; i < clusterSelection.getSubsequenceLength(); i++) {
+            if (getSubselection()[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                continue;
 
-				if (gecko.getGenomes()[i].getName().length() > maxGenomeNameLength)
-					maxGenomeNameLength = (byte) gecko.getGenomes()[i].getName().length();
+            if (genomes[i].getName().length() > maxGenomeNameLength)
+                maxGenomeNameLength = (byte) genomes[i].getName().length();
 
-				if (this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]].isValid()) {
-					int start = this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]].getStart();
-					int stop = this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]].getStop();
-					int chrom = this.clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]].getChromosome();
-					
-					for (int k = start -1; k < stop; k++) {
-						if (stop-start+1 > maxSubseqLength)
-							maxSubseqLength = stop - start + 1;
-						
-						Gene gene = gecko.getGenomes()[i].getChromosomes().get(chrom).getGenes().get(k);
-						if (nameType == GenomePainting.NameType.NAME)
-							if (gene.getName().length() > maxGeneCodeLength)
-								maxGeneCodeLength = gene.getName().length();
-						if (nameType == GenomePainting.NameType.LOCUS_TAG)
-							if (gene.getTag().length() > maxGeneCodeLength)
-								maxGeneCodeLength = gene.getTag().length();
-					}
-				}
+            Subsequence subSequence = clusterSelection.getSubsequence(i);
+            if (subSequence.isValid()){
+                for (int k = subSequence.getStart() - 1; k < subSequence.getStop(); k++){
+                    if (subSequence.getStop()-subSequence.getStart()+1 > maxSubseqLength)
+                        maxSubseqLength = subSequence.getStop()-subSequence.getStart()+1;
+
+                    Gene gene = genomes[i].getChromosomes().get(subSequence.getChromosome()).getGenes().get(k);
+                    if (nameType == GenomePainting.NameType.NAME)
+                        if (gene.getName().length() > maxGeneCodeLength)
+                            maxGeneCodeLength = gene.getName().length();
+                    if (nameType == GenomePainting.NameType.LOCUS_TAG)
+                        if (gene.getTag().length() > maxGeneCodeLength)
+                            maxGeneCodeLength = gene.getTag().length();
+                }
 			}
 		}
 	}
@@ -262,66 +257,9 @@ public class GeneClusterPicture {
 		if (gNames)
 			this.nameWidth = 7 * maxGenomeNameLength + 4;
 		else
-			this.nameWidth = 7 * Integer.toString(this.gecko.getGenomes().length).length() + 4;
+			this.nameWidth = 7 * Integer.toString(genomes.length).length() + 4;
 		
 		this.pageWidth = 2 + this.nameWidth + 2 + 16 + 10 + (maxSubseqLength + 2 * NR_ADDITIONAL_GENES) *(elemWidth + hgap + 8) + 2;
-	}
-	
-	/**
-	 * Paints the header of the genome. If gNames is set, paints the name, otherwise paints the number. 
-	 * @param g the Graphics
-	 * @param genomeIndex the index of the genomes
-	 * @param x the x coordinate the painting starts at
-	 * @param y the y coordinate of the painting
-	 * @return the x coordinate after the painting
-	 */
-	private int paintGenomeHeader(Graphics g, int genomeIndex, int x, int y){
-		String name;
-		if (this.gNames) 
-			name = this.genomes[genomeIndex].getName();
-		else
-			name = Integer.toString(genomeIndex + 1);
-			
-		boolean refSeq = (this.clusterSelection.getCluster().getRefSeqIndex() == genomeIndex);
-		
-		return GenomePainting.paintGenomeHeader(g, name, refSeq, x, y, this.nameWidth, this.elemHeight);
-	}
-	
-	/**
-	 * Paints the beginning symbol |--
-	 * @param g the Graphics
-	 * @param x the x coordinate
-	 * @param y the y coordinate
-	 * @return the x coordinate after the painting
-	 */
-	private int paintChromosomeStart(Graphics g, int x, int y)  {
-		return GenomePainting.paintChromosomeStart(g, x, y, elemWidth, elemHeight, hgap);
-	}
-	
-	/**
-	 * Paints the end symbol --|
-	 * @param g the Graphics
-	 * @param x the x coordinate
-	 * @param y the y coordinate
-	 * @return the x coordinate after the painting
-	 */
-	private int paintChromosomeEnd(Graphics g, int x, int y) {
-		return GenomePainting.paintChromosomeEnd(g, x, y, elemWidth, elemHeight, hgap);
-	} 
-	
-	/**
-	 * Paints one gene
-	 * @param g the Graphics
-	 * @param gene the gene
-	 * @param partOfCluster if the gene is part of the cluster and gets an orange background
-	 * @param x the x coordinate
-	 * @param y the y coordinate
-	 * @return the new x coordinate behind the gene
-	 */
-	private int paintGene(Graphics g, Gene gene, boolean partOfCluster, int x, int y) {
-		Color currentColor = getColor(gene.getGeneFamily());
-		
-		return GenomePainting.paintGene(g, gene, false, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
 	}
 	
 	public void paint(Graphics g){
@@ -336,10 +274,10 @@ public class GeneClusterPicture {
 		g.fillRect(0, 0, this.pageWidth, this.pageHeight);
 		g.setFont(new Font("Monospaced", Font.PLAIN, 10));
 		
-		for (int i = 0; i < this.genomes.length; i++) {
+		for (int i = 0; i < clusterSelection.getSubsequenceLength(); i++) {
 			// if the length is 0 the genome isn't contained in the cluster
 			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
-				Subsequence subsequence = clusterSelection.getCluster().getOccurrences(false).getSubsequences()[i][getSubselection()[i]];
+				Subsequence subsequence = clusterSelection.getSubsequence(i);
 				int x = 2;
 				
 				x = paintGenomeHeader(g, i, x, y);
@@ -361,7 +299,7 @@ public class GeneClusterPicture {
 						x += elemWidth + 2 * hgap;
 					else if (geneIndex == -1)
 						x = paintChromosomeStart(g, x, y);
-					else if (geneIndex >= this.gecko.getGenomes()[i].getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
+					else if (geneIndex >= genomes[i].getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
 						x = paintChromosomeEnd(g, x, y);
 						break;
 					} else {
@@ -425,4 +363,61 @@ public class GeneClusterPicture {
 	public int getPageHeight() {
 		return pageHeight;
 	}
+
+    /**
+     * Paints the header of the genome. If gNames is set, paints the name, otherwise paints the number.
+     * @param g the Graphics
+     * @param genomeIndex the index of the genomes
+     * @param x the x coordinate the painting starts at
+     * @param y the y coordinate of the painting
+     * @return the x coordinate after the painting
+     */
+    private int paintGenomeHeader(Graphics g, int genomeIndex, int x, int y){
+        String name;
+        if (this.gNames)
+            name = this.genomes[genomeIndex].getName();
+        else
+            name = Integer.toString(genomeIndex + 1);
+
+        boolean refSeq = (this.clusterSelection.getCluster().getRefSeqIndex() == genomeIndex);
+
+        return GenomePainting.paintGenomeHeader(g, name, refSeq, x, y, this.nameWidth, this.elemHeight);
+    }
+
+    /**
+     * Paints the beginning symbol |--
+     * @param g the Graphics
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @return the x coordinate after the painting
+     */
+    private int paintChromosomeStart(Graphics g, int x, int y)  {
+        return GenomePainting.paintChromosomeStart(g, x, y, elemWidth, elemHeight, hgap);
+    }
+
+    /**
+     * Paints the end symbol --|
+     * @param g the Graphics
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @return the x coordinate after the painting
+     */
+    private int paintChromosomeEnd(Graphics g, int x, int y) {
+        return GenomePainting.paintChromosomeEnd(g, x, y, elemWidth, elemHeight, hgap);
+    }
+
+    /**
+     * Paints one gene
+     * @param g the Graphics
+     * @param gene the gene
+     * @param partOfCluster if the gene is part of the cluster and gets an orange background
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @return the new x coordinate behind the gene
+     */
+    private int paintGene(Graphics g, Gene gene, boolean partOfCluster, int x, int y) {
+        Color currentColor = getColor(gene.getGeneFamily());
+
+        return GenomePainting.paintGene(g, gene, false, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
+    }
 }
