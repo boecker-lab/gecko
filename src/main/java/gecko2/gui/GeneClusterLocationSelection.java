@@ -37,16 +37,8 @@ public class GeneClusterLocationSelection {
         return subselection;
     }
 
-    public boolean isIncludeSubOptimalOccurrences() {
-        return includeSubOptimalOccurrences;
-    }
-
-    public boolean[] isFlipped() {
-        return flipped;
-    }
-
-    public int[] getAlignmentGene() {
-        return alignmentGene;
+    public boolean isFlipped(int genomeIndex) {
+        return flipped[genomeIndex];
     }
 
     public Subsequence getSubsequence(int i){
@@ -81,11 +73,15 @@ public class GeneClusterLocationSelection {
                 Subsequence subSequence = getSubsequence(i);
                 int width = subSequence.getStop() - subSequence.getStart() + 1;
                 if (alignmentGene[i] != -1) {
-                    leftPaintWidth = Math.max(alignmentGene[i], leftPaintWidth);
-                    rigthWidth = Math.max(width - alignmentGene[i], rigthWidth);
+                    if (isFlipped(i)) {
+                        leftPaintWidth = Math.max(width - alignmentGene[i], leftPaintWidth);
+                        rigthWidth = Math.max(alignmentGene[i], rigthWidth);
+                    } else {
+                        leftPaintWidth = Math.max(alignmentGene[i], leftPaintWidth);
+                        rigthWidth = Math.max(width - alignmentGene[i], rigthWidth);
+                    }
                 } else {
                     paintWidth = Math.max(width, paintWidth);
-
                 }
             }
             leftPaintWidth = Math.max(leftPaintWidth, paintWidth/2);
@@ -100,16 +96,19 @@ public class GeneClusterLocationSelection {
         for (int i = 0; i < getSubsequenceLength(); i++) {
             if (subselection[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
                 continue;
+            Subsequence subSequence = getSubsequence(i);
+            int seqLength = subSequence.getStop() - subSequence.getStart() + 1;
             if (alignmentGene == null || alignmentGene[i] == -1) {
-                Subsequence subSequence = getSubsequence(i);
-                int seqLength = subSequence.getStop() - subSequence.getStart() + 1;
                 // half cluster sequence + 1 if number of genes in the sequence is no straight
                 if (paintWidth % 2 == 0)
                     paintOffset[i] = paintWidth/2 - (seqLength/2 + seqLength%2);
                 else
                     paintOffset[i] = paintWidth/2 - seqLength/2;
             } else {
-                paintOffset[i] = leftPaintWidth-alignmentGene[i];
+                if (isFlipped(i))
+                    paintOffset[i] = leftPaintWidth-(seqLength-alignmentGene[i]);
+                else
+                    paintOffset[i] = leftPaintWidth-alignmentGene[i];
             }
         }
     }

@@ -23,7 +23,6 @@ public class GeneClusterPicture {
 	 * Color array for the gene elements to prevent not nice looking colors.
 	 */
 	private final Color[] geneColors = {
-		
 		new Color(0xEEEEEE), // Shiny silver
 		new Color(0xFFFF88), // Interactive action yellow
 		new Color(0xCDEB8B), // Qoop Mint
@@ -299,21 +298,42 @@ public class GeneClusterPicture {
         // determine start setOff if not in refPaintGenome
         int setOff = NR_ADDITIONAL_GENES + clusterSelection.getGeneOffset(genomeIndex);
 
-        int geneIndex = subsequence.getStart() - 1 - setOff; // Paint setOff many additional genes (or gaps) that are not part of the cluster
+        int geneIndex;
+        if (clusterSelection.isFlipped(genomeIndex)){
+            geneIndex = subsequence.getStop() + setOff;
+        } else {
+            geneIndex = subsequence.getStart() - 1 - setOff; // Paint setOff many additional genes (or gaps) that are not part of the cluster
+        }
 
         for (int paintIndex = 0; paintIndex < maxSubseqLength + 2 * NR_ADDITIONAL_GENES; paintIndex++) {
-            if (geneIndex < -1)  // first gene is at index 0
-                x += elemWidth + 2 * hgap;
-            else if (geneIndex == -1)
-                x = paintChromosomeStart(g, x, y);
-            else if (geneIndex >= genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
-                paintChromosomeEnd(g, x, y);
-                break;
+            if (!clusterSelection.isFlipped(genomeIndex)) {
+                if (geneIndex < -1)  // skip not in chromosome
+                    x += elemWidth + 2 * hgap;
+                else if (geneIndex == -1)
+                    x = paintChromosomeStart(g, x, y);
+                else if (geneIndex >= genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
+                    paintChromosomeEnd(g, x, y);
+                    break;
+                } else {
+                    boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
+                    x = paintGene(g, this.genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), clusterSelection.isFlipped(genomeIndex), partOfCluster, x, y);
+                }
+                geneIndex++;
             } else {
-                boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
-                x = paintGene(g, this.genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), partOfCluster, x, y);
+                if (geneIndex > genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().size()) // skip not in chromosome
+                    x += elemWidth + 2 * hgap;
+                else if (geneIndex == genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().size())
+                    x = paintChromosomeStart(g, x, y);
+                else if (geneIndex == -1) {
+                    paintChromosomeEnd(g, x, y);
+                    break;
+                } else {
+                    boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
+                    x = paintGene(g, this.genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), clusterSelection.isFlipped(genomeIndex), partOfCluster, x, y);
+                }
+                geneIndex--;
             }
-            geneIndex++;
+
         }
     }
 
@@ -368,9 +388,9 @@ public class GeneClusterPicture {
      * @param y the y coordinate
      * @return the new x coordinate behind the gene
      */
-    private int paintGene(Graphics g, Gene gene, boolean partOfCluster, int x, int y) {
+    private int paintGene(Graphics g, Gene gene, boolean flipped, boolean partOfCluster, int x, int y) {
         Color currentColor = getColor(gene.getGeneFamily());
 
-        return GenomePainting.paintGene(g, gene, false, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
+        return GenomePainting.paintGene(g, gene, flipped, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
     }
 }
