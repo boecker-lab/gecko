@@ -583,7 +583,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
     public GeneClusterLocationSelection getDefaultLocationSelection(boolean includeSubOptimalOccurrences){
         int[] subSelection = getDefaultSubSelection(includeSubOptimalOccurrences);
-        GeneFamily geneFamily = getBestConservedGeneFamily();
+        GeneFamily geneFamily = getBestConservedGeneFamily(subSelection, includeSubOptimalOccurrences);
         return getGeneClusterLocationSelection(geneFamily, subSelection, includeSubOptimalOccurrences);
     }
 
@@ -594,8 +594,36 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return new GeneClusterLocationSelection(this, subSelection, includeSubOptimalOccurrences, flipped, alignmentGenesCluster, alignmentGenesGlobal);
     }
 
-    private GeneFamily getBestConservedGeneFamily() {
-        return null;
+    private GeneFamily getBestConservedGeneFamily(int[] subSelection, boolean includeSubOptimalOccurrences) {
+        GeneFamily bestConservedGeneFamily = null;
+        int bestConservation = 0;
+        for (GeneFamily geneFamily : geneFamilies){
+            int conservedInGenomes = getGeneFamilyConservationInGenomes(geneFamily, subSelection, includeSubOptimalOccurrences);
+            if (conservedInGenomes > bestConservation){
+                bestConservation = conservedInGenomes;
+                bestConservedGeneFamily = geneFamily;
+            }
+        }
+        return bestConservedGeneFamily;
+    }
+
+    private int getGeneFamilyConservationInGenomes(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences) {
+        GeneClusterOccurrence gOcc = getOccurrences(includeSubOptimalOccurrences);
+        int occsInGenomes = 0;
+        for (int i=0; i<gOcc.getSubsequences().length;i++) {
+            // If genome i is not in the cluster, skip
+            if (subSelection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                continue;
+            List<Chromosome> genes = GeckoInstance.getInstance().getGenomes()[i].getChromosomes();
+            Subsequence s = gOcc.getSubsequences()[i][subSelection[i]];
+            for (int j=s.getStart()-1;j<s.getStop();j++) {
+                if (genes.get(s.getChromosome()).getGenes().get(j).getGeneFamily().equals(geneFamily)) {
+                    occsInGenomes++;
+                    break;
+                }
+            }
+        }
+        return occsInGenomes;
     }
 
     public boolean[] getClusterAlignmentFlipped(int[] subselection, int[] alignmentGenesGlobal, boolean includeSubOptimalOccurrences) {
