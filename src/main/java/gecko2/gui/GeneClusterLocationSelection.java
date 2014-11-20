@@ -102,7 +102,7 @@ public class GeneClusterLocationSelection {
             }
         } else {
             leftPaintWidth = 0;
-            int rigthWidth = 0;
+            int maxRightWidth = 0;
             for (int i=0; i < getTotalGenomeNumber(); i++) {
                 if (subselection[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
                     continue;
@@ -110,18 +110,18 @@ public class GeneClusterLocationSelection {
                 int width = subSequence.getStop() - subSequence.getStart() + 1;
                 if (alignmentGeneCluster[i] != -1) {
                     if (isFlipped(i)) {
-                        leftPaintWidth = Math.max(width - alignmentGeneCluster[i], leftPaintWidth);
-                        rigthWidth = Math.max(alignmentGeneCluster[i], rigthWidth);
+                        leftPaintWidth = Math.max(width - alignmentGeneCluster[i] - 1, leftPaintWidth);
+                        maxRightWidth = Math.max(alignmentGeneCluster[i], maxRightWidth);
                     } else {
                         leftPaintWidth = Math.max(alignmentGeneCluster[i], leftPaintWidth);
-                        rigthWidth = Math.max(width - alignmentGeneCluster[i], rigthWidth);
+                        maxRightWidth = Math.max(width - alignmentGeneCluster[i] - 1, maxRightWidth);
                     }
                 } else {
                     paintWidth = Math.max(width, paintWidth);
                 }
             }
             leftPaintWidth = Math.max(leftPaintWidth, paintWidth/2);
-            paintWidth = Math.max(leftPaintWidth + rigthWidth, paintWidth);
+            paintWidth = Math.max(leftPaintWidth + maxRightWidth + 1, paintWidth);
         }
     }
 
