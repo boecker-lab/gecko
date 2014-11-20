@@ -614,9 +614,9 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
     public int[] getGeneFamilyClusterPositions(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences) {
         GeneClusterOccurrence gOcc = getOccurrences(includeSubOptimalOccurrences);
-        int[] centerGenes = new int[gOcc.getSubsequences().length];
-        Arrays.fill(centerGenes, -1);
-        for (int i=0; i<centerGenes.length;i++) {
+        int[] alignmentGenes = new int[gOcc.getSubsequences().length];
+        Arrays.fill(alignmentGenes, -1);
+        for (int i=0; i<alignmentGenes.length;i++) {
             // If genome i is not in the cluster, skip
             if (subSelection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED)
                 continue;
@@ -625,12 +625,12 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             int localPosition = 0;
             for (int j=s.getStart()-1;j<s.getStop();j++, localPosition++) {
                 if (genes.get(s.getChromosome()).getGenes().get(j).getGeneFamily().equals(geneFamily)) {
-                    centerGenes[i] = localPosition;
+                    alignmentGenes[i] = localPosition;
                     break;
                 }
             }
         }
-        return centerGenes;
+        return alignmentGenes;
     }
 
     /**
