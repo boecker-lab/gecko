@@ -182,7 +182,7 @@ public class GeneClusterPicture {
 		maxGenomeNameLength = 0;
 		maxSubseqLength = clusterSelection.getMaxClusterLocationWidth();
 		
-		for (int i = 0; i < clusterSelection.getSubsequenceLength(); i++) {
+		for (int i = 0; i < clusterSelection.getTotalGenomeNumber(); i++) {
             if (getSubselection()[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
                 continue;
 
@@ -230,7 +230,7 @@ public class GeneClusterPicture {
 		g.fillRect(0, 0, this.pageWidth, this.pageHeight);
 		g.setFont(new Font("Monospaced", Font.PLAIN, 10));
 		
-		for (int i = 0; i < clusterSelection.getSubsequenceLength(); i++) {
+		for (int i = 0; i < clusterSelection.getTotalGenomeNumber(); i++) {
 			// if the length is 0 the genome isn't contained in the cluster
 			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
                 paintGenome(g, i, y);

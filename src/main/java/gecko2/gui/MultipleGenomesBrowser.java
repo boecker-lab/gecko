@@ -28,7 +28,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	private final JPanel rightPanel;
 	private final List<AbstractGenomeBrowser> genomeBrowsers;
 	private final ScrollListener wheelListener;
-	private LocationSelectionEvent lastLocationEvent;
 	private final List<GBNavigator> gbNavigators;
 
     public enum GenomeFilterMode {
@@ -36,16 +35,11 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
     }
 	
 	private final GeckoInstance gecko;
-	
-	/**
-	 * The variable stores the currently selected gene cluster
-	 */
-	private GeneCluster selectedCluster = null;
 
     /**
-     * The genes from the current subselection the cluster is aligned to
+     * All information about the selected cluster, which sub locations are selected, etc.
      */
-    private int[] alignmentGenes = null;
+    private GeneClusterLocationSelection clusterLocationSelection;
 
     /**
      * What name is shown for each gene
@@ -96,12 +90,12 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	@Override
 	public void hideNonClusteredGenomes(boolean filter)	{
 		// filter is only active if a cluster was selected
-		if (this.selectedCluster != null) {
+		if (clusterLocationSelection != null) {
 			if (!filterNonContainedGenomes && filter) {
 				// activation branch
-				for (int i = 0; i < this.selectedCluster.getOccurrences(true).getSubsequences().length; i++) {
-					if (this.selectedCluster.getOccurrences(true).getSubsequences()[i].length == 0) {
-						this.centerpanel.getComponent(i).setVisible(false);
+				for (int i = 0; i < clusterLocationSelection.getCluster().getOccurrences(true).getSubsequences().length; i++) {
+					if (clusterLocationSelection.getCluster().getOccurrences(true).getSubsequences()[i].length == 0) {
+						centerpanel.getComponent(i).setVisible(false);
 						this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() - getGenomeBrowserHeight()));
 					}
 				}
@@ -128,7 +122,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
     @Override
     public GeneClusterLocationSelection getClusterSelection() {
-        return new GeneClusterLocationSelection(selectedCluster, getSubselection(), lastLocationEvent.includeSubOptimalOccurrences(), isFlipped(), alignmentGenes);
+        return clusterLocationSelection;
     }
 
     @Override
@@ -303,39 +297,16 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
 	@Override
 	public void centerCurrentClusterAt(GeneFamily geneFamily) {
-        int[] subselections = lastLocationEvent.getsubselection();
-		boolean includeSubOptimalOccurrences = lastLocationEvent.includeSubOptimalOccurrences();
+        clusterLocationSelection = clusterLocationSelection.getGeneClusterLocationSelection(geneFamily);
 
-		int[] alignmentGenesGlobal = selectedCluster.getGeneFamilyChromosomePositions(geneFamily, subselections, includeSubOptimalOccurrences);
-        alignmentGenes = selectedCluster.getGeneFamilyClusterPositions(geneFamily, subselections, includeSubOptimalOccurrences);
-        ArrayList<Integer> minus = new ArrayList<>();
-		ArrayList<Integer> plus = new ArrayList<>();
-		for (int i=0; i< alignmentGenesGlobal.length;i++) {
-			// If genome i is not in the cluster, skip
-			if (alignmentGenesGlobal[i] == -1)
-				continue;
-			List<Chromosome> genes = gecko.getGenomes()[i].getChromosomes();
-			Subsequence s = selectedCluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselections[i]];
-            if (genes.get(s.getChromosome()).getGenes().get(alignmentGenesGlobal[i]).getOrientation().equals(Gene.GeneOrientation.NEGATIVE))
-                minus.add(i);
-            else
-                plus.add(i);
-		}
-		if (minus.size()>plus.size()) {
-			for (Integer i : plus) 
-				if (!genomeBrowsers.get(i).isFlipped()) genomeBrowsers.get(i).flip();
-			for (Integer i : minus)
-				if (genomeBrowsers.get(i).isFlipped()) genomeBrowsers.get(i).flip();
-		} else {
-			for (Integer i : minus)
-				if (!genomeBrowsers.get(i).isFlipped()) genomeBrowsers.get(i).flip();
-			for (Integer i : plus) 
-				if (genomeBrowsers.get(i).isFlipped()) genomeBrowsers.get(i).flip();
-		}
-		for (int i=0;i< alignmentGenesGlobal.length;i++)
-			if (alignmentGenesGlobal[i]!=-1) scrollToPosition(i,
-					selectedCluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselections[i]].getChromosome(),
-                    alignmentGenesGlobal[i]);
+        for (int i=0; i<clusterLocationSelection.getTotalGenomeNumber(); i++){
+            if (clusterLocationSelection.isFlipped(i) != genomeBrowsers.get(i).isFlipped())
+                genomeBrowsers.get(i).flip();
+            if (clusterLocationSelection.getAlignmentGenePosition(i)!=-1)
+                scrollToPosition(i,
+                        clusterLocationSelection.getSubsequence(i).getChromosome(),
+                        clusterLocationSelection.getAlignmentGenePosition(i));
+        }
 	}
 	
 	/**
@@ -452,14 +423,13 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		// to do something if a particular location of a gene cluster was
 		// selected
 		if (e instanceof LocationSelectionEvent) {
-			lastLocationEvent = (LocationSelectionEvent) e;
+            LocationSelectionEvent lastLocationEvent = (LocationSelectionEvent) e;
 			
 			// save current filter status
 			boolean stat = filterNonContainedGenomes;
 
             // save the currently selected cluster for the filter function
-            selectedCluster = e.getSelection();
-            alignmentGenes = null;
+            clusterLocationSelection = new GeneClusterLocationSelection(lastLocationEvent.getSelection(), lastLocationEvent.getsubselection(), lastLocationEvent.includeSubOptimalOccurrences());
 
 			// deactivate the filter if active
 			this.hideNonClusteredGenomes(false);
@@ -471,14 +441,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			if (e.getSelection()!=null)
 				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.includeSubOptimalOccurrences(), lastLocationEvent.getsubselection());
 		}
-	}
-
-	/**
-	 * Returns the int array of the last subselection
-	 * @return
-	 */
-	public int[] getSubselection() {
-		return lastLocationEvent.getsubselection();
 	}
 
 	@Override
@@ -498,13 +460,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		}
 		return lineLengths;
 	}
-
-    private boolean[] isFlipped() {
-        boolean[] flipped = new boolean[genomeBrowsers.size()];
-        for (int i=0; i<genomeBrowsers.size(); i++)
-            flipped[i] = genomeBrowsers.get(i).isFlipped();
-        return flipped;
-    }
 
 	@Override
 	public boolean isFlipped(int genomeIndex) {
@@ -580,22 +535,17 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource()==next) {
-                int[] subselections = lastLocationEvent.getsubselection();
-                subselections[genome] = subselections[genome] + 1;
+            if (e.getSource()==next || e.getSource()==prev) {
+                int[] subselections = clusterLocationSelection.getSubselection();
+                if (e.getSource() == next)
+                    subselections[genome] = subselections[genome] + 1;
+                else
+                    subselections[genome] = subselections[genome] - 1;
                 fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this,
-                        lastLocationEvent.getSelection(),
-                        lastLocationEvent.includeSubOptimalOccurrences(),
-                        subselections));
-            } else if (e.getSource()==prev) {
-                int[] subselections = lastLocationEvent.getsubselection();
-                subselections[genome] = subselections[genome] - 1;
-                fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this,
-                        lastLocationEvent.getSelection(),
-                        lastLocationEvent.includeSubOptimalOccurrences(),
+                        clusterLocationSelection.getCluster(),
+                        clusterLocationSelection.includeSubOptimalOccurrences(),
                         subselections));
             }
         }
-
     }
 }

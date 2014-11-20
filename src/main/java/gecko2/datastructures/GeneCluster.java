@@ -584,12 +584,47 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
     public GeneClusterLocationSelection getDefaultLocationSelection(boolean includeSubOptimalOccurrences){
         int[] subSelection = getDefaultSubSelection(includeSubOptimalOccurrences);
         GeneFamily geneFamily = getBestConservedGeneFamily();
-        int[] centerGenes = getGeneFamilyChromosomePositions(geneFamily, subSelection, includeSubOptimalOccurrences);
-        return null;
+        return getGeneClusterLocationSelection(geneFamily, subSelection, includeSubOptimalOccurrences);
+    }
+
+    public GeneClusterLocationSelection getGeneClusterLocationSelection(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences){
+        int[] alignmentGenesCluster = getGeneFamilyClusterPositions(geneFamily, subSelection, includeSubOptimalOccurrences);
+        int[] alignmentGenesGlobal = getGeneFamilyChromosomePositions(geneFamily, subSelection, includeSubOptimalOccurrences);
+        boolean[] flipped = getClusterAlignmentFlipped(subSelection, alignmentGenesGlobal, includeSubOptimalOccurrences);
+        return new GeneClusterLocationSelection(this, subSelection, includeSubOptimalOccurrences, flipped, alignmentGenesCluster, alignmentGenesGlobal);
     }
 
     private GeneFamily getBestConservedGeneFamily() {
         return null;
+    }
+
+    public boolean[] getClusterAlignmentFlipped(int[] subselection, int[] alignmentGenesGlobal, boolean includeSubOptimalOccurrences) {
+        ArrayList<Integer> minus = new ArrayList<>();
+        ArrayList<Integer> plus = new ArrayList<>();
+        for (int i=0; i< alignmentGenesGlobal.length;i++) {
+            // If genome i is not in the cluster, skip
+            if (alignmentGenesGlobal[i] == -1)
+                continue;
+            List<Chromosome> genes = GeckoInstance.getInstance().getGenomes()[i].getChromosomes();
+            Subsequence s = this.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselection[i]];
+            if (genes.get(s.getChromosome()).getGenes().get(alignmentGenesGlobal[i]).getOrientation().equals(Gene.GeneOrientation.NEGATIVE))
+                minus.add(i);
+            else
+                plus.add(i);
+        }
+        boolean[] flipped = new boolean[subselection.length];
+        if (minus.size()>plus.size()) {
+            for (Integer i : plus)
+                flipped[i] = true;
+            for (Integer i : minus)
+                flipped[i] = false;
+        } else {
+            for (Integer i : plus)
+                flipped[i] = false;
+            for (Integer i : minus)
+                flipped[i] = true;
+        }
+        return flipped;
     }
 
     public int[] getGeneFamilyChromosomePositions(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences){
