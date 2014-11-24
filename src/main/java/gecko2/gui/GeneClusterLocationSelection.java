@@ -1,38 +1,47 @@
 package gecko2.gui;
 
-import gecko2.datastructures.GeneCluster;
-import gecko2.datastructures.GeneClusterOccurrence;
-import gecko2.datastructures.GeneFamily;
-import gecko2.datastructures.Subsequence;
+import gecko2.datastructures.*;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Created by swinter on 18.11.2014.
+ * All information concerning a specific cluster location, including with occ is selected.
  */
 public class GeneClusterLocationSelection {
     private final GeneCluster cluster;
+    private final Genome[] genomes;
     private final int[] subselection;
     private final boolean includeSubOptimalOccurrences;
     private final boolean[] flipped;
+
+    /*
+     * Cluster alignment information, might be null
+     */
     private final int[] alignmentGeneCluster;
     private final int[] alignmentGeneChromosome;
 
-    private int refPaintGenome;
+    /*
+     * Painting specific information
+     */
     private int paintWidth;
     private int leftPaintWidth;
     private int[] paintOffset;
 
-    public GeneClusterLocationSelection(GeneCluster cluster, int[] subselection, boolean includeSubOptimalOccurrences){
-        this(cluster, subselection, includeSubOptimalOccurrences, null, null, null);
+    public GeneClusterLocationSelection(Genome[] genomes, GeneCluster cluster, int[] subselection, boolean includeSubOptimalOccurrences){
+        this(genomes, cluster, subselection, includeSubOptimalOccurrences, null, null, null);
     }
 
-    public GeneClusterLocationSelection(GeneCluster cluster, int[] subselection, boolean includeSubOptimalOccurrences, boolean[] flipped, int[] alignmentGeneCluster, int[] alignmentGeneChromosome) {
+    public GeneClusterLocationSelection(Genome[] genomes, GeneCluster cluster, int[] subselection, boolean includeSubOptimalOccurrences, boolean[] flipped, int[] alignmentGeneCluster, int[] alignmentGeneChromosome) {
+        this.genomes = genomes;
         this.cluster = cluster;
         this.subselection = subselection;
         this.includeSubOptimalOccurrences = includeSubOptimalOccurrences;
         this.flipped = flipped;
         this.alignmentGeneCluster = alignmentGeneCluster;
         this.alignmentGeneChromosome = alignmentGeneChromosome;
-        this.refPaintGenome = -1;
         this.paintWidth = -1;
     }
 
@@ -43,11 +52,15 @@ public class GeneClusterLocationSelection {
      * @return
      */
     public GeneClusterLocationSelection getGeneClusterLocationSelection(GeneFamily geneFamily) {
-        return cluster.getGeneClusterLocationSelection(geneFamily, subselection, includeSubOptimalOccurrences);
+        return cluster.getGeneClusterLocationSelection(genomes, geneFamily, subselection, includeSubOptimalOccurrences);
     }
 
     public GeneCluster getCluster() {
         return cluster;
+    }
+
+    public Genome getGenome(int genomeIndex) {
+        return genomes[genomeIndex];
     }
 
     public int[] getSubselection() {
@@ -59,6 +72,8 @@ public class GeneClusterLocationSelection {
     }
 
     public boolean isFlipped(int genomeIndex) {
+        if (flipped == null)
+            return false;
         return flipped[genomeIndex];
     }
 
@@ -66,6 +81,21 @@ public class GeneClusterLocationSelection {
         if (subselection[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
             return null;
         return cluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences()[i][subselection[i]];
+    }
+
+    public List<GeneFamily> getGeneFamilies(){
+        List<GeneFamily> geneFamilies = new ArrayList<>();
+        Set<GeneFamily> helperSet = new HashSet<>();
+        for (int i = 0; i < getTotalGenomeNumber(); i++){
+            if (subselection[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
+                continue;
+            Gene[] genes = genomes[i].getSubsequence(getSubsequence(i));
+            for (Gene gene : genes){
+                if (!gene.getGeneFamily().isUnknownGeneFamily() || helperSet.add(gene.getGeneFamily()))
+                    geneFamilies.add(gene.getGeneFamily());
+            }
+        }
+        return geneFamilies;
     }
 
     /**
@@ -97,7 +127,6 @@ public class GeneClusterLocationSelection {
                 int newWidth = subSequence.getStop() - subSequence.getStart() + 1;
                 if (newWidth > paintWidth) {
                     paintWidth = newWidth;
-                    refPaintGenome = i;
                 }
             }
         } else {

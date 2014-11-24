@@ -514,7 +514,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
 
             Genome genome = genomes[i];
             for (Subsequence seq : occ.getSubsequences()[i]){
-                Set<GeneFamily> geneFamilies = getGeneFamiliesOfSubsequence(seq, genome);
+                Set<GeneFamily> geneFamilies = getGeneFamiliesOfSubSequence(seq, genome);
                 int nonMissingFamilies = 0;
                 for (GeneFamily geneFamily : geneFamilies){
                     if (nonMergedGeneFamilies.contains(geneFamily))
@@ -572,26 +572,21 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return nonMergedGeneFamilies;
     }
 
-
-    Set<GeneFamily> getGeneFamiliesOfSubsequence(Subsequence seq, Genome genome){
-        Set<GeneFamily> geneFamilies = new HashSet<>();
-        for (int index = seq.getStart()-1; index < seq.getStop(); index++){
-            geneFamilies.add(genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index).getGeneFamily());
-        }
-        return geneFamilies;
+    private Set<GeneFamily> getGeneFamiliesOfSubSequence(Subsequence seq, Genome genome){
+        return genome.addGeneFamiliesOfSubSequence(seq, new HashSet<GeneFamily>());
     }
 
-    public GeneClusterLocationSelection getDefaultLocationSelection(boolean includeSubOptimalOccurrences){
+    public GeneClusterLocationSelection getDefaultLocationSelection(Genome[] genomes, boolean includeSubOptimalOccurrences){
         int[] subSelection = getDefaultSubSelection(includeSubOptimalOccurrences);
         GeneFamily geneFamily = getBestConservedGeneFamily(subSelection, includeSubOptimalOccurrences);
-        return getGeneClusterLocationSelection(geneFamily, subSelection, includeSubOptimalOccurrences);
+        return getGeneClusterLocationSelection(genomes, geneFamily, subSelection, includeSubOptimalOccurrences);
     }
 
-    public GeneClusterLocationSelection getGeneClusterLocationSelection(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences){
+    public GeneClusterLocationSelection getGeneClusterLocationSelection(Genome[] genomes, GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences){
         int[] alignmentGenesCluster = getGeneFamilyClusterPositions(geneFamily, subSelection, includeSubOptimalOccurrences);
         int[] alignmentGenesGlobal = getGeneFamilyChromosomePositions(geneFamily, subSelection, includeSubOptimalOccurrences);
         boolean[] flipped = getClusterAlignmentFlipped(subSelection, alignmentGenesGlobal, includeSubOptimalOccurrences);
-        return new GeneClusterLocationSelection(this, subSelection, includeSubOptimalOccurrences, flipped, alignmentGenesCluster, alignmentGenesGlobal);
+        return new GeneClusterLocationSelection(genomes, this, subSelection, includeSubOptimalOccurrences, flipped, alignmentGenesCluster, alignmentGenesGlobal);
     }
 
     private GeneFamily getBestConservedGeneFamily(int[] subSelection, boolean includeSubOptimalOccurrences) {

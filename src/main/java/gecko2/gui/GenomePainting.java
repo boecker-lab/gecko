@@ -269,13 +269,9 @@ public class GenomePainting {
             return color;
     }
 	
-	private static Color getGreyValueColor(Gene gene) {
-		Color original = getColor(gene);
-		if (original.equals(Color.GRAY))
-			return original;
-		int greyValue = (original.getBlue() + original.getRed() + original.getGreen()) / 3;
-		return new Color(greyValue, greyValue, greyValue);
-
+	public static Color getOpaqueColor(Color color) {
+        float[] rgb = color.getRGBColorComponents(null);
+        return new Color(rgb[0], rgb[1], rgb[2], 0.5f);
 	}
 
 	/**
@@ -351,7 +347,7 @@ public class GenomePainting {
 	}
 	
 	/**
-	 * Paints the Chromosome with grey value gene colors
+	 * Paints the Chromosome with opaque gene colors
 	 * @param g the used Graphics
 	 * @param chromosome the Chromosome
      * @param nameType what information shall be painted in each gene
@@ -369,7 +365,7 @@ public class GenomePainting {
 	}
 	
 	/**
-	 * Paints the Chromosome with highlighted cluster, the rest has grey value gene colors
+	 * Paints the Chromosome with highlighted cluster, the rest has opaque gene colors
 	 * @param g the used Graphics
      * @param chromosome the Chromosome
 	 * @param start the start gene of the cluster
@@ -397,7 +393,7 @@ public class GenomePainting {
      * @param chromosome the Chromosome
      * @param start the start gene of the cluster, -1 if no cluster
      * @param stop the end gene of the cluster, -1 if no cluster
-     * @param useGrayValues if gray values shall be used for the painting, outside the cluster, if a cluster is contained
+     * @param  useOpaqueGenes if opaque colors shall be used for the painting, outside the cluster, if a cluster is contained
      * @param nameType what information shall be painted in each gene
      * @param highlightColor the color the cluster background is color with, null if no cluster
      * @param x the x coordinate to start the painting at
@@ -408,7 +404,7 @@ public class GenomePainting {
      * @param vgap the vertical gap size
      * @param flipped if the chromosome shall be painted inverse
      */
-    private static int paintChromosome(Graphics g, Chromosome chromosome, boolean flipped, int start, int stop, boolean useGrayValues, NameType nameType, Color highlightColor, int x, int y, int width,
+    private static int paintChromosome(Graphics g, Chromosome chromosome, boolean flipped, int start, int stop, boolean useOpaqueGenes, NameType nameType, Color highlightColor, int x, int y, int width,
                                        int height, int hgap, int vgap) {
         if (highlightColor == null && !(start == -1 && stop==-1))
             throw new InvalidParameterException("Invalid Parameters, highlightColor == null and not start and stop == -1");
@@ -427,7 +423,7 @@ public class GenomePainting {
             if (i>=start && i<=stop)
                 x = paintGene(g, gene, flipped, nameType, highlightColor, getColor(gene), x, y, width, height, hgap, vgap);
             else
-                x = paintGene(g, gene, flipped, nameType, Color.WHITE, useGrayValues ? getGreyValueColor(gene) : getColor(gene), x, y, width, height, hgap, vgap);
+                x = paintGene(g, gene, flipped, nameType, Color.WHITE, useOpaqueGenes ? getOpaqueColor(getColor(gene)) : getColor(gene), x, y, width, height, hgap, vgap);
         }
 
         x = paintChromosomeEnd(g, x, y, width, height, hgap);

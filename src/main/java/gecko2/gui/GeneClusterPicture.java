@@ -1,5 +1,7 @@
 package gecko2.gui;
 
+import cern.jet.random.Uniform;
+import cern.jet.random.engine.MersenneTwister;
 import gecko2.GeckoInstance;
 import gecko2.datastructures.*;
 
@@ -42,16 +44,13 @@ public class GeneClusterPicture {
 		new Color(0x3F4C6B), // Mozilla Blue
 		new Color(0x356AA0), // Digg Blue
 		new Color(0xD01F3C)}; // Last.fm Crimson (kind of pink)
-		
+
+    private Map<GeneFamily, Color> colorMap;
+
 	/**
 	 * The selected gene cluster
 	 */
 	private final GeneClusterLocationSelection clusterSelection;
-	
-	/**
-	 * All input genomes from gecko instance
-	 */
-	private final Genome[] genomes;
 	
 	/**
 	 * Tells us whether to write genome names instead if just the number.
@@ -125,7 +124,7 @@ public class GeneClusterPicture {
 	private static final int NR_ADDITIONAL_GENES = 0;
 
     public GeneClusterPicture(GeneCluster selectedCluster, GenomePainting.NameType nameType, boolean gnames) {
-        this(selectedCluster.getDefaultLocationSelection(false), nameType, gnames);
+        this(selectedCluster.getDefaultLocationSelection(GeckoInstance.getInstance().getGenomes(),false), nameType, gnames);
     }
 
 	/**
@@ -137,7 +136,6 @@ public class GeneClusterPicture {
      */
 	public GeneClusterPicture(GeneClusterLocationSelection clusterLocation, GenomePainting.NameType nameType, boolean gnames) {
 		this.clusterSelection = clusterLocation;
-		this.genomes = GeckoInstance.getInstance().getGenomes();
 		this.gNames = gnames;
 		this.setNameType(nameType);
 	}
@@ -186,13 +184,13 @@ public class GeneClusterPicture {
             if (getSubselection()[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
                 continue;
 
-            if (genomes[i].getName().length() > maxGenomeNameLength)
-                maxGenomeNameLength = (byte) genomes[i].getName().length();
+            if (clusterSelection.getGenome(i).getName().length() > maxGenomeNameLength)
+                maxGenomeNameLength = (byte) clusterSelection.getGenome(i).getName().length();
 
             Subsequence subSequence = clusterSelection.getSubsequence(i);
             if (subSequence.isValid()){
                 for (int k = subSequence.getStart() - 1; k < subSequence.getStop(); k++){
-                    Gene gene = genomes[i].getChromosomes().get(subSequence.getChromosome()).getGenes().get(k);
+                    Gene gene = clusterSelection.getGenome(i).getChromosomes().get(subSequence.getChromosome()).getGenes().get(k);
                     if (nameType == GenomePainting.NameType.NAME)
                         if (gene.getName().length() > maxGeneCodeLength)
                             maxGeneCodeLength = gene.getName().length();
@@ -217,7 +215,7 @@ public class GeneClusterPicture {
 		if (gNames)
 			this.nameWidth = 7 * maxGenomeNameLength + 4;
 		else
-			this.nameWidth = 7 * Integer.toString(genomes.length).length() + 4;
+			this.nameWidth = 7 * Integer.toString(clusterSelection.getTotalGenomeNumber()).length() + 4;
 		
 		this.pageWidth = 2 + this.nameWidth + 2 + 16 + 10 + (maxSubseqLength + 2 * NR_ADDITIONAL_GENES) *(elemWidth + hgap + 8) + 2;
 	}
@@ -246,6 +244,33 @@ public class GeneClusterPicture {
 		paint(image.getGraphics());
 		return image;
 	}
+
+    private void prepareClusterUniqueColors() {
+        Uniform.staticSetRandomEngine(new MersenneTwister(clusterSelection.getCluster().getId()));
+        java.util.List<GeneFamily> geneFamilies = clusterSelection.getGeneFamilies();
+        int[] hue = new int[geneFamilies.size()];
+        hue[0] = Uniform.staticNextIntFromTo(0, 255);
+        for (int i=1; i<hue.length; i++){
+            hue[i] = (int)((i+Uniform.staticNextDoubleFromTo(-0.3, 0.3)) *256/hue.length + hue[0]) % 256;
+        }
+        colorMap = new HashMap<>();
+        for (int i = 0; i < hue.length; i++) {
+            colorMap.put(geneFamilies.get(i), Color.getHSBColor(hue[i], Uniform.staticNextIntFromTo(128, 255), Uniform.staticNextIntFromTo(128, 255)));
+        }
+    }
+
+    private Color getColor(GeneFamily geneFamily) {
+        if (colorMap == null)
+            prepareClusterUniqueColors();
+        Color geneColor = colorMap.get(geneFamily);
+        //Color geneColor = getStandardColor(geneFamily);
+        if (geneColor == null)
+            if (geneFamily.isSingleGeneFamily())
+                geneColor = Color.GRAY;
+            else
+                geneColor = GeckoInstance.getInstance().getGeneColor(geneFamily);
+        return geneColor;
+    }
 	
 	/**
 	 * The method takes a color from the array geneColors and associate the color with a 
@@ -255,8 +280,8 @@ public class GeneClusterPicture {
 	 * @param geneFamily the gene family
 	 * @return returns the color for the gene element of the given gene ID
 	 */
-	private Color getColor(GeneFamily geneFamily) {
-		Color out;
+	private Color getStandardColor(GeneFamily geneFamily) {
+		Color out = null;
 		
 		if (geneFamily.isSingleGeneFamily()) {
 			out = Color.GRAY;
@@ -271,10 +296,6 @@ public class GeneClusterPicture {
 					newColorMap.put(geneFamily, out);
 					colorPos++;
 				}
-				else {
-					// fallback if we do not have enough colors defined
-					out = GeckoInstance.getInstance().getGeneColor(geneFamily);
-				}	
 			}
 		}
 		
@@ -311,25 +332,25 @@ public class GeneClusterPicture {
                     x += elemWidth + 2 * hgap;
                 else if (geneIndex == -1)
                     x = paintChromosomeStart(g, x, y);
-                else if (geneIndex >= genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
+                else if (geneIndex >= clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
                     paintChromosomeEnd(g, x, y);
                     break;
                 } else {
                     boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
-                    x = paintGene(g, this.genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), clusterSelection.isFlipped(genomeIndex), partOfCluster, x, y);
+                    x = paintGene(g, clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), clusterSelection.isFlipped(genomeIndex), partOfCluster, x, y);
                 }
                 geneIndex++;
             } else {
-                if (geneIndex > genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().size()) // skip not in chromosome
+                if (geneIndex > clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().size()) // skip not in chromosome
                     x += elemWidth + 2 * hgap;
-                else if (geneIndex == genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().size())
+                else if (geneIndex == clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().size())
                     x = paintChromosomeStart(g, x, y);
                 else if (geneIndex == -1) {
                     paintChromosomeEnd(g, x, y);
                     break;
                 } else {
                     boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
-                    x = paintGene(g, this.genomes[genomeIndex].getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), clusterSelection.isFlipped(genomeIndex), partOfCluster, x, y);
+                    x = paintGene(g, clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), clusterSelection.isFlipped(genomeIndex), partOfCluster, x, y);
                 }
                 geneIndex--;
             }
@@ -348,7 +369,7 @@ public class GeneClusterPicture {
     private int paintGenomeHeader(Graphics g, int genomeIndex, int x, int y){
         String name;
         if (this.gNames)
-            name = this.genomes[genomeIndex].getName();
+            name = clusterSelection.getGenome(genomeIndex).getName();
         else
             name = Integer.toString(genomeIndex + 1);
 
@@ -390,7 +411,9 @@ public class GeneClusterPicture {
      */
     private int paintGene(Graphics g, Gene gene, boolean flipped, boolean partOfCluster, int x, int y) {
         Color currentColor = getColor(gene.getGeneFamily());
-
+        if (!partOfCluster) {
+            currentColor = GenomePainting.getOpaqueColor(currentColor);
+        }
         return GenomePainting.paintGene(g, gene, flipped, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
     }
 }

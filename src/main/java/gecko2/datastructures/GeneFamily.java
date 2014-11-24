@@ -87,6 +87,14 @@ public class GeneFamily {
 
     /**
      *
+     * @return true
+     */
+    public boolean isUnknownGeneFamily() {
+        return externalId.equals(UNKNOWN_GENE_ID);
+    }
+
+    /**
+     *
      * @return true if the gene family contains only one gene
      */
     public boolean isSingleGeneFamily() {

@@ -229,6 +229,11 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 				genome.getTotalGeneNumber() * getGeneWidth() + 
 				2 * genome.getChromosomes().size() * getChromosomeEndingWidth();
 	}
+
+    @Override
+    public void highlightCluster() {
+        highlightCluster(-1, -1, -1, null);
+    }
 	
 	@Override
 	public void highlightCluster(int chr, int start, int stop,

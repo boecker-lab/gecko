@@ -1,9 +1,7 @@
 package gecko2.datastructures;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 public class Genome implements Serializable {
@@ -57,6 +55,23 @@ public class Genome implements Serializable {
 			geneList.add(chromosomes.get(s.getChromosome()).getGenes().get(i));
 		return geneList.toArray(new Gene[geneList.size()]);
 	}
+
+    /**
+     * Adds all gene families in the given SubSequence  to the given set.
+     * Constructs a new @link HashSet if geneFamilies is null.
+     * @param subSequence
+     * @param geneFamilies
+     * @return
+     */
+    public Set<GeneFamily> addGeneFamiliesOfSubSequence(Subsequence subSequence, Set<GeneFamily> geneFamilies){
+        if (geneFamilies == null)
+            geneFamilies = new HashSet<>();
+        Chromosome chr = getChromosomes().get(subSequence.getChromosome());
+        for (int index = subSequence.getStart()-1; index < subSequence.getStop(); index++){
+            geneFamilies.add(chr.getGenes().get(index).getGeneFamily());
+        }
+        return geneFamilies;
+    }
 	
 	public int getTotalGeneNumber() {
 		int geneNumber = 0;

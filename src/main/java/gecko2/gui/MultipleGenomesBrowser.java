@@ -362,17 +362,15 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			rightPanel.setVisible(false);
 		updateButtons(gc.getOccurrences(includeSuboptimalOccs),subselection);
 		for (int i=0;i<subselection.length;i++) {
-			if (subselection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) continue;
+			if (subselection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
+                genomeBrowsers.get(i).highlightCluster();
+                continue;
+            }
 			Subsequence s = gc.getOccurrences(includeSuboptimalOccs).getSubsequences()[i][subselection[i]];
-//			if (s==null) continue; // must actually not be the case
-
-
 			scrollToPosition(i, s.getChromosome(), (s.getStart() - 1 + s.getStop() - 1) / 2);
-			
 			if (i == gc.getRefSeqIndex()) {
 				genomeBrowsers.get(i).highlightCluster(s.getChromosome(), s.getStart() - 1, s.getStop() - 1, GeneElement.COLOR_HIGHLIGHT_REFCLUST);
-			}
-			else {
+			} else {
 				genomeBrowsers.get(i).highlightCluster(s.getChromosome(), s.getStart() - 1, s.getStop() - 1, GeneElement.COLOR_HIGHLIGHT_DEFAULT);
 			}
 		}		
@@ -429,7 +427,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			boolean stat = filterNonContainedGenomes;
 
             // save the currently selected cluster for the filter function
-            clusterLocationSelection = new GeneClusterLocationSelection(lastLocationEvent.getSelection(), lastLocationEvent.getsubselection(), lastLocationEvent.includeSubOptimalOccurrences());
+            clusterLocationSelection = new GeneClusterLocationSelection(gecko.getGenomes(), lastLocationEvent.getSelection(), lastLocationEvent.getsubselection(), lastLocationEvent.includeSubOptimalOccurrences());
 
 			// deactivate the filter if active
 			this.hideNonClusteredGenomes(false);
