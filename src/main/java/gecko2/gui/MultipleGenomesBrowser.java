@@ -90,7 +90,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	@Override
 	public void hideNonClusteredGenomes(boolean filter)	{
 		// filter is only active if a cluster was selected
-		if (clusterLocationSelection != null) {
+		if (clusterLocationSelection != null && clusterLocationSelection.getCluster() != null) {
 			if (!filterNonContainedGenomes && filter) {
 				// activation branch
 				for (int i = 0; i < clusterLocationSelection.getCluster().getOccurrences(true).getSubsequences().length; i++) {

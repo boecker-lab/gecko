@@ -1,5 +1,7 @@
 package gecko2.datastructures;
 
+import cern.jet.random.Uniform;
+import cern.jet.random.engine.MersenneTwister;
 import gecko2.datastructures.util.MutableInteger;
 
 import java.awt.*;
@@ -365,11 +367,7 @@ public class DataSet {
 
     private Map<GeneFamily, Color> getColorMap() {
         if (colorMap == null) {
-            Random r = new Random();
-            colorMap = new HashMap<>();
-            for (GeneFamily geneFamily : geneFamilySet)
-                if (!geneFamily.isSingleGeneFamily())
-                    colorMap.put(geneFamily, new Color(r.nextInt(240), r.nextInt(240), r.nextInt(240)));
+            colorMap = GeneFamily.prepareColorMap(geneFamilySet, unknownGeneFamily, null);
         }
         return colorMap;
     }

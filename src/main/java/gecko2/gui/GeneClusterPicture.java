@@ -245,30 +245,13 @@ public class GeneClusterPicture {
 		return image;
 	}
 
-    private void prepareClusterUniqueColors() {
-        Uniform.staticSetRandomEngine(new MersenneTwister(clusterSelection.getCluster().getId()));
-        java.util.List<GeneFamily> geneFamilies = clusterSelection.getGeneFamilies();
-        int[] hue = new int[geneFamilies.size()];
-        hue[0] = Uniform.staticNextIntFromTo(0, 255);
-        for (int i=1; i<hue.length; i++){
-            hue[i] = (int)((i+Uniform.staticNextDoubleFromTo(-0.3, 0.3)) *256/hue.length + hue[0]) % 256;
-        }
-        colorMap = new HashMap<>();
-        for (int i = 0; i < hue.length; i++) {
-            colorMap.put(geneFamilies.get(i), Color.getHSBColor(hue[i], Uniform.staticNextIntFromTo(128, 255), Uniform.staticNextIntFromTo(128, 255)));
-        }
-    }
-
     private Color getColor(GeneFamily geneFamily) {
-        if (colorMap == null)
-            prepareClusterUniqueColors();
+        /*if (colorMap == null)
+            colorMap = GeneFamily.prepareColorMap(clusterSelection.getGeneFamilies(), null, clusterSelection.getCluster().getId());
         Color geneColor = colorMap.get(geneFamily);
         //Color geneColor = getStandardColor(geneFamily);
-        if (geneColor == null)
-            if (geneFamily.isSingleGeneFamily())
-                geneColor = Color.GRAY;
-            else
-                geneColor = GeckoInstance.getInstance().getGeneColor(geneFamily);
+        if (geneColor == null)*/
+            Color geneColor = GeckoInstance.getInstance().getGeneColor(geneFamily);
         return geneColor;
     }
 	
