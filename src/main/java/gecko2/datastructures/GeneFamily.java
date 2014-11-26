@@ -150,33 +150,6 @@ public class GeneFamily {
      * @param randomSeed the random seed may be null.
      * @return
      */
-    public static Map<GeneFamily, Color> prepareColorMapSebastian(Collection<GeneFamily> geneFamilies, GeneFamily unknownGeneFamily, Integer randomSeed) {
-        if (randomSeed == null)
-            Uniform.staticSetRandomEngine(new MersenneTwister());
-        else
-            Uniform.staticSetRandomEngine(new MersenneTwister(randomSeed));
-        int[] hue = new int[geneFamilies.size()];
-        hue[0] = Uniform.staticNextIntFromTo(0, 255);
-        for (int i=1; i<hue.length; i++){
-            hue[i] = (int)((i+Uniform.staticNextDoubleFromTo(-0.3, 0.3)) *256/hue.length + hue[0]) % 256;
-        }
-        Map<GeneFamily, Color> colorMap = new HashMap<>();
-        int i = 0;
-        for (GeneFamily geneFamily : geneFamilies) {
-            colorMap.put(geneFamily, Color.getHSBColor(hue[i], Uniform.staticNextIntFromTo(128, 255), Uniform.staticNextIntFromTo(128, 255)));
-        }
-        if (unknownGeneFamily != null)
-            colorMap.put(unknownGeneFamily, Color.GRAY);
-        return colorMap;
-    }
-
-    /**
-     * Computes a color mapping for the given gene families to colors.
-     * @param geneFamilies a collection of gene families. If you want always the same color has to have a guaranteed ordering (so not a set)
-     * @param unknownGeneFamily may be null, otherwise Color.GRAY is assigned to unknown genes
-     * @param randomSeed the random seed may be null.
-     * @return
-     */
     public static Map<GeneFamily, Color> prepareColorMap(Collection<GeneFamily> geneFamilies, GeneFamily unknownGeneFamily, Integer randomSeed) {
         if (randomSeed == null)
             Uniform.staticSetRandomEngine(new MersenneTwister());

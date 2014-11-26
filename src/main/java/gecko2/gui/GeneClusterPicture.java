@@ -1,9 +1,9 @@
 package gecko2.gui;
 
-import cern.jet.random.Uniform;
-import cern.jet.random.engine.MersenneTwister;
 import gecko2.GeckoInstance;
 import gecko2.datastructures.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -20,6 +20,7 @@ import java.util.Map;
  * @version 0.12
  */
 public class GeneClusterPicture {
+    private static final Logger logger = LoggerFactory.getLogger(GeneClusterPicture.class);
 
 	/**
 	 * Color array for the gene elements to prevent not nice looking colors.
@@ -45,6 +46,11 @@ public class GeneClusterPicture {
 		new Color(0x356AA0), // Digg Blue
 		new Color(0xD01F3C)}; // Last.fm Crimson (kind of pink)
 
+    private enum  ColorMapType{
+        geckoGlobal, clusterLocal, standardColors
+    };
+
+    private final ColorMapType useColorMap = ColorMapType.geckoGlobal;
     private Map<GeneFamily, Color> colorMap;
 
 	/**
@@ -246,13 +252,19 @@ public class GeneClusterPicture {
 	}
 
     private Color getColor(GeneFamily geneFamily) {
-        /*if (colorMap == null)
-            colorMap = GeneFamily.prepareColorMap(clusterSelection.getGeneFamilies(), null, clusterSelection.getCluster().getId());
-        Color geneColor = colorMap.get(geneFamily);
-        //Color geneColor = getStandardColor(geneFamily);
-        if (geneColor == null)*/
-            Color geneColor = GeckoInstance.getInstance().getGeneColor(geneFamily);
-        return geneColor;
+        switch (useColorMap){
+            case geckoGlobal:
+                return GeckoInstance.getInstance().getGeneColor(geneFamily);
+            case clusterLocal:
+                if (colorMap == null)
+                    colorMap = GeneFamily.prepareColorMap(clusterSelection.getGeneFamilies(), null, clusterSelection.getCluster().getId());
+                return colorMap.get(geneFamily);
+            case standardColors:
+                return getStandardColor(geneFamily);
+            default:
+                logger.error("Should not happen, wrong/unused type in ColorMapType! Type set to {}", useColorMap.toString());
+                return null;
+        }
     }
 	
 	/**
