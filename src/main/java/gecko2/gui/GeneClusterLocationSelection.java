@@ -52,7 +52,7 @@ public class GeneClusterLocationSelection {
      * @return
      */
     public GeneClusterLocationSelection getGeneClusterLocationSelection(GeneFamily geneFamily) {
-        return cluster.getGeneClusterLocationSelection(genomes, geneFamily, subselection, includeSubOptimalOccurrences);
+        return cluster.getGeneClusterLocationSelection(geneFamily, subselection, includeSubOptimalOccurrences, genomes);
     }
 
     public GeneCluster getCluster() {
