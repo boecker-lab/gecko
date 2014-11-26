@@ -103,23 +103,10 @@ public class Gui {
 		mgb = new MultipleGenomesBrowser();
 		
 		
-		// Lowest component in the upper half of the window		
-	
-		final JScrollPane upscoll = new JScrollPane();
-		upscoll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		upscoll.setViewportView(mgb);
-
-        GenomeNavigator navigator = new GenomeNavigator();
-		gecko.addDataListener(navigator);
-		
-		mgb.addBrowserContentListener(navigator);
-		
-		JScrollPane navigatorScroll = new JScrollPane(navigator);
-		
-		// Panel under 
-		final JSplitPane upperPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upscoll, navigatorScroll);
-		// setResizeWight to give both components the same size
-		upperPanel.setResizeWeight(0.5);
+		// Lowest component in the upper half of the window
+		final JScrollPane genomeBrowserScrollPane = new JScrollPane();
+        genomeBrowserScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        genomeBrowserScrollPane.setViewportView(mgb);
 		
 		//Toolbar
 		JToolBar toolbar = new JToolBar();
@@ -237,7 +224,7 @@ public class Gui {
 		northpanel.add(toolbar);
 		mainframe.add(northpanel, BorderLayout.NORTH);
 		
-		horiSplit.setTopComponent(upperPanel);
+		horiSplit.setTopComponent(genomeBrowserScrollPane);
 		horiSplit.setBottomComponent(vertSplit);
 		mainframe.add(horiSplit, BorderLayout.CENTER);
 		JPanel southpanel = new JPanel();
@@ -269,7 +256,6 @@ public class Gui {
 		
 		// Listener stuff
 		gcSelector.addSelectionListener(gcDisplay);
-		gcSelector.addSelectionListener(navigator);
 		gcSelector.addSelectionListener(mgb);
 		mgb.addSelectionListener(gcDisplay);
 
