@@ -270,8 +270,8 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	}
 	
 	/**
-	 * Calls the {@link GenomeBrowser#scrollToPosition(int, int)}
-	 * function for the {@link GenomeBrowser} with the specified id
+	 * Calls the {@link gecko2.gui.PaintingGenomeBrowser#scrollToPosition(int, int)}
+	 * function for the {@link gecko2.gui.PaintingGenomeBrowser} with the specified id
 	 * @param gbid The id of the genome browser
 	 */
 	private void scrollToPosition(int gbid, int chromosome, int position) {
@@ -306,11 +306,13 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
                 scrollToPosition(i,
                         clusterLocationSelection.getSubsequence(i).getChromosome(),
                         clusterLocationSelection.getAlignmentGenePosition(i));
+            else if (clusterLocationSelection.getSubsequence(i) != null)
+                scrollToPosition(i, clusterLocationSelection.getSubsequence(i).getChromosome(), (clusterLocationSelection.getSubsequence(i).getStart() - 1 + clusterLocationSelection.getSubsequence(i).getStop() - 1) / 2);
         }
 	}
 	
 	/**
-	 * Call the {@link GenomeBrowser#adjustAllSizes()} method for all {@link GenomeBrowser}s handled by
+	 * Call the {@link gecko2.gui.PaintingGenomeBrowser#adjustSize()} method for all {@link gecko2.gui.PaintingGenomeBrowser}s handled by
 	 * this {@link MultipleGenomesBrowser}.
 	 */
 	private void adjustAllSizes() {
