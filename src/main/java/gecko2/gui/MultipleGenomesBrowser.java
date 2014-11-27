@@ -21,15 +21,15 @@ import java.util.List;
  * 
  * @author original author unknown
  */
-public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
+public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
 	private static final long serialVersionUID = -6769789368841494821L;
 
+    private final JPanel body;
 	private final JPanel centerpanel;
 	private final JPanel rightPanel;
 	private final List<AbstractGenomeBrowser> genomeBrowsers;
 	private final ScrollListener wheelListener;
 	private final List<GBNavigator> gbNavigators;
-    //private final MouseWheelListener mouseWheelListener;
 	
 	private final GeckoInstance gecko;
 
@@ -97,13 +97,14 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	
 	public MultipleGenomesBrowser() {
 		gecko = GeckoInstance.getInstance();
-		this.setBackground(Color.WHITE);
+        body = new JPanel();
+        body.setBackground(Color.WHITE);
 		this.addSelectionListener(this);
-		this.setPreferredSize(new Dimension(0,0));
+        body.setPreferredSize(new Dimension(0,0));
 		this.wheelListener = new ScrollListener();
 		this.genomeBrowsers = new ArrayList<>();
 		this.gbNavigators = new ArrayList<>();
-		this.setLayout(new BorderLayout());
+        body.setLayout(new BorderLayout());
         JPanel leftpanel = new JPanel();
 		this.centerpanel = new JPanel();
 		centerpanel.setBackground(Color.WHITE);
@@ -114,11 +115,16 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		this.centerpanel.setLayout(new BoxLayout(centerpanel,BoxLayout.Y_AXIS));
 		this.centerpanel.setPreferredSize(new Dimension(200,200));
 		this.rightPanel.setLayout(new BoxLayout(rightPanel,BoxLayout.Y_AXIS));
-		this.add(centerpanel,BorderLayout.CENTER);
-		this.add(leftpanel,BorderLayout.WEST);
-		this.add(rightPanel,BorderLayout.EAST);
-		this.addMouseWheelListener(this.wheelListener);
+        body.add(centerpanel,BorderLayout.CENTER);
+        body.add(leftpanel,BorderLayout.WEST);
+        body.add(rightPanel,BorderLayout.EAST);
+        body.addMouseWheelListener(this.wheelListener);
 	}
+
+    @Override
+    public JPanel getBody() {
+        return body;
+    }
 
 	/**
 	 * This method implements a filter for the mgb. It removes the GenomeBrowers for the genomes
@@ -137,19 +143,19 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 				for (int i = 0; i < clusterLocationSelection.getCluster().getOccurrences(true).getSubsequences().length; i++) {
 					if (clusterLocationSelection.getCluster().getOccurrences(true).getSubsequences()[i].length == 0) {
 						centerpanel.getComponent(i).setVisible(false);
-						this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() - getGenomeBrowserHeight()));
+                        body.setPreferredSize(new Dimension((int)body.getPreferredSize().getWidth(),(int) body.getPreferredSize().getHeight() - getGenomeBrowserHeight()));
 					}
 				}
-				this.validate();
+                body.validate();
 			} else {
 				if (filterNonContainedGenomes && !filter) {
                     for (Component component : this.centerpanel.getComponents()) {
                         if (!component.isVisible()) {
                             component.setVisible(true);
-                            this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(),(int) this.getPreferredSize().getHeight() + getGenomeBrowserHeight()));
+                            body.setPreferredSize(new Dimension((int)body.getPreferredSize().getWidth(),(int) body.getPreferredSize().getHeight() + getGenomeBrowserHeight()));
                         }
                     }
-					this.validate();
+                    body.validate();
 				}
 			}
 		}
@@ -157,19 +163,9 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	}
 
     @Override
-	public int getScrollValue(int genomeIndex) {
-		return genomeBrowsers.get(genomeIndex).getScrollValue();
-	}
-
-    @Override
     public GeneClusterLocationSelection getClusterSelection() {
         return clusterLocationSelection;
     }
-	
-	@Override
-	public int getNrGenomes() {
-		return genomeBrowsers.size();
-	}
 	
 	class ScrollListener implements MouseWheelListener {
 		public void mouseWheelMoved(MouseWheelEvent e) {
@@ -190,7 +186,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	public void changeGeneElementHight(int adjustment) {
 		gecko.setGeneElementHight(gecko.getGeneElementHight() + adjustment);
 		adjustAllSizes();
-		repaint();	
+        body.repaint();
 	}
 	
 	/*
@@ -264,21 +260,21 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		this.gbNavigators.add(nav);
 		this.centerpanel.add(boxPanel);
 		rightPanel.add(nav);
-		this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(), (int) this.getPreferredSize().getHeight() + getGenomeBrowserHeight()));
-		this.repaint();
+        body.setPreferredSize(new Dimension((int)body.getPreferredSize().getWidth(), (int) body.getPreferredSize().getHeight() + getGenomeBrowserHeight()));
+        body.repaint();
 
-		this.revalidate();
+        body.revalidate();
 	}
 
 	@Override
 	public void clear() {
-		this.setPreferredSize(new Dimension(0,0));
+        body.setPreferredSize(new Dimension(0,0));
 		this.centerpanel.removeAll();
 		this.genomeBrowsers.clear();
 		this.rightPanel.removeAll();
 		this.rightPanel.setVisible(false);
 		this.gbNavigators.clear();
-		this.repaint();
+        body.repaint();
 	}
 	
 	private void unflipAll() {
@@ -299,23 +295,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 */
 	private void scrollToPosition(int gbid, int chromosome, int position) {
 		this.genomeBrowsers.get(gbid).scrollToPosition(chromosome, position);
-	}
-	
-	@Override
-	public int getScrollWidth() {
-		if (genomeBrowsers.size() == 0)
-			return 0;
-		return genomeBrowsers.get(0).getScrollWidth();
-	}
-	
-	@Override
-	public int getScrollMaximum() {
-		int maxBarMax = 0;
-		for (AbstractGenomeBrowser gb : genomeBrowsers) {
-			if (gb.getMaximumValue() > maxBarMax)
-				maxBarMax = gb.getMaximumValue();
-		}
-		return maxBarMax;
 	}
 
 	@Override
@@ -339,11 +318,11 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * this {@link MultipleGenomesBrowser}.
 	 */
 	private void adjustAllSizes() {
-		this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(), genomeBrowsers.size() * getGenomeBrowserHeight()));
+        body.setPreferredSize(new Dimension((int)body.getPreferredSize().getWidth(), genomeBrowsers.size() * getGenomeBrowserHeight()));
 		for (AbstractGenomeBrowser g : genomeBrowsers) {
 			g.adjustSize();
 		}
-		this.revalidate();
+        body.revalidate();
 	}
 	
 	private int getGenomeBrowserHeight() {
@@ -406,18 +385,9 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 */
 	
 	private final EventListenerList eventListener = new EventListenerList();
-
-	@Override
-	public void addBrowserContentListener(BrowserContentListener l) {
-		eventListener.add(BrowserContentListener.class, l);
-	}
-	
-	private void removeBrowserContentListener(BrowserContentListener l) {
-		eventListener.remove(BrowserContentListener.class, l);
-	}
 	
 	@Override
-	protected synchronized void fireBrowserContentChanged(short type) {
+	public synchronized void fireBrowserContentChanged(short type) {
 		for (BrowserContentListener d : eventListener.getListeners(BrowserContentListener.class) ) {
 			d.browserContentChanged(new BrowserContentEvent(this, type));
 		}
@@ -464,29 +434,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 			if (e.getSelection()!=null)
 				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.includeSubOptimalOccurrences(), lastLocationEvent.getsubselection());
 		}
-	}
-
-	@Override
-	public int getGeneWidth() {
-		if (this.genomeBrowsers.size() == 0)
-			return 0;
-		else 
-			return this.genomeBrowsers.get(0).getGeneWidth();
-	}
-
-    @Override
-	public int[] getGeneNumbers(int genomeIndex) {
-		int[] lineLengths = new int[genomeBrowsers.get(genomeIndex).getGenome().getChromosomes().size()];
-        for (int i=0; i<genomeBrowsers.get(genomeIndex).getGenome().getChromosomes().size(); i++) {
-			// Compute the line length in GenomeBrowser pixels
-			lineLengths[i] = genomeBrowsers.get(genomeIndex).getGenome().getChromosomes().get(i).getGenes().size();
-		}
-		return lineLengths;
-	}
-
-	@Override
-	public boolean isFlipped(int genomeIndex) {
-		return genomeBrowsers.get(genomeIndex).isFlipped();
 	}
 
     /**

@@ -250,7 +250,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AbstractMultipleGenomeBrowser mgb = GeckoInstance.getInstance().getGui().getMgb();
+				MultipleGenomesBrowserInterface mgb = GeckoInstance.getInstance().getGui().getMgb();
                 List<GeneCluster> gcs = tableModel.getSelected();
                 if (gcs.isEmpty())
                     return;

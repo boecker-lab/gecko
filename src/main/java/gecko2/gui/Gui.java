@@ -32,7 +32,7 @@ public class Gui {
 
 	private final JFrame mainframe;
 	
-	private final AbstractMultipleGenomeBrowser mgb;
+	private final MultipleGenomesBrowserInterface mgb;
 	private final GeneClusterSelector gcSelector;
 	private final GeneClusterDisplay gcDisplay;
 
@@ -106,7 +106,7 @@ public class Gui {
 		// Lowest component in the upper half of the window
 		final JScrollPane genomeBrowserScrollPane = new JScrollPane();
         genomeBrowserScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        genomeBrowserScrollPane.setViewportView(mgb);
+        genomeBrowserScrollPane.setViewportView(mgb.getBody());
 		
 		//Toolbar
 		JToolBar toolbar = new JToolBar();
@@ -294,7 +294,7 @@ public class Gui {
         }
 	}
 	
-	public AbstractMultipleGenomeBrowser getMgb() {
+	public MultipleGenomesBrowserInterface getMgb() {
 		return mgb;
 	}
 	

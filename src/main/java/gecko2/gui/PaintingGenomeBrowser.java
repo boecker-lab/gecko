@@ -20,7 +20,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	private final JPanel canvas;
 	private final Genome genome;
 	private final GeckoInstance gecko;
-	private final AbstractMultipleGenomeBrowser parent;
+	private final MultipleGenomesBrowserInterface parent;
 	private int borderSpace;
 	private static final int hgap = 2;
 	private static final int vgap = 2;
