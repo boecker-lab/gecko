@@ -263,7 +263,6 @@ public class Gui {
 		// Show JFrame
 		mainframe.pack();
 		mainframe.setLocationRelativeTo(null);
-		mainframe.addKeyListener(mgb.getWheelListener());
 		mainframe.setIconImage(createImageIcon("images/gecko2_a_small.png").getImage());
 		mainframe.setVisible(true);
 

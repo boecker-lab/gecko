@@ -13,7 +13,6 @@ public abstract class AbstractMultipleGenomeBrowser extends JPanel implements Cl
 	public abstract void addBrowserContentListener(BrowserContentListener l);
 	public abstract void addSelectionListener(ClusterSelectionListener s);
 	protected abstract void fireBrowserContentChanged(short type);
-	public abstract ScrollListener getWheelListener();
 	
 	public abstract void clear();
 	public abstract void clearSelection();

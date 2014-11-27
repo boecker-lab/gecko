@@ -29,10 +29,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	private final List<AbstractGenomeBrowser> genomeBrowsers;
 	private final ScrollListener wheelListener;
 	private final List<GBNavigator> gbNavigators;
-
-    public enum GenomeFilterMode {
-        None, Include, Exclude
-    }
+    //private final MouseWheelListener mouseWheelListener;
 	
 	private final GeckoInstance gecko;
 
@@ -51,7 +48,52 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 	 * false filter is inactive
 	 * true filter is active
 	 */
-	private boolean filterNonContainedGenomes = false; 
+	private boolean filterNonContainedGenomes = false;
+
+    /*private static class GenomeBrowserGuiRow{
+        private final JComboBox genomeFilterBox;
+        private final JLabel genomeName;
+        private final AbstractGenomeBrowser genomeBrowser;
+        private final GBNavigator gbNavigator;
+
+        public GenomeBrowserGuiRow(Genome genome, MultipleGenomesBrowser parent, GenomePainting.NameType nameType, ){
+            AbstractGenomeBrowser gb = new PaintingGenomeBrowser(genome, parent, nameType);
+            gb.addMouseWheelListener(mouseWheelListener);
+            gb.addComponentListener(genomeBrowserComponentListener);
+            this.genomeBrowsers.add(gb);
+            JPanel boxPanel = new JPanel();
+
+            boxPanel.setBackground(gb.getBackground());
+            boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
+
+            JLabel genomeName = new JLabel(g.getName());
+            genomeName.setFont(genomeName.getFont().deriveFont(10.0f));
+            genomeName.setBackground(gb.getBackground());
+            genomeName.setOpaque(true);
+            JScrollPane scrollPane = new JScrollPane(genomeName, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(Integer.MAX_VALUE, 5));
+            scrollPane.setPreferredSize(new Dimension(100, getGenomeBrowserHeight()));
+
+            JComboBox box = createComboBox(genomeBrowsers.size());
+            boxPanel.add(box);
+            boxPanel.add(Box.createRigidArea(new Dimension(2, 0)));
+            boxPanel.add(scrollPane);
+            boxPanel.add(Box.createRigidArea(new Dimension(2, 0)));
+            boxPanel.add(gb);
+            GBNavigator nav = new GBNavigator(boxPanel, genomeBrowsers.size() - 1);
+            this.gbNavigators.add(nav);
+            this.centerpanel.add(boxPanel);
+            rightPanel.add(nav);
+            this.setPreferredSize(new Dimension((int)this.getPreferredSize().getWidth(), (int) this.getPreferredSize().getHeight() + getGenomeBrowserHeight()));
+            this.repaint();
+
+            this.revalidate();
+        }
+    }*/
+
+    public enum GenomeFilterMode {
+        None, Include, Exclude
+    }
 	
 	public MultipleGenomesBrowser() {
 		gecko = GeckoInstance.getInstance();
@@ -75,7 +117,6 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 		this.add(centerpanel,BorderLayout.CENTER);
 		this.add(leftpanel,BorderLayout.WEST);
 		this.add(rightPanel,BorderLayout.EAST);
-		this.addKeyListener(this.wheelListener);
 		this.addMouseWheelListener(this.wheelListener);
 	}
 
@@ -124,44 +165,26 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
     public GeneClusterLocationSelection getClusterSelection() {
         return clusterLocationSelection;
     }
-
-    @Override
-	public ScrollListener getWheelListener() {
-		return wheelListener;
-	}
 	
 	@Override
 	public int getNrGenomes() {
 		return genomeBrowsers.size();
 	}
 	
-	class ScrollListener extends KeyAdapter implements MouseWheelListener {
-		
+	class ScrollListener implements MouseWheelListener {
 		public void mouseWheelMoved(MouseWheelEvent e) {
-			if (!e.isShiftDown()) {
-				for (AbstractGenomeBrowser gb : MultipleGenomesBrowser.this.genomeBrowsers) {
-					gb.adjustScrollPosition(e.getUnitsToScroll());
-				}
-				fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
-			}
+            if (e.isShiftDown() || !(e.getSource() instanceof AbstractGenomeBrowser)) {
+                handleGlobalMouseWheelEvent(e);
+                return;
+            } else {
+                if (e.getSource() instanceof AbstractGenomeBrowser) {
+                    ((AbstractGenomeBrowser) e.getSource()).adjustScrollPosition(e.getUnitsToScroll());
+                    fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
+                }
+            }
 		}
 
 	}
-
-	private final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
-		
-		@Override
-		public void mouseWheelMoved(MouseWheelEvent e) {
-			if (e.isShiftDown()) {
-				handleGlobalMouseWheelEvent(e);
-				return;
-			}			
-			if (e.getSource() instanceof AbstractGenomeBrowser) {
-				((AbstractGenomeBrowser) e.getSource()).adjustScrollPosition(e.getUnitsToScroll());
-				fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
-			}
-		}
-	};
 	
 	@Override
 	public void changeGeneElementHight(int adjustment) {
@@ -215,7 +238,7 @@ public class MultipleGenomesBrowser extends AbstractMultipleGenomeBrowser {
 
     private void addGenome(Genome g)	{
 		AbstractGenomeBrowser gb = new PaintingGenomeBrowser(g, this, nameType);
-		gb.addMouseWheelListener(mouseWheelListener);
+		gb.addMouseWheelListener(wheelListener);
 		gb.addComponentListener(genomeBrowserComponentListener);
 		this.genomeBrowsers.add(gb);
 		JPanel boxPanel = new JPanel();
