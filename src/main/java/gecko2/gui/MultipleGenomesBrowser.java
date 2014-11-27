@@ -22,8 +22,6 @@ import java.util.List;
  * @author original author unknown
  */
 public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
-	private static final long serialVersionUID = -6769789368841494821L;
-
     private final JPanel body;
 	private final JPanel centerpanel;
 	private final JPanel rightPanel;
