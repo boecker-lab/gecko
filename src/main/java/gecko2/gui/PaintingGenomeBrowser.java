@@ -82,13 +82,11 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		this.repaint();
 	}
 
-	@Override
-	public int getScrollValue() {
+	private int getScrollValue() {
 		return this.getHorizontalScrollBar().getValue();
 	}
 
-	@Override
-	public int getMaximumValue() {
+	private int getMaximumValue() {
 		return this.getHorizontalScrollBar().getMaximum();
 	}
 
@@ -185,17 +183,11 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	}
 
 	@Override
-	public int getScrollWidth() {
-		return this.getHorizontalScrollBar().getWidth();
-	}
-
-	@Override
 	public Genome getGenome() {
 		return genome;
 	}
 
-	@Override
-	public int getGeneWidth() {
+	private int getGeneWidth() {
 		return getGeneElementWidth() + 2 * hgap;
 	}
 	

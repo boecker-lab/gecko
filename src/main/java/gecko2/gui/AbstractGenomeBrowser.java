@@ -6,8 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 
 abstract class AbstractGenomeBrowser extends JScrollPane implements Adjustable{
-	public abstract int getScrollValue();
-	public abstract int getMaximumValue();
 	public abstract void adjustScrollPosition(int value);
 	public abstract void scrollToPosition(int chromosomeIndex, int geneIndex);
 	public abstract boolean isFlipped();
@@ -28,9 +26,7 @@ abstract class AbstractGenomeBrowser extends JScrollPane implements Adjustable{
      */
 	public abstract void highlightCluster(int chr, int start, int stop, Color highlightColor);
 	public abstract void clearHighlight();
-	public abstract int getScrollWidth();
 	public abstract Genome getGenome();
-	public abstract int getGeneWidth();
 	public abstract int getGBHeight();
     public abstract void setNameType(GenomePainting.NameType nameType);
 }
