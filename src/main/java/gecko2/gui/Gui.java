@@ -31,7 +31,7 @@ public class Gui {
 	private final GeckoInstance gecko;
 
 	private final JFrame mainframe;
-	
+
 	private final MultipleGenomesBrowserInterface mgb;
 	private final GeneClusterSelector gcSelector;
 	private final GeneClusterDisplay gcDisplay;
@@ -288,9 +288,7 @@ public class Gui {
 	
 	public void updateViewscreen() {
         if (mgb != null) {
-            this.mgb.clear();
-            if (gecko.getGenomes() != null)
-                this.mgb.addGenomes(gecko.getGenomes());
+            mgb.setGenomes(gecko.getGenomes());
         }
 	}
 	

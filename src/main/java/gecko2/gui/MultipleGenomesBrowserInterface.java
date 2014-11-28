@@ -12,7 +12,13 @@ public interface MultipleGenomesBrowserInterface extends ClusterSelectionListene
 	
 	public void clear();
 	public void clearSelection();
-	public void addGenomes(Genome[] g);
+
+    /**
+     * Sets the genomes to the given array of Genomes, clearing the old genomes.
+     * If the array is null, only clears the old genomes.
+     * @param g
+     */
+	public void setGenomes(Genome[] g);
     public void updateGeneSize();
     public void changeNameType(GenomePainting.NameType nameType);
 

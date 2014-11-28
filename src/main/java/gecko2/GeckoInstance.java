@@ -230,13 +230,11 @@ public class GeckoInstance {
      */
     public void reorderGenomes(int index) {
         this.data.reorderGenomes(index);
-        this.gui.getMgb().clear();
         dataUpdated();
     }
 	
 	public void addReferenceGenome(Genome referenceGenome) {
         this.data.addReferenceGenome(referenceGenome);
-        this.gui.getMgb().clear();
         dataUpdated();
 	}
 	
@@ -268,11 +266,11 @@ public class GeckoInstance {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    gui.updateViewscreen();
                     if (data.getGenomes() != null)
                         scd = new StartComputationDialog();
                     else
                         scd = null;
-                    gui.updateViewscreen();
                     fireDataChanged();
                 }
             });
