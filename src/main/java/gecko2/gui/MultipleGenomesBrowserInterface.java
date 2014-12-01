@@ -11,20 +11,21 @@ public interface MultipleGenomesBrowserInterface extends ClusterSelectionListene
 	public void fireBrowserContentChanged(short type);
 	
 	public void clear();
-	public void clearSelection();
-
     /**
      * Sets the genomes to the given array of Genomes, clearing the old genomes.
      * If the array is null, only clears the old genomes.
      * @param g
      */
-	public void setGenomes(Genome[] g);
+    public void setGenomes(Genome[] g);
+
+	public void clearSelection();
+
     public void updateGeneSize();
+    public void changeGeneElementHight(int adjustment);
     public void changeNameType(GenomePainting.NameType nameType);
 
 	public void centerCurrentClusterAt(GeneFamily geneFamily);
     public GeneClusterLocationSelection getClusterSelection();
-	public void changeGeneElementHight(int adjustment);
 	public void hideNonClusteredGenomes(boolean hide);
 
     public JPanel getBody();
