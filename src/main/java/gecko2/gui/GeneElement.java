@@ -14,10 +14,6 @@ public class GeneElement extends JPanel implements Adjustable {
 	public static final short ORIENTATION_BACKWARDS = 1;
 	public static final short ORIENTATION_NONE = 0;
 	
-	public static final short BORDER_LEFT = 1;
-	public static final short BORDER_NO = 2;
-	public static final short BORDER_RIGHT = 3;
-	
 	public static final Color COLOR_HIGHLIGHT_DEFAULT = new Color(120,120,254);
 	public static final Color COLOR_HIGHLIGHT_REFCLUST = Color.RED;
 	
@@ -31,14 +27,8 @@ public class GeneElement extends JPanel implements Adjustable {
 	private boolean unknown = false;
 	private boolean fixedSize = false;
 	private final Gene gene;
-	
-	private Color highlightColor;
-	
+
 	private final GeckoInstance gecko;
-	
-	public GeneElement(Gene g) {
-		this(g, false);
-	}
 	
 	public GeneElement(Gene g, boolean fixedSize) {
 		this.gecko = GeckoInstance.getInstance();
@@ -47,15 +37,6 @@ public class GeneElement extends JPanel implements Adjustable {
 		this.adjustSize();
 		this.setBackground(Color.WHITE);
 		updateElement();
-	}
-
-	
-	public boolean isUnknown() {
-		return unknown;
-	}
-	
-	public void setUnknown(boolean unknown) {
-		this.unknown = unknown;
 	}
 	
 	private int computeHeight() {
@@ -102,22 +83,6 @@ public class GeneElement extends JPanel implements Adjustable {
 			else
 				this.setToolTipText("----");
 	}
-	
-	public void setHighlighted(Color highlightColor) {
-		this.highlightColor = highlightColor;
-		this.repaint();
-	}
-	
-	public boolean isHighlighted() {
-        return this.highlightColor != null;
-    }
-		
-	public void setGrey(boolean grey) {
-		this.grey = grey;
-		this.repaint();
-	}
-	
-
 		
 	@Override 
 	protected void paintComponent(Graphics g) 
@@ -127,12 +92,6 @@ public class GeneElement extends JPanel implements Adjustable {
 		int ELEMHIGHT = computeHeight();
 		int ELEMENTWIDTH = computeWidth();
 		Color c;
-		
-		if (this.highlightColor != null) {
-//			c = new Color(120,120,254);
-			g.setColor(this.highlightColor);
-			g.fillRect(0, 0, (int) getPreferredSize().getWidth(), getPreferredHeight());
-		}
 		
 		if (this.unknown)
 			c = Color.GRAY;
