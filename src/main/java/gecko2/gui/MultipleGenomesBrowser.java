@@ -27,8 +27,8 @@ import java.util.List;
 public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
     private final JPanel body;
 	private final List<AbstractGenomeBrowser> genomeBrowsers;
-    private final List<JScrollPane> genomeLabels;
-    private final List<JComboBox<GenomeFilterMode>> genomeFilterBoxes;
+    private final List<GenomeLabel> genomeLabels;
+    private final List<GenomeFilterBox> genomeFilterBoxes;
     private final List<GBNavigator> gbNavigators;
 	private final ScrollListener wheelListener;
 	private final GeckoInstance gecko;
@@ -151,22 +151,6 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
 		}
 	};
 	
-	/**
-	 * This method creates the combo box on each genome browser.
-	 * It sets the name, selection and implements an ActionListener
-	 * which handles the different selection events.
-	 * 
-	 * @param genomeBrowsersSize size of the ArrayList genomeBrowsers.
-	 * this is the id of the genome.
-	 * @return a JComboBox for the use in a GenomeBrowser
-	 */
-	private JComboBox<GenomeFilterMode> createComboBox(int genomeBrowsersSize) {
-		JComboBox<GenomeFilterMode> box = new JComboBox<>(GenomeFilterMode.values());
-		box.setName(Integer.toString(genomeBrowsersSize - 1));
-        gecko.getGui().getGcSelector().addIncludeExcludeFilterComboBox(box);
-		return box;
-	}
-	
 	@Override
 	public void setGenomes(Genome[] genomes) {
         clear();
@@ -194,17 +178,9 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
         gb.addComponentListener(genomeBrowserComponentListener);
         genomeBrowsers.add(gb);
 
-        JLabel genomeName = new JLabel(g.getName());
-        genomeName.setFont(genomeName.getFont().deriveFont(10.0f));
-        genomeName.setBackground(gb.getBackground());
-        genomeName.setOpaque(true);
-        JScrollPane scrollPane = new JScrollPane(genomeName, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(Integer.MAX_VALUE, 5));
-        scrollPane.setPreferredSize(new Dimension(100, getGenomeBrowserHeight()));
-        genomeLabels.add(scrollPane);
+        genomeLabels.add(new GenomeLabel(gb, g));
 
-        JComboBox genomeFilter = createComboBox(genomeBrowsers.size());
-        genomeFilterBoxes.add(genomeFilter);
+        genomeFilterBoxes.add(new GenomeFilterBox(gb, genomeBrowsers.size() - 1));
 
         GBNavigator nav = new GBNavigator(gb, genomeBrowsers.size() - 1);
         gbNavigators.add(nav);
@@ -241,7 +217,6 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
 
 	@Override
 	public void clear() {
-        //body.setPreferredSize(new Dimension(0,0));
 		body.removeAll();
 		genomeBrowsers.clear();
 		gbNavigators.clear();
@@ -424,11 +399,100 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
 
     }
 
+    private static class GenomeLabel extends JScrollPane {
+        private final JComponent sizeReference;
+
+        private final ComponentListener componentListener = new ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                GenomeLabel.this.invalidate();
+                GenomeLabel.this.getParent().validate();
+            }
+        };
+
+        public GenomeLabel(JComponent sizeReference, Genome g){
+            super(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            this.sizeReference = sizeReference;
+            sizeReference.addComponentListener(componentListener);
+            JLabel genomeName = new JLabel(g.getName());
+            genomeName.setFont(genomeName.getFont().deriveFont(10.0f));
+            genomeName.setBackground(sizeReference.getBackground());
+            genomeName.setOpaque(true);
+            this.setViewportView(genomeName);
+            this.getHorizontalScrollBar().setPreferredSize(new Dimension(Integer.MAX_VALUE, 5));
+            this.setPreferredSize(new Dimension(100, sizeReference.getHeight()));
+        }
+
+        @Override
+        public Dimension getMinimumSize() {
+            Dimension d = super.getMinimumSize();
+            return new Dimension((int) d.getWidth(),sizeReference.getHeight());
+        }
+
+        @Override
+        public Dimension getMaximumSize() {
+            Dimension d = super.getMaximumSize();
+            return new Dimension((int) d.getWidth(),sizeReference.getHeight());
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            return new Dimension((int) d.getWidth(),sizeReference.getHeight());
+        }
+    }
+
+    /**
+     * The filter mode combo box on each genome browser.
+     * It sets the name, selection and implements an ActionListener
+     * which handles the different selection events.
+     */
+    private static class GenomeFilterBox extends JComboBox<GenomeFilterMode>{
+        private final JComponent sizeReference;
+
+        private final ComponentListener componentListener = new ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                GenomeFilterBox.this.invalidate();
+                GenomeFilterBox.this.getParent().validate();
+            }
+        };
+
+        /**
+         * @param sizeReference this component will always have the same height. Must not be null!
+         * @param id
+         */
+        public GenomeFilterBox(JComponent sizeReference, int id) {
+            super(GenomeFilterMode.values());
+            this.setName(Integer.toString(id));
+            this.sizeReference = sizeReference;
+            this.sizeReference.addComponentListener(componentListener);
+            GeckoInstance.getInstance().getGui().getGcSelector().addIncludeExcludeFilterComboBox(this);
+        }
+
+        @Override
+        public Dimension getMinimumSize() {
+            Dimension d = super.getMinimumSize();
+            return new Dimension((int) d.getWidth(),sizeReference.getHeight());
+        }
+
+        @Override
+        public Dimension getMaximumSize() {
+            Dimension d = super.getMaximumSize();
+            return new Dimension((int) d.getWidth(),sizeReference.getHeight());
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            return new Dimension((int) d.getWidth(),sizeReference.getHeight());
+        }
+    }
+
     /**
      * Allows navigation to the different occurrences of one cluster on one genome
      */
     private class GBNavigator  extends JPanel implements ActionListener {
-
         /**
          * Random generated serialization UID
          */
@@ -442,8 +506,7 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
                 GBNavigator.this.invalidate();
-                GBNavigator.this.getParent().doLayout();
-                GBNavigator.this.doLayout();
+                GBNavigator.this.getParent().validate();
             }
         };
 
@@ -478,12 +541,8 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
 
         @Override
         public Dimension getMinimumSize() {
-            if (sizeReference!=null) {
-                Dimension d = super.getMinimumSize();
-                return new Dimension((int) d.getWidth(),sizeReference.getHeight());
-            } else
-                return new Dimension(0,0);
-
+            Dimension d = super.getMinimumSize();
+            return new Dimension((int) d.getWidth(),sizeReference.getHeight());
         }
 
         @Override
