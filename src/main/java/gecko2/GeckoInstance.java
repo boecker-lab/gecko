@@ -56,12 +56,8 @@ public class GeckoInstance {
     private Gui gui;
 
     private StartComputationDialog scd = null;
-	
-	private int geneElementHight;
-    public static final int DEFAULT_GENE_HIGHT = 20;
+
     public static final int DEFAULT_MAX_GENE_NAME_LENGTH = 6;
-    private final static int MAX_GENEELEMENT_HIGHT = 40;
-    private final static int MIN_GENEELEMENT_HIGHT = 9;
 
     private int maxGeneNameLength = DEFAULT_MAX_GENE_NAME_LENGTH;
 
@@ -187,26 +183,6 @@ public class GeckoInstance {
     public Map<String, GeneFamily> getGeneLabelMap() {
         return data.getGeneLabelMap();
     }
-
-	public int getGeneElementHight() {
-		return geneElementHight;
-	}
-	
-	public int getGeneElementWidth() {
-        return (int) Math.round(geneElementHight*1.75);
-	}
-	
-	public void setGeneElementHight(int geneElementHight) {
-		this.geneElementHight = geneElementHight;
-	}
-	
-	public boolean canZoomIn() {
-		return (geneElementHight<=MAX_GENEELEMENT_HIGHT);
-	}
-	
-	public boolean canZoomOut() {
-		return (geneElementHight>=MIN_GENEELEMENT_HIGHT);
-	}
 	
 	public void setDebug(boolean debug) {
 		this.debug = debug;
@@ -325,7 +301,6 @@ public class GeckoInstance {
 	}
 
 	private GeckoInstance() {
-		this.setGeneElementHight(DEFAULT_GENE_HIGHT);
 		ToolTipManager.sharedInstance().setInitialDelay(0);
 	}
 	

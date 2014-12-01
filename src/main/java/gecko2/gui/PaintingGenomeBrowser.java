@@ -202,12 +202,12 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		if (maxLengthString == null || maxLengthString.length() != gecko.getMaxLength(nameType)){
 			maxLengthString = GenomePainting.buildMaxLengthString(gecko.getMaxLength(nameType));
 		}
-		return GenomePainting.getGeneWidth(canvas.getGraphics(), maxLengthString, gecko.getGeneElementHight());
+		return GenomePainting.getGeneWidth(canvas.getGraphics(), maxLengthString, parent.getGeneElementHeight());
 	}
 
 	@Override
 	public int getGBHeight() {
-		return 2 * vgap + gecko.getGeneElementHight();
+		return 2 * vgap + parent.getGeneElementHeight();
 	}
 
     @Override
@@ -250,7 +250,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			GenomePainting.paintGenomeWithCluster(g, genome, flipped, highlights, nameType, highlightColor, borderSpace, vgap, getGeneElementWidth(), gecko.getGeneElementHight(), hgap, vgap);
+			GenomePainting.paintGenomeWithCluster(g, genome, flipped, highlights, nameType, highlightColor, borderSpace, vgap, getGeneElementWidth(), parent.getGeneElementHeight(), hgap, vgap);
 		}
 	}
 	

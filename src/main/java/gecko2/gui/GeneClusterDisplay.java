@@ -144,7 +144,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         if (maxLengthString == null || maxLengthString.length() != idLength){
             maxLengthString = GenomePainting.buildMaxLengthString(idLength);
         }
-        geneWidth = GenomePainting.getGeneWidth(masterPanel.getGraphics(), maxLengthString, GeckoInstance.DEFAULT_GENE_HIGHT);
+        geneWidth = GenomePainting.getGeneWidth(masterPanel.getGraphics(), maxLengthString, MultipleGenomesBrowser.DEFAULT_GENE_HEIGHT);
     }
 
 	private void update() {
@@ -459,7 +459,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         @Override
         public void setValue(Object value) {
             if (value instanceof GeneFamily) {
-                GenomePainting.GeneIcon icon = new GenomePainting.GeneIcon((GeneFamily)value, geneWidth, GeckoInstance.DEFAULT_GENE_HIGHT);
+                GenomePainting.GeneIcon icon = new GenomePainting.GeneIcon((GeneFamily)value, geneWidth, MultipleGenomesBrowser.DEFAULT_GENE_HEIGHT);
                 setIcon(icon);
             } else
                 setIcon(null);

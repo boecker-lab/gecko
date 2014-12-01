@@ -33,6 +33,17 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
 	private final ScrollListener wheelListener;
 	private final GeckoInstance gecko;
 
+    /*
+     * Some Size values for the gui
+     */
+    public static final int DEFAULT_GENE_HEIGHT = 20;
+    private final static int MAX_GENEELEMENT_HIGHT = 40;
+    private final static int MIN_GENEELEMENT_HIGHT = 9;
+    private int geneElementHeight = DEFAULT_GENE_HEIGHT;
+
+    private static final Color COLOR_HIGHLIGHT_DEFAULT = new Color(120,120,254);
+    private static final Color COLOR_HIGHLIGHT_REFCLUST = Color.RED;
+
     /**
      * All information about the selected cluster, which sub locations are selected, etc.
      */
@@ -121,14 +132,19 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
 	
 	@Override
 	public void changeGeneElementHeight(int adjustment) {
-		gecko.setGeneElementHight(gecko.getGeneElementHight() + adjustment);
+		geneElementHeight = geneElementHeight + adjustment;
 		adjustAllSizes();
         body.repaint();
 	}
-	
-	/*
-	 * When a GenomeBrowser 
-	 */
+
+    @Override
+    public int getGeneElementHeight() {
+        return geneElementHeight;
+    }
+
+    /*
+         * When a GenomeBrowser
+         */
 	private final ComponentListener genomeBrowserComponentListener = new ComponentAdapter() {
 		public void componentResized(java.awt.event.ComponentEvent e) {
 			fireBrowserContentChanged(BrowserContentEvent.ZOOM_FACTOR_CHANGED);
@@ -204,6 +220,16 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
     @Override
     public void updateGeneWidth() {
         adjustAllSizes();
+    }
+
+    @Override
+    public boolean canZoomIn() {
+        return (geneElementHeight<=MAX_GENEELEMENT_HIGHT);
+    }
+
+    @Override
+    public boolean canZoomOut() {
+        return (geneElementHeight>=MIN_GENEELEMENT_HIGHT);
     }
 
     @Override
@@ -320,9 +346,9 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
 			Subsequence s = gc.getOccurrences(includeSuboptimalOccs).getSubsequences()[i][subselection[i]];
 			scrollToPosition(i, s.getChromosome(), (s.getStart() - 1 + s.getStop() - 1) / 2);
 			if (i == gc.getRefSeqIndex()) {
-				genomeBrowsers.get(i).highlightCluster(s.getChromosome(), s.getStart() - 1, s.getStop() - 1, GeneElement.COLOR_HIGHLIGHT_REFCLUST);
+				genomeBrowsers.get(i).highlightCluster(s.getChromosome(), s.getStart() - 1, s.getStop() - 1, COLOR_HIGHLIGHT_REFCLUST);
 			} else {
-				genomeBrowsers.get(i).highlightCluster(s.getChromosome(), s.getStart() - 1, s.getStop() - 1, GeneElement.COLOR_HIGHLIGHT_DEFAULT);
+				genomeBrowsers.get(i).highlightCluster(s.getChromosome(), s.getStart() - 1, s.getStop() - 1, COLOR_HIGHLIGHT_DEFAULT);
 			}
 		}		
 	}

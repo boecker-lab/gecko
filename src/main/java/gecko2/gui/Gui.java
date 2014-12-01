@@ -363,8 +363,8 @@ public class Gui {
 		clearSelectionAction.setEnabled(clusterBrowserActive);
 		saveSessionAction.setEnabled(clusterBrowserActive);
 		if (clusterBrowserActive) {
-			zoomIn.setEnabled(gecko.canZoomIn());
-			zoomOut.setEnabled(gecko.canZoomOut());
+			zoomIn.setEnabled(mgb.canZoomIn());
+			zoomOut.setEnabled(mgb.canZoomOut());
 		} else {
 			zoomIn.setEnabled(false);
 			zoomOut.setEnabled(false);
@@ -656,8 +656,8 @@ public class Gui {
 		private static final long serialVersionUID = 6370914610738020426L;
 		public void actionPerformed(ActionEvent e) {
 			Gui.this.mgb.changeGeneElementHeight(+2);
-			this.setEnabled(gecko.canZoomIn());
-			zoomOut.setEnabled(gecko.canZoomOut());
+			this.setEnabled(mgb.canZoomIn());
+			zoomOut.setEnabled(mgb.canZoomOut());
 		}
 	};
 	
@@ -665,8 +665,8 @@ public class Gui {
 		private static final long serialVersionUID = -5867464557496189529L;
 		public void actionPerformed(ActionEvent e) {
 			Gui.this.mgb.changeGeneElementHeight(-2);
-			this.setEnabled(gecko.canZoomOut());
-			zoomIn.setEnabled(gecko.canZoomIn());
+			this.setEnabled(mgb.canZoomOut());
+			zoomIn.setEnabled(mgb.canZoomIn());
 		}
 	};
 
