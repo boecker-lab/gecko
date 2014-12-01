@@ -73,7 +73,7 @@ public class StartComputationDialog extends JDialog {
         modeCombo.setSelectedIndex(0);
 
 		final String[] qValues = new String[gecko.getGenomes().length-1];
-		qValues[qValues.length-1] = "all";
+		qValues[Math.max(qValues.length-1, 0)] = "all";
 		for (int i=2;i<gecko.getGenomes().length;i++)
 			qValues[i-2] = Integer.toString(i);
 		final JComboBox<String> qCombo = new JComboBox<>(qValues);

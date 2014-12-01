@@ -20,16 +20,23 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	private final JPanel canvas;
 	private final Genome genome;
 	private final GeckoInstance gecko;
-	private final MultipleGenomesBrowserInterface parent;
-	private int borderSpace;
+	private final MultipleGenomesBrowser parent;
+	private final int borderSpace = 10000;
 	private static final int hgap = 2;
 	private static final int vgap = 2;
 
 	private String maxLengthString;
 	private GenomePainting.NameType nameType;
+
     private boolean flipped;
+
+    /**
+     * The current scroll position
+     */
     private int geneIndex;
     private int chromosomeIndex;
+    private int minPosition;
+    private int maxPosition;
 
 
 	/**
@@ -62,24 +69,34 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		this.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
-		this.adjustSize();
 		this.addComponentListener(new PaintingGenomeBrowserListener());
 		PaintingGenomeBrowserMouseListener listener = new PaintingGenomeBrowserMouseListener();
 		canvas.addMouseMotionListener(listener);
 		canvas.addMouseListener(listener);
+        scrollToInitialPosition();
+        this.adjustSize();
 	}
+
+    @Override
+    public Dimension getMaximumSize(){
+        return new Dimension(getCanvasWidth(), getGBHeight());
+    }
+
+    @Override
+    public Dimension getMinimumSize(){
+        return new Dimension(50, getGBHeight());
+    }
+
+    @Override
+    public Dimension getPreferredSize(){
+        return new Dimension(getCanvasWidth(), getGBHeight());
+    }
 
 	@Override
 	public void adjustSize() {
-		this.setMaximumSize(new Dimension(Integer.MAX_VALUE, getGBHeight()));
-		this.setMinimumSize(new Dimension(20, getGBHeight()));
-		this.setPreferredSize(new Dimension(20, getGBHeight()));
-		borderSpace = (int)this.getSize().getWidth();
-		
 		this.canvas.setPreferredSize(new Dimension (getCanvasWidth(), getGBHeight()));
-
+        setMinMaxPositions();
 		this.revalidate();
-		this.repaint();
 	}
 
 	private int getScrollValue() {
@@ -92,22 +109,47 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 
 	@Override
 	public void adjustScrollPosition(int value) {
-        this.chromosomeIndex = -1;
-        this.geneIndex = -1;
-		this.getHorizontalScrollBar().setValue(this.getHorizontalScrollBar().getValue() + value);
+        int newScrollValue = getHorizontalScrollBar().getValue() + value;
+        checkAndSetCenterGene(newScrollValue);
+		this.getHorizontalScrollBar().setValue(newScrollValue);
 		parent.fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
 	}
 	
 	@Override
 	public void scrollToPosition(int chromosomeIndex, int geneIndex) {
-        this.chromosomeIndex = chromosomeIndex;
-        this.geneIndex = geneIndex;
-		this.getHorizontalScrollBar().setValue(getScrollPosition(chromosomeIndex, geneIndex));
+        int newScrollPosition = getCenterScrollPosition(chromosomeIndex, geneIndex);
+        setMinMaxPositions(chromosomeIndex, geneIndex, newScrollPosition);
+		this.getHorizontalScrollBar().setValue(newScrollPosition);
 		parent.fireBrowserContentChanged(BrowserContentEvent.SCROLL_VALUE_CHANGED);
 	}
+
+    /**
+     * Finds the genes that will make the genome start at the left border and scrolls there
+     */
+    private void scrollToInitialPosition(){
+        int chromosomeIndex = 0;
+        int geneIndex = 0;
+
+        int scrollPosition = 0;
+        while(scrollPosition < 8){ // skip 8 genes
+            if (geneIndex == genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1){
+                if (chromosomeIndex == genome.getChromosomes().size() - 1)
+                    break;
+                geneIndex = 0;
+                chromosomeIndex++;
+                scrollPosition += 2;
+            } else {
+                geneIndex++;
+                scrollPosition ++;
+            }
+        }
+        scrollToPosition(chromosomeIndex, geneIndex);
+    }
+
 	
-	private int getScrollPosition(int chromosomeIndex, int geneIndex) {
-		int scrollPosition = borderSpace/2;  // skip left border (+ borderSpace), but we want the gene in the middle (- borderSpace/2) 
+	private int getCenterScrollPosition(int chromosomeIndex, int geneIndex) {
+		int scrollPosition = borderSpace;  // skip left border (+ borderSpace)
+        scrollPosition -= this.getWidth()/2; // un-skip half the width, so we are centered
 		for (int i=0; i<chromosomeIndex; i++) {
 			scrollPosition += 2 * getChromosomeEndingWidth();
 			scrollPosition += genome.getChromosomes().get(i).getGenes().size() * getGeneWidth();
@@ -120,8 +162,106 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
             scrollPosition += (genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1 - geneIndex) * getGeneWidth();
 
 		scrollPosition += getGeneWidth()/2; // center on the middle of the gene
+
+        setMinMaxPositions(chromosomeIndex, geneIndex, scrollPosition);
+
 		return scrollPosition;
 	}
+
+    private void setMinMaxPositions() {
+        if (chromosomeIndex < 0)
+            return;
+        int centerPosition = getCenterScrollPosition(chromosomeIndex, geneIndex);
+        setMinMaxPositions(chromosomeIndex, geneIndex, centerPosition);
+    }
+
+    /**
+     * Sets the minimum and maximum scroll positions that still center on this gene.
+     * @param chromosomeIndex
+     * @param geneIndex
+     * @param scrollPosition the center position for this gene
+     */
+    private void setMinMaxPositions(int chromosomeIndex, int geneIndex, int scrollPosition) {
+        this.chromosomeIndex = chromosomeIndex;
+        this.geneIndex = geneIndex;
+        minPosition = scrollPosition;
+        maxPosition = scrollPosition + getGeneWidth();
+        if (!flipped) {
+            if (geneIndex == 0) {
+                if (chromosomeIndex == 0)
+                    minPosition = 0;
+                else
+                    minPosition -= 2 * getChromosomeEndingWidth();
+            }
+            if (geneIndex == genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1) {
+                if (chromosomeIndex < genome.getChromosomes().size())
+                    maxPosition += 2 * getChromosomeEndingWidth();
+                else
+                    maxPosition = getHorizontalScrollBar().getMaximum();
+            }
+        } else {
+            if (geneIndex == 0) {
+                if (chromosomeIndex < genome.getChromosomes().size())
+                    maxPosition += 2 * getChromosomeEndingWidth();
+                else
+                    maxPosition = getHorizontalScrollBar().getMaximum();
+            }
+            if (geneIndex == genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1) {
+                if (chromosomeIndex == 0)
+                    minPosition = 0;
+                else
+                    minPosition -= 2 * getChromosomeEndingWidth();
+            }
+        }
+    }
+
+
+    private void checkAndSetCenterGene(int position){
+        boolean changedCenter = false;
+        if (!flipped) {
+            if (position < minPosition) {
+                if (geneIndex == 0) {
+                    chromosomeIndex--;
+                    geneIndex = genome.getChromosomes().get(chromosomeIndex).getGenes().size()-1;
+                    changedCenter = true;
+                } else {
+                    geneIndex--;
+                    changedCenter = true;
+                }
+            } else if (position > maxPosition) {
+                if (geneIndex == genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1){
+                    chromosomeIndex++;
+                    geneIndex = 0;
+                    changedCenter = true;
+                } else {
+                    geneIndex++;
+                    changedCenter = true;
+                }
+            }
+        } else {
+            if (position < minPosition) {
+                if (geneIndex == genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1){
+                    chromosomeIndex--;
+                    geneIndex = 0;
+                    changedCenter = true;
+                } else {
+                    geneIndex++;
+                    changedCenter = true;
+                }
+            } else if (position > maxPosition) {
+                if (geneIndex == 0) {
+                    chromosomeIndex++;
+                    geneIndex = genome.getChromosomes().get(chromosomeIndex).getGenes().size()-1;
+                    changedCenter = true;
+                } else {
+                    geneIndex--;
+                    changedCenter = true;
+                }
+            }
+        }
+        if (changedCenter)
+            setMinMaxPositions();
+    }
 
     /**
      * Returns the gene at the given x positions
@@ -178,6 +318,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	@Override
 	public void flip() {
         this.flipped = !this.flipped;
+        setMinMaxPositions();
         this.revalidate();
         this.repaint();
 	}
@@ -217,7 +358,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
     }
 
     private int getCanvasWidth() {
-		return 2 * borderSpace + 
+		return 2 * borderSpace +
 				genome.getTotalGeneNumber() * getGeneWidth() + 
 				2 * genome.getChromosomes().size() * getChromosomeEndingWidth();
 	}
@@ -258,8 +399,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		@Override
 		public void componentResized(ComponentEvent e) {
 			super.componentResized(e);
-			final int offset = -borderSpace + (int)PaintingGenomeBrowser.this.getSize().getWidth();
-			borderSpace = (int)PaintingGenomeBrowser.this.getSize().getWidth();
+			final int offset = (int)PaintingGenomeBrowser.this.getSize().getWidth();
 			canvas.setPreferredSize(new Dimension (getCanvasWidth(), getGBHeight()));
 			PaintingGenomeBrowser.this.revalidate();
 			PaintingGenomeBrowser.this.repaint();
