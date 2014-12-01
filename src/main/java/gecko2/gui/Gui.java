@@ -515,7 +515,7 @@ public class Gui {
                 gecko.setMaxGeneNameLength(Integer.MAX_VALUE);
             else
                 gecko.setMaxGeneNameLength(Integer.parseInt(actionEvent.getActionCommand()));
-            mgb.updateGeneSize();
+            mgb.updateGeneWidth();
         }
     };
 
@@ -655,7 +655,7 @@ public class Gui {
 	private final Action zoomIn = new AbstractAction() {
 		private static final long serialVersionUID = 6370914610738020426L;
 		public void actionPerformed(ActionEvent e) {
-			Gui.this.mgb.changeGeneElementHight(+2);
+			Gui.this.mgb.changeGeneElementHeight(+2);
 			this.setEnabled(gecko.canZoomIn());
 			zoomOut.setEnabled(gecko.canZoomOut());
 		}
@@ -664,7 +664,7 @@ public class Gui {
 	private final Action zoomOut = new AbstractAction() {
 		private static final long serialVersionUID = -5867464557496189529L;
 		public void actionPerformed(ActionEvent e) {
-			Gui.this.mgb.changeGeneElementHight(-2);
+			Gui.this.mgb.changeGeneElementHeight(-2);
 			this.setEnabled(gecko.canZoomOut());
 			zoomIn.setEnabled(gecko.canZoomIn());
 		}

@@ -20,8 +20,8 @@ public interface MultipleGenomesBrowserInterface extends ClusterSelectionListene
 
 	public void clearSelection();
 
-    public void updateGeneSize();
-    public void changeGeneElementHight(int adjustment);
+    public void updateGeneWidth();
+    public void changeGeneElementHeight(int adjustment);
     public void changeNameType(GenomePainting.NameType nameType);
 
 	public void centerCurrentClusterAt(GeneFamily geneFamily);

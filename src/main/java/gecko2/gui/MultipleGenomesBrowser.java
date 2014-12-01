@@ -120,7 +120,7 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
     }
 	
 	@Override
-	public void changeGeneElementHight(int adjustment) {
+	public void changeGeneElementHeight(int adjustment) {
 		gecko.setGeneElementHight(gecko.getGeneElementHight() + adjustment);
 		adjustAllSizes();
         body.repaint();
@@ -202,7 +202,7 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
     }
 
     @Override
-    public void updateGeneSize() {
+    public void updateGeneWidth() {
         adjustAllSizes();
     }
 
