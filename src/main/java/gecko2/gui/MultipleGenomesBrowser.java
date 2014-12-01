@@ -37,8 +37,8 @@ public class MultipleGenomesBrowser implements MultipleGenomesBrowserInterface {
      * Some Size values for the gui
      */
     public static final int DEFAULT_GENE_HEIGHT = 20;
-    private final static int MAX_GENEELEMENT_HIGHT = 40;
-    private final static int MIN_GENEELEMENT_HIGHT = 9;
+    private static final int MAX_GENEELEMENT_HIGHT = 40;
+    private static final int MIN_GENEELEMENT_HIGHT = 9;
     private int geneElementHeight = DEFAULT_GENE_HEIGHT;
 
     private static final Color COLOR_HIGHLIGHT_DEFAULT = new Color(120,120,254);
