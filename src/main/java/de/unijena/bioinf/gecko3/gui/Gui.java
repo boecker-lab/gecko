@@ -70,26 +70,24 @@ public class Gui {
         searchField = new JTextField("");
 		this.gcSelector = new GeneClusterSelector(searchField);
         gecko.addDataListener(gcSelector);
-		Dimension startDimension = new Dimension(1024, 768);
 		
 		// Basic frame settings
 		
 		mainframe = new JFrame("Gecko3");
 		mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		mainframe.setPreferredSize(startDimension);
+		mainframe.setPreferredSize(new Dimension(1024, 768));
 		mainframe.setLayout(new BorderLayout());
 
 		// SplitPane arrangements
 		// splits the gui in the vertical half
-        JSplitPane horiSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		horiSplit.setResizeWeight(0.5);
+        JSplitPane horizontalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		horizontalSplit.setResizeWeight(0.5);
 		
 		// splits the gui in horizontal half
-        JSplitPane vertSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		vertSplit.setResizeWeight(0.5);
-		vertSplit.setTopComponent(this.gcSelector);
-		
-		vertSplit.setBottomComponent(gcDisplay);
+        JSplitPane verticalSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		verticalSplit.setResizeWeight(0.5);
+		verticalSplit.setTopComponent(gcSelector);
+		verticalSplit.setBottomComponent(gcDisplay);
 
 		// Menu arrangements
         JMenu menuFile = new JMenu("File");
@@ -224,9 +222,9 @@ public class Gui {
 		northpanel.add(toolbar);
 		mainframe.add(northpanel, BorderLayout.NORTH);
 		
-		horiSplit.setTopComponent(genomeBrowserScrollPane);
-		horiSplit.setBottomComponent(vertSplit);
-		mainframe.add(horiSplit, BorderLayout.CENTER);
+		horizontalSplit.setTopComponent(genomeBrowserScrollPane);
+		horizontalSplit.setBottomComponent(verticalSplit);
+		mainframe.add(horizontalSplit, BorderLayout.CENTER);
 		JPanel southpanel = new JPanel();
 		southpanel.setLayout(new BoxLayout(southpanel, BoxLayout.LINE_AXIS));
 		
@@ -265,7 +263,8 @@ public class Gui {
 		mainframe.setLocationRelativeTo(null);
 		mainframe.setIconImage(createImageIcon("images/gecko3_a_small.png").getImage());
 		mainframe.setVisible(true);
-
+        horizontalSplit.setDividerLocation(0.5);
+        verticalSplit.setDividerLocation(0.5);
         // Update data
         gecko.setGeckoInstanceData();
 	}

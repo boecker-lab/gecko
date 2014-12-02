@@ -1,6 +1,7 @@
 package de.unijena.bioinf.gecko3.gui;
 
 import ca.odell.glazedlists.*;
+import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.matchers.AbstractMatcherEditor;
 import ca.odell.glazedlists.matchers.Matcher;
@@ -23,6 +24,7 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
+import java.awt.geom.Arc2D;
 import java.util.*;
 import java.util.List;
 
@@ -89,10 +91,9 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 		checkBoxPanel.add(selectionComboBox);
 		checkBoxPanel.add(showSuboptimalCheckBox);
 		this.add(checkBoxPanel, BorderLayout.PAGE_END);
-		this.setPreferredSize(new Dimension(50, 200));
 		table = new JTable();
 		table.setBackground(Color.WHITE);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.getViewport().setBackground(Color.WHITE);
@@ -293,7 +294,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         tableComparatorChooser.getComparatorsForColumn(COL_GENES).clear();
 
         final TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(COL_ID).setPreferredWidth(50); // ID
+        cm.getColumn(COL_ID).setPreferredWidth(30); // ID
         cm.getColumn(COL_NGENES).setPreferredWidth(50); // #Genes
         cm.getColumn(COL_NGENOMES).setPreferredWidth(70); // #Genomes
         cm.getColumn(COL_SCORE).setPreferredWidth(60); // pValue
@@ -449,14 +450,25 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         updateData();
     }
 
-    private class GeneClusterTableFormat implements TableFormat<GeneCluster> {
+    private class GeneClusterTableFormat implements AdvancedTableFormat<GeneCluster> {
         private final String[] columnNames = {"ID", "#Genes", "#Genomes", "Score", "C-Score", "Genes"};
+        private final Class<?>[] columns = {Integer.class, Integer.class, Integer.class, Double.class, Double.class, String.class};
         /**
          * The number of columns to display.
          */
         @Override
         public int getColumnCount() {
             return columnNames.length;
+        }
+
+        @Override
+        public Class getColumnClass(int column) {
+            return columns[column];
+        }
+
+        @Override
+        public Comparator getColumnComparator(int column) {
+            return GlazedLists.comparableComparator();
         }
 
         /**
