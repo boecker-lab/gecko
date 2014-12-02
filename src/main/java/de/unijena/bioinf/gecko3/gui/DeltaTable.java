@@ -6,7 +6,6 @@ import de.unijena.bioinf.gecko3.gui.util.JTableSelectAll;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,27 +17,22 @@ import java.util.Arrays;
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
-public class DeltaTable extends JPanel{
+public class DeltaTable{
     private final DeltaTableTableModel model;
-    private final JSpinner sizeSpinner;
+    private final JTable deltaTable;
 
-    public DeltaTable(Dimension dimension) {
-        this(dimension, Parameter.DeltaTable.getDefault().getDeltaTable(), Parameter.DeltaTable.getDefault().getMinimumSize());
+    public DeltaTable(final JSpinner sizeSpinner) {
+        this(sizeSpinner, Parameter.DeltaTable.getDefault().getDeltaTable(), Parameter.DeltaTable.getDefault().getMinimumSize());
     }
 
-    public DeltaTable(Dimension dimension, int[][] deltas, int initialMinimumSize) {
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setPreferredSize(dimension);
-        final JTable deltaTable = new JTableSelectAll();
-        JTableHeader header = deltaTable.getTableHeader();
-        header.setPreferredSize(new Dimension((int)dimension.getWidth(), 20));
+    public DeltaTable(final JSpinner sizeSpinner, int[][] deltas, int initialMinimumSize) {
+        deltaTable = new JTableSelectAll();
         deltaTable.setBackground(Color.WHITE);
         model = new DeltaTableTableModel(deltas);
         deltaTable.setModel(model);
         deltaTable.setRowSelectionAllowed(false);
         deltaTable.setCellSelectionEnabled(true);
         deltaTable.setDefaultRenderer(Integer.class, new DeltaTableCellRenderer());
-        deltaTable.setPreferredScrollableViewportSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight() - StartComputationDialog.COMBO_HEIGHT - StartComputationDialog.V_GAP));
         deltaTable.setFillsViewportHeight(true);
 
         // add popup menu to table
@@ -101,25 +95,6 @@ public class DeltaTable extends JPanel{
                 }
             }
         });
-
-        JScrollPane scrollPane = new JScrollPane(deltaTable);
-        add(scrollPane);
-
-        add(Box.createVerticalStrut(StartComputationDialog.V_GAP));
-
-        sizeSpinner = new JSpinner(new SpinnerNumberModel(initialMinimumSize, 0, Integer.MAX_VALUE, 1));
-        sizeSpinner.setPreferredSize(new Dimension(StartComputationDialog.COMBO_WIDTH, StartComputationDialog.COMBO_HEIGHT));
-        JLabel sizeLabel = new JLabel("Minimum cluster size: ", JLabel.LEFT);
-
-        final JPanel sizePanel = new JPanel();
-        sizePanel.setPreferredSize(new Dimension(dimension.width, StartComputationDialog.COMBO_HEIGHT+StartComputationDialog.V_GAP));
-        GridLayout gridLayout = new GridLayout(1, 2, StartComputationDialog.H_GAP, StartComputationDialog.V_GAP);
-        sizePanel.setLayout(gridLayout);
-
-        sizePanel.add(sizeLabel);
-        sizePanel.add(sizeSpinner);
-
-        add(sizePanel);
     }
 
     /**
@@ -326,7 +301,7 @@ public class DeltaTable extends JPanel{
         return model.getDeltaTable();
     }
 
-    public int getMinimumClusterSize(){
-        return (Integer)sizeSpinner.getValue();
+    public JTable getBody() {
+        return deltaTable;
     }
 }
