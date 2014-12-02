@@ -3,6 +3,8 @@ package de.unijena.bioinf.gecko3.gui;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -28,11 +30,6 @@ import java.util.Map;
 public class StartComputationDialog extends JDialog {
 	private static final long serialVersionUID = -5635614016950101153L;
 
-    static final int COMBO_HEIGHT = 30;
-    static final int COMBO_WIDTH = 180;
-    static final int V_GAP = 1;
-    static final int H_GAP = 1;
-
     private int quorum;
     private final JComboBox<String> qCombo;
 	private Parameter.OperationMode opMode;
@@ -46,11 +43,10 @@ public class StartComputationDialog extends JDialog {
     private final DeltaTable deltaTable;
     private final JSpinner distanceSpinner;
     private final JSpinner sizeSpinner;
-    private final JSpinner tableSizeSpinner;
 
 	public StartComputationDialog() {
         final GeckoInstance gecko = GeckoInstance.getInstance();
-		this.setModal(true);
+		this.setModalityType(DEFAULT_MODALITY_TYPE);
 		this.setResizable(false);
 		this.setIconImage(Gui.createImageIcon("images/gecko3_a_small.png").getImage());
 		this.setTitle("Configure computation");
@@ -60,19 +56,14 @@ public class StartComputationDialog extends JDialog {
 
         this.sizeSpinner = new JSpinner(new SpinnerNumberModel(7, 0, Integer.MAX_VALUE, 1));
         this.distanceSpinner = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
-        this.tableSizeSpinner = new JSpinner(new SpinnerNumberModel(7, 0, Integer.MAX_VALUE, 1));
-        this.deltaTable = new DeltaTable(tableSizeSpinner);
-
-		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-		panel.setPreferredSize(new Dimension(430,400));
+        this.deltaTable = new DeltaTable();
 
         /*
          * Tabbed distance and size pane
          */
         final JTabbedPane tabbedDistancePane = new JTabbedPane();
         tabbedDistancePane.addTab("Single Distance", getDistancePanel());
-        tabbedDistancePane.add("Distance Table", new JScrollPane(deltaTable.getBody()));
-        panel.add(tabbedDistancePane);
+        tabbedDistancePane.add("Distance Table", deltaTable);
 
         /*
          * All other options
@@ -120,7 +111,6 @@ public class StartComputationDialog extends JDialog {
         /*
          * layout of other options
          */
-		panel.add(getBody());
 
         // Actions
         qCombo.addActionListener(new ActionListener() {
@@ -174,13 +164,8 @@ public class StartComputationDialog extends JDialog {
                 }
             }
         });
-		
-		JPanel lowerpanel = new JPanel();
-		lowerpanel.setLayout(new BoxLayout(lowerpanel,BoxLayout.X_AXIS));
-        lowerpanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		lowerpanel.setPreferredSize(new Dimension(300,50));
+
 		Action okAction = new AbstractAction("OK") {
-		
 			private static final long serialVersionUID = 6197096728152587585L;
 			public void actionPerformed(ActionEvent e) {
                 Parameter parameter;
@@ -198,7 +183,7 @@ public class StartComputationDialog extends JDialog {
                     } else {
                         parameter = new Parameter(
                                 deltaTable.getDeltaTable(),
-                                (Integer)tableSizeSpinner.getValue(),
+                                deltaTable.getClusterSize(),
                                 quorum,
                                 opMode,
                                 refType);
@@ -235,6 +220,7 @@ public class StartComputationDialog extends JDialog {
 			
 		};
 		JButton okButton = new JButton(okAction);
+
 		Action cancelAction = new AbstractAction() {
 			private static final long serialVersionUID = 2057638030083370800L;
 			public void actionPerformed(ActionEvent e) {
@@ -242,21 +228,25 @@ public class StartComputationDialog extends JDialog {
 			}
 			
 		};
-		
-		panel.getActionMap().put("okAction", okAction);
-		panel.getActionMap().put("cancelAction", cancelAction);
-		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "okAction");
-		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
-
 		cancelAction.putValue(Action.NAME, "Cancel");
 		JButton cancelButton = new JButton(cancelAction);
-		lowerpanel.add(Box.createHorizontalGlue());
-		lowerpanel.add(okButton);
-		lowerpanel.add(cancelButton);
-		
-		panel.add(lowerpanel);
-		this.add(panel);
-	
+        JPanel buttonPanel = new ButtonBarBuilder().addButton(okButton, cancelButton).build();
+
+        FormLayout layout = new FormLayout("default", "default:grow, default, default");
+        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        builder.append(tabbedDistancePane);
+        builder.nextLine();
+        builder.append(getBody());
+        builder.nextLine();
+        builder.append(buttonPanel);
+
+        JPanel panel = builder.build();
+        panel.getActionMap().put("okAction", okAction);
+        panel.getActionMap().put("cancelAction", cancelAction);
+        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "okAction");
+        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
+
+        this.setContentPane(panel);
 		this.pack();
 	}
 
@@ -285,16 +275,12 @@ public class StartComputationDialog extends JDialog {
     private JPanel getDistancePanel() {
         FormLayout layout = new FormLayout(
                 "pref, 4dlu, pref",
-                "pref, 2dlu, pref"
+                ""
         );
-        PanelBuilder builder = new PanelBuilder(layout);
-        CellConstraints cc = new CellConstraints();
+        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-        builder.addLabel("Maximum distance:", cc.xy(1, 1));
-        builder.add(distanceSpinner,                cc.xy(3, 1));
-
-        builder.addLabel("Minimum cluster size:", cc.xy(1, 3));
-        builder.add(sizeSpinner,                    cc.xy(3, 1));
+        builder.append("Maximum distance:", distanceSpinner);
+        builder.append("Minimum cluster size:", sizeSpinner);
 
         return builder.getPanel();
     }

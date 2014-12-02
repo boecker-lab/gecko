@@ -1,5 +1,7 @@
 package de.unijena.bioinf.gecko3.gui;
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import de.unijena.bioinf.gecko3.datastructures.Parameter;
 import de.unijena.bioinf.gecko3.gui.util.JTableSelectAll;
 
@@ -17,15 +19,19 @@ import java.util.Arrays;
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
-public class DeltaTable{
+public class DeltaTable extends JPanel {
     private final DeltaTableTableModel model;
     private final JTable deltaTable;
+    private final JSpinner sizeSpinner;
 
-    public DeltaTable(final JSpinner sizeSpinner) {
-        this(sizeSpinner, Parameter.DeltaTable.getDefault().getDeltaTable(), Parameter.DeltaTable.getDefault().getMinimumSize());
+    public DeltaTable() {
+        this(Parameter.DeltaTable.getDefault().getDeltaTable(), Parameter.DeltaTable.getDefault().getMinimumSize());
     }
 
-    public DeltaTable(final JSpinner sizeSpinner, int[][] deltas, int initialMinimumSize) {
+    public DeltaTable(int[][] deltas, int initialMinimumSize) {
+        /**
+         * Setup the table
+         */
         deltaTable = new JTableSelectAll();
         deltaTable.setBackground(Color.WHITE);
         model = new DeltaTableTableModel(deltas);
@@ -34,6 +40,20 @@ public class DeltaTable{
         deltaTable.setCellSelectionEnabled(true);
         deltaTable.setDefaultRenderer(Integer.class, new DeltaTableCellRenderer());
         deltaTable.setFillsViewportHeight(true);
+
+        sizeSpinner = new JSpinner(new SpinnerNumberModel(initialMinimumSize, 0, Integer.MAX_VALUE, 1));
+        FormLayout sizeLayout = new FormLayout("pref, 2dlu, pref", "pref");
+        DefaultFormBuilder sizeBuilder = new DefaultFormBuilder(sizeLayout);
+        sizeBuilder.append("Minimum cluster size:", sizeSpinner);
+        JPanel sizePanel = sizeBuilder.build();
+
+        // layout of window
+        FormLayout layout = new FormLayout("min", "min(100dlu;default), 4dlu, pref");
+        DefaultFormBuilder builder = new DefaultFormBuilder(layout, this);
+        builder.append(new JScrollPane(deltaTable));
+        builder.nextLine();
+        builder.nextLine();
+        builder.append(sizePanel);
 
         // add popup menu to table
         final JPopupMenu popUp = new JPopupMenu();
@@ -47,7 +67,7 @@ public class DeltaTable{
              */
             @Override
             public void actionPerformed(ActionEvent e) {
-                model.addEmptyDeltaValues(deltaTable.getSelectedRow());
+                model.addEmptyDeltaValuesBefore(deltaTable.getSelectedRow());
 
             }
         });
@@ -86,7 +106,7 @@ public class DeltaTable{
                 maybeShowPopup(e);
             }
 
-            private void maybeShowPopup(MouseEvent e){
+            private void maybeShowPopup(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     int row = deltaTable.rowAtPoint(e.getPoint());
                     int column = deltaTable.columnAtPoint(e.getPoint());
@@ -95,6 +115,18 @@ public class DeltaTable{
                 }
             }
         });
+    }
+
+    public int getClusterSize() {
+        return (int)sizeSpinner.getValue();
+    }
+
+    public boolean isValidDeltaTable() {
+        return model.isValidDeltaTable();
+    }
+
+    public int[][] getDeltaTable() {
+        return model.getDeltaTable();
     }
 
     /**
@@ -225,7 +257,7 @@ public class DeltaTable{
                 }
             }
             if (deltaTable==null || deltaTable.length==0 || isValidRow(deltaValues.size()-1))
-                addEmptyDeltaValues();
+                addEmptyDeltaValuesAtEnd();
         }
 
         private boolean isZeroRow(int[] values) {
@@ -248,7 +280,7 @@ public class DeltaTable{
 
         private void checkAndAddOrRemoveLastRows() {
             if (isValidRow(deltaValues.size()-1)) {
-                addEmptyDeltaValues();
+                addEmptyDeltaValuesAtEnd();
             } else if (isEmptyRow(deltaValues.size()-1)) {
                 for (int row = deltaValues.size()-2; row >= 0; row--){
                     if (isEmptyRow(row)) {
@@ -263,12 +295,20 @@ public class DeltaTable{
         /**
          * Adds an empty row at the end of the delta table
          */
-        void addEmptyDeltaValues() {
-            addEmptyDeltaValues(deltaValues.size());
+        void addEmptyDeltaValuesAtEnd() {
+            addEmptyDeltaValues(deltaValues.size(), (deltaValues.isEmpty()) ? 0 : deltaValues.get(deltaValues.size()-1)[COL_SIZE]+1);
         }
 
-        void addEmptyDeltaValues(int index) {
-            deltaValues.add(index, new int[]{-1, -1, -1, (deltaValues.isEmpty()) ? 0 : deltaValues.get(index-1)[COL_SIZE]+1 });
+        /**
+         * Adds a new empty delta value line before the selected one
+         * @param index
+         */
+        void addEmptyDeltaValuesBefore(int index) {
+            addEmptyDeltaValues(index, (deltaValues.isEmpty()) ? 0 : deltaValues.get(index)[COL_SIZE]-1);
+        }
+
+        void addEmptyDeltaValues(int index, int size) {
+            deltaValues.add(index, new int[]{-1, -1, -1, size});
             fireTableRowsInserted(index, index);
         }
 
@@ -293,15 +333,17 @@ public class DeltaTable{
         }
     }
 
-    public boolean isValidDeltaTable() {
-        return model.isValidDeltaTable();
-    }
-
-    public int[][] getDeltaTable() {
-        return model.getDeltaTable();
-    }
-
-    public JTable getBody() {
-        return deltaTable;
+    public static void main(String[] argv){
+        JFrame frame = new JFrame();
+        final DeltaTable t = new DeltaTable();
+        frame.add(t);
+        frame.pack();
+        frame.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(t.getPreferredSize());
+            }
+        });
     }
 }
