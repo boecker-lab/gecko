@@ -62,7 +62,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 	 * false filter is inactive
 	 * true filter is active
 	 */
-	private boolean filterNonContainedGenomes = false;
+	private boolean filterNonContainedGenomes;
 
     public enum GenomeFilterMode {
         None, Include, Exclude
@@ -92,38 +92,50 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 		gbNavigators = new ArrayList<>();
         genomeLabels = new ArrayList<>();
         genomeFilterBoxes = new ArrayList<>();
+
+        filterNonContainedGenomes = false;
 	}
 
 	/**
 	 * This method implements a filter for the mgb. It removes the GenomeBrowers for the genomes
 	 * which don't support the current cluster.
-	 * For this the method sets the filterActiv variable and the clusterBackup to undo the view change.
+	 * For this the method sets the filterActive variable and the clusterBackup to undo the view change.
 	 * So the method activates and deactivates the filter.
-	 * 
+	 *
 	 * @param filter true if the filter should be activated else false to turn it off
 	 */
 	public void hideNonClusteredGenomes(boolean filter)	{
-		// filter is only active if a cluster was selected
-		if (clusterLocationSelection != null && clusterLocationSelection.getCluster() != null) {
-			if (!filterNonContainedGenomes && filter) {
-				// activation branch
-				for (int i = 0; i < clusterLocationSelection.getTotalGenomeNumber(); i++) {
-					if (clusterLocationSelection.getSubsequence(i) == null) {
-						setVisibleForGenomeBrowser(i, false);
-                        setPreferredSize(new Dimension((int) getPreferredSize().getWidth(), (int) getPreferredSize().getHeight() - getGenomeBrowserHeight()));
-					}
-				}
-                revalidate();
-			} else if (filterNonContainedGenomes && !filter) {
+        if (!filterNonContainedGenomes && !filter) // nothing to do
+            return;
+        filterNonContainedGenomes = filter;
+        applyHideNonClusteredGenomesFilter();
+	}
+
+    private void applyHideNonClusteredGenomesFilter() {
+        if (clusterLocationSelection != null && clusterLocationSelection.getCluster() != null) {
+            if (filterNonContainedGenomes) {
+                // activation branch
+                for (int i = 0; i < clusterLocationSelection.getTotalGenomeNumber(); i++) {
+                    if (clusterLocationSelection.getSubsequence(i) == null) {
+                        setVisibleForGenomeBrowser(i, false);
+                    } else {
+                        setVisibleForGenomeBrowser(i, true);
+                    }
+                }
+            } else if (!filterNonContainedGenomes) {
                 for (int i = 0; i < clusterLocationSelection.getTotalGenomeNumber(); i++) {
                     setVisibleForGenomeBrowser(i, true);
                 }
-                revalidate();
-			}
-		}
-		filterNonContainedGenomes = filter;
-	}
+            }
+        }
+        revalidate();
+    }
 
+    /**
+     * @param index
+     * @param visible
+     * @return
+     */
     private void setVisibleForGenomeBrowser(int index, boolean visible){
         genomeBrowsers.get(index).setVisible(visible);
         genomeLabels.get(index).setVisible(visible);
@@ -277,7 +289,6 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 			g.adjustSize();
 		}
         revalidate();
-        System.out.println(GeckoInstance.getInstance().getGui().getMainframe().getWidth());
     }
 	
 	private int getGenomeBrowserHeight() {
@@ -369,19 +380,16 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 		// selected
 		if (e instanceof LocationSelectionEvent) {
             LocationSelectionEvent lastLocationEvent = (LocationSelectionEvent) e;
-			
-			// save current filter status
-			boolean stat = filterNonContainedGenomes;
 
             // save the currently selected cluster for the filter function
             clusterLocationSelection = new GeneClusterLocationSelection(gecko.getGenomes(), lastLocationEvent.getSelection(), lastLocationEvent.getsubselection(), lastLocationEvent.includeSubOptimalOccurrences());
 
 			// deactivate the filter if active
-			this.hideNonClusteredGenomes(false);
-			
-			// if the check box is selected we show only the genomes which contain the cluster
-			if (stat)
-				this.hideNonClusteredGenomes(stat);
+			//this.hideNonClusteredGenomes(false);
+
+            // if the check box is selected we show only the genomes which contain the cluster
+			if (filterNonContainedGenomes)
+				applyHideNonClusteredGenomesFilter();
 			
 			if (e.getSelection()!=null)
 				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.includeSubOptimalOccurrences(), lastLocationEvent.getsubselection());
