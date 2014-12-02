@@ -3,36 +3,40 @@ USER MANUAL
 
 1. Installation
 
-Java 7 is needed to run Gecko2.
-Java 7 and installation instructions are available from http://www.java.com
+Java 7 is needed to run Gecko3.
+Java 7 and installation instructions are available from http://www.java.com or http://openjdk.java.net
 
-2. Gecko2
+You can check if and which version of java you have installed from the command line with "java -version".
+The first line should give you the java version, for java 7 something like <java version "1.7.0_67"> (the
+second number give the java version),
+
+2. Gecko3
 
 Given a set of genomes in which each gene is assigned to a family
-of homologous genes, Gecko2 detects sets of genes that appear in an
+of homologous genes, Gecko3 detects sets of genes that appear in an
 approximately conserved neighborhood among the genomes.
 
 A typical Gecko session is divided into three parts: genome selection,
 cluster detection, manual evaluation of predictions. These parts are
 described in the following in more detail.
 
-2.1 Starting Gecko2
+2.1 Starting Gecko3
 
-Windows: To start Gecko2, go to the bin directory and execute Gecko2.bat
-For Linux and OS X: To start Gecko2, go to the bin directory and execute Gecko2
+Windows: To start Gecko3, go to the bin directory and execute Gecko3.bat
+For Linux and OS X: To start Gecko3, go to the bin directory and execute Gecko3
 
-As an alternative, you can directly start the Gecko2.jar located in lib with
-java -jar lib/Gecko2-2.1.jar. In this case, you may need to increase the maximum
-heap space with java -Xmx6G -jar lib/Gecko2-2.1.jar
+As an alternative, you can directly start the Gecko3.jar located in lib with
+java -jar lib/Gecko3-1.0.jar. In this case, you may need to increase the maximum
+heap space with java -Xmx6G -jar lib/Gecko3-1.0.jar
 
-Gecko2 can either be run in commandline mode, '-h' will give all possible
+Gecko3 can either be run in commandline mode, '-h' will give all possible
 parameters, that you can, or need to supply.
 Or it can be used in GUI mode, if started without any
 parameters, or just a *.gck or *.cog input file that will be automatically loaded.
 
 2.2 Data
 
-For Gecko2, the basic requirement is that the genomes are given as
+For Gecko3, the basic requirement is that the genomes are given as
 sequences of strings where each character represents a certain family
 containing at least one gene. All
 genes in a family should be homologs performing the same (or very
@@ -86,7 +90,7 @@ selected, it is parsed and all found chromosomes are listed in a table.
 Ticking the check boxes next to a chromosomes in the table, one can
 choose the chromosomes that should be part of the search for approximate
 gene clusters. Different chromosomes of one genome can be marked and
-grouped by clicking on the 'Group' button. Gecko2 suggests a grouping of
+grouped by clicking on the 'Group' button. Gecko3 suggests a grouping of
 chromosomes based on chromosome names. This can be reverted by marking
 the grouped chromosomes and clicking on the 'Ungroup' button. Genome
 selection is finished by clicking on the button 'OK'. The genomes are
@@ -119,7 +123,7 @@ mode only one genome is used as reference. It can be chosen from a
 drop-down list containing the previously selected genomes. In the
 'manual cluster' mode, a sequence of genes can be typed in manually, or
 pasted when e. g. copying a cluster from the result list of a previous
-run of Gecko2.  After all parameters are set, computation can be started
+run of Gecko3.  After all parameters are set, computation can be started
 by clicking the 'OK' button.
 
 2.4 Graphical Evaluation
@@ -150,7 +154,7 @@ search result. It is possible to filter for clusters containing
 individual genes or functional gene annotations by typing the respective
 information into the 'Search' field above the genome browser.
 
-The results of a Gecko2 session can be stored in a file with ending
+The results of a Gecko3 session can be stored in a file with ending
 '.gck' via 'File'->'Save session'.
 
 Results can be exported via 'File'->'Export results' in different data formats.

@@ -1,9 +1,9 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-version = 2.1
+version = 1.0
 
-mainClassName = 'gecko2.Gecko2'
+mainClassName = 'de.unijena.bioinf.gecko3.Gecko3'
 
 applicationDefaultJvmArgs = ["-Xmx6G"]
 
