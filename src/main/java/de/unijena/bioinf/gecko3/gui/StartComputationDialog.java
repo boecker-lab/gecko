@@ -266,8 +266,8 @@ public class StartComputationDialog extends JDialog {
 
         builder.add(additionalRefClusterSettings,   cc.xyw(1, 5, 3));
 
-        builder.add(mergeResults, cc.xy(1, 7));
-        builder.add(refInRef,                       cc.xy(3, 7));
+        //builder.add(mergeResults, cc.xy(1, 7));
+        builder.add(refInRef,                       cc.xy(1, 7));
 
         return builder.getPanel();
     }
