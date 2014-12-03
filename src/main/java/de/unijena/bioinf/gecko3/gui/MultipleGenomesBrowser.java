@@ -72,11 +72,12 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
         super(new BorderLayout());
 		gecko = GeckoInstance.getInstance();
 
-        left = new JPanel();
+        left = new JPanel(new BorderLayout());
         left.setBackground(Color.WHITE);
 
-        right = new JPanel();
+        right = new JPanel(new BorderLayout());
         right.setBackground(Color.WHITE);
+
         wheelListener = new ScrollListener();
         right.addMouseWheelListener(this.wheelListener);
 
@@ -84,7 +85,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
         split.setBackground(Color.WHITE);
 
         setBackground(Color.WHITE);
-        add(split);
+        this.add(split);
 
         addSelectionListener(this);
 
@@ -422,7 +423,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 
     @Override
     public boolean getScrollableTracksViewportHeight() {
-        return false;
+        return genomeBrowsers.isEmpty();
     }
 
     private class ScrollListener implements MouseWheelListener {
