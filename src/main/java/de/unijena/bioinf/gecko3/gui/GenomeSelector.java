@@ -195,7 +195,8 @@ public class GenomeSelector extends JDialog {
 			private static final long serialVersionUID = 3950317889981087655L;
 
 			public void actionPerformed(ActionEvent e) {
-				GenomeSelector.this.setVisible(false);			
+				GenomeSelector.this.setVisible(false);
+                GeckoInstance.getInstance().setGeckoInstanceData();
 			}
 		};
 		cancelAction.putValue(Action.NAME, "Cancel");
