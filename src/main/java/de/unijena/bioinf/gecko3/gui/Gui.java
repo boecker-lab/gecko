@@ -1,6 +1,7 @@
 package de.unijena.bioinf.gecko3.gui;
 
 import de.unijena.bioinf.gecko3.GeckoInstance;
+import de.unijena.bioinf.gecko3.algo.status.AlgorithmStatusEvent;
 import de.unijena.bioinf.gecko3.datastructures.DataSet;
 import de.unijena.bioinf.gecko3.datastructures.GeneCluster;
 import de.unijena.bioinf.gecko3.io.ClusterAnnotationReader;
@@ -39,13 +40,39 @@ public class Gui {
 	private final JLabel statusbartext;
 	private final JLabel statusbaricon;
 	private final JProgressBar progressbar;
-	
+    private boolean progressActive;
+
 	private final JLabel infobar;
 	private ImageIcon waitingAnimation;
 	private final JCheckBox mgbViewSwitcher = new JCheckBox();
 	private final JTextField searchField;
 
-	public JFrame getMainframe() {
+    /*
+ * The users possibilities to interact with the ui depending on the current
+ * state of the application are handled here
+ */
+    public enum Mode {
+        /**
+         * The application is currently performing the gene cluster computation
+         */
+        COMPUTING,DOING_STATISTICS
+        /**
+         * The application is idle, a session is currently open
+         */
+        ,SESSION_IDLE
+        /**
+         * The application is idle, no session is open
+         */
+        ,NO_SESSION
+        /**
+         * The application is currently reading the genomes selected by the user
+         */
+        ,READING_GENOMES
+        ,PREPARING_COMPUTATION
+        ,FINISHING_COMPUTATION}
+    private Mode mode;
+
+    public JFrame getMainframe() {
 		return mainframe;
 	}
 	
@@ -280,10 +307,49 @@ public class Gui {
 	private void selectAndImportGenomes(CogFileReader reader) {
 		new GenomeSelector(reader, this.getMainframe());
 	}
-	
-	public JProgressBar getProgressbar() {
+
+    public void setProgressStatus(final int value, final AlgorithmStatusEvent.Task task) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                switch (task) {
+                    case Init:
+                        initProgressbar(value);
+                    case ComputingClusters:
+                        if (setProgressValue(value))
+                            changeMode(Gui.Mode.COMPUTING);
+                        break;
+                    case ComputingStatistics:
+                        if (setProgressValue(value))
+                            changeMode(Gui.Mode.DOING_STATISTICS);
+                        break;
+                    case Done:
+                        disableProgressBar();
+                        changeMode(Gui.Mode.FINISHING_COMPUTATION);
+                        break;
+                }
+            }
+        });
+    }
+
+    private void initProgressbar(int maxValue){
+        progressActive = true;
+        progressbar.setMaximum(maxValue);
+    }
+
+    private boolean setProgressValue(int value) {
+        if (!progressActive)
+            return false;
+        progressbar.setValue(value);
+        return true;
+    }
+
+    public void disableProgressBar(){
+        progressActive = false;
+    }
+
+	/**public JProgressBar getProgressbar() {
 		return progressbar;
-	}
+	}*/
 	
 	public void updateViewscreen() {
         if (mgb != null) {
@@ -313,31 +379,6 @@ public class Gui {
     public void clearSelection() {
         getGcSelector().clearSelection();
     }
-
-
-    /*
-     * The users possibilities to interact with the ui depending on the current
-     * state of the application are handled here
-     */
-	public enum Mode {
-        /**
-         * The application is currently performing the gene cluster computation
-         */
-        COMPUTING,DOING_STATISTICS
-		/**
-		 * The application is idle, a session is currently open
-		 */
-		,SESSION_IDLE
-		/**
-		 * The application is idle, no session is open
-		 */
-		,NO_SESSION
-		/**
-		 * The application is currently reading the genomes selected by the user
-		 */
-		,READING_GENOMES
-		,PREPARING_COMPUTATION
-		,FINISHING_COMPUTATION}
 	
 	private void changeGuiMode(final String text,
                                final boolean icon,
@@ -375,30 +416,33 @@ public class Gui {
 	}
 	
 	public void changeMode(Mode mode) {
-        switch (mode) {
-			case COMPUTING:
-				changeGuiMode("Computing gene clusters...", false, true, false, false);
-				break;
-            case DOING_STATISTICS:
-                changeGuiMode("Computing cluster statistics...", false, true, false, false);
-                break;
-			case SESSION_IDLE:
-				changeGuiMode("Ready", false, false, true, true);
-				break;
-			case NO_SESSION:
-				changeGuiMode("Ready", false, false, true, false);
-				break;
-			case READING_GENOMES:
-                gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
-				changeGuiMode("Reading genomes...", true, false, false, false);
-				break;
-			case PREPARING_COMPUTATION:
-				changeGuiMode("Preparing data...", true, false, false, false);
-				break;
-			case FINISHING_COMPUTATION:
-				changeGuiMode("Finishing...", true, false, false, false);
-				break;
-		}
+        if (!mode.equals(this.mode)){
+            switch (mode) {
+                case COMPUTING:
+                    changeGuiMode("Computing gene clusters...", false, true, false, false);
+                    break;
+                case DOING_STATISTICS:
+                    changeGuiMode("Computing cluster statistics...", false, true, false, false);
+                    break;
+                case SESSION_IDLE:
+                    changeGuiMode("Ready", false, false, true, true);
+                    break;
+                case NO_SESSION:
+                    changeGuiMode("Ready", false, false, true, false);
+                    break;
+                case READING_GENOMES:
+                    gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
+                    changeGuiMode("Reading genomes...", true, false, false, false);
+                    break;
+                case PREPARING_COMPUTATION:
+                    changeGuiMode("Preparing data...", true, false, false, false);
+                    break;
+                case FINISHING_COMPUTATION:
+                    changeGuiMode("Finishing...", true, false, false, false);
+                    break;
+            }
+            this.mode = mode;
+        }
 	}
 
 	public void closeCurrentSession() {

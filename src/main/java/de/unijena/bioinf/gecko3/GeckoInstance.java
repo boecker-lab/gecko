@@ -20,6 +20,7 @@ import java.awt.*;
 import java.io.File;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 public class GeckoInstance {
@@ -429,6 +430,16 @@ public class GeckoInstance {
                     GeckoInstance.this.mergeClusters(results, p);
                 else
                     GeckoInstance.this.setClusters(results, p);
+            } catch (CancellationException e){
+                if (gui != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            gui.disableProgressBar();
+                            GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
+                        }
+                    });
+                }
             } catch (InterruptedException | ExecutionException e) {
                 JOptionPane.showMessageDialog(gui.getMainframe(), e.getMessage(), "Error computing gene clusters", JOptionPane.ERROR_MESSAGE);
                 logger.error("Error in cluster computation", e);
@@ -488,45 +499,16 @@ public class GeckoInstance {
 	
 	public void displayMessage(String message) {
 		final String m = message;
-		EventQueue.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				JOptionPane.showMessageDialog(gui.getMainframe(), m);
 			}
 		});
 	}
 	
-	public void initProgressBar(int maxvalue) {
-		final int maxv = maxvalue;
+	public void setProgressStatus(int value, final AlgorithmStatusEvent.Task task) {
 		if (gui != null)
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					gui.getProgressbar().setMaximum(maxv);
-				}
-			});
-
-	}
-	
-	public void setProgressStatus(final int value, final AlgorithmStatusEvent.Task task) {
-		if (gui != null)
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-                    switch (task) {
-                        case Init:
-                            gui.getProgressbar().setMaximum(value);
-                        case ComputingClusters:
-                            gui.changeMode(Gui.Mode.COMPUTING);
-                            gui.getProgressbar().setValue(value);
-                            break;
-                        case ComputingStatistics:
-                            gui.changeMode(Gui.Mode.DOING_STATISTICS);
-                            gui.getProgressbar().setValue(value);
-                            break;
-                        case Done:
-                            gui.changeMode(Gui.Mode.FINISHING_COMPUTATION);
-                            break;
-                    }
-				}
-			});
+            gui.setProgressStatus(value, task);
 	}
 	
 	public Genome[] getGenomes() {
