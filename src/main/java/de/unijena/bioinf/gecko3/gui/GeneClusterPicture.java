@@ -2,6 +2,7 @@ package de.unijena.bioinf.gecko3.gui;
 
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.*;
+import de.unijena.bioinf.gecko3.gui.util.ColorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -407,7 +408,7 @@ public class GeneClusterPicture {
     private int paintGene(Graphics g, Gene gene, boolean flipped, boolean partOfCluster, int x, int y) {
         Color currentColor = getColor(gene.getGeneFamily());
         if (!partOfCluster) {
-            currentColor = GenomePainting.getOpaqueColor(currentColor);
+            currentColor = ColorUtils.getTranslucentColor(currentColor);
         }
         return GenomePainting.paintGene(g, gene, flipped, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
     }

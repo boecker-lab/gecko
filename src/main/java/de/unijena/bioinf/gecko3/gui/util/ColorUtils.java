@@ -1,5 +1,7 @@
 package de.unijena.bioinf.gecko3.gui.util;
 
+import java.awt.*;
+
 public class ColorUtils {
 
 	/**
@@ -83,5 +85,14 @@ public class ColorUtils {
 		// create int-packed RGB-color:
 		return ((r&0xff)<<16) | ((g&0xff)<<8) | b&0xff;
 	}
-	
+
+    /**
+     * Returns the given color but with an alpha value of 0.5
+     * @param color
+     * @return
+     */
+    public static Color getTranslucentColor(Color color) {
+        float[] rgb = color.getRGBColorComponents(null);
+        return new Color(rgb[0], rgb[1], rgb[2], 0.5f);
+    }
 }

@@ -3,6 +3,7 @@ package de.unijena.bioinf.gecko3.gui;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import de.unijena.bioinf.gecko3.datastructures.Parameter;
+import de.unijena.bioinf.gecko3.gui.util.ColorUtils;
 import de.unijena.bioinf.gecko3.gui.util.JTableSelectAll;
 
 import javax.swing.*;
@@ -36,6 +37,7 @@ public class DeltaTable extends JPanel {
         deltaTable.setBackground(Color.WHITE);
         model = new DeltaTableTableModel(deltas);
         deltaTable.setModel(model);
+        deltaTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         deltaTable.setRowSelectionAllowed(false);
         deltaTable.setCellSelectionEnabled(true);
         deltaTable.setDefaultRenderer(Integer.class, new DeltaTableCellRenderer());
@@ -320,14 +322,31 @@ public class DeltaTable extends JPanel {
     }
 
     class DeltaTableCellRenderer extends DefaultTableCellRenderer {
+        private final Color defaultForeground;
+        private final Color lastRowForeground;
+
+        public DeltaTableCellRenderer() {
+            super();
+            this.defaultForeground = UIManager.getColor("Table.foreground");
+            this.lastRowForeground = ColorUtils.getTranslucentColor(defaultForeground);
+        }
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            Component rendererComp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
             TableModel model = table.getModel();
             if (model instanceof DeltaTableTableModel){
                 DeltaTableTableModel myModel = (DeltaTableTableModel) model;
-                setBorder(BorderFactory.createLineBorder(!myModel.isValidCell(row, column) ? Color.RED : Color.BLACK));
+                Color borderColor = !myModel.isValidCell(row, column) ? Color.RED : Color.BLACK;
+                if (row == myModel.getRowCount()-1) {
+                    //rendererComp.setForeground(ColorUtils.getTranslucentColor(getForeground()));
+                    rendererComp.setForeground(lastRowForeground);
+                    setBorder(BorderFactory.createLineBorder(ColorUtils.getTranslucentColor(borderColor)));
+                } else {
+                    rendererComp.setForeground(defaultForeground);
+                    setBorder(BorderFactory.createLineBorder(borderColor));
+                }
             }
             return this;
         }

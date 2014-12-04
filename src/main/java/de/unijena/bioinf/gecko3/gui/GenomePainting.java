@@ -11,6 +11,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.security.InvalidParameterException;
 
+import static de.unijena.bioinf.gecko3.gui.util.ColorUtils.getTranslucentColor;
+
 
 public class GenomePainting {
 	
@@ -268,11 +270,6 @@ public class GenomePainting {
         else
             return color;
     }
-	
-	public static Color getOpaqueColor(Color color) {
-        float[] rgb = color.getRGBColorComponents(null);
-        return new Color(rgb[0], rgb[1], rgb[2], 0.5f);
-	}
 
 	/**
 	 * Returns the width of the chromosome start and end symbol for a given gene width
@@ -347,7 +344,7 @@ public class GenomePainting {
 	}
 	
 	/**
-	 * Paints the Chromosome with opaque gene colors
+	 * Paints the Chromosome with translucent gene colors
 	 * @param g the used Graphics
 	 * @param chromosome the Chromosome
      * @param nameType what information shall be painted in each gene
@@ -365,7 +362,7 @@ public class GenomePainting {
 	}
 	
 	/**
-	 * Paints the Chromosome with highlighted cluster, the rest has opaque gene colors
+	 * Paints the Chromosome with highlighted cluster, the rest has translucent gene colors
 	 * @param g the used Graphics
      * @param chromosome the Chromosome
 	 * @param start the start gene of the cluster
@@ -393,7 +390,7 @@ public class GenomePainting {
      * @param chromosome the Chromosome
      * @param start the start gene of the cluster, -1 if no cluster
      * @param stop the end gene of the cluster, -1 if no cluster
-     * @param  useOpaqueGenes if opaque colors shall be used for the painting, outside the cluster, if a cluster is contained
+     * @param  useTranslucentGenes if translucent colors shall be used for the painting, outside the cluster, if a cluster is contained
      * @param nameType what information shall be painted in each gene
      * @param highlightColor the color the cluster background is color with, null if no cluster
      * @param x the x coordinate to start the painting at
@@ -404,7 +401,7 @@ public class GenomePainting {
      * @param vgap the vertical gap size
      * @param flipped if the chromosome shall be painted inverse
      */
-    private static int paintChromosome(Graphics g, Chromosome chromosome, boolean flipped, int start, int stop, boolean useOpaqueGenes, NameType nameType, Color highlightColor, int x, int y, int width,
+    private static int paintChromosome(Graphics g, Chromosome chromosome, boolean flipped, int start, int stop, boolean useTranslucentGenes, NameType nameType, Color highlightColor, int x, int y, int width,
                                        int height, int hgap, int vgap) {
         if (highlightColor == null && !(start == -1 && stop==-1))
             throw new InvalidParameterException("Invalid Parameters, highlightColor == null and not start and stop == -1");
@@ -423,7 +420,7 @@ public class GenomePainting {
             if (i>=start && i<=stop)
                 x = paintGene(g, gene, flipped, nameType, highlightColor, getColor(gene), x, y, width, height, hgap, vgap);
             else
-                x = paintGene(g, gene, flipped, nameType, Color.WHITE, useOpaqueGenes ? getOpaqueColor(getColor(gene)) : getColor(gene), x, y, width, height, hgap, vgap);
+                x = paintGene(g, gene, flipped, nameType, Color.WHITE, useTranslucentGenes ? getTranslucentColor(getColor(gene)) : getColor(gene), x, y, width, height, hgap, vgap);
         }
 
         x = paintChromosomeEnd(g, x, y, width, height, hgap);
