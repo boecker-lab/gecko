@@ -69,6 +69,8 @@ public class DeltaTable extends JPanel {
              */
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (deltaTable.isEditing())
+                    deltaTable.getCellEditor().stopCellEditing();
                 model.addEmptyDeltaValuesBefore(deltaTable.getSelectedRow());
 
             }
@@ -78,6 +80,8 @@ public class DeltaTable extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (deltaTable.isEditing())
+                    deltaTable.getCellEditor().stopCellEditing();
                 model.removeRow(deltaTable.getSelectedRow());
             }
         });
@@ -86,6 +90,8 @@ public class DeltaTable extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (deltaTable.isEditing())
+                    deltaTable.getCellEditor().stopCellEditing();
                 model.setDeltaTable(Parameter.DeltaTable.getDefault().getDeltaTable());
                 sizeSpinner.setValue(Parameter.DeltaTable.getDefault().getMinimumSize());
             }

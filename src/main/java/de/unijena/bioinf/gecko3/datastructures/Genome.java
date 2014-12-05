@@ -50,7 +50,7 @@ public class Genome implements Serializable {
 	}
 
 	public Gene[] getSubsequence(Subsequence s) {
-		List<Gene> geneList = new ArrayList<Gene>(s.getStop() - (s.getStart()-1));
+		List<Gene> geneList = new ArrayList<>(s.getStop() - (s.getStart()-1));
 		for (int i=s.getStart()-1; i<s.getStop(); i++) 
 			geneList.add(chromosomes.get(s.getChromosome()).getGenes().get(i));
 		return geneList.toArray(new Gene[geneList.size()]);
