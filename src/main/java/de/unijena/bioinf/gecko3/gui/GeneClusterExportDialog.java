@@ -96,7 +96,7 @@ public class GeneClusterExportDialog extends JDialog {
 		this.rootPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
 		this.setLayout(new BorderLayout());
 		this.setPreferredSize(new Dimension(1010, 700));
-		this.setIconImage(Gui.createImageIcon("images/gecko3_a_small.png").getImage());
+		this.setIconImages(parent.getIconImages());
 
         JLabel ovlapStatus1 = new JLabel();
 		ovlapStatus1.setForeground(Color.RED);

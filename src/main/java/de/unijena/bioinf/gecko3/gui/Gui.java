@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -46,6 +47,17 @@ public class Gui {
 	private ImageIcon waitingAnimation;
 	private final JCheckBox mgbViewSwitcher = new JCheckBox();
 	private final JTextField searchField;
+
+    private static final String[] GECKO_ICONS = {
+            "images/geckoIcons/Gecko3.178.png",
+            "images/geckoIcons/Gecko3.164.png",
+            "images/geckoIcons/Gecko3.128.png",
+            "images/geckoIcons/Gecko3.96.png",
+            "images/geckoIcons/Gecko3.64.png",
+            "images/geckoIcons/Gecko3.48.png",
+            "images/geckoIcons/Gecko3.32.png",
+            "images/geckoIcons/Gecko3.16.png"
+    };
 
     /*
  * The users possibilities to interact with the ui depending on the current
@@ -91,7 +103,7 @@ public class Gui {
 		this.statusbartext = new JLabel();
 		this.progressbar = new JProgressBar();
 		progressbar.setMaximumSize(new Dimension(100, 30));
-		this.waitingAnimation = createImageIcon("images/ghost.png");
+        this.waitingAnimation = createImageIcon("images/loading.gif");
 		
 		this.gcDisplay = new GeneClusterDisplay();
         searchField = new JTextField("");
@@ -288,15 +300,15 @@ public class Gui {
 		// Show JFrame
 		mainframe.pack();
 		mainframe.setLocationRelativeTo(null);
-		mainframe.setIconImage(createImageIcon("images/gecko3_a_small.png").getImage());
+		mainframe.setIconImages(createGeckoImages());
 		mainframe.setVisible(true);
         horizontalSplit.setDividerLocation(0.5);
         verticalSplit.setDividerLocation(0.5);
         // Update data
         gecko.setGeckoInstanceData();
 	}
-	
-	public void setInfobarText(String text) {
+
+    public void setInfobarText(String text) {
 		infobar.setText(text);
 	}
 	
@@ -361,20 +373,34 @@ public class Gui {
 		return mgb;
 	}
 	
-	/** Simple helper methods which makes it easier to create ImageIcons from Resource
-	 *
+	/**
+	 * Simple helper method which makes it easier to create ImageIcons from Resource
      * @param path the path
-     * @return Returns a imageicon if path describes an image, null otherwise 
+     * @return Returns a ImageIcon if path describes an image, null otherwise
      */
-	public static ImageIcon createImageIcon(String path) {
+	private static ImageIcon createImageIcon(String path) {
 		java.net.URL imgURL =  ClassLoader.getSystemResource(path);
 		if (imgURL != null) {
 			return new ImageIcon(imgURL);
 		} else {
-			System.err.println("Couldn't find file: " + path);
+			logger.warn("Couldn't find file: {}", path);
 			return null;
 		}
 	}
+
+    /**
+     * Helper method that creates a list of Images
+     * @return
+     */
+    private static List<? extends Image> createGeckoImages() {
+        List<Image> images = new ArrayList<>();
+        for (String path : GECKO_ICONS){
+            ImageIcon icon = createImageIcon(path);
+            if (icon != null)
+                images.add(icon.getImage());
+        }
+        return images;
+    }
 
     public void clearSelection() {
         getGcSelector().clearSelection();
@@ -387,7 +413,6 @@ public class Gui {
                                final boolean clusterBrowserActive){
 		if (icon)
 		{
-			this.waitingAnimation = createImageIcon("images/loading.gif");
 			statusbaricon.setIcon(waitingAnimation);
 		}
 		statusbaricon.setVisible(icon);
@@ -604,11 +629,10 @@ public class Gui {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			
 			JDialog about = new JDialog();
 			about.getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 			about.getRootPane().setBackground(about.getContentPane().getBackground());
-			about.setIconImage(createImageIcon("images/gecko3_a_small.png").getImage());
+			about.setIconImages(Gui.this.getMainframe().getIconImages());
 			about.setTitle("About Gecko3");
 			about.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 			about.setPreferredSize(new Dimension(350, 475));
@@ -616,7 +640,7 @@ public class Gui {
 			about.setLayout(new BorderLayout());
 			
 			JLabel iconLabel = new JLabel();
-			iconLabel.setIcon(createImageIcon("images/gecko3_a_small.png"));
+			iconLabel.setIcon(createImageIcon("images/geckoIcons/Gecko3.178.png"));
 			JPanel iconPanel = new JPanel();
 			iconPanel.add(iconLabel);
 			about.add(iconPanel, BorderLayout.NORTH);
@@ -635,7 +659,7 @@ public class Gui {
 						"<br>" +
 						"Version 1.0" +
 						"<br>" +
-						"2013, Sascha Winter, Hans-Martin Haase and Tobias Mann" +
+						"2014, Sascha Winter, Hans-Martin Haase and Tobias Mann" +
 						"<br>" +
 						"Chair of Bioinformatics, University of Jena." +
 						"<br>" +

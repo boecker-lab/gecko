@@ -49,7 +49,7 @@ public class GenomeSelector extends JDialog {
         this.reader = cogReader;
         this.occs = reader.getOccs();
 
-        this.setIconImage(Gui.createImageIcon("images/gecko3_a_small.png").getImage());
+        this.setIconImages(parent.getIconImages());
 		
 		// Resort the occurence list and recompute the group borders for
 		// visualization

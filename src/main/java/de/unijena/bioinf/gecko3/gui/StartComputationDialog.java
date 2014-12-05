@@ -44,11 +44,11 @@ public class StartComputationDialog extends JDialog {
     private final JSpinner distanceSpinner;
     private final JSpinner sizeSpinner;
 
-	public StartComputationDialog() {
+	public StartComputationDialog(JFrame parent) {
         final GeckoInstance gecko = GeckoInstance.getInstance();
 		this.setModalityType(DEFAULT_MODALITY_TYPE);
 		this.setResizable(false);
-		this.setIconImage(Gui.createImageIcon("images/gecko3_a_small.png").getImage());
+        setIconImages(parent.getIconImages());
 		this.setTitle("Configure computation");
 
         this.opMode = Parameter.OperationMode.reference;

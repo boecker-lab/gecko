@@ -29,7 +29,7 @@ public class ResultExportDialog extends JDialog {
 	public ResultExportDialog(Frame parent) {
         super(parent);
 		setTitle("Export Results");
-		this.setIconImage(Gui.createImageIcon("images/gecko3_a_small.png").getImage());
+        setIconImages(parent.getIconImages());
 		setBounds(100, 100, 450, 300);
 		
 		getContentPane().setLayout(new BorderLayout());
