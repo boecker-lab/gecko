@@ -12,6 +12,8 @@ import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.GeckoInstance.ResultFilter;
 import de.unijena.bioinf.gecko3.datastructures.*;
 import de.unijena.bioinf.gecko3.event.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -32,6 +34,8 @@ import java.util.List;
 public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataListener {
 	private static final long serialVersionUID = -4860132931042035952L;
 
+    private static final Logger logger = LoggerFactory.getLogger(GeneClusterSelector.class);
+
 	private final JCheckBox showSuboptimalCheckBox;
 	private final JTable table;
     private EventList<GeneCluster> displayedTableData;
@@ -39,8 +43,10 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 	private JPopupMenu popUp;
 
     // Filter options
-    private final TextComponentMatcherEditor<GeneCluster> textMatcherEditor;
-    private final GeneClusterIncludeExcludeMatcherEditor includeExcludeMatcherEditor;
+    private final JTextField filterField;
+    private TextComponentMatcherEditor<GeneCluster> textMatcherEditor;
+    List<JComboBox> includeExcludeBoxes;
+    private GeneClusterIncludeExcludeMatcherEditor includeExcludeMatcherEditor;
     private ResultFilter filterSelection;
 
     private final EventListenerList eventListener = new EventListenerList();
@@ -55,10 +61,8 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 	
 	public GeneClusterSelector(final JTextField filterField) {
         filterSelection = ResultFilter.showFiltered;
-        textMatcherEditor = new TextComponentMatcherEditor<>(filterField, new GeneClusterTextFilterator());
-        textMatcherEditor.setLive(false);
-        textMatcherEditor.setMode(TextMatcherEditor.CONTAINS);
-        includeExcludeMatcherEditor = new GeneClusterIncludeExcludeMatcherEditor();
+        this.filterField = filterField;
+        this.includeExcludeBoxes = new ArrayList<>();
 
 		this.setLayout(new BorderLayout());
 		JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -280,6 +284,20 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         List<GeneCluster> clusters = GeckoInstance.getInstance().getClusterList(filterSelection);
 
         //EventLists, sorting and filtering
+        if (textMatcherEditor != null)
+            textMatcherEditor.dispose();
+        textMatcherEditor = new TextComponentMatcherEditor<>(filterField, new GeneClusterTextFilterator());
+        textMatcherEditor.setLive(false);
+        textMatcherEditor.setMode(TextMatcherEditor.CONTAINS);
+
+        if (includeExcludeMatcherEditor != null){
+            for (JComboBox box : includeExcludeBoxes)
+                box.removeActionListener(includeExcludeMatcherEditor);
+        }
+        includeExcludeMatcherEditor = new GeneClusterIncludeExcludeMatcherEditor();
+        for (JComboBox box : includeExcludeBoxes)
+            box.addActionListener(includeExcludeMatcherEditor);
+
         EventList<GeneCluster> geneClusterEventList = GlazedLists.eventList(clusters);
         SortedList<GeneCluster> sortedList = new SortedList<>(geneClusterEventList);
         FilterList<GeneCluster> includeExcludeFilteredList = new FilterList<>(sortedList, includeExcludeMatcherEditor);
@@ -305,7 +323,9 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
     }
 
     public void addIncludeExcludeFilterComboBox(JComboBox box) {
-        box.addActionListener(includeExcludeMatcherEditor);
+        includeExcludeBoxes.add(box);
+        if (includeExcludeMatcherEditor != null)
+            box.addActionListener(includeExcludeMatcherEditor);
     }
 
     public void clearSelection() {

@@ -456,7 +456,6 @@ public class Gui {
                     changeGuiMode("Ready", false, false, true, false);
                     break;
                 case READING_GENOMES:
-                    gecko.setGeckoInstanceData(DataSet.getEmptyDataSet());
                     changeGuiMode("Reading genomes...", true, false, false, false);
                     break;
                 case PREPARING_COMPUTATION:

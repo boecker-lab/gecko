@@ -1,6 +1,8 @@
 package de.unijena.bioinf.gecko3.datastructures;
 
 import de.unijena.bioinf.gecko3.datastructures.util.MutableInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.*;
@@ -12,6 +14,9 @@ import java.util.List;
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
 public class DataSet {
+    private static final Logger logger = LoggerFactory.getLogger(DataSet.class);
+    private static final DataSet emptyDataSet = new DataSet(null, 0, 0, 0, null, null, 0);
+
     private Genome[] genomes;
     private List<GeneCluster> clusters;
 
@@ -25,7 +30,7 @@ public class DataSet {
     private Map<GeneFamily, Color> colorMap;
 
     public static DataSet getEmptyDataSet() {
-        return new DataSet(null, 0, 0, 0, null, null, 0);
+        return emptyDataSet;
     }
 
     public DataSet(Genome[] genomes, int maxIdLength, int maxNameLength, int maxLocusTagLength, Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily, int numberOfGeneFamiliesWithMultipleGenes) {
@@ -297,6 +302,10 @@ public class DataSet {
     }
 
     public void setClusters(List<GeneCluster> clusters, Parameter parameter) {
+        if (genomes == null) {
+            logger.error("Trying to add clusters to genome less data set");
+            throw new RuntimeException("Trying to add clusters to genome less data set");
+        }
         this.clusters = correctInvalidClusters(clusters, genomes, parameter);
     }
 

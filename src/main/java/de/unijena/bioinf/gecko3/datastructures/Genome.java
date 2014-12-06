@@ -1,12 +1,16 @@
 package de.unijena.bioinf.gecko3.datastructures;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.util.*;
 
 
 public class Genome implements Serializable {
-
 	private static final long serialVersionUID = 370380955909547007L;
+
+    private static final Logger logger = LoggerFactory.getLogger(Genome.class);
 
 	private final List<Chromosome> chromosomes;
 	private String name;
@@ -16,7 +20,7 @@ public class Genome implements Serializable {
 	}
 	
 	public Genome(String name) {
-		chromosomes = new ArrayList<Chromosome>();
+		chromosomes = new ArrayList<>();
 		this.name = name;
 	}
 	
@@ -51,7 +55,7 @@ public class Genome implements Serializable {
 
 	public Gene[] getSubsequence(Subsequence s) {
 		List<Gene> geneList = new ArrayList<>(s.getStop() - (s.getStart()-1));
-		for (int i=s.getStart()-1; i<s.getStop(); i++) 
+		for (int i=s.getStart()-1; i<s.getStop(); i++)
 			geneList.add(chromosomes.get(s.getChromosome()).getGenes().get(i));
 		return geneList.toArray(new Gene[geneList.size()]);
 	}
