@@ -10,6 +10,7 @@ import org.apache.commons.math3.util.Precision;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CancellationException;
 
 class Statistics implements AlgorithmProgressProvider {
 	private final GenomeList genomes;
@@ -468,7 +469,16 @@ class Statistics implements AlgorithmProgressProvider {
 			progressListeners.remove(listener);
 	}
 
+    /**
+     * Fires a AlgorithmStatusEvent to all listeners. If the Thread is interrupted, throws a CancellationException to
+     * stop the computation
+     * @param statusEvent
+     * @throws java.util.concurrent.CancellationException if the thread was interrupted
+     */
 	private void fireProgressUpdateEvent(AlgorithmStatusEvent statusEvent){
+        if (Thread.currentThread().isInterrupted()){
+            throw new CancellationException();
+        }
 		for (AlgorithmProgressListener listener : progressListeners)
 			listener.algorithmProgressUpdate(statusEvent);
 	}

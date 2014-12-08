@@ -326,6 +326,7 @@ public class Gui {
                 switch (task) {
                     case Init:
                         initProgressbar(value);
+                        break;
                     case ComputingClusters:
                         if (setProgressValue(value))
                             changeMode(Gui.Mode.COMPUTING);
@@ -346,6 +347,7 @@ public class Gui {
     private void initProgressbar(int maxValue){
         progressActive = true;
         progressbar.setMaximum(maxValue);
+        progressbar.setValue(0);
     }
 
     private boolean setProgressValue(int value) {

@@ -8,7 +8,9 @@ import de.unijena.bioinf.gecko3.datastructures.GeneCluster;
 import de.unijena.bioinf.gecko3.datastructures.Parameter;
 
 import java.math.BigDecimal;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.*;
+import java.util.concurrent.CancellationException;
 
 public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 	private final GenomeList genomes;
@@ -330,7 +332,16 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
             progressListeners.remove(listener);
     }
 
+    /**
+     * Fires a AlgorithmStatusEvent to all listeners. If the Thread is interrupted, throws a CancellationException to
+     * stop the computation
+     * @param statusEvent
+     * @throws java.util.concurrent.CancellationException if the thread was interrupted
+     */
     private void fireProgressUpdateEvent(AlgorithmStatusEvent statusEvent){
+        if (Thread.currentThread().isInterrupted()){
+            throw new CancellationException();
+        }
         for (AlgorithmProgressListener listener : progressListeners)
             listener.algorithmProgressUpdate(statusEvent);
     }
