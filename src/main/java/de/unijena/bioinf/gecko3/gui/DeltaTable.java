@@ -277,11 +277,11 @@ public class DeltaTable extends JPanel {
         }
 
         private boolean isEmptyRow(int row) {
-            if (deltaValues.get(row)[COL_D_SUM] > 0)
+            if (deltaValues.get(row)[COL_D_SUM] >= 0)
                 return false;
-            if (deltaValues.get(row)[COL_D_LOSS] > 0)
+            if (deltaValues.get(row)[COL_D_LOSS] >= 0)
                 return false;
-            if (deltaValues.get(row)[COL_D_ADD] > 0)
+            if (deltaValues.get(row)[COL_D_ADD] >= 0)
                 return false;
             return true;
         }
