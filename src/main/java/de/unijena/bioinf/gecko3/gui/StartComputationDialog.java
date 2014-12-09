@@ -68,7 +68,7 @@ public class StartComputationDialog extends JDialog {
         /*
          * All other options
          */
-		final String[] qValues = new String[gecko.getGenomes().length-1];
+		final String[] qValues = new String[Math.max(gecko.getGenomes().length-1, 1)];
 		qValues[Math.max(qValues.length-1, 0)] = "all";
 		for (int i=2;i<gecko.getGenomes().length;i++)
 			qValues[i-2] = Integer.toString(i);

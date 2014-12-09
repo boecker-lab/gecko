@@ -163,8 +163,6 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 
 		scrollPosition += getGeneWidth()/2; // center on the middle of the gene
 
-        setMinMaxPositions(chromosomeIndex, geneIndex, scrollPosition);
-
 		return scrollPosition;
 	}
 
