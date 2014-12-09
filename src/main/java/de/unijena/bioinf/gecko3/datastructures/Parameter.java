@@ -142,14 +142,14 @@ public class Parameter {
 	
     public final static int DELTA_TABLE_SIZE = 3;
 
-	private int delta;
-	private int[][] deltaTable;
-	private int minClusterSize;
-	private int alphabetSize;
-	private int q;
-	private ReferenceType refType;
-	private OperationMode operationMode;
-	private boolean searchRefInRef;
+	private final int delta;
+	private final int[][] deltaTable;
+	private final int minClusterSize;
+	private final int q;
+	private final ReferenceType refType;
+	private final OperationMode operationMode;
+	private final boolean searchRefInRef;
+    private int alphabetSize;
 	
 	public Parameter(int delta, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType) {
 		this(delta, minClusterSize, q, operationMode, refType, false);
@@ -158,8 +158,10 @@ public class Parameter {
 	public Parameter(int delta, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
 		if (searchRefInRef && operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Searching the reference occurrence in the reference genome is only compatible with reference mode!");
-		
-		this.delta = delta;
+		if (delta < 0)
+            throw new IllegalArgumentException("Delta has to be >= 0!");
+
+        this.delta = delta;
 		this.deltaTable = null;
 		this.minClusterSize = minClusterSize;
 		this.q = q;
@@ -176,6 +178,9 @@ public class Parameter {
 	public Parameter(int[][] deltaTable, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
 		if (operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Delta table is only compatible with reference mode!");
+
+        if (deltaTable==null || deltaTable.length<1)
+            throw new IllegalArgumentException("Delta table must not be null or empty!");
 		
 		this.delta = -1;
 		this.deltaTable = new int[deltaTable.length][];
@@ -200,10 +205,6 @@ public class Parameter {
     public char getRefTypeChar() {
         return refType.getCharMode();
     }
-		
-	public void setOperationMode(OperationMode opmode) {
-		this.operationMode = opmode;
-	}
 	
 	public OperationMode getOperationMode() {
 		return operationMode;
@@ -213,10 +214,6 @@ public class Parameter {
         return operationMode.getCharMode();
     }
 	
-	public void setDelta(int delta) {
-		this.delta = delta;
-	}
-	
 	public int getDelta() {
 		return delta;
 	}
@@ -224,10 +221,10 @@ public class Parameter {
 	public int[][] getDeltaTable() {
 		return deltaTable;
 	}
-	
-	public void setMinClusterSize(int minClusterSize) {
-		this.minClusterSize = minClusterSize;
-	}
+
+    public boolean useDeltaTable() {
+        return delta == -1;
+    }
 	
 	public int getMinClusterSize() {
 		return minClusterSize;
@@ -243,10 +240,6 @@ public class Parameter {
 
 	public int getQ() {
 		return q;
-	}
-
-	public void setQ(int q) {
-		this.q = q;
 	}
 	
 	public boolean searchRefInRef() {

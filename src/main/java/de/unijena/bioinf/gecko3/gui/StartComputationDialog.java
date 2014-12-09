@@ -175,7 +175,8 @@ public class StartComputationDialog extends JDialog {
                             (Integer) sizeSpinner.getValue(),
                             quorum,
                             opMode,
-                            refType);
+                            refType,
+                            refInRef.isSelected());
                 } else {
                     if (!deltaTable.isValidDeltaTable()) {
                         JOptionPane.showMessageDialog(StartComputationDialog.this, "Invalid Distance Table!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -186,7 +187,8 @@ public class StartComputationDialog extends JDialog {
                                 deltaTable.getClusterSize(),
                                 quorum,
                                 opMode,
-                                refType);
+                                refType,
+                                refInRef.isSelected());
                     }
                 }
 

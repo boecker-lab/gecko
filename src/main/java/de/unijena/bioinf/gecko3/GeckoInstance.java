@@ -53,7 +53,6 @@ public class GeckoInstance {
 	
 	private boolean debug = false;
 	private boolean animationEnabled = true;
-	private Parameter lastParameter;
     private Gui gui;
 
     private StartComputationDialog scd = null;
@@ -114,10 +113,6 @@ public class GeckoInstance {
     public List<GeneCluster> computeReferenceStatistics(int[][][] genomes, Parameter params, List<GeneCluster> cluster, GeckoInstance gecko) {
         return new ArrayList<>(Arrays.asList(computeReferenceStatistics(genomes, params, cluster.toArray(new GeneCluster[cluster.size()]), gecko)));
     }
-	
-	public Parameter getLastParameter() {
-		return lastParameter;
-	}
 	
 	public void setAnimationEnabled(boolean animationEnabled) {
 		this.animationEnabled = animationEnabled;
@@ -466,7 +461,6 @@ public class GeckoInstance {
      * @return
      */
 	public SwingWorker<List<GeneCluster>, Void> performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
-		lastParameter = p;
         if (gui != null)
 		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
 

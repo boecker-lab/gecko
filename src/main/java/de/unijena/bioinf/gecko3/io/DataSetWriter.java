@@ -9,15 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
 
 
 /**
- * The class implements a writer which write a gecko session to a file.
- * The code of this file is exported from GeckoInstance.java and modified.
- * 
- * @author Hans-Martin Haase <hans-martin dot haase at uni-jena dot de>
- * @version 0.03
+ * The class implements a writer which writes a gecko session to a file.
  */
 public class DataSetWriter{
     private static final Logger logger = LoggerFactory.getLogger(DataSetWriter.class);
@@ -33,6 +30,8 @@ public class DataSetWriter{
 
     final static String CLUSTER_SECTION_START = "<clusters>";
     final static String CLUSTER_SECTION_END = "</clusters>";
+    final static String PARAMETERS_START = "<parameters>";
+    final static String PARAMETERS_END = "</parameters>";
     final static String CLUSTER_START = "<cluster>";
     final static String CLUSTER_END = "</cluster>";
     final static String OCC_START = "<occ>";
@@ -47,10 +46,8 @@ public class DataSetWriter{
         boolean returnValue = true;
 
         try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), Charset.forName("UTF-8"))) {
-        //try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(f)); ObjectOutputStream out = xstream.createObjectOutputStream(zos)) {
-        //    zos.putNextEntry(new ZipEntry(f.getName()));
             writeGenomes(out, data.getGenomes());
-            writeClusters(out, data.getClusters());
+            writeClusters(out, data.getClusters(), data.getParameters());
 
         }
         catch (IOException e) {
@@ -87,9 +84,17 @@ public class DataSetWriter{
         out.newLine();
     }
 
-    private static void writeClusters(BufferedWriter out, List<GeneCluster> clusters) throws  IOException {
+    private static void writeClusters(BufferedWriter out, List<GeneCluster> clusters, Parameter parameters) throws  IOException {
         out.write(CLUSTER_SECTION_START);
         out.newLine();
+        if (parameters != null){
+            out.write(PARAMETERS_START);
+            out.newLine();
+            writeParameters(out, parameters);
+            out.newLine();
+            out.write(PARAMETERS_END);
+            out.newLine();
+        }
         for (GeneCluster cluster : clusters){
             out.write(CLUSTER_START);
             out.newLine();
@@ -114,5 +119,19 @@ public class DataSetWriter{
         }
         out.write(CLUSTER_SECTION_END);
         out.newLine();
+    }
+
+    /**
+     * Writes the parameters. parameters must not be null!
+     * @param out
+     * @param p must not be null
+     * @throws IOException
+     */
+    private static void writeParameters(BufferedWriter out, Parameter p) throws  IOException {
+        out.write(p.getOperationModeChar() + SEPERATOR + p.getRefTypeChar() + SEPERATOR + (p.searchRefInRef()? 1 : 0) + SEPERATOR + p.getMinClusterSize() + SEPERATOR + p.getQ() + SEPERATOR);
+        if (p.useDeltaTable())
+            out.write(Arrays.deepToString(p.getDeltaTable()));
+        else
+            out.write(Integer.toString(p.getDelta()));
     }
 }

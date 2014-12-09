@@ -1,6 +1,7 @@
 package de.unijena.bioinf.gecko3.io;
 
 import de.unijena.bioinf.gecko3.datastructures.*;
+import de.unijena.bioinf.gecko3.io.util.StringParsing;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,7 +36,7 @@ public class GckFileReader implements GeckoDataReader {
 	 * Storing place for the gene clusters.
 	 */
 	private List<GeneCluster> clusters;
-    private List<Parameter> parameters;
+    private Parameter parameters;
 	
 	/**
 	 * Storing place for the length of the longest id.
@@ -90,7 +91,8 @@ public class GckFileReader implements GeckoDataReader {
                 geneFamilySet,
                 unknownGeneFamily,
                 numberOfGeneFamiliesWithMultipleGenes,
-                clusters
+                clusters,
+                parameters
         );
     }
 
@@ -185,6 +187,9 @@ public class GckFileReader implements GeckoDataReader {
         while(continueReading) {
             String line = reader.readLine().trim();
             switch (line) {
+                case DataSetWriter.PARAMETERS_START:
+                    readParameters(reader);
+                    break;
                 case DataSetWriter.CLUSTER_START:
                     if (builder != null)
                         throw new ParseException("Cluster not closed before new cluster start.", 0);
@@ -216,6 +221,34 @@ public class GckFileReader implements GeckoDataReader {
             }
         }
         clusters = clusterList;
+    }
+
+    private void readParameters(BufferedReader reader) throws IOException, ParseException {
+        if (this.parameters != null)
+            throw new ParseException("More than one parameter section found, only one is allowed!", 0);
+
+        String line = reader.readLine().trim();
+        String[] parameters = line.split(DataSetWriter.SEPERATOR);
+
+        Parameter.OperationMode oMode = Parameter.OperationMode.getOperationModeFromChar(parameters[0].charAt(0));
+        Parameter.ReferenceType rType = Parameter.ReferenceType.getReferenceTypeFromChar(parameters[1].charAt(0));
+        if (!(parameters[2].equals("1") || parameters[2].equals("0")))
+            throw new ParseException("Invalid value for search ref in ref, must be 0 or 1, got: " + parameters[2], 0);
+        boolean searchRefInRef = parameters[2].equals("1");
+        int minClusterSize = Integer.parseInt(parameters[3]);
+        int quorum = Integer.parseInt(parameters[4]);
+
+        try{
+            int delta = Integer.parseInt(parameters[5]);
+            this.parameters = new Parameter(delta, minClusterSize, quorum, oMode, rType, searchRefInRef);
+        } catch (NumberFormatException e) {
+            int[][] deltaTable = StringParsing.parseDeltaTable(parameters[5]);
+            this.parameters = new Parameter(deltaTable, minClusterSize, quorum, oMode, rType, searchRefInRef);
+        }
+
+        line = reader.readLine().trim();
+        if (!line.equals(DataSetWriter.PARAMETERS_END))
+            throw new ParseException("Maleformed line: " + line + "expected " + DataSetWriter.PARAMETERS_END, 0);
     }
 
     private static class GeneClusterBuilder {

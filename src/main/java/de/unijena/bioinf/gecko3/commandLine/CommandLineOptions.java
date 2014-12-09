@@ -178,7 +178,7 @@ public class CommandLineOptions {
             Map<Integer, int[]> mapping = new HashMap<>();
             int maxSize = 0;
             for (String delimitedString : delimitedStrings) {
-                String cleanedString = delimitedString.substring(delimitedString.indexOf("[") + 1);
+                String cleanedString = delimitedString.substring(delimitedString.lastIndexOf("[") + 1);
                 String[] singleValues = cleanedString.split(",");
 
                 if (singleValues.length != 4) {

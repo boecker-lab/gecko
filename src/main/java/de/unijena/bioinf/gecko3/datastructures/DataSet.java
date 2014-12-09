@@ -18,6 +18,7 @@ public class DataSet {
     private static final DataSet emptyDataSet = new DataSet(null, 0, 0, 0, null, null, 0);
 
     private Genome[] genomes;
+    private Parameter parameters;
     private List<GeneCluster> clusters;
 
     private final int maxIdLength;
@@ -34,7 +35,7 @@ public class DataSet {
     }
 
     public DataSet(Genome[] genomes, int maxIdLength, int maxNameLength, int maxLocusTagLength, Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily, int numberOfGeneFamiliesWithMultipleGenes) {
-        this(genomes, maxIdLength, maxNameLength, maxLocusTagLength, geneFamilySet, unknownGeneFamily, numberOfGeneFamiliesWithMultipleGenes, null);
+        this(genomes, maxIdLength, maxNameLength, maxLocusTagLength, geneFamilySet, unknownGeneFamily, numberOfGeneFamiliesWithMultipleGenes, null, null);
     }
 
     public DataSet(Genome[] genomes,
@@ -44,9 +45,11 @@ public class DataSet {
                    Set<GeneFamily> geneFamilySet,
                    GeneFamily unknownGeneFamily,
                    int numberOfGeneFamiliesWithMultipleGenes,
-                   List<GeneCluster> clusters) {
+                   List<GeneCluster> clusters,
+                   Parameter parameters) {
         this.genomes = genomes;
         this.clusters = (clusters==null ? new ArrayList<GeneCluster>() : clusters);
+        this.parameters = parameters;
         this.maxIdLength = maxIdLength;
         this.maxNameLength = maxNameLength;
         this.maxLocusTagLength = maxLocusTagLength;
@@ -301,12 +304,15 @@ public class DataSet {
         return clusters;
     }
 
-    public void setClusters(List<GeneCluster> clusters, Parameter parameter) {
+    public Parameter getParameters() {return parameters;}
+
+    public void setClusters(List<GeneCluster> clusters, Parameter parameters) {
         if (genomes == null) {
             logger.error("Trying to add clusters to genome less data set");
             throw new RuntimeException("Trying to add clusters to genome less data set");
         }
-        this.clusters = correctInvalidClusters(clusters, genomes, parameter);
+        this.clusters = correctInvalidClusters(clusters, genomes, parameters);
+        this.parameters = parameters;
     }
 
     public void clearClusters() {

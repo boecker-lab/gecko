@@ -2,6 +2,8 @@ package de.unijena.bioinf.gecko3.algo;
 
 import de.unijena.bioinf.gecko3.datastructures.Parameter;
 
+import java.util.Arrays;
+
 /**
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
@@ -214,6 +216,9 @@ public class AlgorithmParameters{
 	}
 
     public String toString() {
-        return String.format("Delta: %1$d Size: %2$d",  delta, minClusterSize);
+		if (delta >= 0)
+        	return String.format("Delta: %1$d Size: %2$d",  delta, minClusterSize);
+		else
+			return String.format("DeltaTable: %s Size: %2$d", Arrays.deepToString(deltaTable), minClusterSize);
     }
 }
