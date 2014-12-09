@@ -192,14 +192,14 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
                     minPosition -= 2 * getChromosomeEndingWidth();
             }
             if (geneIndex == genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1) {
-                if (chromosomeIndex < genome.getChromosomes().size())
+                if (chromosomeIndex < genome.getChromosomes().size() - 1)
                     maxPosition += 2 * getChromosomeEndingWidth();
                 else
                     maxPosition = getHorizontalScrollBar().getMaximum();
             }
         } else {
             if (geneIndex == 0) {
-                if (chromosomeIndex < genome.getChromosomes().size())
+                if (chromosomeIndex < genome.getChromosomes().size() - 1)
                     maxPosition += 2 * getChromosomeEndingWidth();
                 else
                     maxPosition = getHorizontalScrollBar().getMaximum();
@@ -220,7 +220,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
             if (position < minPosition) {
                 if (geneIndex == 0) {
                     chromosomeIndex--;
-                    geneIndex = genome.getChromosomes().get(chromosomeIndex).getGenes().size()-1;
+                    geneIndex = genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1;
                     changedCenter = true;
                 } else {
                     geneIndex--;
@@ -249,7 +249,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
             } else if (position > maxPosition) {
                 if (geneIndex == 0) {
                     chromosomeIndex++;
-                    geneIndex = genome.getChromosomes().get(chromosomeIndex).getGenes().size()-1;
+                    geneIndex = genome.getChromosomes().get(chromosomeIndex).getGenes().size() - 1;
                     changedCenter = true;
                 } else {
                     geneIndex--;
