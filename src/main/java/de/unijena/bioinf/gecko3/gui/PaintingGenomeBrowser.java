@@ -94,9 +94,15 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 
 	@Override
 	public void adjustSize() {
-		this.canvas.setPreferredSize(new Dimension (getCanvasWidth(), getGBHeight()));
-        setMinMaxPositions();
-		this.revalidate();
+		canvas.setPreferredSize(new Dimension (getCanvasWidth(), getGBHeight()));
+        canvas.invalidate();
+		revalidate();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                PaintingGenomeBrowser.this.scrollToPosition(chromosomeIndex, geneIndex);
+            }
+        });
 	}
 
 	private int getScrollValue() {
@@ -316,9 +322,14 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 	@Override
 	public void flip() {
         this.flipped = !this.flipped;
-        setMinMaxPositions();
-        this.revalidate();
-        this.repaint();
+        canvas.invalidate();
+        revalidate();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                PaintingGenomeBrowser.this.scrollToPosition(chromosomeIndex, geneIndex);
+            }
+        });
 	}
 
 	@Override
@@ -352,7 +363,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
     @Override
     public void setNameType(GenomePainting.NameType nameType) {
         this.nameType = nameType;
-        canvas.repaint();
+        this.adjustSize();
     }
 
     private int getCanvasWidth() {
@@ -397,25 +408,15 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
 		@Override
 		public void componentResized(ComponentEvent e) {
 			super.componentResized(e);
-			final int offset = (int)PaintingGenomeBrowser.this.getSize().getWidth();
 			canvas.setPreferredSize(new Dimension (getCanvasWidth(), getGBHeight()));
 			PaintingGenomeBrowser.this.revalidate();
 			PaintingGenomeBrowser.this.repaint();
-            if (geneIndex >= 0 && chromosomeIndex >= 0){
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        PaintingGenomeBrowser.this.scrollToPosition(chromosomeIndex, geneIndex);
-                    }
-                });
-            } else {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        PaintingGenomeBrowser.this.adjustScrollPosition(offset);
-                    }
-                });
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    PaintingGenomeBrowser.this.scrollToPosition(chromosomeIndex, geneIndex);
+                }
+            });
 		}
 	}
 
@@ -448,8 +449,6 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
                 }
             }
         }
-
-
 
         @Override
 		public void mouseDragged(MouseEvent e) {
