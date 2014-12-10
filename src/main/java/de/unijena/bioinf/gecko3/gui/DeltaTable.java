@@ -41,6 +41,7 @@ public class DeltaTable extends JPanel {
         deltaTable.setRowSelectionAllowed(false);
         deltaTable.setCellSelectionEnabled(true);
         deltaTable.setDefaultRenderer(Integer.class, new DeltaTableCellRenderer());
+        deltaTable.putClientProperty("terminateEditOnFocusLost", true);
         deltaTable.setFillsViewportHeight(true);
 
         sizeSpinner = new JSpinner(new SpinnerNumberModel(initialMinimumSize, 0, Integer.MAX_VALUE, 1));
