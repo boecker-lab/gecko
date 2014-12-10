@@ -86,13 +86,16 @@ public class ColorUtils {
 		return ((r&0xff)<<16) | ((g&0xff)<<8) | b&0xff;
 	}
 
+	public static Color getTranslucentColor(Color color) {
+		return getTranslucentColor(color, 0.5f);
+	}
     /**
      * Returns the given color but with an alpha value of 0.5
      * @param color
      * @return
      */
-    public static Color getTranslucentColor(Color color) {
+    public static Color getTranslucentColor(Color color, float alpha) {
         float[] rgb = color.getRGBColorComponents(null);
-        return new Color(rgb[0], rgb[1], rgb[2], 0.5f);
+        return new Color(rgb[0], rgb[1], rgb[2], alpha);
     }
 }

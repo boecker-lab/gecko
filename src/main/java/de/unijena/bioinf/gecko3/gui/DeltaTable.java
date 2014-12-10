@@ -9,6 +9,7 @@ import de.unijena.bioinf.gecko3.gui.util.JTableSelectAll;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -23,7 +24,6 @@ import java.util.Arrays;
 public class DeltaTable extends JPanel {
     private final DeltaTableTableModel model;
     private final JTable deltaTable;
-    private final JSpinner sizeSpinner;
 
     public DeltaTable() {
         this(Parameter.DeltaTable.getDefault().getDeltaTable(), Parameter.DeltaTable.getDefault().getMinimumSize());
@@ -35,7 +35,7 @@ public class DeltaTable extends JPanel {
          */
         deltaTable = new JTableSelectAll();
         deltaTable.setBackground(Color.WHITE);
-        model = new DeltaTableTableModel(deltas);
+        model = new DeltaTableTableModel(deltas, initialMinimumSize);
         deltaTable.setModel(model);
         deltaTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         deltaTable.setRowSelectionAllowed(false);
@@ -44,19 +44,10 @@ public class DeltaTable extends JPanel {
         deltaTable.putClientProperty("terminateEditOnFocusLost", true);
         deltaTable.setFillsViewportHeight(true);
 
-        sizeSpinner = new JSpinner(new SpinnerNumberModel(initialMinimumSize, 0, Integer.MAX_VALUE, 1));
-        FormLayout sizeLayout = new FormLayout("pref, 2dlu, pref", "pref");
-        DefaultFormBuilder sizeBuilder = new DefaultFormBuilder(sizeLayout);
-        sizeBuilder.append("Minimum cluster size:", sizeSpinner);
-        JPanel sizePanel = sizeBuilder.build();
-
         // layout of window
-        FormLayout layout = new FormLayout("min", "min(100dlu;default), 4dlu, pref");
+        FormLayout layout = new FormLayout("min(155dlu;default)", "min(100dlu;default)");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout, this);
         builder.append(new JScrollPane(deltaTable));
-        builder.nextLine();
-        builder.nextLine();
-        builder.append(sizePanel);
 
         // add popup menu to table
         final JPopupMenu popUp = new JPopupMenu();
@@ -93,8 +84,7 @@ public class DeltaTable extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 if (deltaTable.isEditing())
                     deltaTable.getCellEditor().stopCellEditing();
-                model.setDeltaTable(Parameter.DeltaTable.getDefault().getDeltaTable());
-                sizeSpinner.setValue(Parameter.DeltaTable.getDefault().getMinimumSize());
+                model.setDeltaTable(Parameter.DeltaTable.getDefault());
             }
         });
 
@@ -127,7 +117,7 @@ public class DeltaTable extends JPanel {
     }
 
     public int getClusterSize() {
-        return (int)sizeSpinner.getValue();
+        return model.getMinimumClusterSize();
     }
 
     public boolean isValidDeltaTable() {
@@ -153,8 +143,8 @@ public class DeltaTable extends JPanel {
         private final String[] columnNames = {"D_ADD","D_LOSS", "D_SUM", "Size"};
         private java.util.List<int[]> deltaValues;
 
-        public DeltaTableTableModel(int[][] values) {
-            setDeltaTable(values);
+        public DeltaTableTableModel(int[][] values, int minimumSize) {
+            setDeltaTable(values, minimumSize);
         }
 
         @Override
@@ -252,17 +242,23 @@ public class DeltaTable extends JPanel {
             return true;
         }
 
-        public void setDeltaTable(int[][] deltaTable) {
+        public void setDeltaTable(Parameter.DeltaTable deltaValues) {
+            setDeltaTable(deltaValues.getDeltaTable(), deltaValues.getMinimumSize());
+        }
+
+        public void setDeltaTable(int[][] deltaTable, int minimumSize) {
             this.deltaValues = new ArrayList<>(deltaTable!=null ? deltaTable.length+1 : 1);
             if (deltaTable!= null){
                 for (int i=0; i<deltaTable.length; i++) {
                     if (deltaTable[i].length != 3)
                         throw new IllegalArgumentException("Invalid array, needs to contain exactly 3 elements!");
-                    if (isZeroRow(deltaTable[i]))
-                        continue;
-                    int[] newValues = Arrays.copyOf(deltaTable[i], deltaTable[i].length+1);
-                    newValues[COL_SIZE] = i;
-                    deltaValues.add(newValues);
+                    if (i < minimumSize && !isZeroRow(deltaTable[i]))
+                        throw new IllegalArgumentException("Invalid array, non zero row in table before minimum size");
+                    if (i >= minimumSize){
+                        int[] newValues = Arrays.copyOf(deltaTable[i], deltaTable[i].length+1);
+                        newValues[COL_SIZE] = i;
+                        deltaValues.add(newValues);
+                    }
                 }
             }
             if (deltaTable==null || deltaTable.length==0 || isValidRow(deltaValues.size()-1))
@@ -288,9 +284,9 @@ public class DeltaTable extends JPanel {
         }
 
         private void checkAndAddOrRemoveLastRows() {
-            if (isValidRow(deltaValues.size()-1)) {
+            if (!isEmptyRow(deltaValues.size()-1)) {
                 addEmptyDeltaValuesAtEnd();
-            } else if (isEmptyRow(deltaValues.size()-1)) {
+            } else {
                 for (int row = deltaValues.size()-2; row >= 0; row--){
                     if (isEmptyRow(row)) {
                         deltaValues.remove(deltaValues.size() - 1);
@@ -326,6 +322,10 @@ public class DeltaTable extends JPanel {
                 deltaValues.remove(selectedRow);
             fireTableRowsDeleted(selectedRow, selectedRow);
         }
+
+        public int getMinimumClusterSize() {
+            return deltaValues.get(0)[COL_SIZE];
+        }
     }
 
     class DeltaTableCellRenderer extends DefaultTableCellRenderer {
@@ -335,7 +335,7 @@ public class DeltaTable extends JPanel {
         public DeltaTableCellRenderer() {
             super();
             this.defaultForeground = UIManager.getColor("Table.foreground");
-            this.lastRowForeground = ColorUtils.getTranslucentColor(defaultForeground);
+            this.lastRowForeground = ColorUtils.getTranslucentColor(defaultForeground, 0.2f);
         }
 
         @Override
@@ -345,14 +345,12 @@ public class DeltaTable extends JPanel {
             TableModel model = table.getModel();
             if (model instanceof DeltaTableTableModel){
                 DeltaTableTableModel myModel = (DeltaTableTableModel) model;
-                Color borderColor = !myModel.isValidCell(row, column) ? Color.RED : Color.BLACK;
                 if (row == myModel.getRowCount()-1) {
-                    //rendererComp.setForeground(ColorUtils.getTranslucentColor(getForeground()));
                     rendererComp.setForeground(lastRowForeground);
-                    setBorder(BorderFactory.createLineBorder(ColorUtils.getTranslucentColor(borderColor)));
+                    setBorder(BorderFactory.createLineBorder(ColorUtils.getTranslucentColor(Color.BLACK, 0.2f)));
                 } else {
                     rendererComp.setForeground(defaultForeground);
-                    setBorder(BorderFactory.createLineBorder(borderColor));
+                    setBorder(BorderFactory.createLineBorder(!myModel.isValidCell(row, column) ? Color.RED : Color.BLACK));
                 }
             }
             return this;
