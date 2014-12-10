@@ -364,6 +364,7 @@ public class PaintingGenomeBrowser extends AbstractGenomeBrowser {
     public void setNameType(GenomePainting.NameType nameType) {
         this.nameType = nameType;
         this.adjustSize();
+        canvas.repaint();
     }
 
     private int getCanvasWidth() {
