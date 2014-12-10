@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -48,9 +49,23 @@ public class CommandLineExecution {
             Parameter parameter;
             if (options.getMaxDistance() >= 0)
                 parameter = new Parameter(options.getMaxDistance(), options.getMinClusterSize(), options.getMinCoveredGenomes(), options.getOperationMode(), refType);
-            else
-                parameter = new Parameter(options.getDistanceTable(), options.getMinClusterSize(), options.getMinCoveredGenomes(), options.getOperationMode(), refType);
-
+            else {
+                int[][] distanceValues = options.getDistanceTable();
+                int[][] distanceTable = new int[distanceValues.length][];
+                int[] lastValues = new int[]{0, 0, 0};
+                int minSize = Integer.MAX_VALUE;
+                for (int i=0; i<distanceTable.length; i++){
+                    if (distanceValues[i][0] < 0)
+                        distanceTable[i] = Arrays.copyOf(lastValues, lastValues.length);
+                    else {
+                        distanceTable[i] = distanceValues[i];
+                        lastValues = distanceTable[i];
+                        if (i < minSize)
+                            minSize = i;
+                    }
+                }
+                parameter = new Parameter(distanceTable, minSize, options.getMinCoveredGenomes(), options.getOperationMode(), refType);
+            }
 
             // compute the clusters
             SwingWorker<List<GeneCluster>, Void> worker = GeckoInstance.getInstance().performClusterDetection(parameter, false, options.getGenomeGroupingFactor());

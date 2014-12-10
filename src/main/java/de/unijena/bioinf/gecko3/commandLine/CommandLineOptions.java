@@ -28,18 +28,19 @@ public class CommandLineOptions {
     @Option(name = "-nC", aliases = "--noComputation", usage = "Don't compute clusters, only read data an write output.")
     private boolean noComputation = false;
 
-    @Option(name="-d", aliases = "--distance", usage = "The maximum allowed distance.")
+    @Option(name="-d", aliases = "--distance", usage = "The maximum allowed distance. Not compatible with \"-dT\".")
     private int maxDistance = -1;
 
     @Option(name="-dT", aliases = "--distanceTable", usage = "A string of arrays of maximum allowed distances.\n" +
             "Each array has to have 4 elements, the maximum number of additions, the maximum number of losses," +
             "the maximum sum of deletions and losses and the minimum size the parameters apply to.\n" +
             "e.g. \"[1, 0, 1, 3],[2, 1, 2, 4]\" allows 1 loss for size 3 and 2 losses and/or 1 deletions for size 4.\n" +
-            "Has to be a single string, so either contained in \"\" or not containing any blanks.",
+            "Has to be a single string, so either contained in \"\" or not containing any blanks. \n" +
+            "Not compatible with \"-d\" and \"-s\".",
             handler = DistanceTableOptionHandler.class)
     private int[][] distanceTable;
 
-    @Option(name="-s", aliases = "--size", usage = "The minimum cluster size.")
+    @Option(name="-s", aliases = "--size", usage = "The minimum cluster size. Not compatible with \"-dT\".")
     private int minClusterSize = -1;
 
     @Option(name="-q", aliases = "--quorum", usage = "The minimum number of covered genomes.")
@@ -157,11 +158,11 @@ public class CommandLineOptions {
                 throw new CmdLineException(parser, "Not running gui or no computation and missing either \"-d\" or \"-dT\" or distance < 0.");
             if ((distanceTable != null && distanceTable.length > 0) && (maxDistance >= 0))
                 throw new CmdLineException(parser, "Not running gui or no computation and both \"-d\" and \"-dT\" set.");
-            if (minClusterSize < 0) {
-                throw new CmdLineException(parser, "Not running gui or no computation and minimum cluster size < 0.");
-            }
+            if (minClusterSize >= 0 && distanceTable != null)
+                throw new CmdLineException(parser, "Using distance table und minimum cluster size set.");
+            if (minClusterSize < 0 && maxDistance >= 0)
+                throw new CmdLineException(parser, "Using single distance value and minimum cluster size < 0 or not set.");
         }
-
     }
 
     public static class DistanceTableOptionHandler extends OptionHandler<int[][]> {
@@ -206,7 +207,7 @@ public class CommandLineOptions {
                 }
             }
             int[][] table = new int[maxSize+1][];
-            int[] lastValues = new int[]{0, 0, 0};
+            int[] lastValues = new int[]{-1, -1, -1};
             for (int i=0; i<=maxSize; i++){
                 int[] values = mapping.get(i);
                 if (values == null)

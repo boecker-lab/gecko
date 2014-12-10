@@ -1,5 +1,7 @@
 package de.unijena.bioinf.gecko3.datastructures;
 
+import java.util.Arrays;
+
 public class Parameter {
 
     public enum OperationMode {
@@ -196,7 +198,7 @@ public class Parameter {
 		this.refType = refType;
 		this.alphabetSize = -1;
 		this.searchRefInRef = searchRefInRef;
-	}
+    }
 	
 	public ReferenceType getRefType() {
 		return refType;
