@@ -12,6 +12,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 
 public class ResultExportDialog extends JDialog {
@@ -22,6 +24,7 @@ public class ResultExportDialog extends JDialog {
 	private static final long serialVersionUID = -5557686856082270849L;
 	
 	private final JTextField textField;
+	private final JPanel advancedOptionsPanel;
 
 	/**
 	 * Create the dialog.
@@ -30,12 +33,9 @@ public class ResultExportDialog extends JDialog {
         super(parent);
 		setTitle("Export Results");
         setIconImages(parent.getIconImages());
-		setBounds(100, 100, 450, 300);
 		
-		getContentPane().setLayout(new BorderLayout());
-		
-		DefaultFormBuilder contentBuilder = new DefaultFormBuilder(new FormLayout("p, 4dlu, p:g, 4dlu, p"));
-		contentBuilder.border(Borders.DIALOG);
+		DefaultFormBuilder generalOptionsBuilder = new DefaultFormBuilder(new FormLayout("p, 4dlu, p:g, 4dlu, p"));
+		generalOptionsBuilder.border(Borders.DIALOG);
 
 		textField = new JTextField();
 		JButton btnBrowse = new JButton("Browse...");
@@ -55,14 +55,27 @@ public class ResultExportDialog extends JDialog {
 		});
 		final JComboBox<ResultFilter> resultFilterComboBox = new JComboBox<>(ResultFilter.values());
 		final JComboBox<ExportType> exportTypeCompoBox = new JComboBox<>(ExportType.getSupported());
+		exportTypeCompoBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					CardLayout cl = (CardLayout)(advancedOptionsPanel.getLayout());
+					cl.show(advancedOptionsPanel, e.getItem().toString());
+				}
+			}
+		});
 
-        contentBuilder.append(new JLabel("Choose Export Type"), exportTypeCompoBox);
-        contentBuilder.nextLine();
-        contentBuilder.append(new JLabel("Choose Filtering"), resultFilterComboBox);
-        contentBuilder.nextLine();
-		contentBuilder.append(new JLabel("Choose File"), textField, btnBrowse);
+        generalOptionsBuilder.append(new JLabel("Choose Export Type"), exportTypeCompoBox);
+        generalOptionsBuilder.nextLine();
+        generalOptionsBuilder.append(new JLabel("Choose Filtering"), resultFilterComboBox);
+        generalOptionsBuilder.nextLine();
+		generalOptionsBuilder.append(new JLabel("Choose File"), textField, btnBrowse);
 
-		
+		advancedOptionsPanel = new JPanel(new CardLayout());
+		for (ExportType exportType : ExportType.getSupported()) {
+			advancedOptionsPanel.add(exportType.getAdvancedOptionsPanel(), exportType.toString());
+		}
+
 		ButtonBarBuilder buttonBuilder = new ButtonBarBuilder();
 		
 		JButton okButton = new JButton("OK");
@@ -94,12 +107,22 @@ public class ResultExportDialog extends JDialog {
 		buttonBuilder.addRelatedGap();
 		buttonBuilder.addButton(cancelButton);
 		
+		JPanel generalOptionPanel = generalOptionsBuilder.getPanel();
+
+		DefaultFormBuilder contentBuilder = new DefaultFormBuilder(new FormLayout("p"));
+		contentBuilder.append(generalOptionPanel);
+		contentBuilder.nextLine();
+		contentBuilder.appendSeparator("Advanced Options");
+		contentBuilder.append(advancedOptionsPanel);
 		JPanel contentPanel = contentBuilder.getPanel();
+
 		JPanel buttonPanel = buttonBuilder.getPanel();
 		buttonPanel.setBorder(Borders.DIALOG);
-		
+
+		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+		pack();
 	}
 
 	/**

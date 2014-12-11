@@ -8,8 +8,11 @@ import de.unijena.bioinf.gecko3.gui.GenomePainting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -58,6 +61,10 @@ public class ResultWriter {
 
             // Support only a subset of values
             //return new ExportType[]{clusterData, table, latexTable, pdf, multiPdf};
+        }
+
+        public Component getAdvancedOptionsPanel() {
+            return new JLabel(this.toString());
         }
     }
 
