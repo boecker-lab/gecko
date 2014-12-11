@@ -6,7 +6,7 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.layout.FormLayout;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.GeckoInstance.ResultFilter;
-import de.unijena.bioinf.gecko3.io.ResultWriter.ExportType;
+import de.unijena.bioinf.gecko3.io.ExportType;
 
 import javax.swing.*;
 import java.awt.*;

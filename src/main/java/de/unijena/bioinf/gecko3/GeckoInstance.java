@@ -10,7 +10,7 @@ import de.unijena.bioinf.gecko3.gui.GenomePainting;
 import de.unijena.bioinf.gecko3.gui.Gui;
 import de.unijena.bioinf.gecko3.gui.StartComputationDialog;
 import de.unijena.bioinf.gecko3.io.ResultWriter;
-import de.unijena.bioinf.gecko3.io.ResultWriter.ExportType;
+import de.unijena.bioinf.gecko3.io.ExportType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

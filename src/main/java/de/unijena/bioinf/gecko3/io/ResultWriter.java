@@ -19,55 +19,6 @@ import java.util.zip.ZipOutputStream;
 public class ResultWriter {
     private static final Logger logger = LoggerFactory.getLogger(ResultWriter.class);
 
-	public enum ExportType {
-        clusterData("txt"),
-        clusterStatistics("txt"),
-        table("txt"),
-        geneNameTable("txt"),
-        clusterConservation("txt"),
-        clusterGenomeInformation("txt"),
-        referenceClusterTags("csv"),
-        latexTable("tex"),
-        internalDuplications("txt"),
-        pdf("pdf"),
-        multiPdf("zip");
-
-        private String defaultFileExtension;
-
-        public static final String types = "\"clusterData\" similar to the information in the gui.\n" +
-                "\"clusterStatistics\" general statistics about all the clusters.\n" +
-                "\"table\"\n table of cluster information, as used in Jahn et al, Statistics for approximate gene clusters, BMC Bioinformatics, 2013." +
-                "\"latexTable\" same as above, only latex ready.\n" +
-                "\"geneNameTable\" table of all gene names in the reference occ and additional info.\n" +
-                "\"clusterConservation\" information about the gene oder and additional genes for each cluster.\n" +
-                "\"clusterGenomeInformation\" in which genome the cluster occurs.\n" +
-                "\"referenceClusterTags\" the locus_tags of all genes in the reference occurrence.\n" +
-                "\"pdf\"\n all clusters as a single pdf picture." +
-                "\"multiPdf a zip file containing one pdf picture for each cluster.\"";
-
-        public String getDefaultFileExtension() {return defaultFileExtension;}
-
-        ExportType(String defaultFileExtension) {
-            this.defaultFileExtension = defaultFileExtension;
-        }
-
-        /**
-         * Wrapper method for values() that only returns the currently supported subset of values
-         * @return the supported subset of values
-         */
-        public static ExportType[] getSupported() {
-            // Support all values
-            return values();
-
-            // Support only a subset of values
-            //return new ExportType[]{clusterData, table, latexTable, pdf, multiPdf};
-        }
-
-        public Component getAdvancedOptionsPanel() {
-            return new JLabel(this.toString());
-        }
-    }
-
     public static boolean exportResultsToFile(File file, ExportType type, GeckoInstance.ResultFilter filter) {
         GeckoInstance gecko = GeckoInstance.getInstance();
         return exportResultsToFile(file, gecko.getClusterList(filter), gecko.getData().getGenomeNames(), type);

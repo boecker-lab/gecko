@@ -2,6 +2,7 @@ package de.unijena.bioinf.gecko3.commandLine;
 
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.Parameter;
+import de.unijena.bioinf.gecko3.io.ExportType;
 import de.unijena.bioinf.gecko3.io.ResultWriter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -73,7 +74,7 @@ public class CommandLineOptions {
     private File outfile = null;
 
     @Option(name="-rO", aliases = "--resultOutput", usage = "Write the filtered clusters to a File in different formats.\n" +
-            "ExportType must be one of: " + ResultWriter.ExportType.types + "\n" +
+            "ExportType must be one of: " + ExportType.types + "\n" +
             "ResultFilter must be one of: " + GeckoInstance.ResultFilter.types, handler = OutputOptionHandler.class)
     private List<OutputOption> outputOptions = new ArrayList<>();
 
@@ -262,7 +263,7 @@ public class CommandLineOptions {
         public int parseArguments(Parameters params) throws CmdLineException {
             int counter=0;
             File file = null;
-            ResultWriter.ExportType exportType = null;
+            ExportType exportType = null;
             GeckoInstance.ResultFilter filterType = null;
 
             for (; counter<params.size(); counter++) {
@@ -274,7 +275,7 @@ public class CommandLineOptions {
                 try {
                     switch (counter) {
                         case 0:
-                            exportType = ResultWriter.ExportType.valueOf(param.trim());
+                            exportType = ExportType.valueOf(param.trim());
                             break;
                         case 1:
                             filterType = GeckoInstance.ResultFilter.valueOf(param.trim());

@@ -1,6 +1,7 @@
 package de.unijena.bioinf.gecko3.commandLine;
 
 import de.unijena.bioinf.gecko3.GeckoInstance;
+import de.unijena.bioinf.gecko3.io.ExportType;
 import de.unijena.bioinf.gecko3.io.ResultWriter;
 
 import java.io.File;
@@ -10,10 +11,10 @@ import java.io.File;
  */
 public class OutputOption {
     private final File file;
-    private final ResultWriter.ExportType type;
+    private final ExportType type;
     private final GeckoInstance.ResultFilter filter;
 
-    public OutputOption(File file, ResultWriter.ExportType type, GeckoInstance.ResultFilter filter) {
+    public OutputOption(File file, ExportType type, GeckoInstance.ResultFilter filter) {
         this.file = file;
         this.type = type;
         this.filter = filter;
@@ -23,7 +24,7 @@ public class OutputOption {
         return file;
     }
 
-    public ResultWriter.ExportType getType() {
+    public ExportType getType() {
         return type;
     }
 

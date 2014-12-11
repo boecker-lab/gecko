@@ -23,7 +23,6 @@ public class Gecko3 {
     private static final Logger logger = LoggerFactory.getLogger(Gecko3.class);
 
     public static void main (String[] args) {
-        GeckoInstance instance = null;
         Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
         String lcOSName = System.getProperty("os.name").toLowerCase();
         logger.info("You are running {}-Java on {}", System.getProperty("os.arch"), System.getProperty("os.name"));
@@ -67,7 +66,7 @@ public class Gecko3 {
 
         boolean libgeckoLoaded = false;
 
-        instance = GeckoInstance.getInstance();
+        GeckoInstance instance = GeckoInstance.getInstance();
         instance.setGeckoInstanceData(DataSet.getEmptyDataSet());
         instance.setLibgeckoLoaded(libgeckoLoaded);
 

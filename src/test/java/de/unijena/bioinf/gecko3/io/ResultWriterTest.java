@@ -23,16 +23,16 @@ public class ResultWriterTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     static DataSet data;
-    ResultWriter.ExportType exportType;
+    ExportType exportType;
 
-    public ResultWriterTest(ResultWriter.ExportType exportType){
+    public ResultWriterTest(ExportType exportType){
         this.exportType = exportType;
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         List<Object[]> list = new ArrayList<>();
-        for (ResultWriter.ExportType exportType : ResultWriter.ExportType.values())
+        for (ExportType exportType : ExportType.values())
             list.add(new Object[]{exportType});
         return list;
     }
