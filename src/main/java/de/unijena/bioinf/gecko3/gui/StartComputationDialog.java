@@ -100,7 +100,8 @@ public class StartComputationDialog extends JDialog {
         EventList<Genome> genomeEventList = new BasicEventList<>();
         genomeEventList.addAll(Arrays.asList(GeckoInstance.getInstance().getGenomes()));
         final JComboBox refGenomeCombo = new JComboBox();
-        AutoCompleteSupport.install(refGenomeCombo, genomeEventList);
+        AutoCompleteSupport support = AutoCompleteSupport.install(refGenomeCombo, genomeEventList);
+        support.setStrict(true);
         refGenomeCombo.setSelectedIndex(0);
 
         additionalRefClusterSettings = new JPanel(new CardLayout());

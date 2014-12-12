@@ -951,6 +951,10 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return builder.toString();
     }
 
+	public String getReferenceLocusTags(){
+		return getLocusTags(getRefSeqIndex());
+	}
+
     public String getLocusTags(int genome_index){
         if (bestOccurrences.getSubsequences()[genome_index].length == 0)
             return noOCC;
@@ -1002,6 +1006,10 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         }
         return results;
     }
+
+	public String getReferenceGeneOrientations() {
+		return getGeneOrientations(getRefSeqIndex());
+	}
 
     public String getGeneOrientations(int genome_index) {
         if (bestOccurrences.getSubsequences()[genome_index].length == 0)

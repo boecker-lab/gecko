@@ -53,8 +53,8 @@ public class ResultExportDialog extends JDialog {
 				}
 			}
 		});
-		final JComboBox<ResultFilter> resultFilterComboBox = new JComboBox<>(ResultFilter.values());
 		final JComboBox<ExportType> exportTypeCompoBox = new JComboBox<>(ExportType.getSupported());
+		exportTypeCompoBox.setMaximumRowCount(ExportType.getSupported().length);
 		exportTypeCompoBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -65,6 +65,8 @@ public class ResultExportDialog extends JDialog {
 			}
 		});
 
+		final JComboBox<ResultFilter> resultFilterComboBox = new JComboBox<>(ResultFilter.values());
+
         generalOptionsBuilder.append(new JLabel("Choose Export Type"), exportTypeCompoBox);
         generalOptionsBuilder.nextLine();
         generalOptionsBuilder.append(new JLabel("Choose Filtering"), resultFilterComboBox);
@@ -73,7 +75,7 @@ public class ResultExportDialog extends JDialog {
 
 		advancedOptionsPanel = new JPanel(new CardLayout());
 		for (ExportType exportType : ExportType.getSupported()) {
-			advancedOptionsPanel.add(exportType.getAdvancedOptionsPanel(), exportType.toString());
+			advancedOptionsPanel.add(exportType.getAdditionalOptionsPanel(), exportType.toString());
 		}
 
 		ButtonBarBuilder buttonBuilder = new ButtonBarBuilder();
@@ -98,7 +100,7 @@ public class ResultExportDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ResultExportDialog.this.close();	
+				ResultExportDialog.this.close();
 			}
 		});
 		
@@ -112,7 +114,7 @@ public class ResultExportDialog extends JDialog {
 		DefaultFormBuilder contentBuilder = new DefaultFormBuilder(new FormLayout("p"));
 		contentBuilder.append(generalOptionPanel);
 		contentBuilder.nextLine();
-		contentBuilder.appendSeparator("Advanced Options");
+		contentBuilder.appendSeparator("Additional Options");
 		contentBuilder.append(advancedOptionsPanel);
 		JPanel contentPanel = contentBuilder.getPanel();
 

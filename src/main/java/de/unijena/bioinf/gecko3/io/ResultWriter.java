@@ -4,13 +4,11 @@ import com.lowagie.text.DocumentException;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.*;
 import de.unijena.bioinf.gecko3.gui.GeneClusterPicture;
-import de.unijena.bioinf.gecko3.gui.GenomePainting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.*;
+import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -43,7 +41,7 @@ public class ResultWriter {
                 writtenSuccessfully = writeGeneClusterTable(file, clusters);
                 break;
             case geneNameTable:
-                writtenSuccessfully = writeGeneClusterGeneNameTable(file, clusters, genomeNames);
+                writtenSuccessfully = writeGeneClusterGeneNameTable(file, clusters, genomeNames, type.getAdditionalExportParameters());
                 break;
             case clusterConservation:
                 writtenSuccessfully = writeClusterConservationFile(file, clusters, genomeNames);
@@ -61,19 +59,19 @@ public class ResultWriter {
                 writtenSuccessfully = writeInternalDuplicationsData(file, clusters, genomeNames);
                 break;
             case pdf:
-                writtenSuccessfully = writeGeneClusterToPdf(file, clusters);
+                writtenSuccessfully = writeGeneClusterToPdf(file, clusters, type.getAdditionalExportParameters());
                 break;
             case multiPdf:
-                writtenSuccessfully = writeGeneClusterPdfToZip(file, clusters);
+                writtenSuccessfully = writeGeneClusterPdfToZip(file, clusters, type.getAdditionalExportParameters());
                 break;
         }
         return writtenSuccessfully;
 	}
 
-    private static boolean writeGeneClusterToPdf(File file, List<GeneCluster> clusters) {
+    private static boolean writeGeneClusterToPdf(File file, List<GeneCluster> clusters, ExportType.AdditionalExportParameters additionalParameters) {
         List<GeneClusterPicture> pictures = new ArrayList<>(clusters.size());
         for (GeneCluster cluster : clusters)
-            pictures.add(new GeneClusterPicture(cluster, GenomePainting.NameType.LOCUS_TAG, true));
+            pictures.add(new GeneClusterPicture(cluster, additionalParameters.getNameType(), true));
 
         try (GeneClusterToPDFWriter pdfWriter = new GeneClusterToPDFWriter(new BufferedOutputStream(new FileOutputStream(file)))) {
             pdfWriter.write(pictures);
@@ -84,12 +82,12 @@ public class ResultWriter {
         return true;
     }
 
-    private static boolean writeGeneClusterPdfToZip(File file, List<GeneCluster> clusters) {
+    private static boolean writeGeneClusterPdfToZip(File file, List<GeneCluster> clusters, ExportType.AdditionalExportParameters additionalParameters) {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
              GeneClusterToPDFWriter pdfWriter = new GeneClusterToPDFWriter(zipOutputStream)) {
             for (int i=0; i<clusters.size(); i++) {
                 zipOutputStream.putNextEntry(new ZipEntry("cluster" + clusters.get(i).getId() + ".pdf"));
-                GeneClusterPicture picture = new GeneClusterPicture(clusters.get(i), GenomePainting.NameType.LOCUS_TAG, true);
+                GeneClusterPicture picture = new GeneClusterPicture(clusters.get(i), additionalParameters.getNameType(), true);
                 pdfWriter.write(picture);
                 zipOutputStream.closeEntry();
             }
@@ -183,16 +181,40 @@ public class ResultWriter {
     }
 
 
-    private static boolean writeGeneClusterGeneNameTable(File f, List<GeneCluster> clusters, List<String> genomeNames) {
-        int[] genomesForNaming = new int[]{0, 150};
+    private static boolean writeGeneClusterGeneNameTable(File f, List<GeneCluster> clusters, List<String> genomeNames, ExportType.AdditionalExportParameters additionalExportParameters) {
+        Set<String> genomeNamesUsedInOutput = additionalExportParameters.getGenomeNames();
+        boolean printReference = genomeNamesUsedInOutput.contains(ExportType.AdditionalExportParameters.REFERENCE_GENOME);
+        int nrOfGenomes = genomeNamesUsedInOutput.size() - (printReference ? 1 : 0);
+        int[] genomesForNaming = new int[nrOfGenomes];
+        int j=0;
+        for (int i=0; i<genomeNames.size(); i++){
+            if (genomeNamesUsedInOutput.contains(genomeNames.get(i))) {
+                genomesForNaming[j] = i;
+                j++;
+            }
+        }
+        if (j != genomesForNaming.length){
+            logger.error("Not enough genomes added in gene name table writer!\nFinal indices {}, should use genomes {} from all genomes {}", genomesForNaming, genomeNamesUsedInOutput, genomeNames);
+            throw new InvalidParameterException("Could not match all genomes from AdditionalExportParameters to genomeNames");
+        }
+
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
             writer.write("ID \t corrected pValue \t No of genes \t No of genomes");
-            for (int i=0; i<genomesForNaming.length; i++){
-                writer.write("\t" + genomeNames.get(genomesForNaming[i]));
+            if (printReference) {
+                writer.write("\t" + ExportType.AdditionalExportParameters.REFERENCE_GENOME);
             }
             for (int i=0; i<genomesForNaming.length; i++){
                 writer.write("\t" + genomeNames.get(genomesForNaming[i]));
+            }
+            if (printReference) {
+                writer.write("\t" + ExportType.AdditionalExportParameters.REFERENCE_GENOME);
+            }
+            for (int i=0; i<genomesForNaming.length; i++){
+                writer.write("\t" + genomeNames.get(genomesForNaming[i]));
+            }
+            if (printReference) {
+                writer.write("\t" + ExportType.AdditionalExportParameters.REFERENCE_GENOME);
             }
             for (int i=0; i<genomesForNaming.length; i++){
                 writer.write("\t" + genomeNames.get(genomesForNaming[i]));
@@ -200,16 +222,25 @@ public class ResultWriter {
             writer.newLine();
             for (GeneCluster cluster : clusters) {
                 writer.write(String.format("%d\t%.2f\t%d\t%d", cluster.getId(), cluster.getBestCorrectedScore(), cluster.getNoOfGenesInRefOcc(), cluster.getSize()));
+                if (printReference) {
+                    writer.write("\t"+cluster.getReferenceGeneNames());
+                }
                 for (int i=0; i<genomesForNaming.length; i++){
                     writer.write("\t"+cluster.getGeneNames(genomesForNaming[i]));
+                }
+                if (printReference) {
+                    writer.write("\t"+cluster.getReferenceGeneOrientations());
                 }
                 for (int i=0; i<genomesForNaming.length; i++){
                     writer.write("\t"+cluster.getGeneOrientations(genomesForNaming[i]));
                 }
+                if (printReference) {
+                    writer.write("\t"+cluster.getReferenceLocusTags());
+                }
                 for (int i=0; i<genomesForNaming.length; i++){
                     writer.write("\t"+cluster.getLocusTags(genomesForNaming[i]));
                 }
-                writer.write("\t"+cluster.getGenomeString());
+                //writer.write("\t"+cluster.getGenomeString());
                 writer.newLine();
             }
 
