@@ -171,8 +171,14 @@ public enum ExportType {
         /**
          * The NameType, default ist NameType.NAME
          */
-        private GenomePainting.NameType nameType = GenomePainting.NameType.NAME;
-        private java.util.Set<String> genomeNames = new LinkedHashSet<>();
+        private GenomePainting.NameType nameType;
+        private java.util.Set<String> genomeNames;
+
+        public AdditionalExportParameters() {
+            nameType = GenomePainting.NameType.NAME;
+            genomeNames = new LinkedHashSet<>();
+            genomeNames.add(REFERENCE_GENOME);
+        }
 
         public GenomePainting.NameType getNameType() {
             return nameType;
