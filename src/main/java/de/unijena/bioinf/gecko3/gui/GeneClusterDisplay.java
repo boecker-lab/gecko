@@ -1,6 +1,9 @@
 package de.unijena.bioinf.gecko3.gui;
 
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.*;
 import de.unijena.bioinf.gecko3.event.ClusterSelectionEvent;
@@ -12,10 +15,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 
 public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionListener {
@@ -28,6 +29,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 	private final JPanel masterPanel;
 
 	private GeneCluster cluster;
+    private Parameter parameters;
 	private boolean includeSubOptimalOccurrences;
     private int[] subselections;
 
@@ -118,6 +120,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         GeckoInstance gecko = GeckoInstance.getInstance();
 
 		cluster = l.getSelection();
+        parameters = gecko.getParameters();
 
         reset();
 
@@ -154,8 +157,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             /*
 			 * Global data
 			 */
-            JLabel valTitle = new JLabel("Global cluster information:");
-            valTitle.setFont(boldFont);
+            JLabel valTitle = getBoldLabel("Global cluster information:");
             masterPanel.add(valTitle);
 
             JPanel totalDistancePanel = generateGeneralGenomeInformationPanel("Best total distance: " + cluster.getOccurrences(includeSubOptimalOccurrences).getTotalDist());
@@ -169,16 +171,29 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             masterPanel.add(Box.createVerticalStrut(5));
 
             /*
+             * Used parameters
+             */
+            JLabel parameterLabel = getBoldLabel("Parameters used for computation:");
+            masterPanel.add(parameterLabel);
+            if (parameters == null)
+                masterPanel.add(new JLabel("No Parameters available!"));
+            else {
+                JPanel parameterPanel = getParameterPanel(parameters);
+                parameterPanel.setAlignmentX(LEFT_ALIGNMENT);
+                masterPanel.add(parameterPanel);
+            }
+            masterPanel.add(Box.createVerticalStrut(5));
+
+            /*
 			 * Local distances to median/center
 			 */
-            JLabel distanceLabel = new JLabel();
+            JLabel distanceLabel;
             if (cluster.getType() == Parameter.OperationMode.median)
-                distanceLabel.setText("Distance to median per dataset:");
+                distanceLabel = getBoldLabel("Distance to median per dataset:");
             else if (cluster.getType() == Parameter.OperationMode.center)
-                distanceLabel.setText("Distance to center set per dataset:");
+                distanceLabel = getBoldLabel("Distance to center set per dataset:");
             else
-                distanceLabel.setText("Distance to reference gene set per dataset:");
-            distanceLabel.setFont(boldFont);
+                distanceLabel = getBoldLabel("Distance to reference gene set per dataset:");
             masterPanel.add(distanceLabel);
             masterPanel.add(Box.createVerticalStrut(5));
 
@@ -190,8 +205,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             /*
              * Reference Genes
              */
-            JLabel referenceGenes = new JLabel("Reference Genes:");
-            referenceGenes.setFont(boldFont);
+            JLabel referenceGenes = getBoldLabel("Reference Genes:");
             masterPanel.add(referenceGenes);
             masterPanel.add(Box.createVerticalStrut(5));
             JPanel panel = new JPanel();
@@ -205,8 +219,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 			/*
 			 * List of genes
 			 */
-            JLabel genesInClusterLabel = new JLabel("Genes in this Cluster:");
-            genesInClusterLabel.setFont(boldFont);
+            JLabel genesInClusterLabel = getBoldLabel("Genes in this Cluster:");
 			masterPanel.add(genesInClusterLabel);
 			masterPanel.add(Box.createVerticalStrut(10));
             masterPanel.add(annotationTable);
@@ -215,8 +228,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             /*
 			 * Involved Chromosomes
 			 */
-            JLabel invChrTitle = new JLabel("Involved chromosomes");
-            invChrTitle.setFont(boldFont);
+            JLabel invChrTitle = getBoldLabel("Involved chromosomes");
             invChrTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
             masterPanel.add(invChrTitle);
 
@@ -230,14 +242,53 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         this.getHorizontalScrollBar().setValue(0);
 	}
 
+    private static JLabel getBoldLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(boldFont);
+        return label;
+    }
+
+    private static JLabel getMonoLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(monoFont);
+        return label;
+    }
+
+    private JPanel getParameterPanel(Parameter parameters) {
+        if (parameters.useDeltaTable()) {
+            DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("d"));
+            builder.append(getMonoLabel("Reference mode: " + parameters.getRefType()));
+            if (parameters.searchRefInRef())
+                builder.append("Ref. in Ref.");
+            builder.append(getMonoLabel("Min. Size: " + parameters.getMinClusterSize()));
+            builder.append(getMonoLabel("Quorum: " + parameters.getQ()));
+
+            builder.append(getMonoLabel("Distance Table:"));
+            JTable deltaTable = new JTable(new DeltaTableModel(parameters.getDeltaTable(), parameters.getMinClusterSize()));
+            builder.append(deltaTable.getTableHeader());
+            builder.append(deltaTable);
+
+            return builder.build();
+        } else {
+            DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("p"));
+            builder.append(getMonoLabel("Reference mode: " + parameters.getRefType()));
+            if (parameters.searchRefInRef())
+                builder.append("Ref. in Ref.");
+            builder.nextLine();
+            builder.append(getMonoLabel("Max. Distance: " + parameters.getDelta()));
+            builder.append(getMonoLabel("Min. Size: " + parameters.getMinClusterSize()));
+            builder.append(getMonoLabel("Quorum: " + parameters.getQ()));
+            return builder.build();
+        }
+    }
+
     private JPanel generateGeneralGenomeInformationPanel(String text) {
         JPanel cpanel = new JPanel();
         FlowLayout f = new FlowLayout(FlowLayout.LEFT);
         f.setVgap(1);
         cpanel.setLayout(f);
         cpanel.setBackground(masterPanel.getBackground());
-        JLabel textLabel = new JLabel(text);
-        textLabel.setFont(monoFont);
+        JLabel textLabel = getMonoLabel(text);
         cpanel.add(textLabel);
         return cpanel;
     }
@@ -251,8 +302,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
 
         for (int i=0; i<subsequences.size(); i++) {
             cpanel.add(new NumberInRectangle(genomeIndexMapping.get(i)+1, getBackground(), chromosomes.get(i).getChromosomeMouseListener()));
-            JLabel textLabel = new JLabel(Integer.toString(subsequences.get(i).getDist()));
-            textLabel.setFont(monoFont);
+            JLabel textLabel = getMonoLabel(Integer.toString(subsequences.get(i).getDist()));
             cpanel.add(textLabel);
             cpanel.add(Box.createHorizontalStrut(5));
         }
@@ -430,6 +480,48 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
                 default:
                     return null;
             }
+        }
+    }
+
+    private class DeltaTableModel extends AbstractTableModel {
+        private final Class<?>[] columns = {Integer.class, Integer.class, Integer.class, Integer.class};
+        private final String[] columnTitles = {"D_ADD","D_LOSS", "D_SUM", "Size"};
+
+        List<int[]> deltaValues;
+
+        public DeltaTableModel(int[][] values, int minSize) {
+            super();
+            deltaValues = new ArrayList<>();
+            for (int i=minSize; i<values.length; i++) {
+                if (values[i][0] != -1){
+                    deltaValues.add(new int[]{values[i][0], values[i][1], values[i][2], i});
+                }
+            }
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return false;
+        }
+
+        @Override
+        public int getRowCount() {
+            return deltaValues.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return columns.length;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            return deltaValues.get(rowIndex)[columnIndex];
+        }
+
+        @Override
+        public String getColumnName(int columnIndex) {
+            return columnTitles[columnIndex];
         }
     }
 

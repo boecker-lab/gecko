@@ -154,6 +154,10 @@ public class GeckoInstance {
 	public void clearClusterSelection() {
 		clusterSelection.clear();
 	}
+
+    public Parameter getParameters() {
+        return data.getParameters();
+    }
 	
 	/**
 	 * Returns the list of gene clusters under the given filter condition. 
