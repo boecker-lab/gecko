@@ -260,9 +260,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
             builder.append(getMonoLabel("Reference mode: " + parameters.getRefType()));
             if (parameters.searchRefInRef())
                 builder.append("Ref. in Ref.");
-            builder.append(getMonoLabel("Min. Size: " + parameters.getMinClusterSize()));
             builder.append(getMonoLabel("Quorum: " + parameters.getQ()));
-
             builder.append(getMonoLabel("Distance Table:"));
             JTable deltaTable = new JTable(new DeltaTableModel(parameters.getDeltaTable(), parameters.getMinClusterSize()));
             builder.append(deltaTable.getTableHeader());
