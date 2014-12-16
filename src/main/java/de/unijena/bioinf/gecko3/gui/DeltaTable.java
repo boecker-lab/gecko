@@ -77,16 +77,12 @@ public class DeltaTable extends JPanel {
                 model.removeRow(deltaTable.getSelectedRow());
             }
         });
-        final JMenuItem reset = new JMenuItem(new AbstractAction("Reset") {
-            private static final long serialVersionUID = 7855959578095508292L;
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (deltaTable.isEditing())
-                    deltaTable.getCellEditor().stopCellEditing();
-                model.setDeltaTable(Parameter.DeltaTable.getDefault());
-            }
-        });
+        final JMenu reset = new JMenu("Reset");
+        for (Parameter.DeltaTable value : Parameter.DeltaTable.getSupported()) {
+            final JMenuItem item = new JMenuItem(new SetDeltaTableAction(value));
+            reset.add(item);
+        }
 
         popUp.add(addRow);
         popUp.add(deleteRow);
@@ -354,6 +350,23 @@ public class DeltaTable extends JPanel {
                 }
             }
             return this;
+        }
+    }
+
+    class SetDeltaTableAction extends AbstractAction {
+        private static final long serialVersionUID = 7855959578095508292L;
+        private Parameter.DeltaTable value;
+
+        public SetDeltaTableAction(Parameter.DeltaTable value) {
+            super(value.toString());
+            this.value = value;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (deltaTable.isEditing())
+                deltaTable.getCellEditor().stopCellEditing();
+            model.setDeltaTable(value);
         }
     }
 

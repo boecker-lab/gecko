@@ -73,7 +73,13 @@ public class Parameter {
     }
 
     public enum DeltaTable {
-        highly_conserved, low_conserved, relaxed, lichtheimia, lichtheimia_inner, statistic_paper, test_five_proteobacter;
+        highly_conserved("Default"), low_conserved("Low conserved"), relaxed("Relaxed"), lichtheimia("Lichtheimia"), lichtheimia_inner("Lichtheimia Inner"), statistic_paper("Statistics"), test_five_proteobacter("Test five proteobacter");
+
+        private final String text;
+
+        private DeltaTable(String text) {
+            this.text = text;
+        }
 
         /**
          * Returns the distance tables for the given task, an array of int arrays
@@ -132,11 +138,16 @@ public class Parameter {
             //return values();
 
             // Support only a subset of values
-            return new DeltaTable[]{highly_conserved, low_conserved};
+            return new DeltaTable[]{highly_conserved, relaxed, statistic_paper};
         }
 
         public static DeltaTable getDefault() {
             return highly_conserved;
+        }
+
+        @Override
+        public String toString(){
+            return text;
         }
     }
 	
