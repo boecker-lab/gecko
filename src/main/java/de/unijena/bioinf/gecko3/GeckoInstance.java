@@ -477,7 +477,7 @@ public class GeckoInstance {
         if (gui != null)
 		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
 
-        //p = new Parameter(Parameter.DeltaTable.the_methode_high_dist.getDeltaTable(), Parameter.DeltaTable.the_methode_high_dist.getMinimumSize(), p.getQ(), p.getOperationMode(), p.getRefType());
+        //p = new Parameter(Parameter.DeltaTable.relaxed.getDeltaTable(), Parameter.DeltaTable.relaxed.getMinimumSize(), p.getQ(), p.getOperationMode(), p.getRefType());
 
         geneClusterSwingWorker = new GeneClusterDetectionTask(p, mergeResults, genomeGroupingFactor, GeckoInstance.this.getData());
         geneClusterSwingWorker.execute();

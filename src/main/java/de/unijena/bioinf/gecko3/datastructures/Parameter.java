@@ -1,7 +1,5 @@
 package de.unijena.bioinf.gecko3.datastructures;
 
-import java.util.Arrays;
-
 public class Parameter {
 
     public enum OperationMode {
@@ -75,7 +73,7 @@ public class Parameter {
     }
 
     public enum DeltaTable {
-        highly_conserved, low_conserved, the_methode_high_dist, lichtheimia, lichtheimia_inner, statistic_paper, test_five_proteobacter;
+        highly_conserved, low_conserved, relaxed, lichtheimia, lichtheimia_inner, statistic_paper, test_five_proteobacter;
 
         /**
          * Returns the distance tables for the given task, an array of int arrays
@@ -89,7 +87,7 @@ public class Parameter {
                     return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {2, 1, 2}, {3, 2, 3}, {4, 2, 4}, {5, 3, 5}, {6, 3, 6}};
                 case low_conserved:
                     return new int[][]{{0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {2, 1, 2}, {3, 2, 3}, {3, 3, 3}, {4, 3, 4}, {5, 3, 5}, {6, 4, 6}};
-                case the_methode_high_dist:
+                case relaxed:
                     return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {2, 1, 2}, {3, 2, 3}, {4, 2, 4}, {6, 3, 6}, {8, 4, 8}, {10, 5, 10}};
                 case lichtheimia:
                     return new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
@@ -110,7 +108,7 @@ public class Parameter {
                     return 3;
                 case low_conserved:
                     return 3;
-                case the_methode_high_dist:
+                case relaxed:
                     return 2;
                 case lichtheimia:
                     return 3;
