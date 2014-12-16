@@ -120,20 +120,33 @@ public class ResultWriter {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))){
             writer.write("%%For each cluster occurrence:");
             writer.newLine();
-            writer.write("%%Genome\t#missing genes\t#additional genes\tgene conservation");
+            writer.write("%%Genome\t#missing genes\t#additional genes\tgene order conservation\tgene conservation");
             writer.newLine();
-            writer.write("%%Gene conservation is either \"+\" for singleton genes or genes not in the reference occurrence, or the gene family id.");
+            writer.write("%%Gene order conservation is either \"+\" for singleton genes or genes not in the reference occurrence, or the gene family id.");
             writer.newLine();
+            writer.write("%%Gene conservation gives the gene family order in the last line above the occurrences. For each occurrence, for each gene family, 1 means conserved, 0 means not conserved. Singleton gene families are excluded.");
+            writer.newLine();
+
             for (GeneCluster cluster : clusters){
                 writer.write(String.format("Cluster ID: %d\t p-Value: %.2f", cluster.getId(), cluster.getBestCorrectedScore()));
                 writer.newLine();
+
+                List<GeneFamily> sortedGeneFamilies = new ArrayList<>(cluster.getGeneFamilies());
+                Collections.sort(sortedGeneFamilies);
+                StringBuilder builder = new StringBuilder();
+                for (GeneFamily family : sortedGeneFamilies)
+                    builder.append(family.getExternalId()).append(" ");
+                writer.write(String.format("\t\t\tGene order for gene conservation:\t%s", builder.toString()));
+                writer.newLine();
+
                 GeneClusterOccurrence occ = cluster.getOccurrences(useAllOccurrences);
                 for (int i=0; i<occ.getSubsequences().length; i++) {
                     if (occ.getSubsequences()[i].length == 0)
                         continue;
                     List<String> geneConservation = cluster.getGeneConservation(i, useAllOccurrences);
+                    List<String> geneContained = cluster.getGeneContained(i, useAllOccurrences);
                     for (int j=0; j<occ.getSubsequences()[i].length; j++){
-                        writer.write(String.format("%s\t%s" , genomeNames.get(i), geneConservation.get(j)));
+                        writer.write(String.format("%s\t%s\t%s" , genomeNames.get(i), geneConservation.get(j), geneContained.get(j)));
                         writer.newLine();
                     }
                 }

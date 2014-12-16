@@ -10,8 +10,6 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /**
- * 
- * @author Leon Kuchenbecker <lkuchenb@inf.fu-berlin.de>
  *
  * Note: this class has a natural ordering that is inconsistent with equals.
  *
@@ -977,16 +975,16 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
      * Each string starts with the number of missing genes, then the number of additional genes and
      * finally for each gene in the cluster "+" if it is missing in the reference occ, or a singleton
      * gene, or the external gene family id.
-     * @param genome_index
+     * @param genomeIndex
      * @param allOccurrences
      * @return
      */
-    public List<String> getGeneConservation(int genome_index, boolean allOccurrences) {
+    public List<String> getGeneConservation(int genomeIndex, boolean allOccurrences) {
         GeneClusterOccurrence occ = getOccurrences(allOccurrences);
-        List<String> results = new ArrayList<>(occ.getSubsequences()[genome_index].length);
+        List<String> results = new ArrayList<>(occ.getSubsequences()[genomeIndex].length);
 
-        for (Subsequence seq : occ.getSubsequences()[genome_index]){
-            Genome genome = GeckoInstance.getInstance().getGenomes()[genome_index];
+        for (Subsequence seq : occ.getSubsequences()[genomeIndex]){
+            Genome genome = GeckoInstance.getInstance().getGenomes()[genomeIndex];
             Set<GeneFamily> containedGenes = new HashSet<>();
             StringBuilder builder = new StringBuilder();
             for (int index = seq.getStart()-1; index < seq.getStop(); index++) {
@@ -1006,6 +1004,33 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         }
         return results;
     }
+
+	public List<String> getGeneContained(int genomeIndex, boolean useAllOccurrences) {
+		GeneClusterOccurrence occ = getOccurrences(useAllOccurrences);
+		List<String> results = new ArrayList<>(occ.getSubsequences()[genomeIndex].length);
+
+		for (Subsequence seq : occ.getSubsequences()[genomeIndex]){
+			Genome genome = GeckoInstance.getInstance().getGenomes()[genomeIndex];
+			Set<GeneFamily> containedGenes = new HashSet<>();
+			for (int index = seq.getStart()-1; index < seq.getStop(); index++) {
+				Gene gene = genome.getChromosomes().get(seq.getChromosome()).getGenes().get(index);
+				if (geneFamilies.contains(gene.getGeneFamily())) {
+					containedGenes.add(gene.getGeneFamily());
+				}
+			}
+			List<GeneFamily> sortedGenes = new ArrayList<>(geneFamilies);
+			Collections.sort(sortedGenes);
+			StringBuilder builder = new StringBuilder(geneFamilies.size()*2);
+			for (GeneFamily family : sortedGenes){
+				if (containedGenes.contains(family))
+					builder.append("1 ");
+				else
+					builder.append("0 ");
+			}
+			results.add(builder.toString());
+		}
+		return results;
+	}
 
 	public String getReferenceGeneOrientations() {
 		return getGeneOrientations(getRefSeqIndex());

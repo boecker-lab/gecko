@@ -230,16 +230,16 @@ class Statistics implements AlgorithmProgressProvider {
 		return sum;
 	}
 	
-	private BigDecimal combine_pValuesWithQuorum(double[] pValue, int Q) {
-		if (Q == pValue.length || Q == genomes.size()){
+	private BigDecimal combine_pValuesWithQuorum(double[] pValue, int q) {
+		if (q == pValue.length || q == genomes.size()){
 			Probability combined = Probability.ONE;
 			for (double aPValue : pValue)
 				combined = combined.multiply(aPValue);
 			return combined.toBigDecimal();
 		}
 		
-		Probability[] pArray = new Probability[pValue.length+1];
-		Arrays.fill(pArray, Probability.ZERO);
+		Probability[] qArray = new Probability[pValue.length+1];
+		Arrays.fill(qArray, Probability.ZERO);
 		
 		int i=0;
 		int offset = 0;
@@ -247,12 +247,12 @@ class Statistics implements AlgorithmProgressProvider {
 			offset++;
 			i++;
 		}
-		if (i >= Q)
+		if (i >= q)
 			return BigDecimal.ONE;
 		
-		double q0 = pValue[i];
-		pArray[0] = Probability.ONE.subtract(pValue[i]);
-		pArray[1] = new Probability(pValue[i]);
+		Probability q0 = new Probability(pValue[i]);
+		qArray[0] = Probability.ONE.subtract(pValue[i]); // should never be used, we use q0 instead
+		qArray[1] = new Probability(pValue[i]);
 		
 		i++;
 		
@@ -263,27 +263,28 @@ class Statistics implements AlgorithmProgressProvider {
 			}
 			for (int j=Math.min(i+1, pValue.length)-offset; j>=0; j--){
 				if (j > 1){
-					Probability mul1 = pArray[j].multiply(pValue[i]);
-					Probability mul2 = pArray[j-1].multiply(pValue[i]);
-					Probability sub = pArray[j].subtract(mul1);
-					pArray[j] = sub.add(mul2);
+					Probability mul1 = qArray[j].multiply(pValue[i]); // Qj - Qj*Pi
+					Probability sub = qArray[j].subtract(mul1);       // == Qj*(1-Pi)
+
+					Probability mul2 = qArray[j-1].multiply(pValue[i]); // Q(j-1)*Pi
+
+					qArray[j] = sub.add(mul2);
 				} else if (j == 1){
-					Probability mul1 = pArray[j].multiply(pValue[i]);
-					Probability sub1 = pArray[j].subtract(mul1);
+					// Qj - Pi*Qj + Pi - Pi*q0 == Qj(1-Pi) + Pi(1-q0)
+					Probability mul1 = qArray[j].multiply(pValue[i]);  // Qj - Qj*Pi
+					Probability sub1 = qArray[j].subtract(mul1);       // == Qj*(1-Pi)
 					Probability add = sub1.add(pValue[i]);
-					Probability mul2 = pArray[i].multiply(q0);
-					pArray[j] = add.subtract(mul2);
+					Probability mul2 = q0.multiply(pValue[i]);
+					qArray[j] = add.subtract(mul2);
 				} else {
-					q0 = pValue[i] + q0 - pValue[i] * q0;
+					q0=q0.add(pValue[i]).subtract(q0.multiply(pValue[i]));
 				}
 			}
 		}
 		
-		assert(Q-offset > 0); // will not work if Q or rather (Q-offset) is 0, but that does not make sense for our gene clusters!
-		
 		Probability sum = Probability.ZERO;
-		for (int j=Q-offset; j<=pValue.length-offset; j++)
-			sum = sum.add(pArray[j]);
+		for (int j=Math.max(1, q-offset); j<=pValue.length-offset; j++)
+			sum = sum.add(qArray[j]);
 			
 		return sum.toBigDecimal();
 	}

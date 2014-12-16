@@ -12,7 +12,7 @@ import java.util.Map;
  * Gene family id information.
  * @author Sascha Winter (sascha.winter@uni-jena.de)
  */
-public class GeneFamily {
+public class GeneFamily implements Comparable<GeneFamily>{
     public static final String UNKNOWN_GENE_ID = "0";
 
     /**
@@ -161,5 +161,10 @@ public class GeneFamily {
         if (unknownGeneFamily != null)
             colorMap.put(unknownGeneFamily, Color.GRAY);
         return colorMap;
+    }
+
+    @Override
+    public int compareTo(GeneFamily o) {
+        return externalId.compareTo(o.getExternalId());
     }
 }

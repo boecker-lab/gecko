@@ -440,6 +440,15 @@ public class GeckoInstance {
                     });
                 }
             } catch (InterruptedException | ExecutionException e) {
+                if (gui != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            gui.disableProgressBar();
+                            GeckoInstance.this.gui.changeMode(Gui.Mode.SESSION_IDLE);
+                        }
+                    });
+                }
                 JOptionPane.showMessageDialog(gui.getMainframe(), e.getMessage(), "Error computing gene clusters", JOptionPane.ERROR_MESSAGE);
                 logger.error("Error in cluster computation", e);
             }
