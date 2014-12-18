@@ -114,25 +114,6 @@ public class CogFileReader implements GeckoDataReader {
 	}
 	
 	/**
-	 * The Method tests whether the entered id is from the old integer type.
-	 * If so we look if the string id is a row of zeros if so we replace the mass of zeros by one zero.
-	 * 
-	 * @param id current string id
-	 * @return 0 (as string) if id contains only zeros else the unmodified id
-	 */
-	private String convertToValidIdFormat(String id) {
-        id = id.trim();
-		try {
-			int newID = Integer.parseInt(id);
-			return Integer.toString(newID);
-		} catch (NumberFormatException e) {}
-        if (id.equals(""))
-            return GeneFamily.UNKNOWN_GENE_ID;
-		
-		return id;
-	}
-	
-	/**
 	 * This method computes the occurrences of the genes.
 	 *
 	 * @throws FileNotFoundException
@@ -346,7 +327,7 @@ public class CogFileReader implements GeckoDataReader {
             explode[i] = explode[i].trim();
         String[] ids = explode[0].split(",");
         for (int j = 0; j < ids.length; j++)
-            ids[j] = this.convertToValidIdFormat(ids[j]);
+            ids[j] = GeneFamily.convertToValidIdFormat(ids[j]);
 
         Gene.GeneOrientation orientation;
         switch (explode[1]) {

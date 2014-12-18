@@ -167,4 +167,23 @@ public class GeneFamily implements Comparable<GeneFamily>{
     public int compareTo(GeneFamily o) {
         return externalId.compareTo(o.getExternalId());
     }
+
+    /**
+     * Converts any String id into a valid string id.
+     * Removes leading 0 from integer ids and maps 0 and "" to UNKNOWN_GENE_ID
+     *
+     * @param id current string id
+     * @return modified id
+     */
+    public static String convertToValidIdFormat(String id) {
+        id = id.trim();
+        try {
+            int newID = Integer.parseInt(id);
+            return Integer.toString(newID);
+        } catch (NumberFormatException e) {}
+        if (id.equals(""))
+            return GeneFamily.UNKNOWN_GENE_ID;
+
+        return id;
+    }
 }

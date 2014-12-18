@@ -126,7 +126,8 @@ public class StartComputationDialog extends JDialog {
 		refCombo.setEnabled(true);
 		mergeResults.setEnabled(true);
 
-		refClusterField.setToolTipText("Enter a sequence of gene IDs here, separated by spaces");
+		refClusterField.setToolTipText("<html>Enter a sequence of gene IDs here, separated by spaces.<br>" +
+				"<B>Hint</B>: Instead of entering a sequence of genes by hand you can also select a gene cluster from the result list and copy it!</html>");
 		
 		Document refClusterFieldDocument = new PlainDocument(){
 			
@@ -137,8 +138,7 @@ public class StartComputationDialog extends JDialog {
 
 			@Override
 			public void insertString(int offs, String str, AttributeSet a)
-					throws BadLocationException {
-				if (!str.matches("^[ \\d]*$")) return;
+					throws BadLocationException {;
 				super.insertString(offs, str, a);
 			}
 			
@@ -189,7 +189,6 @@ public class StartComputationDialog extends JDialog {
                     }
                 }
 
-				StartComputationDialog.this.setVisible(false);
 				// Reorder the genomes if necessary
 				if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.genome && refGenomeCombo.getSelectedIndex()!=0) {
 					PrintUtils.printDebug("swapping genomes");
@@ -197,16 +196,20 @@ public class StartComputationDialog extends JDialog {
 				} else if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.cluster) {
 					Genome cluster = new Genome("Reference cluster");
 					ArrayList<Gene> genes = new ArrayList<>();
-					Map<String, GeneFamily> revIDMap = gecko.getGeneLabelMap();
 					for (String id : refClusterField.getText().split(" "))
 						if (id!=null && (!(id.equals("")))) {
-							GeneFamily geneFamily = revIDMap.get(id);
+							GeneFamily geneFamily = gecko.getGeneFamily(id);
 							if (geneFamily!=null)
 								genes.add(new Gene(geneFamily));
+                            else {
+                                JOptionPane.showMessageDialog(StartComputationDialog.this, "Invalid Gene Id: " + id, "Error", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
 						}
 					cluster.addChromosome(new Chromosome("", genes, cluster));
 					gecko.addReferenceGenome(cluster);
 				}
+                StartComputationDialog.this.setVisible(false);
 				boolean mergeResultsEnabled = false;
 				if (opMode==Parameter.OperationMode.reference && mergeResults.isSelected())
 					mergeResultsEnabled = true;

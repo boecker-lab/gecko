@@ -180,8 +180,8 @@ public class GeckoInstance {
         return data.getGeneColor(geneFamily);
     }
 
-    public Map<String, GeneFamily> getGeneLabelMap() {
-        return data.getGeneLabelMap();
+    public GeneFamily getGeneFamily(String externalId){
+        return data.getGeneFamily(externalId);
     }
 	
 	public void setDebug(boolean debug) {

@@ -30,6 +30,11 @@ public class DataSet {
     private final int numberOfGeneFamiliesWithMultipleGenes;
     private Map<GeneFamily, Color> colorMap;
 
+    /**
+     * Just a lazy initialized helper for getGeneFamily
+     */
+    Map<String, GeneFamily> geneFamilyMap;
+
     public static DataSet getEmptyDataSet() {
         return emptyDataSet;
     }
@@ -362,12 +367,15 @@ public class DataSet {
         return unknownGeneFamily;
     }
 
-    public Map<String,GeneFamily> getGeneLabelMap() {
-        Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
-        geneFamilyMap.put(unknownGeneFamily.getExternalId(), unknownGeneFamily);
-        for (GeneFamily geneFamily : geneFamilySet)
-            geneFamilyMap.put(geneFamily.getExternalId(), geneFamily);
-        return geneFamilyMap;
+    public GeneFamily getGeneFamily(String externalId){
+        if (geneFamilyMap == null) {
+            geneFamilyMap = new HashMap<>();
+            geneFamilyMap.put(unknownGeneFamily.getExternalId(), unknownGeneFamily);
+            for (GeneFamily geneFamily : geneFamilySet)
+                geneFamilyMap.put(geneFamily.getExternalId(), geneFamily);
+        }
+        String id = GeneFamily.convertToValidIdFormat(externalId);
+        return geneFamilyMap.get(id);
     }
 
     public int getCompleteAlphabetSize() {
