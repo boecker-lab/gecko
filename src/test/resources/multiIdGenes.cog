@@ -2,10 +2,12 @@ Shorty 1
 1 proteins
 0025, 0021	+	J	int1	int gene
 COG07, NOG08	+	J	str1	string gene
-0025, NOG08	+	J	mix	mixed gene
+0025, NOG08	+	J	mix1	mixed gene
 COG07, 0	+	J	nh	gene with 0 homologe
 
 Shorty 2
 1 proteins
 0007, 0004	+	J	int2	int gene 2
+COG07, NOG08	+	J	str1.2	string gene
+0025, NOG08	+	J	mix1.2	mixed gene
 COG08, NIG07	+	J	str2	string gene 2

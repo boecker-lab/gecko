@@ -237,7 +237,7 @@ public class CogFileReaderTest {
 
         GeneFamily[] geneFamilies = GeneFamilyTest.getTestGeneFamilies(
                 new String[]{"25", "21", "COG07", "NOG08", "7", "4", "COG08", "NIG07"},
-                new int[]{2, 1, 2, 2, 1, 1, 1, 1});
+                new int[]{3, 1, 3, 4, 1, 1, 1, 1});
 
         Set<GeneFamily> geneFamilySet = new HashSet<>(Arrays.asList(geneFamilies));
 
@@ -246,13 +246,18 @@ public class CogFileReaderTest {
         genes1.add(new Gene("int1", geneFamilies[1], Gene.GeneOrientation.POSITIVE, "int gene"));
         genes1.add(new Gene("str1", geneFamilies[2], Gene.GeneOrientation.POSITIVE, "string gene"));
         genes1.add(new Gene("str1", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "string gene"));
-        genes1.add(new Gene("mix", geneFamilies[0], Gene.GeneOrientation.POSITIVE, "mixed gene"));
-        genes1.add(new Gene("mix", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "mixed gene"));
+        genes1.add(new Gene("mix1", geneFamilies[0], Gene.GeneOrientation.POSITIVE, "mixed gene"));
+        genes1.add(new Gene("mix1", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "mixed gene"));
         genes1.add(new Gene("nh", geneFamilies[2], Gene.GeneOrientation.POSITIVE, "gene with 0 homologe"));
+        genes1.add(new Gene("nh", unknownGeneFamily, Gene.GeneOrientation.POSITIVE, "gene with 0 homologe"));
 
         List<Gene> genes2 = new ArrayList<>();
         genes2.add(new Gene("int2", geneFamilies[4], Gene.GeneOrientation.POSITIVE, "int gene 2"));
         genes2.add(new Gene("int2", geneFamilies[5], Gene.GeneOrientation.POSITIVE, "int gene 2"));
+        genes2.add(new Gene("str1.2", geneFamilies[2], Gene.GeneOrientation.POSITIVE, "string gene"));
+        genes2.add(new Gene("str1.2", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "string gene"));
+        genes2.add(new Gene("mix1.2", geneFamilies[0], Gene.GeneOrientation.POSITIVE, "mixed gene"));
+        genes2.add(new Gene("mix1.2", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "mixed gene"));
         genes2.add(new Gene("str2", geneFamilies[6], Gene.GeneOrientation.POSITIVE, "string gene 2"));
         genes2.add(new Gene("str2", geneFamilies[7], Gene.GeneOrientation.POSITIVE, "string gene 2"));
 
@@ -315,10 +320,10 @@ public class CogFileReaderTest {
 
         for( int j = 0; j < readDataSet.getGenomes().length; j++) {
             assertEquals(refGenomes[j].getName(), readDataSet.getGenomes()[j].getName());
+            assertEquals(refGenomes[j].getChromosomes().size(), readDataSet.getGenomes()[j].getChromosomes().size());
             for (int k = 0; k < refGenomes[j].getChromosomes().size(); k++) {
                 assertEquals(refGenomes[j].getChromosomes().get(k).getName(), readDataSet.getGenomes()[j].getChromosomes().get(k).getName());
-
-                int p = 0;
+                assertEquals(refGenomes[j].getChromosomes().get(k).getGenes().size(), readDataSet.getGenomes()[j].getChromosomes().get(k).getGenes().size());
 
                 for (int i=0; i<refGenomes[j].getChromosomes().get(k).getGenes().size(); i++){
                     Gene expectedGene = refGenomes[j].getChromosomes().get(k).getGenes().get(i);
