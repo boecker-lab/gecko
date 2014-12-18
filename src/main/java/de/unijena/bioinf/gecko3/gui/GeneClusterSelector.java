@@ -80,17 +80,20 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 
         // Build popup menu
         popUp = new JPopupMenu();
-        JMenuItem addToSelectionMenuItem = new JMenuItem("Add to selection");
+        final JMenuItem addToSelectionMenuItem = new JMenuItem("Add to selection");
         final JMenuItem addAllToSelectionMenuItem = new JMenuItem("Add all in list to selection");
-        JMenuItem clearSelectionMenuItem = new JMenuItem("Clear selection");
-        JMenuItem exportMenuItem = new JMenuItem("Export gene cluster");
-        JMenuItem showSimilarMenuItem = new JMenuItem("Show similar clusters");
+        final JMenuItem clearSelectionMenuItem = new JMenuItem("Clear selection");
+        final JMenuItem exportMenuItem = new JMenuItem("Export gene cluster");
+        final JMenuItem showSimilarMenuItem = new JMenuItem("Show similar clusters");
+        final JMenuItem copyGeneIdsMenuItem = new JMenuItem();
         popUp.add(addToSelectionMenuItem);
         popUp.add(addAllToSelectionMenuItem);
         popUp.add(clearSelectionMenuItem);
         popUp.add(exportMenuItem);
         popUp.addSeparator();
         popUp.add(showSimilarMenuItem);
+        popUp.addSeparator();
+        popUp.add(copyGeneIdsMenuItem);
 
 		checkBoxPanel.add(selectionComboBox);
 		checkBoxPanel.add(showSuboptimalCheckBox);
@@ -99,6 +102,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 		table.setBackground(Color.WHITE);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setDefaultRenderer(Double.class, new DoubleCellRenderer());
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.getViewport().setBackground(Color.WHITE);
 
@@ -189,10 +193,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
             }
         });
 		ActionMap am =  table.getActionMap();
-		am.put("copy", new AbstractAction() {
-            /**
-             * Random generated serialization UID
-             */
+        Action copyAction = new AbstractAction("Copy gene ids") {
             private static final long serialVersionUID = 8912874714540056321L;
 
             @Override
@@ -204,13 +205,14 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
                 StringBuilder geneIDs = new StringBuilder();
 
                 for (GeneFamily geneFamily : gc.getGeneFamilies()) {
-                    geneIDs.append(geneFamily.getAlgorithmId()).append(" ");
+                    geneIDs.append(geneFamily.getExternalId()).append(" ");
                 }
 
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(geneIDs.toString()), GeneClusterSelector.this);
             }
-        });
-		table.setDefaultRenderer(Double.class, new DoubleCellRenderer());
+        };
+		am.put("copy", copyAction);
+        copyGeneIdsMenuItem.setAction(copyAction);
 
 		addToSelectionMenuItem.addActionListener(new ActionListener()	{
 			@Override
@@ -237,7 +239,6 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
                     updateData();
             }
         });
-
 
 		clearSelectionMenuItem.addActionListener(new ActionListener() {
 			@Override
