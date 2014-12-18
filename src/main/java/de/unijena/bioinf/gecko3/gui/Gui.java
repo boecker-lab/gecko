@@ -636,8 +636,6 @@ public class Gui {
 			about.setIconImages(Gui.this.getMainframe().getIconImages());
 			about.setTitle("About Gecko3");
 			about.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-			about.setPreferredSize(new Dimension(350, 475));
-			about.setSize(new Dimension(350, 475));
 			about.setLayout(new BorderLayout());
 			
 			JLabel iconLabel = new JLabel();
@@ -662,7 +660,7 @@ public class Gui {
 						"<br>" +
 						"2014, Sascha Winter, Hans-Martin Haase and Tobias Mann" +
 						"<br>" +
-						"Chair of Bioinformatics, University of Jena." +
+						"Chair of Bioinformatics, Friedrich-Schiller-Universität Jena" +
 						"<br>" +
 						"http://bio.informatik.uni-jena.de" +
 						"<br><br>" +
@@ -676,6 +674,7 @@ public class Gui {
 			text.setBackground(about.getContentPane().getBackground());
 			authorPane.add(text, BorderLayout.CENTER);
 			about.add(authorPane);
+			about.pack();
 			about.setVisible(true);
 		}
 	};
@@ -695,7 +694,7 @@ public class Gui {
 				Desktop desktop = Desktop.getDesktop();
 				
 				try {
-					desktop.browse(new URI("http://bio.informatik.uni-jena.de/"));
+					desktop.browse(new URI("http://bio.informatik.uni-jena.de/software/gecko3"));
 				} 
 				catch (IOException e) {
 					new JOptionPane("This option requires a internet connection.", JOptionPane.ERROR_MESSAGE);	
@@ -879,10 +878,10 @@ public class Gui {
 		exitAction.putValue(Action.NAME, "Exit");
 		exitAction.putValue(Action.SHORT_DESCRIPTION, "Leave the program");
 		
-		showHomePage.putValue(Action.NAME, "Gecko² Website");
-		showHomePage.putValue(Action.SHORT_DESCRIPTION, "Opens the Gecko² website in the browser");
+		showHomePage.putValue(Action.NAME, "Gecko3 Website");
+		showHomePage.putValue(Action.SHORT_DESCRIPTION, "Opens the Gecko3 website in the browser");
 		
-		aboutAction.putValue(Action.NAME, "About Gecko²...");
+		aboutAction.putValue(Action.NAME, "About Gecko3...");
 		
 	}
 }
