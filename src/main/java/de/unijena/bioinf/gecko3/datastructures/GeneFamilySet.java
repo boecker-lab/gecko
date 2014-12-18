@@ -26,6 +26,7 @@ public class GeneFamilySet {
         unknownGeneFamily = GeneFamily.getNewUnknownGeneFamily();
         numberOfGeneFamiliesWithMultipleGenes = 0;
         geneFamilyMap = new HashMap<>();
+        geneFamilyMap.put(unknownGeneFamily.getExternalId(), unknownGeneFamily);
     }
 
     public int getNumberOfGeneFamiliesWithMultipleGenes() {

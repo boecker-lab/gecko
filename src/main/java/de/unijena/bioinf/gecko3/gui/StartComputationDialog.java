@@ -68,12 +68,12 @@ public class StartComputationDialog extends JDialog {
         /*
          * All other options
          */
-		final String[] qValues = new String[Math.max(gecko.getGenomes().length-1, 1)];
-		qValues[Math.max(qValues.length-1, 0)] = "all";
-		for (int i=2;i<gecko.getGenomes().length;i++)
-			qValues[i-2] = Integer.toString(i);
+		final String[] qValues = new String[Math.max(gecko.getGenomes().length, 1)];
+		qValues[0] = "all";
+		for (int i=1;i<qValues.length;i++)
+			qValues[i] = Integer.toString(i+1);
 		qCombo = new JComboBox<>(qValues);
-		qCombo.setSelectedIndex(qValues.length-1);
+		qCombo.setSelectedIndex(0);
 
         refCombo = new JComboBox<>(Parameter.ReferenceType.getSupported());
 
@@ -116,10 +116,10 @@ public class StartComputationDialog extends JDialog {
         // Actions
         qCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (qCombo.getSelectedIndex()==qValues.length-1)
+                if (qCombo.getSelectedIndex()==0)
                     quorum = 0;
                 else
-                    quorum = qCombo.getSelectedIndex()+2;
+                    quorum = qCombo.getSelectedIndex()+1;
             }
         });
 
