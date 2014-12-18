@@ -20,12 +20,7 @@ import java.util.*;
  * @version 0.03
  */
 public class GckFileReader implements GeckoDataReader {
-	/**
-	 * Storing place for the geneLabelMap 
-	 */
-	private Set<GeneFamily> geneFamilySet;
-    private GeneFamily unknownGeneFamily;
-    private int numberOfGeneFamiliesWithMultipleGenes;
+    GeneFamilySet geneFamilies;
 	
 	/**
 	 * Storing place for the genomes.
@@ -68,17 +63,16 @@ public class GckFileReader implements GeckoDataReader {
     @Override
     public DataSet readData() throws IOException, ParseException {
         try	(BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), Charset.forName("UTF-8"))) {
-            Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
-            unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();
+            geneFamilies = new GeneFamilySet();
 
             String line = reader.readLine().trim();
             if (!line.equals(DataSetWriter.GENOME_SECTION_START))
                 throw new ParseException("Malformed first line: " + line, 0);
-            readGenomeData(reader, geneFamilyMap);
+            readGenomeData(reader, geneFamilies);
             line = reader.readLine().trim();
             if (!line.startsWith(DataSetWriter.CLUSTER_SECTION_START))
                 throw new ParseException("Malformed cluster section start: " + line, 0);
-            readClusterData(reader, geneFamilyMap, unknownGeneFamily);
+            readClusterData(reader, geneFamilies);
         } catch (IOException | ParseException e) {
             handleFailedSessionLoad();
             throw e;
@@ -88,15 +82,13 @@ public class GckFileReader implements GeckoDataReader {
                 maxIdLength,
                 maxNameLength,
                 maxLocusTagLength,
-                geneFamilySet,
-                unknownGeneFamily,
-                numberOfGeneFamiliesWithMultipleGenes,
+                geneFamilies,
                 clusters,
                 parameters
         );
     }
 
-    private void readGenomeData(BufferedReader reader, Map<String, GeneFamily> geneFamilyMap) throws IOException, ParseException {
+    private void readGenomeData(BufferedReader reader, GeneFamilySet geneFamilies) throws IOException, ParseException {
         List<Genome> genomeList = new ArrayList<>();
         Genome genome = null;
         boolean continueReading = true;
@@ -115,7 +107,7 @@ public class GckFileReader implements GeckoDataReader {
                 case DataSetWriter.CHROMOSOME_START:
                     if (genome == null)
                         throw new ParseException("Not in Genome at chromosome start!" , 0);
-                    genome.addChromosome(readChromosome(reader, genome, geneFamilyMap));
+                    genome.addChromosome(readChromosome(reader, genome, geneFamilies));
                     break;
                 case DataSetWriter.GENOME_SECTION_END:
                     if (genome != null)
@@ -127,11 +119,9 @@ public class GckFileReader implements GeckoDataReader {
             }
         }
         genomes = genomeList.toArray(new Genome[genomeList.size()]);
-        geneFamilySet = new HashSet<>(geneFamilyMap.values());
-        numberOfGeneFamiliesWithMultipleGenes = GeneFamily.getNumberOfGeneFamiliesWithMultipleGenes();
     }
 
-    private Chromosome readChromosome(BufferedReader reader, Genome genome, Map<String, GeneFamily> geneFamilyMap) throws IOException, ParseException {
+    private Chromosome readChromosome(BufferedReader reader, Genome genome, GeneFamilySet geneFamilies) throws IOException, ParseException {
         Chromosome chr = new Chromosome(reader.readLine().trim(), genome);
         chr.setGenes(new ArrayList<Gene>());
 
@@ -143,19 +133,7 @@ public class GckFileReader implements GeckoDataReader {
             else {
                 String[] split = line.split(DataSetWriter.SEPERATOR);
 
-                GeneFamily geneFamily;
-                if (split[1].equals(GeneFamily.UNKNOWN_GENE_ID)) {
-                    geneFamily = this.unknownGeneFamily;
-                    geneFamily.addGene();
-                } else {
-                    if (!geneFamilyMap.containsKey(split[1])) {
-                        geneFamily = new GeneFamily(split[1]);
-                        geneFamilyMap.put(split[1], geneFamily);
-                    } else {
-                        geneFamily = geneFamilyMap.get(split[1]);
-                        geneFamily.addGene();
-                    }
-                }
+                GeneFamily geneFamily = geneFamilies.addGene(split[1]);
 
                 Gene.GeneOrientation orientation;
                 switch (split[0]) {
@@ -180,7 +158,7 @@ public class GckFileReader implements GeckoDataReader {
         return chr;
     }
 
-    private void readClusterData(BufferedReader reader, Map<String, GeneFamily> geneFamilyMap, GeneFamily unknownGeneFamily) throws IOException, ParseException {
+    private void readClusterData(BufferedReader reader, GeneFamilySet geneFamilies) throws IOException, ParseException {
         List<GeneCluster> clusterList = new ArrayList<>();
         GeneClusterBuilder builder = null;
         boolean continueReading = true;
@@ -193,7 +171,7 @@ public class GckFileReader implements GeckoDataReader {
                 case DataSetWriter.CLUSTER_START:
                     if (builder != null)
                         throw new ParseException("Cluster not closed before new cluster start.", 0);
-                    builder = new GeneClusterBuilder(reader, geneFamilyMap, unknownGeneFamily);
+                    builder = new GeneClusterBuilder(reader, geneFamilies);
                     builder.readGenes(reader);
                     break;
                 case DataSetWriter.OCC_START:
@@ -261,10 +239,9 @@ public class GckFileReader implements GeckoDataReader {
         Set<GeneFamily> genes;
         GeneClusterOccurrence bestOccs;
         GeneClusterOccurrence allOccs;
-        private final Map<String, GeneFamily> geneFamilyMap;
-        private final GeneFamily unknownGeneFamily;
+        private final GeneFamilySet geneFamilies;
 
-        GeneClusterBuilder(BufferedReader reader, Map<String, GeneFamily> geneFamilyMap, GeneFamily unknownGeneFamily) throws IOException, ParseException {
+        GeneClusterBuilder(BufferedReader reader, GeneFamilySet geneFamilies) throws IOException, ParseException {
             String line = reader.readLine().trim();
             String[] clusterInfo = line.split(DataSetWriter.SEPERATOR);
 
@@ -277,8 +254,7 @@ public class GckFileReader implements GeckoDataReader {
             minTotalDistance = Integer.parseInt(clusterInfo[3]);
             pValue = new BigDecimal(clusterInfo[4]);
             pValueCorr = new BigDecimal(clusterInfo[5]);
-            this.geneFamilyMap = geneFamilyMap;
-            this.unknownGeneFamily = unknownGeneFamily;
+            this.geneFamilies = geneFamilies;
         }
 
         private void readGenes(BufferedReader reader) throws IOException, ParseException {
@@ -288,9 +264,9 @@ public class GckFileReader implements GeckoDataReader {
             for (String gene : genes) {
                 GeneFamily geneFamily;
                 if (gene.trim().equals(GeneFamily.UNKNOWN_GENE_ID)) {
-                    geneFamily = unknownGeneFamily;
+                    geneFamily = geneFamilies.getUnknownGeneFamily();
                 } else {
-                    geneFamily = geneFamilyMap.get(gene.trim());
+                    geneFamily = geneFamilies.getGeneFamily(gene.trim());
                     if (geneFamily == null) {
                         throw new ParseException("No gene family found for key: " + gene.trim(), 0);
                     }
@@ -369,9 +345,7 @@ public class GckFileReader implements GeckoDataReader {
 	 */
 	private void handleFailedSessionLoad() {
         genomes = null;
-        unknownGeneFamily = null;
-        geneFamilySet = null;
-        numberOfGeneFamiliesWithMultipleGenes = 0;
+        geneFamilies = null;
         clusters = null;
         maxIdLength = 0;
         maxLocusTagLength = 0;

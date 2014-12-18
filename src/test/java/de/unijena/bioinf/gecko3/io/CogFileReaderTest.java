@@ -26,7 +26,7 @@ public class CogFileReaderTest {
 	public void readFileContentTest() throws  IOException, ParseException {
 		// define the result we want to get
 
-        GeneFamily unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();
+        GeneFamily unknownGeneFamily = GeneFamily.getUnknownTestGeneFamily(0);
 
         GeneFamily[] geneFamilies = GeneFamilyTest.getTestGeneFamilies(
                 new String[]{"25", "21", "7", "4"},
@@ -66,7 +66,7 @@ public class CogFileReaderTest {
 		// define the result we want to get
 
         // define gene families
-        GeneFamily unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();
+        GeneFamily unknownGeneFamily = GeneFamily.getUnknownTestGeneFamily(0);
 
         GeneFamily[] geneFamilies = GeneFamilyTest.getTestGeneFamilies(
                 new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"},
@@ -232,8 +232,7 @@ public class CogFileReaderTest {
     @Test
     public void readFileContentMultiIdTest() throws  IOException, ParseException {
         // define the result we want to get
-        GeneFamily unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();
-        unknownGeneFamily.addGene();
+        GeneFamily unknownGeneFamily = GeneFamily.getUnknownTestGeneFamily(1);
 
         GeneFamily[] geneFamilies = GeneFamilyTest.getTestGeneFamilies(
                 new String[]{"25", "21", "COG07", "NOG08", "7", "4", "COG08", "NIG07"},

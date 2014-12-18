@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class DataSet {
     private static final Logger logger = LoggerFactory.getLogger(DataSet.class);
-    private static final DataSet emptyDataSet = new DataSet(null, 0, 0, 0, null, null, 0);
+    private static final DataSet emptyDataSet = new DataSet(null, 0, 0, 0, new GeneFamilySet());
 
     private Genome[] genomes;
     private Parameter parameters;
@@ -25,9 +25,7 @@ public class DataSet {
     private final int maxNameLength;
     private final int maxLocusTagLength;
 
-    private final Set<GeneFamily> geneFamilySet;
-    private final GeneFamily unknownGeneFamily;
-    private final int numberOfGeneFamiliesWithMultipleGenes;
+    private final GeneFamilySet geneFamilySet;
     private Map<GeneFamily, Color> colorMap;
 
     /**
@@ -39,17 +37,15 @@ public class DataSet {
         return emptyDataSet;
     }
 
-    public DataSet(Genome[] genomes, int maxIdLength, int maxNameLength, int maxLocusTagLength, Set<GeneFamily> geneFamilySet, GeneFamily unknownGeneFamily, int numberOfGeneFamiliesWithMultipleGenes) {
-        this(genomes, maxIdLength, maxNameLength, maxLocusTagLength, geneFamilySet, unknownGeneFamily, numberOfGeneFamiliesWithMultipleGenes, null, null);
+    public DataSet(Genome[] genomes, int maxIdLength, int maxNameLength, int maxLocusTagLength, GeneFamilySet geneFamilySet) {
+        this(genomes, maxIdLength, maxNameLength, maxLocusTagLength, geneFamilySet, null, null);
     }
 
     public DataSet(Genome[] genomes,
                    int maxIdLength,
                    int maxNameLength,
                    int maxLocusTagLength,
-                   Set<GeneFamily> geneFamilySet,
-                   GeneFamily unknownGeneFamily,
-                   int numberOfGeneFamiliesWithMultipleGenes,
+                   GeneFamilySet geneFamilySet,
                    List<GeneCluster> clusters,
                    Parameter parameters) {
         this.genomes = genomes;
@@ -59,8 +55,6 @@ public class DataSet {
         this.maxNameLength = maxNameLength;
         this.maxLocusTagLength = maxLocusTagLength;
         this.geneFamilySet = geneFamilySet;
-        this.unknownGeneFamily = unknownGeneFamily;
-        this.numberOfGeneFamiliesWithMultipleGenes = numberOfGeneFamiliesWithMultipleGenes;
         this.colorMap = null;
     }
 
@@ -119,7 +113,7 @@ public class DataSet {
      */
     private int[][][] toIntArray(boolean useMemoryReduction, boolean randomizeGeneOrder, boolean addZeros, boolean absolute) {
         int genomeArray[][][] = new int[genomes.length][][];
-        MutableInteger unHomologeGeneFamilyId = new MutableInteger(numberOfGeneFamiliesWithMultipleGenes + 1);
+        MutableInteger unHomologeGeneFamilyId = new MutableInteger(geneFamilySet.getNumberOfGeneFamiliesWithMultipleGenes() + 1);
         for (int i=0;i<genomes.length;i++) {
             genomeArray[i] = new int[genomes[i].getChromosomes().size()][];
             for (int j=0;j<genomeArray[i].length;j++)
@@ -303,6 +297,12 @@ public class DataSet {
         genomes = new Genome[oldGenomes.length+1];
         genomes[0] = newReferenceGenome;
         System.arraycopy(oldGenomes, 0, genomes, 1, oldGenomes.length);
+
+        for (Chromosome chr : newReferenceGenome.getChromosomes()) {
+            for (Gene gene : chr.getGenes()) {
+                geneFamilySet.addGene(gene.getGeneFamily());
+            }
+        }
     }
 
     public List<GeneCluster> getClusters() {
@@ -360,35 +360,28 @@ public class DataSet {
     }
 
     public Set<GeneFamily> getGeneFamilySet() {
-        return geneFamilySet;
+        return geneFamilySet.getKnowGeneFamilies();
     }
 
     public GeneFamily getUnknownGeneFamily() {
-        return unknownGeneFamily;
+        return geneFamilySet.getUnknownGeneFamily();
     }
 
     public GeneFamily getGeneFamily(String externalId){
-        if (geneFamilyMap == null) {
-            geneFamilyMap = new HashMap<>();
-            geneFamilyMap.put(unknownGeneFamily.getExternalId(), unknownGeneFamily);
-            for (GeneFamily geneFamily : geneFamilySet)
-                geneFamilyMap.put(geneFamily.getExternalId(), geneFamily);
-        }
-        String id = GeneFamily.convertToValidIdFormat(externalId);
-        return geneFamilyMap.get(id);
+        return geneFamilySet.getGeneFamily(externalId);
     }
 
     public int getCompleteAlphabetSize() {
-        return geneFamilySet.size() + unknownGeneFamily.getFamilySize();
+        return geneFamilySet.getCompleteAlphabetSize();
     }
 
     public int getReducedAlphabetSize() {
-        return numberOfGeneFamiliesWithMultipleGenes;
+        return geneFamilySet.getNumberOfGeneFamiliesWithMultipleGenes();
     }
 
     private Map<GeneFamily, Color> getColorMap() {
         if (colorMap == null) {
-            colorMap = GeneFamily.prepareColorMap(geneFamilySet, unknownGeneFamily, null);
+            colorMap = GeneFamily.prepareColorMap(geneFamilySet.getKnowGeneFamilies(), geneFamilySet.getUnknownGeneFamily(), null);
         }
         return colorMap;
     }
@@ -404,13 +397,10 @@ public class DataSet {
 
         DataSet dataSet = (DataSet) o;
 
-        if (numberOfGeneFamiliesWithMultipleGenes != dataSet.numberOfGeneFamiliesWithMultipleGenes) return false;
         if (!clusters.equals(dataSet.clusters)) return false;
         if (geneFamilySet != null ? !geneFamilySet.equals(dataSet.geneFamilySet) : dataSet.geneFamilySet != null)
             return false;
         if (!Arrays.equals(genomes, dataSet.genomes)) return false;
-        if (unknownGeneFamily != null ? !unknownGeneFamily.equals(dataSet.unknownGeneFamily) : dataSet.unknownGeneFamily != null)
-            return false;
 
         return true;
     }
@@ -420,8 +410,6 @@ public class DataSet {
         int result = genomes != null ? Arrays.hashCode(genomes) : 0;
         result = 31 * result + (clusters != null ? clusters.hashCode() : 0);
         result = 31 * result + (geneFamilySet != null ? geneFamilySet.hashCode() : 0);
-        result = 31 * result + (unknownGeneFamily != null ? unknownGeneFamily.hashCode() : 0);
-        result = 31 * result + numberOfGeneFamiliesWithMultipleGenes;
         return result;
     }
 }

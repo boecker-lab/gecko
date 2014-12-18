@@ -15,29 +15,15 @@ import java.util.Map;
 public class GeneFamily implements Comparable<GeneFamily>{
     public static final String UNKNOWN_GENE_ID = "0";
 
-    /**
-     * The number of gene families with more than one gene that were read since the last call to
-     * {@link #getNewUnknownGeneFamilyAndInitializeAlgorithmId() getNewUnknownGeneFamilyAndInitializeAlgorithmId()}
-     *
-     * @return the number of gene families with more than one gene
-     */
-    public static int getNumberOfGeneFamiliesWithMultipleGenes() {
-        return algorithmIdCounter - 1;
-    }
-
-    private static int algorithmIdCounter;
-
     private int familySize;
     private final String externalId;
     private int algorithmId;
 
     /**
      * A new gene family with a given external id, family size 1 and algorithm id -1.
-     * Use {@link #getNewUnknownGeneFamilyAndInitializeAlgorithmId() getNewUnknownGeneFamilyAndInitializeAlgorithmId()}
-     * method before to initialize algorithm id starting from 1.
      * @param externalId the String externalId
      */
-    public GeneFamily(String externalId) {
+    GeneFamily(String externalId) {
         this(externalId, -1, 1);
     }
 
@@ -64,20 +50,34 @@ public class GeneFamily implements Comparable<GeneFamily>{
         return new GeneFamily(externalId, algorithmId, familySize);
     }
 
-    public static GeneFamily getNewUnknownGeneFamilyAndInitializeAlgorithmId() {
-        algorithmIdCounter = 1;
+    public static GeneFamily getUnknownTestGeneFamily(int familySize){
+        GeneFamily testFamily = getNewUnknownGeneFamily();
+        testFamily.familySize = familySize;
+        return testFamily;
+    }
+
+    static GeneFamily getNewUnknownGeneFamily(){
         return new GeneFamily(UNKNOWN_GENE_ID, -1, 0);
     }
 
+    /*public static GeneFamily getNewUnknownGeneFamilyAndInitializeAlgorithmId() {
+        algorithmIdCounter = 1;
+        return new GeneFamily(UNKNOWN_GENE_ID, -1, 0);
+    }*/
+
     /**
-     * Adds a a gene to the geneFamily and set the algorithm id to the next free algorithmId if the externalId is
-     * not {@link #UNKNOWN_GENE_ID UNKNOWN_GENE_ID} and the algorithmId has not been set.
-     * Use {@link #getNewUnknownGeneFamilyAndInitializeAlgorithmId() getNewUnknownGeneFamilyAndInitializeAlgorithmId()}
-     * method before to initialize algorithm id starting from 1.
+     * Sets the algorithm id of the geneFamily
+     *
+     * @param id
      */
-    public void addGene() {
-        if (this.algorithmId == -1 && !this.externalId.equals(UNKNOWN_GENE_ID))
-            this.algorithmId = algorithmIdCounter++;
+    void setAlgorithmId(int id){
+        this.algorithmId = id;
+    }
+
+    /**
+     * Adds a a gene to the geneFamily.
+     */
+    void addGene() {
         this.familySize++;
     }
 
@@ -115,25 +115,21 @@ public class GeneFamily implements Comparable<GeneFamily>{
         return familySize;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        GeneFamily that = (GeneFamily) o;
+        GeneFamily family = (GeneFamily) o;
 
-        if (familySize != that.familySize) return false;
-        if (!externalId.equals(that.externalId)) return false;
+        if (!externalId.equals(family.externalId)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = familySize;
-        result = 31 * result + externalId.hashCode();
-        return result;
+        return externalId.hashCode();
     }
 
     @Override

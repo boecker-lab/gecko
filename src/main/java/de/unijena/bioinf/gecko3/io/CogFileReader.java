@@ -19,12 +19,8 @@ import java.util.regex.Pattern;
  */
 public class CogFileReader implements GeckoDataReader {
     private static final Logger logger = LoggerFactory.getLogger(CogFileReader.class);
-	/**
-	 * Storing place for the geneLabelMap 
-	 */
-	private Set<GeneFamily> geneFamilySet;
-    private GeneFamily unknownGeneFamily;
-    private int numberOfGeneFamiliesWithMultipleGenes;
+
+    GeneFamilySet geneFamilies;
 	
 	/**
 	 * Storing place for the genomes.
@@ -215,11 +211,7 @@ public class CogFileReader implements GeckoDataReader {
 		Map<Integer, Genome> groupedGenomes = new HashMap<>();
 		List<Genome> ungroupedGenomes = new ArrayList<>();
 
-        this.unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();
-        /*
-            Maps each possible homologue gene (string) id to the gene family of this gene
-         */
-        Map<String, GeneFamily> geneFamilyMap = new HashMap<>();
+        geneFamilies = new GeneFamilySet();
 
         try (CountedReader reader = new CountedReader(new FileReader(inputFile))){
             this.maxIdLength = 0;
@@ -255,7 +247,7 @@ public class CogFileReader implements GeckoDataReader {
                 // Forward file pointer to genomes first gene
                 reader.jumpToLine(occ.getStart_line() + 2);
 
-                List<Gene> genes = readChromosome(reader, occ.getEnd_line(), geneFamilyMap);
+                List<Gene> genes = readChromosome(reader, occ.getEnd_line(), geneFamilies);
 
                 // TODO handle the case where EOF is reached before endline
                 c.setGenes(genes);
@@ -263,9 +255,6 @@ public class CogFileReader implements GeckoDataReader {
         } catch (LinePassedException e) {
             throw new ParseException(e.getMessage(), 0);
         }
-
-        geneFamilySet = new HashSet<>(geneFamilyMap.values());
-        numberOfGeneFamiliesWithMultipleGenes = GeneFamily.getNumberOfGeneFamiliesWithMultipleGenes();
 		
 		this.genomes = new Genome[groupedGenomes.size() + ungroupedGenomes.size()];
 
@@ -283,9 +272,7 @@ public class CogFileReader implements GeckoDataReader {
                 maxIdLength,
                 maxNameLength,
                 maxLocusTagLength,
-                geneFamilySet,
-                unknownGeneFamily,
-                numberOfGeneFamiliesWithMultipleGenes
+                geneFamilies
         );
 	}
 
@@ -293,17 +280,17 @@ public class CogFileReader implements GeckoDataReader {
      * Reads all the genes of one chromosome
      * @param reader the reader that is used
      * @param endLine the last line that contains a gene of the chromosome
-     * @param geneFamilyMap the mapping of external (String) ids to internal geneFamilies, is modified
+     * @param geneFamilies, is modified
      * @return the list of all genes
      * @throws IOException
      */
-    private List<Gene> readChromosome(CountedReader reader, int endLine, Map<String, GeneFamily> geneFamilyMap) throws  IOException, ParseException{
+    private List<Gene> readChromosome(CountedReader reader, int endLine, GeneFamilySet geneFamilies) throws  IOException, ParseException{
         List<Gene> genes = new ArrayList<>();
 
         String line;
         while (reader.getCurrentLineNumber() <= endLine && (line = reader.readLine()) != null) {
             if (!line.equals("")) {
-                parseGeneLine(line, genes, geneFamilyMap);
+                parseGeneLine(line, genes, geneFamilies);
             }
         }
         return genes;
@@ -313,9 +300,9 @@ public class CogFileReader implements GeckoDataReader {
      * Parses one gene containing line of the cog file, append all contained genes to the given list
      * @param line the line that is parsed
      * @param genes the list the new found genes will be appended to, is modified
-     * @param geneFamilyMap the mapping of external (String) ids to internal geneFamilies, is modified
+     * @param geneFamilies all geneFamilies, is modified
      */
-    private void parseGeneLine(String line, List<Gene> genes, Map<String, GeneFamily> geneFamilyMap) throws ParseException {
+    private void parseGeneLine(String line, List<Gene> genes, GeneFamilySet geneFamilies) throws ParseException {
         String[] explode = line.split("\t");
         if (explode.length < 5) {
             ParseException e = new ParseException("Maleformed line, not enough \"\\t\" in "+line, 0);
@@ -352,20 +339,7 @@ public class CogFileReader implements GeckoDataReader {
                 maxNameLength = explode[3].length();
             }
 
-            GeneFamily geneFamily;
-            if (isUnHomologe(singleId)) {
-                geneFamily = this.unknownGeneFamily;
-                geneFamily.addGene();
-            } else {
-                if (!geneFamilyMap.containsKey(singleId)) {
-                    geneFamily = new GeneFamily(singleId);
-                    geneFamilyMap.put(singleId, geneFamily);
-                }
-                else {
-                    geneFamily = geneFamilyMap.get(singleId);
-                    geneFamily.addGene();
-                }
-            }
+            GeneFamily geneFamily = geneFamilies.addGene(singleId);
 
             Gene gene;
             if (explode.length > 5)

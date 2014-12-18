@@ -1,10 +1,7 @@
 package de.unijena.bioinf.gecko3.io;
 
 import de.unijena.bioinf.gecko3.GeckoInstance;
-import de.unijena.bioinf.gecko3.datastructures.Chromosome;
-import de.unijena.bioinf.gecko3.datastructures.DataSet;
-import de.unijena.bioinf.gecko3.datastructures.GeneCluster;
-import de.unijena.bioinf.gecko3.datastructures.Parameter;
+import de.unijena.bioinf.gecko3.datastructures.*;
 import de.unijena.bioinf.gecko3.algo.GeneClusterTestUtils;
 import org.junit.Test;
 
@@ -12,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Set;
 
 import static de.unijena.bioinf.gecko3.algo.GeneClusterTestUtils.compareGeneClusters;
 import static org.junit.Assert.assertArrayEquals;
