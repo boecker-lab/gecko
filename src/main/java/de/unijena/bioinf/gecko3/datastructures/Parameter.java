@@ -68,7 +68,8 @@ public class Parameter {
         }
 
         public static ReferenceType[] getSupported() {
-            return new ReferenceType[]{ReferenceType.allAgainstAll, ReferenceType.genome};
+            return values();
+            //return new ReferenceType[]{ReferenceType.allAgainstAll, ReferenceType.genome};
         }
     }
 

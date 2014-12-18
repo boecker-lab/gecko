@@ -233,25 +233,28 @@ public class CogFileReaderTest {
     public void readFileContentMultiIdTest() throws  IOException, ParseException {
         // define the result we want to get
         GeneFamily unknownGeneFamily = GeneFamily.getNewUnknownGeneFamilyAndInitializeAlgorithmId();
+        unknownGeneFamily.addGene();
 
         GeneFamily[] geneFamilies = GeneFamilyTest.getTestGeneFamilies(
-                new String[]{"25", "21", "7", "4"},
-                new int[]{1, 1, 1, 1});
+                new String[]{"25", "21", "COG07", "NOG08", "7", "4", "COG08", "NIG07"},
+                new int[]{2, 1, 2, 2, 1, 1, 1, 1});
 
         Set<GeneFamily> geneFamilySet = new HashSet<>(Arrays.asList(geneFamilies));
 
-
         List<Gene> genes1 = new ArrayList<>();
-        List<Gene> genes2 = new ArrayList<>();
-        Gene gen1 = new Gene("fusA", geneFamilies[0], Gene.GeneOrientation.POSITIVE, "elongation factor EF-A");
-        Gene gen2 = new Gene("fusA", geneFamilies[1], Gene.GeneOrientation.POSITIVE, "elongation factor EF-A");
-        Gene gen3 = new Gene("fusB", geneFamilies[2], Gene.GeneOrientation.POSITIVE, "elongation factor EF-B");
-        Gene gen4 = new Gene("fusB", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "elongation factor EF-B");
+        genes1.add(new Gene("int1", geneFamilies[0], Gene.GeneOrientation.POSITIVE, "int gene"));
+        genes1.add(new Gene("int1", geneFamilies[1], Gene.GeneOrientation.POSITIVE, "int gene"));
+        genes1.add(new Gene("str1", geneFamilies[2], Gene.GeneOrientation.POSITIVE, "string gene"));
+        genes1.add(new Gene("str1", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "string gene"));
+        genes1.add(new Gene("mix", geneFamilies[0], Gene.GeneOrientation.POSITIVE, "mixed gene"));
+        genes1.add(new Gene("mix", geneFamilies[3], Gene.GeneOrientation.POSITIVE, "mixed gene"));
+        genes1.add(new Gene("nh", geneFamilies[2], Gene.GeneOrientation.POSITIVE, "gene with 0 homologe"));
 
-        genes1.add(gen1);
-        genes1.add(gen2);
-        genes2.add(gen3);
-        genes2.add(gen4);
+        List<Gene> genes2 = new ArrayList<>();
+        genes2.add(new Gene("int2", geneFamilies[4], Gene.GeneOrientation.POSITIVE, "int gene 2"));
+        genes2.add(new Gene("int2", geneFamilies[5], Gene.GeneOrientation.POSITIVE, "int gene 2"));
+        genes2.add(new Gene("str2", geneFamilies[6], Gene.GeneOrientation.POSITIVE, "string gene 2"));
+        genes2.add(new Gene("str2", geneFamilies[7], Gene.GeneOrientation.POSITIVE, "string gene 2"));
 
         Genome[] refGenomes = new Genome[2];
         refGenomes[0] = new Genome("Shorty 1");

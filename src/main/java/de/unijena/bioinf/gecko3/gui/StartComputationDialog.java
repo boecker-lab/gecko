@@ -126,11 +126,7 @@ public class StartComputationDialog extends JDialog {
 		refCombo.setEnabled(true);
 		mergeResults.setEnabled(true);
 
-		refClusterField.setToolTipText("<html>Enter a sequence of gene IDs here, separated by<br>" +
-				"spaces.<br><br>" +
-				"<B>Hint</B>:<br>Instead of entering a sequence of genes by<br>" +
-				"hand you can also select a gene cluster from<br>" +
-				"the result list and copy it!</html>");
+		refClusterField.setToolTipText("Enter a sequence of gene IDs here, separated by spaces");
 		
 		Document refClusterFieldDocument = new PlainDocument(){
 			
@@ -199,7 +195,7 @@ public class StartComputationDialog extends JDialog {
 					PrintUtils.printDebug("swapping genomes");
                     gecko.reorderGenomes(refGenomeCombo.getSelectedIndex());
 				} else if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.cluster) {
-					Genome cluster = new Genome();
+					Genome cluster = new Genome("Reference cluster");
 					ArrayList<Gene> genes = new ArrayList<>();
 					Map<String, GeneFamily> revIDMap = gecko.getGeneLabelMap();
 					for (String id : refClusterField.getText().split(" "))
@@ -208,7 +204,7 @@ public class StartComputationDialog extends JDialog {
 							if (geneFamily!=null)
 								genes.add(new Gene(geneFamily));
 						}
-					cluster.getChromosomes().add(new Chromosome("Reference cluster", genes, cluster));
+					cluster.addChromosome(new Chromosome("", genes, cluster));
 					gecko.addReferenceGenome(cluster);
 				}
 				boolean mergeResultsEnabled = false;

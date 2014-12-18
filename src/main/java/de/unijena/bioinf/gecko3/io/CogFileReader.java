@@ -316,7 +316,7 @@ public class CogFileReader implements GeckoDataReader {
      * @return the list of all genes
      * @throws IOException
      */
-    private List<Gene> readChromosome(CountedReader reader, int endLine, Map<String, GeneFamily> geneFamilyMap) throws  IOException{
+    private List<Gene> readChromosome(CountedReader reader, int endLine, Map<String, GeneFamily> geneFamilyMap) throws  IOException, ParseException{
         List<Gene> genes = new ArrayList<>();
 
         String line;
@@ -334,8 +334,14 @@ public class CogFileReader implements GeckoDataReader {
      * @param genes the list the new found genes will be appended to, is modified
      * @param geneFamilyMap the mapping of external (String) ids to internal geneFamilies, is modified
      */
-    private void parseGeneLine(String line, List<Gene> genes, Map<String, GeneFamily> geneFamilyMap) {
+    private void parseGeneLine(String line, List<Gene> genes, Map<String, GeneFamily> geneFamilyMap) throws ParseException {
         String[] explode = line.split("\t");
+        if (explode.length < 5) {
+            ParseException e = new ParseException("Maleformed line, not enough \"\\t\" in "+line, 0);
+            logger.error("Error parsing file", e);
+            throw e;
+        }
+
         for (int i=0; i<explode.length; i++)
             explode[i] = explode[i].trim();
         String[] ids = explode[0].split(",");
