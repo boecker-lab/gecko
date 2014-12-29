@@ -35,14 +35,14 @@ public enum ExportType {
 
     public static final String types = "\"clusterData\" similar to the information in the gui.\n" +
             "\"clusterStatistics\" general statistics about all the clusters.\n" +
-            "\"table\"\n table of cluster information, as used in Jahn et al, Statistics for approximate gene clusters, BMC Bioinformatics, 2013." +
+            "\"table\" table of cluster information, as used in Jahn et al, Statistics for approximate gene clusters, BMC Bioinformatics, 2013.\n" +
             "\"latexTable\" same as above, only latex ready.\n" +
             "\"geneNameTable\" table of all gene names in the reference occ and additional info.\n" +
             "\"clusterConservation\" information about the gene oder and additional genes for each cluster.\n" +
             "\"clusterGenomeInformation\" in which genome the cluster occurs.\n" +
             "\"referenceClusterTags\" the locus_tags of all genes in the reference occurrence.\n" +
-            "\"pdf\"\n all clusters as a single pdf picture." +
-            "\"multiPdf a zip file containing one pdf picture for each cluster.\"";
+            "\"pdf\" all clusters as a single pdf picture.\n" +
+            "\"multiPdf\" a zip file containing one pdf picture for each cluster.";
 
     public String getDefaultFileExtension() {return defaultFileExtension;}
 

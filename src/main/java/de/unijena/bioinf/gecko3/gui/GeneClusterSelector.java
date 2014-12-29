@@ -271,7 +271,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 		showSimilarMenuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String filterString = table.getValueAt(table.getSelectedRow(), 4).toString();
+				String filterString = table.getValueAt(table.getSelectedRow(), 5).toString();
 				if (filterString.length() > 2) {
 					filterString = filterString.substring(1, filterString.length() - 1);
 				}
