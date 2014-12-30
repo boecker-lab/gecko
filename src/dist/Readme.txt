@@ -1,7 +1,7 @@
 USER MANUAL
 -----------
 
-1. Installation
+1. INSTALLATION
 
 Java 7 is needed to run Gecko3.
 If you have a 64-Bit operations system, 64-Bit Java is suggested.
@@ -11,7 +11,7 @@ You can check if and which version of java you have installed from the command l
 The first line should give you the java version, for java 7 something like <java version "1.7.0_67"> (the
 second number gives the java version),
 
-2. Gecko3
+2. USING GECKO 3
 
 Given a set of genomes in which each gene is assigned to a family
 of homologous genes, Gecko3 detects sets of genes that appear in an
@@ -21,7 +21,7 @@ A typical Gecko session is divided into three parts: genome selection,
 cluster detection, manual evaluation of predictions. These parts are
 described in the following in more detail.
 
-2.1 Starting Gecko3
+2.1 STARTING GECKO 3
 
 Windows: To start Gecko3, go to the bin directory and execute Gecko3.bat
 For Linux and OS X: To start Gecko3, go to the bin directory and execute Gecko3
@@ -31,7 +31,7 @@ parameters, that you can, or need to supply.
 Or it can be used in GUI mode, if started without any
 parameters, or just a *.gck or *.cog input file that will be automatically loaded.
 
-2.2 Data
+2.2 INPUT DATA FORMAT
 
 For Gecko3, the basic requirement is that the genomes are given as
 sequences of strings where each character represents a certain family
@@ -96,6 +96,8 @@ NOG76743	+	?	yaaX	hypothetical protein	E2348C_0005	unknown
 COG3022	-	?	yaaA	hypothetical protein	E2348C_0006	unknown
             ...
 
+2.3 IMPORTING DATA
+
 After selecting an input file via 'File'->'Open session or genome file',
 Gecko determines automatically from the file ending whether it loads a
 genome file (.cog) or a stored session (.gck). In case a genome file is
@@ -111,7 +113,7 @@ then visualized in a genome browser, allowing to inspect the genomes,
 contained genes, and gene annotations.
 
 
-2.3 Cluster Detection
+2.4 CLUSTER DETECTION
 
 When clicking the 'start computation" button, the user is asked to
 select a search mode, as well as global and model-dependent parameters
@@ -141,7 +143,7 @@ the reference genome.
 
 After all parameters are set, computation can be started by clicking the 'OK' button.
 
-2.4 Graphical Evaluation
+2.5 GRAPHICAL EVALUATION
 
 After completion of computations, results are shown in tabular form
 below the genome browser. The table contains the list of all predicted
@@ -169,7 +171,7 @@ the user with the annotation data available for genes or chromosomes,
 and the information area allows for a more detailed inspection of the
 search result.
 
-2.5 Filtering and Searching
+2.6 FILTERING AND SEARCHING
 
 Under the table different filter modes for the results can be chosen.
 Either all gene clusters are shown ("showAll"), for all overlapping occurrences,
@@ -189,11 +191,13 @@ the genome.
 By right Clicking on a gene cluster in the table, one can choose "Show similar clusters". This will automatically
 enter all gene families from this cluster into the search field.
 
-2.6 Saving the results
+2.7 SAVING A GECKO 3 SESSION
+
 The results of a Gecko3 session can be stored in a file with ending
 '.gck' via 'File'->'Save session'.
 
-2.7 Exporting clusters
+2.8 EXPORTING CLUSTERS
+
 Results can be exported via 'File'->'Export results' in different data formats.
 1. "clusterData" similar to the information in the gui.
 2. "clusterStatistics" general statistics about all the clusters.
@@ -205,6 +209,9 @@ Results can be exported via 'File'->'Export results' in different data formats.
 8. "referenceClusterTags" the locus_tags of all genes in the reference occurrence.
 9. "pdf" all clusters as a single pdf picture(not all pdf viewers will be able to open this, due to the size).
 10. "multiPdf" a zip file containing one pdf picture for each cluster.
+
+If you right click on a single cluster in the table, you can select "Export gene cluster" to export this single cluster
+as a picture (pdf, jpg or png).
 
 
 
