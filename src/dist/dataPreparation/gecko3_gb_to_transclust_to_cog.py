@@ -28,30 +28,45 @@ def gb_to_fasta(infile):
     return outfile
 
 
-def make_blast_db(faa_files,  db_name="db", title="transclust"):
+def run_blastAll(faaFiles, workingDir, title="transclust", dbName="db", evalue="0.01", num_threads="4"):
+    fasta_files = ' '.join(faaFiles)
+    subprocess.call(["makeblastdb", "-dbtype", "prot", "-title", title, "-out", dbName, "-in", fasta_files])
+    mergeFiles(workingDir, ".faa", "merged.faa")
+    print "Running blast"
+    subprocess.call(["blastp", "-db", dbName, "-query", "merged.faa", "-evalue",  evalue, "-outfmt", "6", "-num_threads", num_threads, "-out", "merged.blast2p"])
+
+
+def make_blast_db_command_string(faa_files, db_name, title="transclust"):
     fasta_files = ' '.join(faa_files)
-    subprocess.call(["makeblastdb", "-dbtype", "prot", "-title", title, "-out", db_name, "-in", fasta_files])
-    return db_name
-
-def make_blast_db_command_string(faa_files, db_name="db", title="transclust"):
-    fasta_files = ' '.join(faa_files)
-    return "makeblastdb -dbtype prot -title %s -out %s -in %s\n" %(title, db_name, fasta_files)
+    return "makeblastdb -dbtype prot -title %s -out %s -in \"%s\"\n" %(title, db_name, fasta_files)
 
 
-def make_blast_command_string(faaFile, dbName, evalue, num_threads):
-    return "blastp -db %s -query %s -evalue %f -outfmt 6 -num_threads %d > %s\n" % (dbName, faaFile, evalue, num_threads,os.path.splitext(faaFile)[0]+"_vs_all.blast2p")
+def make_blast_command_string(faaFile, dbName, evalue, num_threads, outfile):
+    return "blastp -db %s -query %s -evalue %f -outfmt 6 -num_threads %d -out %s\n" % (dbName, faaFile, evalue, num_threads, outfile)
 
 
-def generate_blastAll_command(faaFiles, dbName, workingDir, evalue=0.01, num_threads=4):
+def generate_merged_blastAll_command(faaFiles, workingDir, dbName="db", evalue=0.01, num_threads=4):
     bashFile = os.path.join(workingDir, "myBlastAll.sh")
     with open(bashFile, "w") as output:
         output.write("#!/bin/bash\n")
-        for faaFile in faaFiles:
-            blastCommand = make_blast_command_string(faaFile, dbName, evalue, num_threads)
-            output.write(blastCommand)
-            with open(os.path.join(workingDir, os.path.splitext(faaFile)[0]+"_vs_all.sh"), "w") as singleScript:
-                singleScript.write("#!/bin/bash\n")
-                singleScript.write(blastCommand)
+        blast_db_command = make_blast_db_command_string(faaFiles, dbName)
+        output.write(blast_db_command)
+        mergeFiles(workingDir, ".faa", "merged.faa")
+        blastCommand = make_blast_command_string("merged.faa", dbName, evalue, num_threads, "merged.blast2p")
+        output.write(blastCommand)
+
+
+def generate_split_blastAll_commands(faaFiles, workingDir, dbName="db", evalue=0.01, num_threads=4):
+    db_bash_File = os.path.join(workingDir, "makeBlastDb.sh")
+    with open(db_bash_File, "w") as db_output:
+        db_output.write("#!/bin/bash\n")
+        blast_db_command = make_blast_db_command_string(faaFiles, dbName)
+        db_output.write(blast_db_command)
+    for faaFile in faaFiles:
+        blastCommand = make_blast_command_string(faaFile, dbName, evalue, num_threads, os.path.splitext(faaFile)[0]+"_vs_all.blast2p")
+        with open(os.path.join(workingDir, os.path.splitext(faaFile)[0]+"_vs_all.sh"), "w") as singleScript:
+            singleScript.write("#!/bin/bash\n")
+            singleScript.write(blastCommand)
 
 
 def getAllFiles(workingDir, ending, exclude=None):
@@ -63,38 +78,47 @@ def getAllFiles(workingDir, ending, exclude=None):
     return files
 
 
-def prepareBlast(workingDir):
+def generateFastaFiles(workingDir):
     genbankFiles = getAllFiles(workingDir, ".gb")
 
     faaFiles = []
     for file in genbankFiles:
         faaFiles.append(gb_to_fasta(file))
 
-    dbName = make_blast_db(faaFiles)
+    return faaFiles
 
-    generate_blastAll_command(faaFiles, dbName, workingDir)
+
+def doLocalBlast(workingDir):
+    faaFiles = generateFastaFiles(workingDir)
+    run_blastAll(faaFiles, workingDir)
+
+
+def prepareSingleBlast(workingDir):
+    faaFiles = generateFastaFiles(workingDir)
+    generate_merged_blastAll_command(faaFiles, workingDir)
+
+
+def prepareSplitBlast(workingDir):
+    faaFiles = generateFastaFiles(workingDir)
+    generate_split_blastAll_commands(faaFiles, workingDir)
+
+
+def mergeFiles(workingDir, extension, mergedFile):
+    with open(mergedFile, "w") as output:
+        to_merge = getAllFiles(workingDir, extension, mergedFile)
+        for f in to_merge:
+            print "Processing %s" % f
+            with open(f, "r") as infile:
+                for line in infile:
+                    output.write(line)
 
 
 def mergeBlast(workingDir):
-    outfile = os.path.join(workingDir, "merged.blast2p")
-    with open(outfile, "w") as output:
-        blast2pFiles = getAllFiles(workingDir, ".blast2p", outfile)
-        for f in blast2pFiles:
-            print "Processing %s" % f
-            with open(f, "r") as infile:
-                for line in infile:
-                    output.write(line)
-    outfile = os.path.join(workingDir, "merged.faa")
-    with open(outfile, "w") as output:
-        fastaFiles = getAllFiles(workingDir, ".faa", outfile)
-        for f in fastaFiles:
-            print "Processing %s" % f
-            with open(f, "r") as infile:
-                for line in infile:
-                    output.write(line)
+    mergeFiles(workingDir, ".blast2p", "merged.blast2p")
+    mergeFiles(workingDir, ".faa", "merged.faa")
 
 
-def extractGeneFamiliesForParameter(workingDir, parameter):
+def extractGeneFamiliesForParameter(workingDir, parameter=None):
     datafile = os.path.join(workingDir, "transclustResults.txt")
     if not os.path.exists(datafile):
         sys.exit("Transclust result file %s missing!" % datafile)
@@ -104,7 +128,7 @@ def extractGeneFamiliesForParameter(workingDir, parameter):
     with open(datafile, "r") as data:
         for line in data:
             split = line.strip().split("\t")
-            if int(float(split[0])) == parameter:
+            if not parameter or int(float(split[0])) == parameter:
                 geneFamilies = split[2].split(";")
                 for geneFamily in geneFamilies:
                     genes = geneFamily.split(",")
@@ -122,6 +146,8 @@ def extractGeneFamiliesForParameter(workingDir, parameter):
                         if geneSplit[0] in genomeGeneFamilyDict[geneSplit[1]]:
                             sys.exit("Duplicate Gene %s: %d and %d" %(gene, familyId, genomeGeneFamilyDict[geneSplit[1]][geneSplit[0]]))
                         genomeGeneFamilyDict[geneSplit[1]][geneSplit[0]] = familyId
+            if not parameter:
+                break
     return genomeGeneFamilyDict
 
 
@@ -246,8 +272,8 @@ def mapGeneFamiliesToGeneBankAndPrintToCog(genBankFiles, geneFamilies, outfile, 
                 printFeature(name, positionMap, output)
 
 
-def transclustToCog(workingDir, parameter=48):
-    geneFamilies = extractGeneFamiliesForParameter(workingDir, parameter)
+def transclustToCog(workingDir):
+    geneFamilies = extractGeneFamiliesForParameter(workingDir)
     genBankFiles = getAllFiles(workingDir, ".gb")
     mapGeneFamiliesToGeneBankAndPrintToCog(genBankFiles, geneFamilies, outfile=os.path.join(workingDir, "transclust.cog"))
 
@@ -361,7 +387,7 @@ def getCoreGeneAnnotations(idToGenomeToAnnotation, nrOfGenomes):
     return coreGenes
 
 
-def annotateGenome(workingDir, parameter=48):
+def annotateGenome(workingDir, parameter=45):
     fileToAnnotate = os.path.join(workingDir, "morax_mx.gb")
     outfile = os.path.join(workingDir, "annotations.txt")
 
@@ -379,9 +405,11 @@ def annotateGenome(workingDir, parameter=48):
     mapAnnotationsToGenome(fileToAnnotate, geneFamilies, coreGenes, outfile)
 
 options = {
-    "-prepareBlast": prepareBlast,
+    "-doLocalBlast": doLocalBlast,
+    "-prepareSingleBlast": prepareSingleBlast,
+    "-prepareSplitBlast": prepareSplitBlast,
     "-mergeBlast": mergeBlast,
-    "-statistics": statistics,
+    #"-statistics": statistics,
     "-transclustToCog": transclustToCog,
    # "-annotateGenome": annotateGenome,
 }
@@ -402,9 +430,11 @@ def main():
         sys.exit("Invalid number of parameters!")
     command = sys.argv[1]
     if not command in options:
+        printUsage()
         sys.exit("Invalid command!")
     workingDir = sys.argv[2]
     if not os.path.exists(workingDir) or not os.path.isdir(workingDir):
+        printUsage()
         sys.exit("Directory %s not found!" % workingDir)
 
     options[command](workingDir)
