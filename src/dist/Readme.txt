@@ -1,3 +1,22 @@
+/*
+ * Copyright 2014 Sascha Winter, Tobias Mann, Hans-Martin Haase, Leon Kuchenbecker and Katharina Jahn
+ *
+ * This file is part of Gecko3.
+ *
+ * Gecko3 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gecko3 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Gecko3.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 USER MANUAL
 -----------
 
@@ -7,7 +26,7 @@ For support and suggestions, sascha.winter(at)uni-jena.de
 1. INSTALLATION
 
 Java 7 is needed to run Gecko3.
-If you have a 64-Bit operations system, 64-Bit Java is suggested.
+If you have a 64-Bit operations system, 64-Bit Java is highly suggested.
 Java 7 and installation instructions are available from http://www.java.com or http://openjdk.java.net
 
 You can check if and which version of java you have installed from the command line with "java -version".
@@ -33,6 +52,11 @@ Gecko3 can either be run in commandline mode, '-h' will give all possible
 parameters, that you can, or need to supply.
 Or it can be used in GUI mode, if started without any
 parameters, or just a *.gck or *.cog input file that will be automatically loaded.
+
+By default, Gecko3 will use a maximum heap size of 6GB (-Xmx6G), set in
+the Gecko3.bat and Gecko3 start scripts. This is sufficient to work with about 1000 Genomes.
+If you need more memory, modify the start script with any text editor, changing
+-Xmx6G to an appropriate value (e.g. -Xmx12G).
 
 2.2 INPUT DATA FORMAT
 
