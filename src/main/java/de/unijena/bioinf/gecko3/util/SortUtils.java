@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Sascha Winter
+ * Copyright 2014 Sascha Winter, Tobias Mann, Hans-Martin Haase, Leon Kuchenbecker and Katharina Jahn
  *
  * This file is part of Gecko3.
  *

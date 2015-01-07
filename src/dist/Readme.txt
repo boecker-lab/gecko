@@ -1,6 +1,9 @@
 USER MANUAL
 -----------
 
+CONTACT
+For support and suggestions, sascha.winter(at)uni-jena.de
+
 1. INSTALLATION
 
 Java 7 is needed to run Gecko3.
