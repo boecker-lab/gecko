@@ -9,7 +9,7 @@ Java 7 and installation instructions are available from http://www.java.com or h
 
 You can check if and which version of java you have installed from the command line with "java -version".
 The first line should give you the java version, for java 7 something like <java version "1.7.0_67"> (the
-second number gives the java version),
+second number gives the java version).
 
 2. USING GECKO 3
 
