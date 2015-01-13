@@ -27,7 +27,28 @@ For support and suggestions, sascha.winter(at)uni-jena.de
 
 Java 7 is needed to run Gecko3.
 If you have a 64-Bit operations system, 64-Bit Java is highly suggested.
-Java 7 and installation instructions are available from http://www.java.com or http://openjdk.java.net
+Java 7 and installation instructions are available from http://www.java.com or http://openjdk.java.net.
+
+1.1 JAVA INSTALLATION
+
+Java 7 and installation instructions are available from http://www.java.com/de/download/manual.jsp
+or http://openjdk.java.net.
+
+Windows: Oracle Java is recommended. Follow this link (http://www.java.com/de/download/manual.jsp)
+and select Windows Offline (64-Bit) (If you have a 32-Bit operation system, you need to choose
+Windows Offline (32-Bit), but will most likely not have enough memory available to use Gecko3).
+Download and afterwards execute the file to install Java.
+
+Linux: OpenJDK 7 is recommended. How to install Java depends on your specific linux distribution.
+You should be able to install Java 7 or Java 8 from your package management system.
+Note: The Oracle Java 8 Version that is available for Ubuntu causes display errors in Gecko3.
+
+Mac OS X >= 10.7.3: Oracle Java is recommended. Follow this link (http://www.java.com/de/download/manual.jsp)
+and select Mac OS X. Download and afterwards execute the file to install Java.
+
+Mac OS X < 10.7.3: Java 7 installation is not possible.
+If you have Lion Mac OS X 10.7.1 or 10.7.2 you need to upgrade to 10.7.3.
+
 
 You can check if and which version of java you have installed from the command line with "java -version".
 The first line should give you the java version, for java 7 something like <java version "1.7.0_67"> (the

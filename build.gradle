@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-version = 1.0
+version = 3
 
 mainClassName = 'de.unijena.bioinf.gecko3.Gecko3'
 
@@ -31,6 +31,10 @@ jar {
         attributes 'Main-Class' : mainClassName
         attributes "Class-Path": configurations.compile.collect { it.getName() }.join(' ')
     }
+}
+
+distZip {
+    archiveName "Gecko" + version+'.zip'
 }
 
 test {
