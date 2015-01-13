@@ -34,25 +34,25 @@ Java 7 and installation instructions are available from http://www.java.com or h
 Java 7 and installation instructions are available from http://www.java.com/de/download/manual.jsp
 or http://openjdk.java.net.
 
-Windows: Oracle Java is recommended. Follow this link (http://www.java.com/de/download/manual.jsp)
+You can check if and which version of java you have installed from the command line with "java -version".
+The first line should give you the java version, for java 7 something like <java version "1.7.0_67"> (the
+second number gives the java version).
+
+1.1.1 WINDOWS: Oracle Java is recommended. Follow this link (http://www.java.com/de/download/manual.jsp)
 and select Windows Offline (64-Bit) (If you have a 32-Bit operation system, you need to choose
-Windows Offline (32-Bit), but will most likely not have enough memory available to use Gecko3).
+Windows Offline (32-Bit), but will most likely not have enough memory available to use Gecko3 with a large data).
 Download and afterwards execute the file to install Java.
 
-Linux: OpenJDK 7 is recommended. How to install Java depends on your specific linux distribution.
+1.1.2 LINUX: OpenJDK 7 is recommended. How to install Java depends on your specific linux distribution.
 You should be able to install Java 7 or Java 8 from your package management system.
 Note: The Oracle Java 8 Version that is available for Ubuntu causes display errors in Gecko3.
 
+1.1.3 MAC OS X:
 Mac OS X >= 10.7.3: Oracle Java is recommended. Follow this link (http://www.java.com/de/download/manual.jsp)
 and select Mac OS X. Download and afterwards execute the file to install Java.
 
 Mac OS X < 10.7.3: Java 7 installation is not possible.
 If you have Lion Mac OS X 10.7.1 or 10.7.2 you need to upgrade to 10.7.3.
-
-
-You can check if and which version of java you have installed from the command line with "java -version".
-The first line should give you the java version, for java 7 something like <java version "1.7.0_67"> (the
-second number gives the java version).
 
 2. USING GECKO 3
 
@@ -66,8 +66,16 @@ described in the following in more detail.
 
 2.1 STARTING GECKO 3
 
+For a 64-Bit operation system, 64-Bit Java is highly recommended.
 Windows: To start Gecko3, go to the bin directory and execute Gecko3.bat
 For Linux and OS X: To start Gecko3, go to the bin directory and execute Gecko3
+
+If you have only 32-Bit Java, there are also 32-Bit starters contained:
+Windows: To start Gecko3 in 32-Bit mode, go to the bin directory and execute Gecko3-32bit.bat
+For Linux and OS X: To start Gecko3 in 32-Bit mode, go to the bin directory and execute Gecko3-32bit
+
+If Gecko3 does not start, run the appropriate file from the command line, to get error messages.
+Most likely, you have no Java or 32-Bit Java and try to run the normal 64-Bit Gecko3 version.
 
 Gecko3 can either be run in commandline mode, '-h' will give all possible
 parameters, that you can, or need to supply.

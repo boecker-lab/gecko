@@ -33,6 +33,24 @@ jar {
     }
 }
 
+task createMoreStartScripts(type: CreateStartScripts) {
+    defaultJvmOpts = ["-Xmx2G"]
+    applicationName = "${startScripts.applicationName}-32bit"
+    mainClassName = startScripts.mainClassName
+    outputDir = startScripts.outputDir
+    classpath = startScripts.classpath
+
+    // Set as a dependent of the builtin startScripts so
+    // all the start scripts are generated together.
+    startScripts.dependsOn name
+
+    // Include the generated scripts in the distribution.
+    applicationDistribution.from(outputDir) {
+        include "${applicationName}", "${applicationName}.bat"
+        into 'bin'
+    }
+}
+
 distZip {
     archiveName "Gecko" + version+'.zip'
 }
