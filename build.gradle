@@ -52,7 +52,7 @@ task createMoreStartScripts(type: CreateStartScripts) {
 }
 
 distZip {
-    archiveName "Gecko" + version+'.zip'
+    archiveName "Gecko-" + version+'.zip'
 }
 
 test {
