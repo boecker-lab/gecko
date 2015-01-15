@@ -103,7 +103,10 @@ public class GeckoInstance {
             default:
                 return -1;
         }
-        return Math.min(maxLength, maxGeneNameLength);
+        if (maxGeneNameLength == Integer.MAX_VALUE)
+            return maxLength;
+        else
+            return maxGeneNameLength;
 	}
 	
 	/*

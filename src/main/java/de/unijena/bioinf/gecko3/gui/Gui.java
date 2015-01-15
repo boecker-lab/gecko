@@ -190,7 +190,7 @@ public class Gui {
         JMenu nameWidthChooser = new JMenu("Gene Width");
         ButtonGroup group = new ButtonGroup();
         boolean useMaxLength = true;
-        for (int i=4; i<=12; i+=2) {
+        for (int i=4; i<=16; i+=2) {
             JRadioButtonMenuItem radioButtonMenuItem = new JRadioButtonMenuItem(Integer.toString(i));
             radioButtonMenuItem.addActionListener(changeGeneWidth);
             if (i==gecko.DEFAULT_MAX_GENE_NAME_LENGTH) {
