@@ -620,8 +620,7 @@ public class Gui {
 			StartComputationDialog d = gecko.getStartComputationDialog();
 			d.setLocationRelativeTo(Gui.this.mainframe);
 			d.setVisible(true);
-			
-			// Set the check box enabled
+
 			Gui.this.mgbViewSwitcher.setEnabled(true);
 		}
 	};
@@ -666,7 +665,6 @@ public class Gui {
 			JPanel authorPane = new JPanel();
 			JEditorPane text = new JEditorPane();
 			text.setContentType("text/html");
-			//text.addHyperlinkListener(new HyperlinkListener());
 			text.setText(
 			"<html>" +
 				"<body>" +
@@ -707,19 +705,20 @@ public class Gui {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			
-			// fix the url for gecko just linking to the bioinformatic page
 			if (Desktop.isDesktopSupported()) {
 				Desktop desktop = Desktop.getDesktop();
-				
-				try {
-					desktop.browse(new URI("http://bio.informatik.uni-jena.de/software/gecko3"));
-				} 
-				catch (IOException e) {
-					new JOptionPane("This option requires a internet connection.", JOptionPane.ERROR_MESSAGE);	
-				} 
-				catch (URISyntaxException e) {
-					new JOptionPane("Wrong URI syntax.", JOptionPane.ERROR_MESSAGE);
+				if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)){
+					try {
+						desktop.browse(new URI("http://bio.informatik.uni-jena.de/software/gecko3"));
+					}
+					catch (IOException e) {
+						JOptionPane.showMessageDialog(Gui.this.getMainframe(), "This option requires a internet connection.", "Could not open web page", JOptionPane.ERROR_MESSAGE);
+					}
+					catch (URISyntaxException e) {
+						JOptionPane.showMessageDialog(Gui.this.getMainframe(), "Wrong URI syntax.", "Could not open web page", JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(Gui.this.getMainframe(), "Webpage available at http://bio.informatik.uni-jena.de/software/gecko3.", "Could not open browser", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 			
