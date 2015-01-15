@@ -29,7 +29,6 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.*;
-import de.unijena.bioinf.gecko3.util.PrintUtils;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -43,7 +42,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 
 public class StartComputationDialog extends JDialog {
@@ -210,7 +208,6 @@ public class StartComputationDialog extends JDialog {
 
 				// Reorder the genomes if necessary
 				if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.genome && refGenomeCombo.getSelectedIndex()!=0) {
-					PrintUtils.printDebug("swapping genomes");
                     gecko.reorderGenomes(refGenomeCombo.getSelectedIndex());
 				} else if (opMode==Parameter.OperationMode.reference && refType==Parameter.ReferenceType.cluster) {
 					Genome cluster = new Genome("Reference cluster");

@@ -97,6 +97,20 @@ public class Gecko3 {
             infile = new File(args[0]);
         }
 
+        GeckoDataReader reader = null;
+        if (infile != null) {
+            String extension = infile.getPath().substring(infile.getPath().lastIndexOf(".") + 1);
+
+            if (extension.equals("gck")) {
+                reader = new GckFileReader(infile);
+            } else if (extension.equals("cog")) {
+                reader = new CogFileReader(infile, options.getGenomeList());
+            } else {
+                printUsage(System.err, parser, new CmdLineException(parser, "Input file is not of type .gck or .cog!"));
+                return;
+            }
+        }
+
         if (args.length <= 1 || options.useGui()) {
             try {
                 Gui.startUp();
@@ -107,17 +121,6 @@ public class Gecko3 {
         }
 
         if (infile != null) {
-            String extension = infile.getPath().substring(infile.getPath().lastIndexOf(".") + 1);
-            GeckoDataReader reader = null;
-
-            if (extension.equals("gck")) {
-                reader = new GckFileReader(infile);
-            } else if (extension.equals("cog")) {
-                reader = new CogFileReader(infile, options.getGenomeList());
-            } else {
-                printUsage(System.err, parser, new CmdLineException(parser, "Input file is not of type .gck or .cog!"));
-                return;
-            }
             try {
                 DataSet data = reader.readData();
                 instance.setCurrentWorkingDirectoryOrFile(infile);

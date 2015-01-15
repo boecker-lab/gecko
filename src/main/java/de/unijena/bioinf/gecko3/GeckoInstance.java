@@ -69,8 +69,7 @@ public class GeckoInstance {
 
     private List<GeneCluster> clusterSelection;
 	private List<GeneCluster> reducedList;
-	
-	private boolean debug = false;
+
 	private boolean animationEnabled = true;
     private Gui gui;
 
@@ -202,14 +201,6 @@ public class GeckoInstance {
     public GeneFamily getGeneFamily(String externalId){
         return data.getGeneFamily(externalId);
     }
-	
-	public void setDebug(boolean debug) {
-		this.debug = debug;
-	}
-	
-	public boolean isDebugEnabled() {
-		return debug;
-	}
 	
 	public void setGui(Gui gui) {
 		this.gui = gui;
@@ -448,6 +439,9 @@ public class GeckoInstance {
                     GeckoInstance.this.mergeClusters(results, p);
                 else
                     GeckoInstance.this.setClusters(results, p);
+                if (gui != null)
+                    JOptionPane.showMessageDialog(gui.getMainframe(),
+                            String.format("Computation done. Detected a total of %d gene clusters!", results.size()));
             } catch (CancellationException e){
                 if (gui != null) {
                     SwingUtilities.invokeLater(new Runnable() {

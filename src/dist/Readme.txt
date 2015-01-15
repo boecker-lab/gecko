@@ -86,6 +86,11 @@ By default, Gecko3 will use a maximum heap size of 6GB (-Xmx6G), set in
 the Gecko3.bat and Gecko3 start scripts. This is sufficient to work with about 1000 Genomes.
 If you need more memory, modify the start script with any text editor, changing
 -Xmx6G to an appropriate value (e.g. -Xmx12G).
+For the Linux/OS X script, this means changing:
+DEFAULT_JVM_OPTS='"-Xmx6G"' to DEFAULT_JVM_OPTS='"-Xmx12G"'
+For the Windows script, this means changing:
+set DEFAULT_JVM_OPTS="-Xmx6G" to set DEFAULT_JVM_OPTS="-Xmx12G"
+
 
 2.2 INPUT DATA FORMAT
 

@@ -34,7 +34,7 @@ jar {
 }
 
 task createMoreStartScripts(type: CreateStartScripts) {
-    defaultJvmOpts = ["-Xmx2G"]
+    defaultJvmOpts = ["-Xmx3G"]
     applicationName = "${startScripts.applicationName}-32bit"
     mainClassName = startScripts.mainClassName
     outputDir = startScripts.outputDir
