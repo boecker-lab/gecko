@@ -84,7 +84,18 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 	private boolean filterNonContainedGenomes;
 
     public enum GenomeFilterMode {
-        None, Include, Exclude
+        None("None"), Include("Include"), Exclude("Exclude");
+
+        private final String toString;
+
+        GenomeFilterMode(String string){
+            toString = string;
+        }
+
+        @Override
+        public String toString() {
+            return toString;
+        }
     }
 	
 	public MultipleGenomesBrowser() {
@@ -574,7 +585,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
             prev.setEnabled(false);
             next.putClientProperty("JButton.buttonType", "bevel");
             next.addActionListener(this);
-            next.setMargin(new Insets(0,0,0,0));
+            next.setMargin(new Insets(0, 0, 0, 0));
             next.setEnabled(false);
             this.sizeReference = sizeReference;
             this.setLayout(new GridLayout(1, 2));
