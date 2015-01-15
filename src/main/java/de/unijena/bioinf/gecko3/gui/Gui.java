@@ -225,23 +225,15 @@ public class Gui {
 		
 		menuAbout.add(aboutAction);
 		menuAbout.add(showHomePage);
-				
-		JToggleButton animationButton = new JToggleButton("Animation");
-		animationButton.setSelected(gecko.isAnimationEnabled());
-		toolbar.add(new JToolBar.Separator());
-		toolbar.add(animationButton);
-		
+
 		toolbar.add(new JToolBar.Separator());
 		
-		mgbViewSwitcher.setText("Hide unclustered genomes");
+		mgbViewSwitcher.setText("Show only supporting genomes");
 		mgbViewSwitcher.setToolTipText("Hides all genomes which are not in the currently selected cluster.");
 		
-		mgbViewSwitcher.addItemListener(new ItemListener()
-		{
-
+		mgbViewSwitcher.addItemListener(new ItemListener(){
 			@Override
-			public void itemStateChanged(ItemEvent arg0) 
-			{	
+			public void itemStateChanged(ItemEvent arg0) {
 				int status = arg0.getStateChange();
 	            JCheckBox mgbViewSwitcher2 = (JCheckBox) arg0.getItemSelectable();
 		    
@@ -254,17 +246,11 @@ public class Gui {
 			}
 			
 		});
+		mgbViewSwitcher.setSelected(true);
 		
 		toolbar.add(mgbViewSwitcher);
 		toolbar.add(Box.createHorizontalGlue());
 		toolbar.add(new JLabel("Search "));
-		
-		animationButton.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				GeckoInstance.getInstance().setAnimationEnabled(((JToggleButton) e.getSource()).isSelected());
-			}
-		});
 	
 		JPanel p = new JPanel(new BorderLayout());
 		searchField.setPreferredSize(new Dimension(150, toolbar.getHeight()));
@@ -379,10 +365,6 @@ public class Gui {
     public void disableProgressBar(){
         progressActive = false;
     }
-
-	/**public JProgressBar getProgressbar() {
-		return progressbar;
-	}*/
 	
 	public void updateViewscreen() {
         if (mgb != null) {
@@ -666,26 +648,51 @@ public class Gui {
 			JEditorPane text = new JEditorPane();
 			text.setContentType("text/html");
 			text.setText(
-			"<html>" +
-				"<body>" +
-					"<center>" +
-						"Gecko 3" +
-						"<br>" +
-						"Tool for searching gene clusters" +
-						"<br>" +
-						"Version 1.0" +
-						"<br>" +
-						"2014, Sascha Winter, Hans-Martin Haase and Tobias Mann" +
-						"<br>" +
-						"Chair of Bioinformatics, Friedrich-Schiller-Universität Jena" +
-						"<br>" +
-						"http://bio.informatik.uni-jena.de" +
-						"<br><br>" +
-						"This program is based on Gecko2 by <br>" +
-						"Katharina Jahn and Leon Kuchenbecker" +
-					"</center>" +
-				"</body>" +
-			"</html>");
+					"<html>" +
+							"<body>" +
+							"<center>" +
+							"Gecko 3" +
+							"<br>" +
+							"Tool for searching gene clusters" +
+							"<br>" +
+							"Version 1.0" +
+							"<br>" +
+							"2014, Sascha Winter, Hans-Martin Haase and Tobias Mann, Katharina Jahn and Leon Kuchenbecker" +
+							"<br>" +
+							"Chair of Bioinformatics, Friedrich-Schiller-Universität Jena" +
+							"<br>" +
+							"http://bio.informatik.uni-jena.de" +
+							"<br>" +
+							"Distributed under the GNU Lesser General Public License Version 3.0"+
+							"<br><br>" +
+							"This program is based on Gecko2 by <br>" +
+							"Katharina Jahn and Leon Kuchenbecker" +
+							"<br><br><br>" +
+							"Copyright 2014 Sascha Winter, Tobias Mann, Hans-Martin Haase, Leon Kuchenbecker and Katharina Jahn" +
+							"<br><br>" +
+							"Gecko3 is free software: you can redistribute it and/or modify" +
+							"<br>" +
+							" it under the terms of the GNU Lesser General Public License as published by" +
+							"<br>" +
+							" the Free Software Foundation, either version 3 of the License, or" +
+							"<br>" +
+							" (at your option) any later version." +
+							"<br><br>" +
+							" Gecko3 is distributed in the hope that it will be useful," +
+							"<br>" +
+							" but WITHOUT ANY WARRANTY; without even the implied warranty of" +
+							"<br>" +
+							" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the" +
+							"<br>" +
+							" GNU Lesser General Public License for more details." +
+							"<br><br>" +
+							" You should have received a copy of the GNU Lesser General Public License" +
+							"<br>" +
+							" along with Gecko3.  If not, see <http://www.gnu.org/licenses/>."+
+							"<br>" +
+							"</center>" +
+							"</body>" +
+							"</html>");
 	
 			text.setEditable(false);
 			text.setBackground(about.getContentPane().getBackground());

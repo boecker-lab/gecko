@@ -70,7 +70,6 @@ public class GeckoInstance {
     private List<GeneCluster> clusterSelection;
 	private List<GeneCluster> reducedList;
 
-	private boolean animationEnabled = true;
     private Gui gui;
 
     private StartComputationDialog scd = null;
@@ -131,14 +130,6 @@ public class GeckoInstance {
     public List<GeneCluster> computeReferenceStatistics(int[][][] genomes, Parameter params, List<GeneCluster> cluster, GeckoInstance gecko) {
         return new ArrayList<>(Arrays.asList(computeReferenceStatistics(genomes, params, cluster.toArray(new GeneCluster[cluster.size()]), gecko)));
     }
-	
-	public void setAnimationEnabled(boolean animationEnabled) {
-		this.animationEnabled = animationEnabled;
-	}
-	
-	public boolean isAnimationEnabled() {
-		return animationEnabled;
-	}
 	
 	public boolean isLibgeckoLoaded() {
 		return libgeckoLoaded;
