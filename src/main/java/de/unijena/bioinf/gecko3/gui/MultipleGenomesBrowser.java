@@ -332,14 +332,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 		Subsequence[][] subseqs = gOcc.getSubsequences();
 		for (int i=0; i<subseqs.length;i++) {
 			GBNavigator gbn = gbNavigators.get(i);
-			if (subselection[i]<subseqs[i].length-1)
-				gbn.getNext().setEnabled(true);
-			else
-				gbn.getNext().setEnabled(false);
-			if (subselection[i]>0)
-				gbn.getPrev().setEnabled(true);
-			else
-				gbn.getPrev().setEnabled(false);
+            gbn.updateButtons(subselection[i], subseqs[i]);
 		}
 	}
 	
@@ -571,24 +564,18 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
             }
         };
 
-        public JButton getPrev() {
-            return prev;
-        }
-
-        public JButton getNext() {
-            return next;
-        }
-
         public GBNavigator(JComponent sizeReference, int genome) {
             this.genome = genome;
             sizeReference.addComponentListener(componentListener);
             this.setBackground(Color.WHITE);
             prev.putClientProperty("JButton.buttonType", "bevel");
             prev.addActionListener(this);
-            prev.setMargin(new Insets(0,0,0,0));
+            prev.setMargin(new Insets(0, 0, 0, 0));
+            prev.setEnabled(false);
             next.putClientProperty("JButton.buttonType", "bevel");
             next.addActionListener(this);
             next.setMargin(new Insets(0,0,0,0));
+            next.setEnabled(false);
             this.sizeReference = sizeReference;
             this.setLayout(new GridLayout(1, 2));
             this.add(prev);
@@ -624,6 +611,22 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
                         clusterLocationSelection.includeSubOptimalOccurrences(),
                         subselections));
             }
+        }
+
+        /**
+         * Updates the buttons for the given sub selection in the given sub sequence
+         * @param subselection
+         * @param subseq
+         */
+        public void updateButtons(int subselection, Subsequence[] subseq) {
+            if (subselection<subseq.length-1)
+                next.setEnabled(true);
+            else
+                next.setEnabled(false);
+            if (subselection>0)
+                prev.setEnabled(true);
+            else
+                prev.setEnabled(false);
         }
     }
 }
