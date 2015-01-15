@@ -630,76 +630,81 @@ public class Gui {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			JDialog about = new JDialog();
-			about.getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-			about.getRootPane().setBackground(about.getContentPane().getBackground());
-			about.setIconImages(Gui.this.getMainframe().getIconImages());
-			about.setTitle("About Gecko3");
-			about.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-			about.setLayout(new BorderLayout());
-			
-			JLabel iconLabel = new JLabel();
-			iconLabel.setIcon(createImageIcon("images/geckoIcons/Gecko3.178.png"));
-			JPanel iconPanel = new JPanel();
-			iconPanel.add(iconLabel);
-			about.add(iconPanel, BorderLayout.NORTH);
-			
-			JPanel authorPane = new JPanel();
-			JEditorPane text = new JEditorPane();
-			text.setContentType("text/html");
-			text.setText(
-					"<html>" +
-							"<body>" +
-							"<center>" +
-							"Gecko 3" +
-							"<br>" +
-							"Tool for searching gene clusters" +
-							"<br>" +
-							"Version 1.0" +
-							"<br>" +
-							"2014, Sascha Winter, Hans-Martin Haase and Tobias Mann, Katharina Jahn and Leon Kuchenbecker" +
-							"<br>" +
-							"Chair of Bioinformatics, Friedrich-Schiller-Universität Jena" +
-							"<br>" +
-							"http://bio.informatik.uni-jena.de" +
-							"<br>" +
-							"Distributed under the GNU Lesser General Public License Version 3.0"+
-							"<br><br>" +
-							"This program is based on Gecko2 by <br>" +
-							"Katharina Jahn and Leon Kuchenbecker" +
-							"<br><br><br>" +
-							"Copyright 2014 Sascha Winter, Tobias Mann, Hans-Martin Haase, Leon Kuchenbecker and Katharina Jahn" +
-							"<br><br>" +
-							"Gecko3 is free software: you can redistribute it and/or modify" +
-							"<br>" +
-							" it under the terms of the GNU Lesser General Public License as published by" +
-							"<br>" +
-							" the Free Software Foundation, either version 3 of the License, or" +
-							"<br>" +
-							" (at your option) any later version." +
-							"<br><br>" +
-							" Gecko3 is distributed in the hope that it will be useful," +
-							"<br>" +
-							" but WITHOUT ANY WARRANTY; without even the implied warranty of" +
-							"<br>" +
-							" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the" +
-							"<br>" +
-							" GNU Lesser General Public License for more details." +
-							"<br><br>" +
-							" You should have received a copy of the GNU Lesser General Public License" +
-							"<br>" +
-							" along with Gecko3.  If not, see <http://www.gnu.org/licenses/>."+
-							"<br>" +
-							"</center>" +
-							"</body>" +
-							"</html>");
-	
-			text.setEditable(false);
-			text.setBackground(about.getContentPane().getBackground());
-			authorPane.add(text, BorderLayout.CENTER);
-			about.add(authorPane);
-			about.pack();
-			about.setVisible(true);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					JDialog about = new JDialog();
+					about.getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+					about.getRootPane().setBackground(about.getContentPane().getBackground());
+					about.setIconImages(Gui.this.getMainframe().getIconImages());
+					about.setTitle("About Gecko3");
+					about.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+					about.setLayout(new BorderLayout());
+
+					JLabel iconLabel = new JLabel();
+					iconLabel.setIcon(createImageIcon("images/geckoIcons/Gecko3.178.png"));
+					JPanel iconPanel = new JPanel();
+					iconPanel.add(iconLabel);
+					about.add(iconPanel, BorderLayout.NORTH);
+
+					JPanel authorPane = new JPanel();
+					JEditorPane text = new JEditorPane();
+					text.setContentType("text/html");
+					text.setText(
+							"<html>" +
+									"<body>" +
+									"<center>" +
+									"Gecko 3" +
+									"<br>" +
+									"Tool for searching gene clusters" +
+									"<br>" +
+									"Version 1.0" +
+									"<br>" +
+									"2014, Sascha Winter, Hans-Martin Haase and Tobias Mann, Katharina Jahn and Leon Kuchenbecker" +
+									"<br>" +
+									"Chair of Bioinformatics, Friedrich-Schiller-Universität Jena" +
+									"<br>" +
+									"http://bio.informatik.uni-jena.de" +
+									"<br>" +
+									"Distributed under the GNU Lesser General Public License Version 3.0"+
+									"<br><br>" +
+									"This program is based on Gecko2 by <br>" +
+									"Katharina Jahn and Leon Kuchenbecker" +
+									"<br><br><br>" +
+									"Copyright 2014 Sascha Winter, Tobias Mann, Hans-Martin Haase, Leon Kuchenbecker and Katharina Jahn" +
+									"<br><br>" +
+									"Gecko3 is free software: you can redistribute it and/or modify" +
+									"<br>" +
+									" it under the terms of the GNU Lesser General Public License as published by" +
+									"<br>" +
+									" the Free Software Foundation, either version 3 of the License, or" +
+									"<br>" +
+									" (at your option) any later version." +
+									"<br><br>" +
+									" Gecko3 is distributed in the hope that it will be useful," +
+									"<br>" +
+									" but WITHOUT ANY WARRANTY; without even the implied warranty of" +
+									"<br>" +
+									" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the" +
+									"<br>" +
+									" GNU Lesser General Public License for more details." +
+									"<br><br>" +
+									" You should have received a copy of the GNU Lesser General Public License" +
+									"<br>" +
+									" along with Gecko3.  If not, see <http://www.gnu.org/licenses/>."+
+									"<br>" +
+									"</center>" +
+									"</body>" +
+									"</html>");
+
+					text.setEditable(false);
+					text.setBackground(about.getContentPane().getBackground());
+					authorPane.add(text, BorderLayout.CENTER);
+					about.add(authorPane);
+					about.pack();
+					about.setVisible(true);
+				}
+			});
 		}
 	};
 	
