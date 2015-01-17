@@ -303,7 +303,9 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
                         clusterLocationSelection.getSubsequence(i).getChromosome(),
                         clusterLocationSelection.getAlignmentGenePosition(i));
             else if (clusterLocationSelection.getSubsequence(i) != null)
-                scrollToPosition(i, clusterLocationSelection.getSubsequence(i).getChromosome(), (clusterLocationSelection.getSubsequence(i).getStart() - 1 + clusterLocationSelection.getSubsequence(i).getStop() - 1) / 2);
+                scrollToPosition(i,
+                        clusterLocationSelection.getSubsequence(i).getChromosome(),
+                        (clusterLocationSelection.getSubsequence(i).getStart() - 1 + clusterLocationSelection.getSubsequence(i).getStop() - 1) / 2);
         }
 	}
 	

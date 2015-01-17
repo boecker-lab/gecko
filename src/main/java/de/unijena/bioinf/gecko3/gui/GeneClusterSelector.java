@@ -90,7 +90,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 		showSuboptimalCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fireSelectionEvent(true);
+                fireSelectionEvent();
             }
         });
 
@@ -154,7 +154,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
                     return;
                 GeneCluster gc = gcs.get(0);
                 if (!(gc.getType() == Parameter.OperationMode.reference)) {
-                    fireSelectionEvent(false);
+                    fireSelectionEvent();
                 }
             }
         });
@@ -175,7 +175,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    fireSelectionEvent(true);
+                    fireSelectionEvent();
                 } else {
                     if (e.getClickCount() == 1) {
                         table.requestFocus();
@@ -206,7 +206,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    fireSelectionEvent(true);
+                    fireSelectionEvent();
                     e.consume();
                 }
             }
@@ -281,7 +281,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
                     return;
                 GeneCluster gc = gcs.get(0);
 				if (mgb.getClusterSelection() == null || !gc.equals(mgb.getClusterSelection().getCluster()))
-					fireSelectionEvent(true);
+					fireSelectionEvent();
 				GeneClusterExportDialog d = new GeneClusterExportDialog(GeckoInstance.getInstance().getGui().getMainframe(), mgb.getClusterSelection());
 				d.setVisible(true);
 			}
@@ -449,7 +449,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
         }
     }
 	
-	private void fireSelectionEvent(boolean instant) {
+	private void fireSelectionEvent() {
 		int row = table.getSelectedRow();
 		
 		if (row < 0) return;
@@ -462,8 +462,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 		if (gc.getType() == Parameter.OperationMode.center || gc.getType() == Parameter.OperationMode.median) {
 			showSuboptimalCheckBox.setVisible(false);
 			fireSelectionEvent(new ClusterSelectionEvent(GeneClusterSelector.this, 
-					gc,
-					instant));
+					gc));
 		} 
 		else {
 			showSuboptimalCheckBox.setVisible(true);
@@ -473,8 +472,7 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 			fireSelectionEvent(new LocationSelectionEvent(GeneClusterSelector.this,
 					gc,
 					showSuboptimalCheckBox.isSelected(),
-					subSelections,
-					instant));
+					subSelections));
 		}
 	}
 

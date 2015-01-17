@@ -36,14 +36,10 @@ public class LocationSelectionEvent extends ClusterSelectionEvent {
 	private final int[] subselection;
 	private final boolean includeSubOptimalOccurrences;
 	
-	public LocationSelectionEvent(Object source, GeneCluster gc, boolean includeSubOptimalOccurrences, int[] subselection, boolean instant) {
-		super(source, gc, instant);
+	public LocationSelectionEvent(Object source, GeneCluster gc, boolean includeSubOptimalOccurrences, int[] subselection) {
+		super(source, gc);
 		this.includeSubOptimalOccurrences = includeSubOptimalOccurrences;
 		this.subselection = subselection;
-	}
-	
-	public LocationSelectionEvent(Object source, GeneCluster gc, boolean includeSubOptimalOccurrences, int[] subselection) {
-		this(source,gc,includeSubOptimalOccurrences,subselection,false);
 	}
 	
 	public int[] getsubselection() {

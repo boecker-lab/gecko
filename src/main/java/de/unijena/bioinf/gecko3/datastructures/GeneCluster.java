@@ -599,6 +599,14 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
         return getGeneClusterLocationSelection(geneFamily, subSelection, includeSubOptimalOccurrences, genomes);
     }
 
+	/**
+	 * Returns the location selection of the given cluster, for the given GeneFamily and subselection
+	 * @param geneFamily
+	 * @param subSelection
+	 * @param includeSubOptimalOccurrences
+	 * @param genomes
+	 * @return
+	 */
     public GeneClusterLocationSelection getGeneClusterLocationSelection(GeneFamily geneFamily, int[] subSelection, boolean includeSubOptimalOccurrences, Genome[] genomes){
         int[] alignmentGenesClusterPosition = new int[subSelection.length];
         boolean[] flipped = new boolean[subSelection.length];
