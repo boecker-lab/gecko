@@ -20,6 +20,9 @@
 package de.unijena.bioinf.gecko3.event;
 
 import de.unijena.bioinf.gecko3.datastructures.GeneCluster;
+import de.unijena.bioinf.gecko3.datastructures.GeneFamily;
+
+import java.util.Arrays;
 
 /**
  * 
@@ -35,17 +38,27 @@ public class LocationSelectionEvent extends ClusterSelectionEvent {
 	
 	private final int[] subselection;
 	private final boolean includeSubOptimalOccurrences;
-	
+	private final GeneFamily alignmentGeneFamily;
+
 	public LocationSelectionEvent(Object source, GeneCluster gc, boolean includeSubOptimalOccurrences, int[] subselection) {
+		this(source, gc, includeSubOptimalOccurrences, subselection, null);
+	}
+	
+	public LocationSelectionEvent(Object source, GeneCluster gc, boolean includeSubOptimalOccurrences, int[] subselection, GeneFamily alignmentGeneFamily) {
 		super(source, gc);
 		this.includeSubOptimalOccurrences = includeSubOptimalOccurrences;
 		this.subselection = subselection;
+		this.alignmentGeneFamily = alignmentGeneFamily;
 	}
 	
-	public int[] getsubselection() {
+	public int[] getSubselection() {
 		return subselection;
 	}
-	
+
+	public GeneFamily getAlignmentGeneFamily() {
+		return alignmentGeneFamily;
+	}
+
 	public boolean includeSubOptimalOccurrences() {
 		return includeSubOptimalOccurrences;
 	}

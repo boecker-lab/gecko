@@ -657,7 +657,7 @@ public class GeneCluster implements Serializable, Comparable<GeneCluster> {
             }
         }
         int[] alignmentGenesGlobal = getGeneFamilyChromosomePositions(alignmentGenesClusterPosition, subSelection, includeSubOptimalOccurrences);
-        return new GeneClusterLocationSelection(genomes, this, subSelection, includeSubOptimalOccurrences, flipped, alignmentGenesClusterPosition, alignmentGenesGlobal);
+        return new GeneClusterLocationSelection(genomes, this, subSelection, includeSubOptimalOccurrences, flipped, geneFamily, alignmentGenesClusterPosition, alignmentGenesGlobal);
     }
 
     /**

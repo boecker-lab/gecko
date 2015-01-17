@@ -21,7 +21,6 @@ package de.unijena.bioinf.gecko3.gui;
 
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.*;
@@ -144,7 +143,7 @@ public class GeneClusterDisplay extends JScrollPane implements ClusterSelectionL
         reset();
 
 		if (cluster!=null) {
-			subselections = l.getsubselection();
+			subselections = l.getSubselection();
             includeSubOptimalOccurrences = l.includeSubOptimalOccurrences();
 
             this.setGeneData();

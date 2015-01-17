@@ -39,6 +39,7 @@ public class GeneClusterLocationSelection {
     /*
      * Cluster alignment information, might be null
      */
+    private final GeneFamily alignmentGeneFamily;
     private final int[] alignmentGeneCluster;
     private final int[] alignmentGeneChromosome;
 
@@ -50,15 +51,16 @@ public class GeneClusterLocationSelection {
     private int[] paintOffset;
 
     public GeneClusterLocationSelection(Genome[] genomes, GeneCluster cluster, int[] subselection, boolean includeSubOptimalOccurrences){
-        this(genomes, cluster, subselection, includeSubOptimalOccurrences, null, null, null);
+        this(genomes, cluster, subselection, includeSubOptimalOccurrences, null, null, null, null);
     }
 
-    public GeneClusterLocationSelection(Genome[] genomes, GeneCluster cluster, int[] subselection, boolean includeSubOptimalOccurrences, boolean[] flipped, int[] alignmentGeneCluster, int[] alignmentGeneChromosome) {
+    public GeneClusterLocationSelection(Genome[] genomes, GeneCluster cluster, int[] subselection, boolean includeSubOptimalOccurrences, boolean[] flipped, GeneFamily alignmentGeneFamily, int[] alignmentGeneCluster, int[] alignmentGeneChromosome) {
         this.genomes = genomes;
         this.cluster = cluster;
         this.subselection = subselection;
         this.includeSubOptimalOccurrences = includeSubOptimalOccurrences;
         this.flipped = flipped;
+        this.alignmentGeneFamily = alignmentGeneFamily;
         this.alignmentGeneCluster = alignmentGeneCluster;
         this.alignmentGeneChromosome = alignmentGeneChromosome;
         this.paintWidth = -1;
@@ -115,6 +117,10 @@ public class GeneClusterLocationSelection {
             }
         }
         return geneFamilies;
+    }
+
+    public GeneFamily getAlignmentGeneFamily() {
+        return alignmentGeneFamily;
     }
 
     /**

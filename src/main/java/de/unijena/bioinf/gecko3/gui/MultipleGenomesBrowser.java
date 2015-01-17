@@ -349,12 +349,8 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 		}
 	}
 	
-	private void visualizeCluster(GeneCluster gc, boolean includeSuboptimalOccs, int[] subselection) {
+	private void visualizeCluster(GeneCluster gc, boolean includeSuboptimalOccs, int[] subselection, GeneFamily alignmentGeneFamily) {
 		clearHighlight();
-		/*if (gc.getType()== Parameter.OperationMode.reference)
-			rightPanel.setVisible(true);
-		else
-			rightPanel.setVisible(false);*/
 		updateButtons(gc.getOccurrences(includeSuboptimalOccs),subselection);
 		for (int i=0;i<subselection.length;i++) {
 			if (subselection[i]==GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
@@ -368,7 +364,9 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 			} else {
 				genomeBrowsers.get(i).highlightCluster(s.getChromosome(), s.getStart() - 1, s.getStop() - 1, COLOR_HIGHLIGHT_DEFAULT);
 			}
-		}		
+		}
+        if (alignmentGeneFamily != null)
+            centerCurrentClusterAt(alignmentGeneFamily);
 	}
 
 	/*
@@ -408,7 +406,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
             LocationSelectionEvent lastLocationEvent = (LocationSelectionEvent) e;
 
             // save the currently selected cluster for the filter function
-            clusterLocationSelection = new GeneClusterLocationSelection(gecko.getGenomes(), lastLocationEvent.getSelection(), lastLocationEvent.getsubselection(), lastLocationEvent.includeSubOptimalOccurrences());
+            clusterLocationSelection = new GeneClusterLocationSelection(gecko.getGenomes(), lastLocationEvent.getSelection(), lastLocationEvent.getSubselection(), lastLocationEvent.includeSubOptimalOccurrences());
 
 			// deactivate the filter if active
 			//this.hideNonClusteredGenomes(false);
@@ -418,7 +416,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 				applyHideNonClusteredGenomesFilter();
 			
 			if (e.getSelection()!=null)
-				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.includeSubOptimalOccurrences(), lastLocationEvent.getsubselection());
+				visualizeCluster(lastLocationEvent.getSelection(), lastLocationEvent.includeSubOptimalOccurrences(), lastLocationEvent.getSubselection(), lastLocationEvent.getAlignmentGeneFamily());
 		}
 	}
 
@@ -622,7 +620,8 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
                 fireSelectionEvent(new LocationSelectionEvent(MultipleGenomesBrowser.this,
                         clusterLocationSelection.getCluster(),
                         clusterLocationSelection.includeSubOptimalOccurrences(),
-                        subselections));
+                        subselections,
+                        clusterLocationSelection.getAlignmentGeneFamily()));
             }
         }
 
