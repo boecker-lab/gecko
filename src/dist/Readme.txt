@@ -1,5 +1,6 @@
 /*
- * Copyright 2014 Sascha Winter, Tobias Mann, Hans-Martin Haase, Leon Kuchenbecker and Katharina Jahn
+ * Copyright 2014 Sascha Winter, Tobias Mann, Hans-Martin Haase, Leon
+ Kuchenbecker and Katharina Jahn
  *
  * This file is part of Gecko3.
  *
@@ -25,18 +26,19 @@ For support and suggestions, sascha.winter(at)uni-jena.de
 
 1. INSTALLATION
 
-Java 7 is needed to run Gecko3.
-If you have a 64-Bit operations system, 64-Bit Java is highly suggested.
-Java 7 and installation instructions are available from http://www.java.com or http://openjdk.java.net.
+Java 7 is needed to run Gecko3.  If you have a 64-Bit operations system,
+64-Bit Java is highly suggested.  Java 7 and installation instructions are
+available from http://www.java.com or http://openjdk.java.net
+
+You can check if and which version of java you have installed from the
+command line with "java -version".  The first line should give you the java
+version, for java 7 something like <java version "1.7.0_67"> (the second
+number gives the java version).
 
 1.1 JAVA INSTALLATION
 
 Java 7 and installation instructions are available from http://www.java.com/de/download/manual.jsp
 or http://openjdk.java.net.
-
-You can check if and which version of java you have installed from the command line with "java -version".
-The first line should give you the java version, for java 7 something like <java version "1.7.0_67"> (the
-second number gives the java version).
 
 1.1.1 WINDOWS: Oracle Java is recommended. Follow this link (http://www.java.com/de/download/manual.jsp)
 and select Windows Offline (64-Bit) (If you have a 32-Bit operation system, you need to choose
@@ -71,26 +73,29 @@ Windows: To start Gecko3, go to the bin directory and execute Gecko3.bat
 For Linux and OS X: To start Gecko3, go to the bin directory and execute Gecko3
 
 If you have only 32-Bit Java, there are also 32-Bit starters contained:
-Windows: To start Gecko3 in 32-Bit mode, go to the bin directory and execute Gecko3-32bit.bat
-For Linux and OS X: To start Gecko3 in 32-Bit mode, go to the bin directory and execute Gecko3-32bit
+Windows: To start Gecko3 in 32-Bit mode, go to the bin directory and execute
+Gecko3-32bit.bat
+For Linux and OS X: To start Gecko3 in 32-Bit mode, go to the bin directory
+and execute Gecko3-32bit
 
-If Gecko3 does not start, run the appropriate file from the command line, to get error messages.
-Most likely, you have no Java or 32-Bit Java and try to run the normal 64-Bit Gecko3 version.
+If Gecko3 does not start, run the appropriate file from the command line, to
+get error messages. Most likely, you have no Java or 32-Bit Java and try to
+run the normal 64-Bit Gecko3 version.
 
 Gecko3 can either be run in commandline mode, '-h' will give all possible
-parameters, that you can, or need to supply.
-Or it can be used in GUI mode, if started without any
-parameters, or just a *.gck or *.cog input file that will be automatically loaded.
+parameters, that you can, or need to supply.  Or it can be used in GUI mode,
+if started without any parameters, or just a *.gck or *.cog input file that
+will be automatically loaded.
 
-By default, Gecko3 will use a maximum heap size of 6GB (-Xmx6G), set in
-the Gecko3.bat and Gecko3 start scripts. This is sufficient to work with about 1000 Genomes.
-If you need more memory, modify the start script with any text editor, changing
--Xmx6G to an appropriate value (e.g. -Xmx12G).
+By default, Gecko3 will use a maximum heap size of 6GB (-Xmx6G), set in the
+Gecko3.bat and Gecko3 start scripts. This is sufficient to work with about
+1000 bacterial genomes.  If you need/have more memory, modify the start
+script with any text editor, changing -Xmx6G to an appropriate value
+(e.g. -Xmx12G).
 For the Linux/OS X script, this means changing:
 DEFAULT_JVM_OPTS='"-Xmx6G"' to DEFAULT_JVM_OPTS='"-Xmx12G"'
 For the Windows script, this means changing:
 set DEFAULT_JVM_OPTS="-Xmx6G" to set DEFAULT_JVM_OPTS="-Xmx12G"
-
 
 2.2 INPUT DATA FORMAT
 
@@ -114,10 +119,10 @@ GenomeName <COMMA> Descriptive Text  <NEWLINE>
 Descriptive Text (ignored) <NEWLINE>
 <Genome Content> <NEWLINE>
 
-Where in <Genome Content> each line contains information about the
-family and function of single genes in the order of their
-occurrence in the genome in one of two different formats
-(if unique locus tags are available, the second format is preferred):
+Where in <Genome Content> each line contains information about the family and
+function of single genes in the order of their occurrence in the genome in
+one of two different formats (if unique locus tags are available, the second
+format is preferred):
 
 <Homology> <TAB> Strand (+ or -) <TAB> functional category <TAB> Gene Name <TAB> functional annotation <NEWLINE>
 
@@ -125,13 +130,14 @@ or
 
 <Homology> <TAB> Strand (+ or -) <TAB> functional category <TAB> Gene Name <TAB> functional annotation <TAB> Locus Tag <TAB> product <NEWLINE>
 
-<Homology> can be any word or number, not containing ",". All genes with the same entry
-will be in one homology family. All genes with the empty string or
-0 will be treated as un-homologue. Multiple gene families can be assigned to one gene
-(see Example 2, second gene), as comma separated entries. Gecko will for visualisation
-and computation split the one gene with multiple gene families into multiple gene with
-one gene family each, in the order given in the .cog file.
-Locus Tag should be an unique tag for each gene in the data set.
+<Homology> can be any word or number, not containing ",". All genes with the
+same entry will be in one homology family. All genes with the empty string or
+0 will be treated as un-homologue. Multiple gene families can be assigned to
+one gene (see Example 2, second gene), as comma separated entries. Gecko will
+for visualisation and computation split the one gene with multiple gene
+families into multiple gene with one gene family each, in the order given in
+the .cog file.  Locus Tag should be an unique tag for each gene in the data
+set.
 
 Example 1 for the format without locus tag:
 
@@ -176,81 +182,84 @@ contained genes, and gene annotations.
 
 2.4 CLUSTER DETECTION
 
-When clicking the 'start computation" button, the user is asked to
-select a search mode, as well as global and model-dependent parameters
-before the actual search begins.
-In the simple "Single Distance" mode the minimum cluster size and the maximum distance
-have to be set. The distance threshold determines the maximum pair-wise distance
-between the reference set, and each approximate occurrence. The minimum size gives the minimum
-number of genes a gene cluster has to contain, to be reported.
-As an alternative in "Distance Table" mode, for each size, a maximum number of gene losses, a maximum number of
-gene insertions and the maximum sum of losses and insertions can be set. A right click in the table allows to
-add or delete rows or reset the table to some parameters we used in different publications.
-For both modes, the minimum number of genomes a cluster has to appear in (quorum parameter)
-can be set. By default, this value is set to the number of selected genomes. Then, only gene clusters
-with an approximate occurrence in all genomes are reported.
+When clicking the 'start computation" button, the user is asked to select a
+search mode, as well as global and model-dependent parameters before the
+actual search begins.  In the simple "Single Distance" mode the minimum
+cluster size and the maximum distance have to be set. The distance threshold
+determines the maximum pair-wise distance between the reference set, and each
+approximate occurrence. The minimum size gives the minimum number of genes a
+gene cluster has to contain, to be reported.  As an alternative in "Distance
+Table" mode, for each size, a maximum number of gene losses, a maximum number
+of gene insertions and the maximum sum of losses and insertions can be set. A
+right click in the table allows to add or delete rows or reset the table to
+some parameters we used in different publications.  For both modes, the
+minimum number of genomes a cluster has to appear in (quorum parameter) can
+be set. By default, this value is set to the number of selected
+genomes. Then, only gene clusters with an approximate occurrence in all
+genomes are reported.
 
-Additional, one can chose between three sub-modes. In
-the 'all against all' mode, gene cluster are predicted using all input
-genomes one after the other as reference genome. In the 'fixed genome'
-mode only one genome is used as reference. It can be chosen from a
-drop-down list containing the previously selected genomes. You can filter the list by typing in the text field.
-In the 'manual cluster' mode, a sequence of genes can be typed in manually, or
-pasted when e. g. copying a cluster from the result list of a previous
-run of Gecko3.
+Additional, one can chose between three sub-modes. In the 'all against all'
+mode, gene cluster are predicted using all input genomes one after the other
+as reference genome. In the 'fixed genome' mode only one genome is used as
+reference. It can be chosen from a drop-down list containing the previously
+selected genomes. You can filter the list by typing in the text field.  In
+the 'manual cluster' mode, a sequence of genes can be typed in manually, or
+pasted when e. g. copying a cluster from the result list of a previous run of
+Gecko3.
 
-Finally, by checking "Search Ref. in Ref.", each reference genome will also search for occurrences of the cluster in
-the reference genome.
+Finally, by checking "Search Ref. in Ref.", each reference genome will also
+search for occurrences of the cluster in the reference genome.
 
 After all parameters are set, computation can be started by clicking the 'OK' button.
 
 2.5 GRAPHICAL EVALUATION
 
-After completion of computations, results are shown in tabular form
-below the genome browser. The table contains the list of all predicted
-gene clusters, listing a unique id, the number of genes, the number of included
-genomes, the score of the best occurrence combination (negative
-logarithm of p-value, and negative logarithm of FDR corrected p-value)
-and a list with the gene families of the genes in the reference occurrence.
-By default, the gene cluster list is sorted by decreasing score, but clicking on the table header
-will sort or inverse sort the clusters according to the selected column.
-A gene cluster can be selected with a double-click on the entry -- its best
-occurrence will then be visualized by the genome browser, and details
-about the cluster will be displayed in an information area. Additional
-(and, if enabled by the user, also suboptimal) occurrences can be
-selected with navigation buttons next to the genomes.
-On top of the genome browser, one can choose to hide un-clustered genomes.
-By default a chosen cluster will be centered on the screen. To manually align a cluster,
-you can scroll or drag and drop each genome browser to the left or right. SHIFT + Double Click
-on a genome browser will invert the genome. A Double Click on a single gene will align
-the cluster using this gene family as an anchor.
+After completion of computations, results are shown in tabular form below the
+genome browser. The table contains the list of all predicted gene clusters,
+listing a unique id, the number of genes, the number of included genomes, the
+score of the best occurrence combination (negative logarithm of p-value, and
+negative logarithm of FDR corrected p-value) and a list with the gene
+families of the genes in the reference occurrence.  By default, the gene
+cluster list is sorted by decreasing score, but clicking on the table header
+will sort or inverse sort the clusters according to the selected column.  A
+gene cluster can be selected with a double-click on the entry -- its best
+occurrence will then be visualized by the genome browser, and details about
+the cluster will be displayed in an information area. Additional (and, if
+enabled by the user, also suboptimal) occurrences can be selected with
+navigation buttons next to the genomes.  On top of the genome browser, one
+can choose to hide un-clustered genomes.  By default a chosen cluster will be
+centered on the screen. To manually align a cluster, you can scroll or drag
+and drop each genome browser to the left or right. SHIFT + Double Click on a
+genome browser will invert the genome. A Double Click on a single gene will
+align the cluster using this gene family as an anchor.
 
-The visualization of a selected gene cluster has been optimized to allow
-for an easy inspection of the gene cluster -- the genome browser allows
-to visualize the neighborhood on each genome, mouse over tooltips provide
-the user with the annotation data available for genes or chromosomes,
-and the information area allows for a more detailed inspection of the
-search result.
+The visualization of a selected gene cluster has been optimized to allow for
+an easy inspection of the gene cluster -- the genome browser allows to
+visualize the neighborhood on each genome, mouse over tooltips provide the
+user with the annotation data available for genes or chromosomes, and the
+information area allows for a more detailed inspection of the search result.
 
 2.6 FILTERING AND SEARCHING
 
-Under the table different filter modes for the results can be chosen.
-Either all gene clusters are shown ("showAll"), for all overlapping occurrences,
+Under the table different filter modes for the results can be chosen.  Either
+all gene clusters are shown ("showAll"), for all overlapping occurrences,
 only the best scoring one is reported ("showFiltered"), or only selected
-clusters are shown. Clusters can be selected by right clicking on the table columns and
-choosing "Add to selection" or "Add all in list to selection".
+clusters are shown. Clusters can be selected by right clicking on the table
+columns and choosing "Add to selection" or "Add all in list to selection".
 
-In the top right corner of the gui, it is possible to filter for clusters containing
-individual genes or functional gene annotations by typing the respective information
-into the 'Search' field above the genome browser.
+In the top right corner of the gui, it is possible to filter for clusters
+containing individual genes or functional gene annotations by typing the
+respective information into the 'Search' field above the genome browser.
 
-In front of each genome in the genome browser, one can choose between "None", "Include" and "Exclude".
-"None" means no additional filtering. With "Include" the Gene Cluster Table will only contain clusters,
-that include the genome, when choosing "Exclude", the table will only contain clusters, that do not contain
-the genome.
+In front of each genome in the genome browser, one can choose between "None",
+"Include" and "Exclude".  "None" means no additional filtering. With
+"Include" the Gene Cluster Table will only contain clusters, that include the
+genome, when choosing "Exclude", the table will only contain clusters, that
+do not contain the genome.
 
-By right Clicking on a gene cluster in the table, one can choose "Show similar clusters". This will automatically
-enter all gene families from this cluster into the search field.
+By right Clicking on a gene cluster in the table, one can choose "Show
+similar clusters". This will automatically enter all gene families from this
+cluster into the search field.
 
 2.7 SAVING A GECKO 3 SESSION
 
@@ -271,8 +280,5 @@ Results can be exported via 'File'->'Export results' in different data formats.
 9. "pdf" all clusters as a single pdf picture(not all pdf viewers will be able to open this, due to the size).
 10. "multiPdf" a zip file containing one pdf picture for each cluster.
 
-If you right click on a single cluster in the table, you can select "Export gene cluster" to export this single cluster
-as a picture (pdf, jpg or png).
-
-
-
+If you right click on a single cluster in the table, you can select "Export
+gene cluster" to export this single cluster as a picture (pdf, jpg or png).
