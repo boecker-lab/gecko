@@ -388,18 +388,4 @@ public class DeltaTable extends JPanel {
             model.setDeltaTable(value);
         }
     }
-
-    public static void main(String[] argv){
-        JFrame frame = new JFrame();
-        final DeltaTable t = new DeltaTable();
-        frame.add(t);
-        frame.pack();
-        frame.setVisible(true);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(t.getPreferredSize());
-            }
-        });
-    }
 }

@@ -22,7 +22,7 @@ USER MANUAL
 -----------
 
 CONTACT
-For support and suggestions, sascha.winter(at)uni-jena.de
+For support and suggestions, gecko3(at)uni-jena.de
 
 1. INSTALLATION
 

@@ -84,7 +84,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 	private boolean filterNonContainedGenomes;
 
     public enum GenomeFilterMode {
-        None("No Filter"), Include("Include"), Exclude("Exclude");
+        None("Filter: Off"), Include("Filter: Included"), Exclude("Filter: Exclude");
 
         private final String toString;
 
@@ -198,24 +198,29 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 	};
 
 	public void setGenomes(Genome[] genomes) {
-        clear();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                clear();
 
-        if (genomes != null) {
-            FormLayout layoutLeft = new FormLayout("min, 2dlu, default:grow", "");
-            FormLayout layoutRight = new FormLayout("default:grow, 2dlu, min", "");
+                if (genomes != null) {
+                    FormLayout layoutLeft = new FormLayout("min, 2dlu, default:grow", "");
+                    FormLayout layoutRight = new FormLayout("default:grow, 2dlu, min", "");
 
-            DefaultFormBuilder builderLeft = new DefaultFormBuilder(layoutLeft, left);
-            DefaultFormBuilder builderRight = new DefaultFormBuilder(layoutRight, right);
-            builderLeft.lineGapSize(Sizes.ZERO);
-            builderRight.lineGapSize(Sizes.ZERO);
+                    DefaultFormBuilder builderLeft = new DefaultFormBuilder(layoutLeft, left);
+                    DefaultFormBuilder builderRight = new DefaultFormBuilder(layoutRight, right);
+                    builderLeft.lineGapSize(Sizes.ZERO);
+                    builderRight.lineGapSize(Sizes.ZERO);
 
-            for (Genome g : genomes) {
-                generateGenomeElements(g);
-                layoutGenome(genomeBrowsers.size()-1, builderLeft, builderRight);
+                    for (Genome g : genomes) {
+                        generateGenomeElements(g);
+                        layoutGenome(genomeBrowsers.size()-1, builderLeft, builderRight);
+                    }
+                    left.setMinimumSize(new Dimension(0, (int)left.getMinimumSize().getHeight()));
+                    split.setDividerLocation(250);
+                }
             }
-            left.setMinimumSize(new Dimension(0, (int)left.getMinimumSize().getHeight()));
-            split.setDividerLocation(250);
-        }
+        });
 	}
 
     /**
@@ -293,6 +298,8 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 	}
 
 	public void centerCurrentClusterAt(GeneFamily geneFamily) {
+        if (clusterLocationSelection.getCluster() == null)
+            return;
         clusterLocationSelection = clusterLocationSelection.getGeneClusterLocationSelection(geneFamily);
 
         for (int i=0; i<clusterLocationSelection.getTotalGenomeNumber(); i++){
@@ -408,9 +415,6 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
             // save the currently selected cluster for the filter function
             clusterLocationSelection = new GeneClusterLocationSelection(gecko.getGenomes(), lastLocationEvent.getSelection(), lastLocationEvent.getSubselection(), lastLocationEvent.includeSubOptimalOccurrences());
 
-			// deactivate the filter if active
-			//this.hideNonClusteredGenomes(false);
-
             // if the check box is selected we show only the genomes which contain the cluster
 			if (filterNonContainedGenomes)
 				applyHideNonClusteredGenomesFilter();
@@ -453,7 +457,6 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
         public void mouseWheelMoved(MouseWheelEvent e) {
             if (e.isShiftDown() || !(e.getSource() instanceof AbstractGenomeBrowser)) {
                 handleGlobalMouseWheelEvent(e);
-                return;
             } else {
                 if (e.getSource() instanceof AbstractGenomeBrowser) {
                     ((AbstractGenomeBrowser) e.getSource()).adjustScrollPosition(e.getUnitsToScroll());

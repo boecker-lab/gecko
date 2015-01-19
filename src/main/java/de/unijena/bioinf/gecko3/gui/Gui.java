@@ -38,6 +38,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -295,7 +296,6 @@ public class Gui {
 		mainframe.add(southpanel,BorderLayout.SOUTH);
 		changeMode(Mode.NO_SESSION);
 
-		
 		// Listener stuff
 		gcSelector.addSelectionListener(gcDisplay);
 		gcSelector.addSelectionListener(mgb);
@@ -318,7 +318,16 @@ public class Gui {
 	}
 	
 	public static void startUp() {
-		new Gui();
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    new Gui();
+                }
+            });
+		} catch (InterruptedException | InvocationTargetException e) {
+			logger.error("Creating gui error", e);
+		}
 	}
 	
 	private void selectAndImportGenomes(CogFileReader reader) {
@@ -482,7 +491,6 @@ public class Gui {
 	 */
 
 	private final Action stopComputationAction = new AbstractAction() {
-
 		private static final long serialVersionUID = -6567239762573695048L;
 
 		public void actionPerformed(ActionEvent e) {
@@ -526,7 +534,7 @@ public class Gui {
                                     } catch (final IOException e) {
                                         EventQueue.invokeLater(new Runnable() {
                                             public void run() {
-                                            e.printStackTrace();
+                                            logger.error("Error reading gck file", e);
                                             JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
                                                     "An error occured while reading the file!",
                                                     "Error",
@@ -536,7 +544,7 @@ public class Gui {
                                     } catch (final ParseException e) {
                                         EventQueue.invokeLater(new Runnable() {
                                             public void run() {
-                                                e.printStackTrace();
+                                                logger.error("Error reading gck file", e);
                                                 JOptionPane.showMessageDialog(GeckoInstance.getInstance().getGui().getMainframe(),
                                                     "The input file is not in the right format!",
                                                     "Wrong format",
@@ -608,10 +616,6 @@ public class Gui {
 	};
 	
 	private final Action exitAction = new AbstractAction() {
-
-		/**
-		 * Random generated serial version uid
-		 */
 		private static final long serialVersionUID = 196167012152483868L;
 
 		@Override
@@ -622,10 +626,6 @@ public class Gui {
 	};
 	
 	private final Action aboutAction = new AbstractAction() {
-
-		/**
-		 * Random generated serial version uid
-		 */
 		private static final long serialVersionUID = -5982961195947652321L;
 
 		@Override
@@ -709,10 +709,6 @@ public class Gui {
 	};
 	
 	private final Action showHomePage = new AbstractAction() {
-
-		/**
-		 * Random generated serial version uid
-		 */
 		private static final long serialVersionUID = 3693048160852637628L;
 
 		@Override
@@ -756,7 +752,6 @@ public class Gui {
 	};
 
 	private final Action exportResultsAction = new AbstractAction() {
-
 		private static final long serialVersionUID = 3693048160852637628L;
 
 		public void actionPerformed(ActionEvent e) {
@@ -811,9 +806,7 @@ public class Gui {
 		}
 	};
 	
-	private final Action loadClusterAnnotationsAction = new AbstractAction()
-	{
-		
+	private final Action loadClusterAnnotationsAction = new AbstractAction() {
 		private static final long serialVersionUID = 1148103871109191664L;
 
 		@Override
@@ -855,7 +848,6 @@ public class Gui {
 
 	
 	private void initActions() {
-		
 		stopComputationAction.putValue(Action.NAME, "Stop current computation...");
 		stopComputationAction.putValue(Action.SHORT_DESCRIPTION, "Stop");
 		stopComputationAction.putValue(Action.SMALL_ICON, createImageIcon("images/player_stop.png"));

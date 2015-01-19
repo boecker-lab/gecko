@@ -176,13 +176,4 @@ public class JCheckList<E> extends JPanel implements ItemSelectable{
             baseList.add(element.toString());
         }
     }
-
-    public static void main(String args[]) {
-        JFrame frame = new JFrame();
-        String[] values = {"apple", "orange", "mango", "paw paw", "apple", "orange", "mango", "paw paw", "apple", "orange", "mango", "paw paw", "apple", "orange", "mango", "paw paw"};
-        final JCheckList<String> l = new JCheckList<>(values);
-        frame.add(l);
-        frame.pack();
-        frame.setVisible(true);
-    }
 }
