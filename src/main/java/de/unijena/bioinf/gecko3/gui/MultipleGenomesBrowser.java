@@ -25,6 +25,7 @@ import com.jgoodies.forms.layout.Sizes;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.*;
 import de.unijena.bioinf.gecko3.event.*;
+import de.unijena.bioinf.gecko3.gui.util.MouseListenerTester;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -58,6 +59,8 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
     /*
      * Some Size values for the gui
      */
+    private final int maxUnitIncrement = 5;
+
     public static final int DEFAULT_GENE_HEIGHT = 20;
     private static final int MAX_GENEELEMENT_HIGHT = 40;
     private static final int MIN_GENEELEMENT_HIGHT = 9;
@@ -84,7 +87,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 	private boolean filterNonContainedGenomes;
 
     public enum GenomeFilterMode {
-        None("Filter: Off"), Include("Filter: Included"), Exclude("Filter: Exclude");
+        None("No Filter"), Include("Filter: Included"), Exclude("Filter: Exclude");
 
         private final String toString;
 
@@ -197,7 +200,7 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 		}
 	};
 
-	public void setGenomes(Genome[] genomes) {
+	public void setGenomes(final Genome[] genomes) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -435,12 +438,15 @@ public class MultipleGenomesBrowser extends JPanel implements Scrollable, Cluste
 
     @Override
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-        return 0;
+        return maxUnitIncrement;
     }
 
     @Override
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-        return 0;
+        if (orientation == SwingConstants.HORIZONTAL)
+            return visibleRect.width - maxUnitIncrement;
+        else
+            return visibleRect.height - maxUnitIncrement;
     }
 
     @Override

@@ -163,7 +163,6 @@ public class Gui {
 		final JScrollPane genomeBrowserScrollPane = new JScrollPane(mgb);
         genomeBrowserScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         genomeBrowserScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
 		
 		//Toolbar
 		JToolBar toolbar = new JToolBar();
