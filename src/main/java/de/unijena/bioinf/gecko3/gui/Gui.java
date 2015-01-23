@@ -134,7 +134,6 @@ public class Gui {
 		
 		mainframe = new JFrame("Gecko3");
 		mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		mainframe.setPreferredSize(new Dimension(1024, 768));
 		mainframe.setLayout(new BorderLayout());
 
 		// SplitPane arrangements
@@ -306,6 +305,7 @@ public class Gui {
 		mainframe.setLocationRelativeTo(null);
 		mainframe.setIconImages(createGeckoImages());
 		mainframe.setVisible(true);
+		mainframe.setExtendedState(JFrame.MAXIMIZED_BOTH);
         horizontalSplit.setDividerLocation(0.5);
         verticalSplit.setDividerLocation(0.5);
         // Update data
