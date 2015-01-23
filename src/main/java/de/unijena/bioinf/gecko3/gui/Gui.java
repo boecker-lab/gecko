@@ -107,7 +107,7 @@ public class Gui {
 	
 	private Gui() {
 		this.gecko = GeckoInstance.getInstance();
-		Preferences prefs = gecko.getPreferences();
+		final Preferences prefs = gecko.getPreferences();
 
 		ToolTipManager.sharedInstance().setInitialDelay(0);
 

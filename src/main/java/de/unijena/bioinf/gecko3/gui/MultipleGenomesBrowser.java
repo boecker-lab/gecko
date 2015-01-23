@@ -25,7 +25,6 @@ import com.jgoodies.forms.layout.Sizes;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.*;
 import de.unijena.bioinf.gecko3.event.*;
-import de.unijena.bioinf.gecko3.gui.util.MouseListenerTester;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
