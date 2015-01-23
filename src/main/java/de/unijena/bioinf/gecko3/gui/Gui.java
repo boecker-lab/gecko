@@ -45,6 +45,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.Preferences;
 
 public class Gui {
     private static final Logger logger = LoggerFactory.getLogger(Gui.class);
@@ -103,17 +104,13 @@ public class Gui {
         ,PREPARING_COMPUTATION
         ,FINISHING_COMPUTATION}
     private Mode mode;
-
-    public JFrame getMainframe() {
-		return mainframe;
-	}
-	
-	public GeneClusterSelector getGcSelector() {
-		return gcSelector;
-	}
 	
 	private Gui() {
 		this.gecko = GeckoInstance.getInstance();
+		Preferences prefs = gecko.getPreferences();
+
+		ToolTipManager.sharedInstance().setInitialDelay(0);
+
 		this.gecko.setGui(this);
 		
 		initActions(); 
@@ -133,7 +130,18 @@ public class Gui {
 		// Basic frame settings
 		
 		mainframe = new JFrame("Gecko3");
-		mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainframe.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				super.windowClosed(e);
+				prefs.putBoolean("windowMaximized", mainframe.getExtendedState() == Frame.MAXIMIZED_BOTH);
+				prefs.putInt("windowX", mainframe.getX());
+				prefs.putInt("windowY", mainframe.getY());
+				prefs.putInt("windowWidth", (int) mainframe.getSize().getWidth());
+				prefs.putInt("windowHeight", (int) mainframe.getSize().getHeight());
+			}
+		});
 		mainframe.setLayout(new BorderLayout());
 
 		// SplitPane arrangements
@@ -299,17 +307,37 @@ public class Gui {
 		gcSelector.addSelectionListener(mgb);
 		mgb.addSelectionListener(gcDisplay);
 
-		
 		// Show JFrame
 		mainframe.pack();
 		mainframe.setLocationRelativeTo(null);
 		mainframe.setIconImages(createGeckoImages());
 		mainframe.setVisible(true);
-		mainframe.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+		// Restore preferred size
+		int windowX = prefs.getInt("windowX", 0);
+		int windowY = prefs.getInt("windowY", 0);
+		int windowWidth = prefs.getInt("windowWidth", Integer.MAX_VALUE);
+		int windowHeight = prefs.getInt("windowHeight", Integer.MAX_VALUE);
+		boolean windowMax = prefs.getBoolean("windowMaximized", true);
+
+		if (windowMax)
+			mainframe.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		else {
+			mainframe.setBounds(windowX, windowY, windowWidth, windowHeight);
+		}
+
         horizontalSplit.setDividerLocation(0.5);
         verticalSplit.setDividerLocation(0.5);
         // Update data
         gecko.setGeckoInstanceData();
+	}
+
+	public JFrame getMainframe() {
+		return mainframe;
+	}
+
+	public GeneClusterSelector getGcSelector() {
+		return gcSelector;
 	}
 
     public void setInfobarText(String text) {

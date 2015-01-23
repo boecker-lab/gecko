@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.ParseException;
+import java.util.prefs.Preferences;
+import java.util.prefs.PreferencesFactory;
 
 public class Gecko3 {
     private static final Logger logger = LoggerFactory.getLogger(Gecko3.class);
@@ -46,9 +48,10 @@ public class Gecko3 {
         String lcOSName = System.getProperty("os.name").toLowerCase();
         logger.info("You are running {}-Java on {}", System.getProperty("os.arch"), System.getProperty("os.name"));
 
+
         /*
-            * Check for command line parameters
-            */
+         * Check for command line parameters
+         */
         CommandLineOptions options = new CommandLineOptions();
         CmdLineParser parser = new CmdLineParser(options);
 
@@ -87,7 +90,6 @@ public class Gecko3 {
 
         GeckoInstance instance = GeckoInstance.getInstance();
         instance.setGeckoInstanceData(DataSet.getEmptyDataSet());
-        instance.setLibgeckoLoaded(libgeckoLoaded);
 
         /*
          * Load input genomes from .gck or .cog

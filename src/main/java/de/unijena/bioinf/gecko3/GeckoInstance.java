@@ -41,11 +41,13 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.Preferences;
 
 public class GeckoInstance {
     private static final Logger logger = LoggerFactory.getLogger(GeckoInstance.class);
+    private Preferences prefs;
 
-	private static GeckoInstance instance;
+    private static GeckoInstance instance;
 
     private DataSet data;
 
@@ -62,8 +64,6 @@ public class GeckoInstance {
     }
 
     private SwingWorker<List<GeneCluster>, Void> geneClusterSwingWorker = null;
-
-	private boolean libgeckoLoaded;
 	
 	private File currentWorkingDirectoryOrFile;
 
@@ -133,14 +133,6 @@ public class GeckoInstance {
     public List<GeneCluster> computeReferenceStatistics(int[][][] genomes, Parameter params, List<GeneCluster> cluster, GeckoInstance gecko) {
         return new ArrayList<>(Arrays.asList(computeReferenceStatistics(genomes, params, cluster.toArray(new GeneCluster[cluster.size()]), gecko)));
     }
-	
-	public boolean isLibgeckoLoaded() {
-		return libgeckoLoaded;
-	}
-
-	public void setLibgeckoLoaded(boolean libgeckoLoaded) {
-		this.libgeckoLoaded = libgeckoLoaded;
-	}
 
 	public synchronized StartComputationDialog getStartComputationDialog() {
 		if (scd==null)
@@ -302,11 +294,19 @@ public class GeckoInstance {
 
 	public void setCurrentWorkingDirectoryOrFile(File currentWorkingDirectoryOrFile) {
 		this.currentWorkingDirectoryOrFile = currentWorkingDirectoryOrFile;
+        prefs.put("workingDirectory", currentWorkingDirectoryOrFile.getAbsolutePath());
 	}
 
 	private GeckoInstance() {
-		ToolTipManager.sharedInstance().setInitialDelay(0);
+        prefs = Preferences.userRoot().node("Gecko3");
+        String workingDir = prefs.get("workingDirectory", System.getProperty("user.home"));
+        if (workingDir != null)
+            setCurrentWorkingDirectoryOrFile(new File(workingDir));
 	}
+
+    public Preferences getPreferences() {
+        return prefs;
+    }
 	
 	public static synchronized GeckoInstance getInstance() {
 		if (instance==null) {
@@ -492,10 +492,6 @@ public class GeckoInstance {
 	}
 	
 	public List<GeneCluster> computeReferenceStatistics(List<GeneCluster> clusters){
-		if (!this.isLibgeckoLoaded()){
-			System.err.println("Running in visualization only mode! Cannot compute statistics!");
-			return clusters;
-		}
 		int genomes[][][] = data.toIntArray();
 		int maxPWDelta = 0;
 		int minClusterSize = Integer.MAX_VALUE;

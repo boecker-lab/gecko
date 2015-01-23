@@ -71,7 +71,6 @@ public class CogFileReader implements GeckoDataReader {
 	 */
 	private static final Pattern nameSplitPattern = Pattern.compile(",|[\\s[-_]]chrom(?:osome)?|[\\s[-_]](?:mega)?plasmid|[\\s[-_]]scaffold|[\\s[-_]](?:super)?cont(?:ig)?|[\\s[-_]]unmap(?:ped)?|[\\s[-_]]chr[_ ]?\\d+|[\\s[-_]]complete genome", Pattern.CASE_INSENSITIVE);
 
-
     /**
      * The input File
      */
