@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-version = "3.0.1"
+version = 3
 
 mainClassName = 'de.unijena.bioinf.gecko3.Gecko3'
 

@@ -135,8 +135,11 @@ public class GeckoInstance {
     }
 
 	public synchronized StartComputationDialog getStartComputationDialog() {
-		if (scd==null)
-			scd = new StartComputationDialog(gui.getMainframe());
+		if (scd==null) {
+            scd = new StartComputationDialog(gui.getMainframe());
+            if (data.getParameters() != null)
+                scd.setParameters(data.getParameters());
+        }
 		return scd;
 	}
 	
@@ -239,8 +242,11 @@ public class GeckoInstance {
                 @Override
                 public void run() {
                     gui.updateViewscreen();
-                    if (data.getGenomes() != null)
+                    if (data.getGenomes() != null) {
                         scd = new StartComputationDialog(gui.getMainframe());
+                        if (data.getParameters() != null)
+                            scd.setParameters(data.getParameters());
+                    }
                     else
                         scd = null;
                     fireDataChanged();
@@ -483,8 +489,6 @@ public class GeckoInstance {
 	public SwingWorker<List<GeneCluster>, Void> performClusterDetection(Parameter p, boolean mergeResults, double genomeGroupingFactor) {
         if (gui != null)
 		    gui.changeMode(Gui.Mode.PREPARING_COMPUTATION);
-
-        //p = new Parameter(Parameter.DeltaTable.relaxed.getDeltaTable(), Parameter.DeltaTable.relaxed.getMinimumSize(), p.getQ(), p.getOperationMode(), p.getRefType());
 
         geneClusterSwingWorker = new GeneClusterDetectionTask(p, mergeResults, genomeGroupingFactor, GeckoInstance.this.getData());
         geneClusterSwingWorker.execute();

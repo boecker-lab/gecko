@@ -53,6 +53,7 @@ public class StartComputationDialog extends JDialog {
     private Parameter.ReferenceType refType;
 	private final JComboBox<Parameter.ReferenceType> refCombo;
     private final JPanel additionalRefClusterSettings;
+    final JTabbedPane tabbedDistancePane;
 
 	private final JCheckBox mergeResults;
     private final JCheckBox refInRef;
@@ -78,7 +79,7 @@ public class StartComputationDialog extends JDialog {
         /*
          * Tabbed distance and size pane
          */
-        final JTabbedPane tabbedDistancePane = new JTabbedPane();
+        tabbedDistancePane = new JTabbedPane();
         tabbedDistancePane.addTab("Single Distance", getDistancePanel());
         tabbedDistancePane.add("Distance Table", deltaTable);
 
@@ -267,6 +268,35 @@ public class StartComputationDialog extends JDialog {
         this.setContentPane(panel);
 		this.pack();
 	}
+
+    public void setParameters(Parameter parameters){
+        // Distance and size
+        if (parameters.useDeltaTable()){
+            tabbedDistancePane.setSelectedIndex(1);
+            deltaTable.setDeltaValues(parameters.getDeltaTable(), parameters.getMinClusterSize());
+        } else {
+            tabbedDistancePane.setSelectedIndex(0);
+            distanceSpinner.setValue(parameters.getDelta());
+
+            sizeSpinner.setValue(parameters.getMinClusterSize());
+        }
+
+        // Mode, all-against-all, genome or cluster
+        if (parameters.getRefType().equals(Parameter.ReferenceType.cluster) || parameters.getRefType().equals(Parameter.ReferenceType.genome))
+            refCombo.setSelectedItem(Parameter.ReferenceType.genome);
+        else
+            refCombo.setSelectedItem(parameters.getRefType());
+
+        // Quorum
+        if (parameters.getQ() == 0)
+            qCombo.setSelectedIndex(0);
+        else
+            qCombo.setSelectedIndex(parameters.getQ()-1);
+
+        // Ref in Ref
+        refInRef.setSelected(parameters.searchRefInRef());
+
+    }
 
     private JComponent getBody(){
         FormLayout layout = new FormLayout(

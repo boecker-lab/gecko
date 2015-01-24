@@ -143,6 +143,10 @@ public class DeltaTable extends JPanel {
         return model.getDeltaTable();
     }
 
+    public void setDeltaValues(int[][] deltas, int minimumSize) {
+        model.setDeltaTable(deltas, minimumSize);
+    }
+
     /**
      * The model for the delta table. Will automatically grow and shrink,
      * to always have at least one at a maximum of two invalid rows at the end,
@@ -204,11 +208,11 @@ public class DeltaTable extends JPanel {
          * Additional table logic
          */
 
-        public boolean isValidRow(int row) {
+        boolean isValidRow(int row) {
             return isValidCell(row, COL_D_ADD) && isValidCell(row, COL_D_LOSS) && isValidCell(row, COL_D_SUM) && isValidCell(row, COL_SIZE);
         }
 
-        public boolean isValidCell(int row, int column) {
+        boolean isValidCell(int row, int column) {
             if (deltaValues.get(row)[column] < 0)
                 return false;
 
@@ -229,7 +233,7 @@ public class DeltaTable extends JPanel {
             return valid;
         }
 
-        public int[][] getDeltaTable() {
+        int[][] getDeltaTable() {
             int[][] deltaTable = new int[deltaValues.get(deltaValues.size()-2)[COL_SIZE]+1][];
             int row = 0;
             int[] currentDeltaValues = new int[]{0, 0 ,0};
@@ -250,18 +254,18 @@ public class DeltaTable extends JPanel {
             return deltaTable;
         }
 
-        public boolean isValidDeltaTable() {
+        boolean isValidDeltaTable() {
             for (int i=0; i<deltaValues.size()-1; i++)
                 if (!isValidRow(i))
                     return false;
             return true;
         }
 
-        public void setDeltaTable(Parameter.DeltaTable deltaValues) {
+        void setDeltaTable(Parameter.DeltaTable deltaValues) {
             setDeltaTable(deltaValues.getDeltaTable(), deltaValues.getMinimumSize());
         }
 
-        public void setDeltaTable(int[][] deltaTable, int minimumSize) {
+        void setDeltaTable(int[][] deltaTable, int minimumSize) {
             this.deltaValues = new ArrayList<>(deltaTable!=null ? deltaTable.length+1 : 1);
             if (deltaTable!= null){
                 for (int i=0; i<deltaTable.length; i++) {
