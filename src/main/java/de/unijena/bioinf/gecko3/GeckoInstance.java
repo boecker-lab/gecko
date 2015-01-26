@@ -300,14 +300,22 @@ public class GeckoInstance {
 
 	public void setCurrentWorkingDirectoryOrFile(File currentWorkingDirectoryOrFile) {
 		this.currentWorkingDirectoryOrFile = currentWorkingDirectoryOrFile;
-        prefs.put("workingDirectory", currentWorkingDirectoryOrFile.getAbsolutePath());
+        if (prefs != null)
+            prefs.put("workingDirectory", currentWorkingDirectoryOrFile.getAbsolutePath());
 	}
 
 	private GeckoInstance() {
-        prefs = Preferences.userRoot().node("Gecko3");
-        String workingDir = prefs.get("workingDirectory", System.getProperty("user.home"));
-        if (workingDir != null)
-            setCurrentWorkingDirectoryOrFile(new File(workingDir));
+        try {
+            prefs = Preferences.userRoot().node("Gecko3");
+        } catch (SecurityException e) {
+            logger.warn("No permission to access Preferences", e);
+            prefs = null;
+        }
+        if (prefs != null) {
+            String workingDir = prefs.get("workingDirectory", System.getProperty("user.home"));
+            if (workingDir != null)
+                setCurrentWorkingDirectoryOrFile(new File(workingDir));
+        }
 	}
 
     public Preferences getPreferences() {

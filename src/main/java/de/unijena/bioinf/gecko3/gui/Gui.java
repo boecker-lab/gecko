@@ -135,11 +135,13 @@ public class Gui {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				super.windowClosed(e);
-				prefs.putBoolean("windowMaximized", mainframe.getExtendedState() == Frame.MAXIMIZED_BOTH);
-				prefs.putInt("windowX", mainframe.getX());
-				prefs.putInt("windowY", mainframe.getY());
-				prefs.putInt("windowWidth", (int) mainframe.getSize().getWidth());
-				prefs.putInt("windowHeight", (int) mainframe.getSize().getHeight());
+				if (prefs != null){
+					prefs.putBoolean("windowMaximized", mainframe.getExtendedState() == Frame.MAXIMIZED_BOTH);
+					prefs.putInt("windowX", mainframe.getX());
+					prefs.putInt("windowY", mainframe.getY());
+					prefs.putInt("windowWidth", (int) mainframe.getSize().getWidth());
+					prefs.putInt("windowHeight", (int) mainframe.getSize().getHeight());
+				}
 			}
 		});
 		mainframe.setLayout(new BorderLayout());
@@ -314,17 +316,20 @@ public class Gui {
 		mainframe.setVisible(true);
 
 		// Restore preferred size
-		int windowX = prefs.getInt("windowX", 0);
-		int windowY = prefs.getInt("windowY", 0);
-		int windowWidth = prefs.getInt("windowWidth", Integer.MAX_VALUE);
-		int windowHeight = prefs.getInt("windowHeight", Integer.MAX_VALUE);
-		boolean windowMax = prefs.getBoolean("windowMaximized", true);
+		if (prefs != null) {
+			int windowX = prefs.getInt("windowX", 0);
+			int windowY = prefs.getInt("windowY", 0);
+			int windowWidth = prefs.getInt("windowWidth", Integer.MAX_VALUE);
+			int windowHeight = prefs.getInt("windowHeight", Integer.MAX_VALUE);
+			boolean windowMax = prefs.getBoolean("windowMaximized", true);
 
-		if (windowMax)
+			if (windowMax)
+				mainframe.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			else {
+				mainframe.setBounds(windowX, windowY, windowWidth, windowHeight);
+			}
+		} else
 			mainframe.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		else {
-			mainframe.setBounds(windowX, windowY, windowWidth, windowHeight);
-		}
 
         horizontalSplit.setDividerLocation(0.5);
         verticalSplit.setDividerLocation(0.5);
