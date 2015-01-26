@@ -19,8 +19,10 @@
 
 package de.unijena.bioinf.gecko3.datastructures;
 
-public class Parameter {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class Parameter {
     public enum OperationMode {
         reference('r'), median('m'), center('c');
 

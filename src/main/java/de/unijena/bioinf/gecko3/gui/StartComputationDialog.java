@@ -29,6 +29,8 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -42,9 +44,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.prefs.Preferences;
 
 
 public class StartComputationDialog extends JDialog {
+    private static final Logger logger = LoggerFactory.getLogger(StartComputationDialog.class);
 	private static final long serialVersionUID = -5635614016950101153L;
 
     private int quorum;
@@ -226,6 +230,7 @@ public class StartComputationDialog extends JDialog {
 					cluster.addChromosome(new Chromosome("", genes, cluster));
 					gecko.addReferenceGenome(cluster);
 				}
+                saveToPreferences(gecko.getPreferences());
                 StartComputationDialog.this.setVisible(false);
 				boolean mergeResultsEnabled = false;
 				if (opMode==Parameter.OperationMode.reference && mergeResults.isSelected())
@@ -267,9 +272,10 @@ public class StartComputationDialog extends JDialog {
 
         this.setContentPane(panel);
 		this.pack();
+        this.loadFromPreferences(gecko.getPreferences());
 	}
 
-    public void setParameters(Parameter parameters){
+    private void setParameters(Parameter parameters){
         // Distance and size
         if (parameters.useDeltaTable()){
             tabbedDistancePane.setSelectedIndex(1);
@@ -331,6 +337,86 @@ public class StartComputationDialog extends JDialog {
         builder.append("Minimum cluster size:", sizeSpinner);
 
         return builder.getPanel();
+    }
+
+
+    private void saveToPreferences(Preferences preferences) {
+        if (preferences != null) {
+            preferences.putInt("delta", (int)distanceSpinner.getValue());
+            preferences.putInt("deltaSize", (int)sizeSpinner.getValue());
+            preferences.put("deltaTable", Arrays.deepToString(deltaTable.getDeltaTable()));
+            preferences.putInt("deltaTableSize", deltaTable.getClusterSize());
+            preferences.putInt("distancePaneSelected", tabbedDistancePane.getSelectedIndex());
+            preferences.putInt("quorum", quorum);
+            preferences.put("refType", Character.toString(refType.getCharMode()));
+            preferences.put("operationMode", Character.toString(opMode.getCharMode()));
+            preferences.putBoolean("refInRef", refInRef.isSelected());
+        }
+    }
+
+    private void loadFromPreferences(Preferences preferences) {
+        if (preferences != null) {
+            // Load from preferences
+            int delta = preferences.getInt("delta", 3);
+            int deltaSize = preferences.getInt("deltaSize", 7);
+
+            String deltaTableString = preferences.get("deltaTable", "null");
+            int[][] deltaTable = null;
+            if (!deltaTableString.equals("null")){
+                try {
+                    String[] split = deltaTableString.replaceFirst("^\\[*", "").replaceAll("\\]*$", "").split("\\],\\s*\\[");
+                    deltaTable = new int[split.length][];
+                    for (int i = 0; i < split.length; i++) {
+                        String[] values = split[i].split(",");
+                        if (values.length != Parameter.DELTA_TABLE_SIZE) {
+                            deltaTable = null;
+                            logger.warn("Invalid delta table size at {}", split[i]);
+                            break;
+                        }
+                        deltaTable[i] = new int[values.length];
+                        for (int j = 0; j < values.length; j++)
+                            deltaTable[i][j] = Integer.parseInt(values[j].trim());
+                    }
+                }catch (NumberFormatException e){
+                    deltaTable = null;
+                    logger.warn("Invalid deltaTable format, could not read the data", e);
+                }
+            }
+            int deltaTableSize = preferences.getInt("deltaTableSize", Parameter.DeltaTable.getDefault().getMinimumSize());
+            if (deltaTable == null) {
+                deltaTable = Parameter.DeltaTable.getDefault().getDeltaTable();
+                deltaTableSize = Parameter.DeltaTable.getDefault().getMinimumSize();
+            }
+            int distancePaneSelected = preferences.getInt("distancePaneSelected", 0);
+            int q = preferences.getInt("quorum", 0);
+            Parameter.ReferenceType referenceType = Parameter.ReferenceType.getReferenceTypeFromChar(preferences.get("refType", "a").charAt(0));
+            Parameter.OperationMode operationMode = Parameter.OperationMode.getOperationModeFromChar(preferences.get("operationMode", "r").charAt(0));
+            boolean searchRefInRef = preferences.getBoolean("refInRef", false);
+
+            // Set values
+
+            // Distance and size
+            tabbedDistancePane.setSelectedIndex(distancePaneSelected);
+            this.deltaTable.setDeltaValues(deltaTable, deltaTableSize);
+            distanceSpinner.setValue(delta);
+            sizeSpinner.setValue(deltaSize);
+
+            this.opMode = operationMode;
+            // Mode, all-against-all, genome or cluster
+            if (referenceType.equals(Parameter.ReferenceType.cluster) || referenceType.equals(Parameter.ReferenceType.genome))
+                refCombo.setSelectedItem(Parameter.ReferenceType.genome);
+            else
+                refCombo.setSelectedItem(referenceType);
+
+            // Quorum
+            if (q == 0)
+                qCombo.setSelectedIndex(0);
+            else
+                qCombo.setSelectedIndex(q-1);
+
+            // Ref in Ref
+            refInRef.setSelected(searchRefInRef);
+        }
     }
 
 }

@@ -137,8 +137,6 @@ public class GeckoInstance {
 	public synchronized StartComputationDialog getStartComputationDialog() {
 		if (scd==null) {
             scd = new StartComputationDialog(gui.getMainframe());
-            if (data.getParameters() != null)
-                scd.setParameters(data.getParameters());
         }
 		return scd;
 	}
@@ -244,8 +242,6 @@ public class GeckoInstance {
                     gui.updateViewscreen();
                     if (data.getGenomes() != null) {
                         scd = new StartComputationDialog(gui.getMainframe());
-                        if (data.getParameters() != null)
-                            scd.setParameters(data.getParameters());
                     }
                     else
                         scd = null;
