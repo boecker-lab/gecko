@@ -47,7 +47,7 @@ public enum ExportType {
     latexTable("tex", new NoAdditionalOptions()),
     internalDuplications("txt", new NoAdditionalOptions()),
     pdf("pdf", new AdditionalPdfOptions()),
-    multiPdf("zip",new AdditionalPdfOptions());
+    zippedPdfs("zip",new AdditionalPdfOptions());
 
     private final String defaultFileExtension;
     private final AdditionalExportBundle additionalExportBundle;
@@ -61,7 +61,7 @@ public enum ExportType {
             "\"clusterGenomeInformation\" in which genome the cluster occurs.\n" +
             "\"referenceClusterTags\" the locus_tags of all genes in the reference occurrence.\n" +
             "\"pdf\" all clusters as a single pdf picture.\n" +
-            "\"multiPdf\" a zip file containing one pdf picture for each cluster.";
+            "\"zippedPdfs\" a zip file containing one pdf picture for each cluster.";
 
     public String getDefaultFileExtension() {return defaultFileExtension;}
 
@@ -79,7 +79,7 @@ public enum ExportType {
         return values();
 
         // Support only a subset of values
-        //return new ExportType[]{clusterData, table, latexTable, pdf, multiPdf};
+        //return new ExportType[]{clusterData, table, latexTable, pdf, zippedPdfs};
     }
 
     public Component getAdditionalOptionsPanel() {

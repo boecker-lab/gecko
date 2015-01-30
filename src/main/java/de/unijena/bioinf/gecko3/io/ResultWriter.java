@@ -80,7 +80,7 @@ public class ResultWriter {
             case pdf:
                 writtenSuccessfully = writeGeneClusterToPdf(file, clusters, type.getAdditionalExportParameters());
                 break;
-            case multiPdf:
+            case zippedPdfs:
                 writtenSuccessfully = writeGeneClusterPdfToZip(file, clusters, type.getAdditionalExportParameters());
                 break;
         }
