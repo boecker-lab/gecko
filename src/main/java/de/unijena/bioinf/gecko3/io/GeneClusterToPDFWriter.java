@@ -19,10 +19,8 @@
 
 package de.unijena.bioinf.gecko3.io;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
+import com.lowagie.text.*;
 import com.lowagie.text.Image;
-import com.lowagie.text.PageSize;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfWriter;
@@ -95,6 +93,8 @@ public class GeneClusterToPDFWriter implements AutoCloseable {
         clusterPDF.open();
         PdfContentByte cb = writer.getDirectContent();
         for (GeneClusterPicture clusterPicture : clusterPictures) {
+            clusterPDF.setPageSize(new RectangleReadOnly(clusterPicture.getPageWidth(), clusterPicture.getPageHeight()));
+            clusterPDF.setMargins(0, 0, 0, 0);
             clusterPDF.newPage();
             // open pdf for writing
             PdfTemplate template = cb.createTemplate(clusterPicture.getPageWidth(), clusterPicture.getPageHeight());

@@ -111,7 +111,7 @@ public enum ExportType {
      * AdditionalExportBundle for pdf exports. Allows to set the name type in the picture.
      */
     private static class AdditionalPdfOptions implements AdditionalExportBundle {
-        private AdditionalExportParameters additionalExportParameters = new AdditionalExportParameters();
+        private AdditionalExportParameters additionalExportParameters = new AdditionalExportParameters(GenomePainting.NameType.ID);
         private JPanel body;
 
         @Override
@@ -141,7 +141,7 @@ public enum ExportType {
     }
 
     private static class AdditionalGeneNameTableParameters implements AdditionalExportBundle {
-        private AdditionalExportParameters additionalExportParameters = new AdditionalExportParameters();
+        private AdditionalExportParameters additionalExportParameters = new AdditionalExportParameters(GenomePainting.NameType.NAME);
 
         @Override
         public AdditionalExportParameters getAdditionalExportParameters() {
@@ -153,7 +153,7 @@ public enum ExportType {
             /**
              * We cannot store the body, as the genomes might change.
              */
-            additionalExportParameters = new AdditionalExportParameters();
+            additionalExportParameters = new AdditionalExportParameters(GenomePainting.NameType.NAME);
             DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("p, 4dlu, p"));
 
             Genome[] genomes = GeckoInstance.getInstance().getGenomes();
@@ -193,8 +193,8 @@ public enum ExportType {
         private GenomePainting.NameType nameType;
         private java.util.Set<String> genomeNames;
 
-        public AdditionalExportParameters() {
-            nameType = GenomePainting.NameType.NAME;
+        public AdditionalExportParameters(GenomePainting.NameType nameType) {
+            this.nameType = nameType;
             genomeNames = new LinkedHashSet<>();
             genomeNames.add(REFERENCE_GENOME);
         }

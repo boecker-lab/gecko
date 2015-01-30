@@ -87,11 +87,6 @@ public class GeneClusterPicture {
 
     private GenomePainting.NameType nameType = null;
 
-    /**
-     * The maximum number of genes in any subSequence
-     */
-    private int maxSubseqLength;
-
 	/**
 	 * Default height of the gene elements
 	 */
@@ -125,7 +120,7 @@ public class GeneClusterPicture {
 	/**
 	 * The length of the longest gene code.
 	 */
-	private int maxGeneCodeLength;	/**
+	private int maxGeneCodeLength;
 	
 	/**
 	 * The length of the longest genome name from the clustered genomes.
@@ -204,7 +199,6 @@ public class GeneClusterPicture {
 	private void calcLengths(GenomePainting.NameType nameType) {
 		maxGeneCodeLength = 0;
 		maxGenomeNameLength = 0;
-		maxSubseqLength = clusterSelection.getMaxClusterLocationWidth();
 		
 		for (int i = 0; i < clusterSelection.getTotalGenomeNumber(); i++) {
             if (getSubselection()[i] == GeneClusterOccurrence.GENOME_NOT_INCLUDED)
@@ -213,18 +207,16 @@ public class GeneClusterPicture {
             if (clusterSelection.getGenome(i).getName().length() > maxGenomeNameLength)
                 maxGenomeNameLength = (byte) clusterSelection.getGenome(i).getName().length();
 
-            Subsequence subSequence = clusterSelection.getSubsequence(i);
-            if (subSequence.isValid()){
-                for (int k = subSequence.getStart() - 1; k < subSequence.getStop(); k++){
-                    Gene gene = clusterSelection.getGenome(i).getChromosomes().get(subSequence.getChromosome()).getGenes().get(k);
+            for (GeneForPainting gene : clusterSelection.getGenesForPainting(i, NR_ADDITIONAL_GENES)) {
+                if (gene != null && !gene.equals(GeneForPainting.CHROMOSOME_START) && !gene.equals(GeneForPainting.CHROMOSOME_END)){
                     if (nameType == GenomePainting.NameType.NAME)
-                        if (gene.getName().length() > maxGeneCodeLength)
-                            maxGeneCodeLength = gene.getName().length();
+                        if (gene.getGene().getName().length() > maxGeneCodeLength)
+                            maxGeneCodeLength = gene.getGene().getName().length();
                     if (nameType == GenomePainting.NameType.LOCUS_TAG)
-                        if (gene.getTag().length() > maxGeneCodeLength)
-                            maxGeneCodeLength = gene.getTag().length();
+                        if (gene.getGene().getTag().length() > maxGeneCodeLength)
+                            maxGeneCodeLength = gene.getGene().getTag().length();
                 }
-			}
+            }
 		}
 	}
 	
@@ -243,7 +235,7 @@ public class GeneClusterPicture {
 		else
 			this.nameWidth = 7 * Integer.toString(clusterSelection.getTotalGenomeNumber()).length() + 4;
 		
-		this.pageWidth = 2 + this.nameWidth + 2 + 16 + 10 + (maxSubseqLength + 2 * NR_ADDITIONAL_GENES) *(elemWidth + hgap + 8) + 2;
+		this.pageWidth = 2 + this.nameWidth + 10 + (clusterSelection.getMaxClusterLocationWidth() + 2 * NR_ADDITIONAL_GENES) * (elemWidth + 2 * hgap);
 	}
 	
 	public void paint(Graphics g){
@@ -326,50 +318,23 @@ public class GeneClusterPicture {
 	}
 
     private void paintGenome(Graphics g, int genomeIndex, int y){
-        Subsequence subsequence = clusterSelection.getSubsequence(genomeIndex);
         int x = 2;
 
         x = paintGenomeHeader(g, genomeIndex, x, y);
 
-        // determine start setOff if not in refPaintGenome
-        int setOff = NR_ADDITIONAL_GENES + clusterSelection.getGeneOffset(genomeIndex);
+        x += 10;
 
-        int geneIndex;
-        if (clusterSelection.isFlipped(genomeIndex)){
-            geneIndex = subsequence.getStop() + setOff;
-        } else {
-            geneIndex = subsequence.getStart() - 1 - setOff; // Paint setOff many additional genes (or gaps) that are not part of the cluster
-        }
-
-        for (int paintIndex = 0; paintIndex < maxSubseqLength + 2 * NR_ADDITIONAL_GENES; paintIndex++) {
-            if (!clusterSelection.isFlipped(genomeIndex)) {
-                if (geneIndex < -1)  // skip not in chromosome
-                    x += elemWidth + 2 * hgap;
-                else if (geneIndex == -1)
-                    x = paintChromosomeStart(g, x, y);
-                else if (geneIndex >= clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
-                    paintChromosomeEnd(g, x, y);
-                    break;
-                } else {
-                    boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
-                    x = paintGene(g, clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), clusterSelection.isFlipped(genomeIndex), partOfCluster, x, y);
-                }
-                geneIndex++;
-            } else {
-                if (geneIndex > clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().size()) // skip not in chromosome
-                    x += elemWidth + 2 * hgap;
-                else if (geneIndex == clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().size())
-                    x = paintChromosomeStart(g, x, y);
-                else if (geneIndex == -1) {
-                    paintChromosomeEnd(g, x, y);
-                    break;
-                } else {
-                    boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
-                    x = paintGene(g, clusterSelection.getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex), clusterSelection.isFlipped(genomeIndex), partOfCluster, x, y);
-                }
-                geneIndex--;
+        GeneForPainting[] genes = clusterSelection.getGenesForPainting(genomeIndex, NR_ADDITIONAL_GENES);
+        for (int i=0; i<genes.length; i++) {
+            if (genes[i] == null) // skip not in chromosome
+                x += elemWidth + 2 * hgap;
+            else if (genes[i].equals(GeneForPainting.CHROMOSOME_START))
+                x = paintChromosomeStart(g, x, y);
+            else if (genes[i].equals(GeneForPainting.CHROMOSOME_END))
+                paintChromosomeEnd(g, x, y);
+            else {
+                x = paintGene(g, genes[i].getGene(), clusterSelection.isFlipped(genomeIndex), genes[i].isPartOfCluster(), x, y);
             }
-
         }
     }
 

@@ -91,9 +91,6 @@ public class GenomePainting {
 			
 		// move pen
 		x = x + width;
-		
-		// move the pen 10 pixels right
-		x = x + 10;
 		return x;
 	}
 
@@ -204,7 +201,7 @@ public class GenomePainting {
 	public static int paintGene(Graphics g, boolean flipped, Gene.GeneOrientation geneOrientation, Color backgroundColor, Color color, String text, int x, int y, int width, int height, int hgap, int vgap) {
 		g.setColor(color);
 		
-		int returnX = x + width + 2 * hgap;
+		final int returnX = x + width + 2 * hgap;
 		
 		// if we are in the cluster, paint orange background
 		if (!backgroundColor.equals(Color.WHITE)) {

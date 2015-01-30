@@ -142,6 +142,11 @@ public class GeneClusterLocationSelection {
         return cluster.getOccurrences(includeSubOptimalOccurrences).getSubsequences().length;
     }
 
+    /**
+     * Computes the number of genes that have to be used to paint the gene cluster.
+     * Without alignment to a certain gene, that is the max number of genes in a subsequence.
+     * Otherwise it is the max number of genes left and right of the aligning gene in the cluster.
+     */
     private void computePaintWidths(){
         if (alignmentGeneCluster == null) {
             paintWidth = 0;
@@ -217,5 +222,57 @@ public class GeneClusterLocationSelection {
         if (paintOffset == null)
             computePaintOffsets();
         return paintOffset[genomeIndex];
+    }
+
+    public GeneForPainting[] getGenesForPainting(final int genomeIndex, final int NR_ADDITIONAL_GENES) {
+        GeneForPainting[] geneArray = new GeneForPainting[getMaxClusterLocationWidth() + 2 * NR_ADDITIONAL_GENES];
+
+        // determine start setOff if not in refPaintGenome
+        int setOff = NR_ADDITIONAL_GENES + getGeneOffset(genomeIndex);
+        Subsequence subsequence = getSubsequence(genomeIndex);
+        if (!subsequence.isValid())
+            return geneArray;
+
+        int geneIndex;
+        if (isFlipped(genomeIndex)){
+            geneIndex = subsequence.getStop() + setOff;
+        } else {
+            geneIndex = subsequence.getStart() - 1 - setOff; // Paint setOff many additional genes (or gaps) that are not part of the cluster
+        }
+
+        for (int paintIndex = 0; paintIndex < getMaxClusterLocationWidth() + 2 * NR_ADDITIONAL_GENES; paintIndex++) {
+            if (!isFlipped(genomeIndex)) {
+                if (geneIndex < -1)  // skip not in chromosome
+                    geneArray[paintIndex] = null;
+                else if (geneIndex == -1)
+                    geneArray[paintIndex] = GeneForPainting.getChromosomeStart();
+                else if (geneIndex >= getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().size()) {
+                    geneArray[paintIndex] = GeneForPainting.getChromosomeEnd();
+                    break;
+                } else {
+                    boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
+                    geneArray[paintIndex] = new GeneForPainting(
+                            getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex),
+                            partOfCluster);
+                }
+                geneIndex++;
+            } else {
+                if (geneIndex > getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().size()) // skip not in chromosome
+                    geneArray[paintIndex] = null;
+                else if (geneIndex == getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().size())
+                    geneArray[paintIndex] = GeneForPainting.getChromosomeStart();
+                else if (geneIndex == -1) {
+                    geneArray[paintIndex] = GeneForPainting.getChromosomeEnd();
+                    break;
+                } else {
+                    boolean partOfCluster = subsequence.getStart() - 1 <= geneIndex && geneIndex < subsequence.getStop();
+                    geneArray[paintIndex] = new GeneForPainting(
+                            getGenome(genomeIndex).getChromosomes().get(subsequence.getChromosome()).getGenes().get(geneIndex),
+                            partOfCluster);
+                }
+                geneIndex--;
+            }
+        }
+        return geneArray;
     }
 }
