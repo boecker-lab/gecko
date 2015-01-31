@@ -132,8 +132,16 @@ public enum ExportType {
                         }
                     }
                 });
+                final JCheckBox clusterHeaderCheckbox = new JCheckBox();
+                clusterHeaderCheckbox.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        additionalExportParameters.setClusterHeader(clusterHeaderCheckbox.isSelected());
+                    }
+                });
                 nameTypeComboBox.setSelectedItem(additionalExportParameters.getNameType());
                 builder.append("Gene annotation:", nameTypeComboBox);
+                builder.append("Cluster header:", clusterHeaderCheckbox);
                 body = builder.build();
             }
             return body;
@@ -192,11 +200,13 @@ public enum ExportType {
          */
         private GenomePainting.NameType nameType;
         private java.util.Set<String> genomeNames;
+        private boolean clusterHeader;
 
         public AdditionalExportParameters(GenomePainting.NameType nameType) {
             this.nameType = nameType;
             genomeNames = new LinkedHashSet<>();
             genomeNames.add(REFERENCE_GENOME);
+            clusterHeader = true;
         }
 
         public GenomePainting.NameType getNameType() {
@@ -217,6 +227,14 @@ public enum ExportType {
 
         private void removeGenomeName(String name) {
             genomeNames.remove(name);
+        }
+
+        private void setClusterHeader(boolean clusterHeader) {
+            this.clusterHeader = clusterHeader;
+        }
+
+        public boolean clusterHeader() {
+            return clusterHeader;
         }
     }
 

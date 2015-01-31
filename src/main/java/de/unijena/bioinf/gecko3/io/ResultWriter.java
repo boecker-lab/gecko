@@ -90,7 +90,7 @@ public class ResultWriter {
     private static boolean writeGeneClusterToPdf(File file, List<GeneCluster> clusters, ExportType.AdditionalExportParameters additionalParameters) {
         List<GeneClusterPicture> pictures = new ArrayList<>(clusters.size());
         for (GeneCluster cluster : clusters)
-            pictures.add(new GeneClusterPicture(cluster, additionalParameters.getNameType(), true));
+            pictures.add(new GeneClusterPicture(cluster, additionalParameters.getNameType(), additionalParameters.clusterHeader(), true));
 
         try (GeneClusterToPDFWriter pdfWriter = new GeneClusterToPDFWriter(new BufferedOutputStream(new FileOutputStream(file)))) {
             pdfWriter.write(pictures);
@@ -106,7 +106,7 @@ public class ResultWriter {
              GeneClusterToPDFWriter pdfWriter = new GeneClusterToPDFWriter(zipOutputStream)) {
             for (int i=0; i<clusters.size(); i++) {
                 zipOutputStream.putNextEntry(new ZipEntry("cluster" + clusters.get(i).getId() + ".pdf"));
-                GeneClusterPicture picture = new GeneClusterPicture(clusters.get(i), additionalParameters.getNameType(), true);
+                GeneClusterPicture picture = new GeneClusterPicture(clusters.get(i), additionalParameters.getNameType(), additionalParameters.clusterHeader(), true);
                 pdfWriter.write(picture);
                 zipOutputStream.closeEntry();
             }

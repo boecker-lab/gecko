@@ -19,6 +19,8 @@
 
 package de.unijena.bioinf.gecko3.gui;
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import com.lowagie.text.DocumentException;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.gui.GenomePainting.NameType;
@@ -54,42 +56,29 @@ public class GeneClusterExportDialog extends JDialog {
 	 * Random serial version UID
 	 */
 	private static final long serialVersionUID = 1468873732499397039L;
+
+    private enum PictureFormat{
+        PDF,
+        JPG,
+        PNG
+    }
 	
 	/**
 	 * Text filed which contains the path to the pdf file we want to store.
 	 */
-	private final JTextField storingLocation = new JTextField();
+	private final JTextField storingLocation;
 	
 	/**
 	 * Text field which contains the users name.
 	 */
-	private final JTextField authorName = new JTextField(System.getProperty("user.name"));
+	private final JTextField authorName;
+
+    private final JComboBox<PictureFormat> exportFormatComboBox;
 	
 	/**
 	 * Predefined file name for the pdf file.
 	 */
 	private final String FILENAME = "ClusterExport";
-
-	/**
-	 * Here we store whether extra data from the GeneClusterDisplay shall be
-	 * added to the PDF.
-	 */
-	private boolean eData = false;
-	
-	/**
-	 * True if we have to use the optional output format png.
-	 */
-	private boolean png = false;
-	
-	/**
-	 * True if we have to use the optional output format jpg.
-	 */
-	private boolean jpg = false;
-	
-	/**
-	 * Default output format
-	 */
-	private boolean pdf = true;
 	
 	/**
 	 * The object which contains/creates the image content
@@ -108,29 +97,15 @@ public class GeneClusterExportDialog extends JDialog {
      * @param clusterSelection the cluster selection
      */
 	public GeneClusterExportDialog (final Frame parent, GeneClusterLocationSelection clusterSelection) {
-
 		// Setup the dialog window
-		super(parent,"Export gene cluster");
-		super.setModal(true);
+		super(parent,"Export gene cluster", true);
+        authorName = new JTextField(System.getProperty("user.name"));
+        storingLocation = new JTextField();
 		this.rootPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
 		this.setLayout(new BorderLayout());
-		this.setPreferredSize(new Dimension(1010, 700));
 		this.setIconImages(parent.getIconImages());
 
-        JLabel ovlapStatus1 = new JLabel();
-		ovlapStatus1.setForeground(Color.RED);
-        JLabel ovlapStatus2 = new JLabel();
-		ovlapStatus2.setForeground(Color.RED);
-	
-		// two main panels
-		JPanel mainPanel1 = new JPanel();
-		mainPanel1.setLayout(new GridLayout(23, 1, 5, 5));
-		JPanel mainPanel2 = new JPanel();
-		mainPanel2.setLayout(new BorderLayout());
-		
 		// description label for the text field
-		JLabel storLocLabel = new JLabel("File name:  ");
-		this.storingLocation.setPreferredSize(new Dimension(280, storingLocation.getHeight()));
 		this.storingLocation.setText(System.getProperty("user.dir") + File.separatorChar + FILENAME + ".pdf");
 		
 		
@@ -156,7 +131,7 @@ public class GeneClusterExportDialog extends JDialog {
 		
 		// check box for using genome names instead of the internal mapped number
 		JCheckBox useGenomeNamesCheckBox = new JCheckBox();
-		useGenomeNamesCheckBox.setText("Use genome names instead of numbers.");
+		useGenomeNamesCheckBox.setText("Print genome names");
 		
 		useGenomeNamesCheckBox.addItemListener(new ItemListener() {
 
@@ -184,25 +159,6 @@ public class GeneClusterExportDialog extends JDialog {
 				updateImage();
 			}
 		});
-		
-		// check box for the extra data from the gene cluster display
-		JCheckBox extraData = new JCheckBox();
-		extraData.setText("Add extra information about the cluster. (Just for .pdf export)");
-		
-		extraData.addItemListener(new ItemListener() {
-
-			// just save the status we use this for the pdf only
-			@Override
-			public void itemStateChanged(ItemEvent arg0) {				
-				int status = arg0.getStateChange();
-
-                GeneClusterExportDialog.this.eData = status != ItemEvent.DESELECTED;
-			}
-			
-		});		
-		
-		// disable because it is not implemented
-		//extraData.setEnabled(false);
 		
 		// color chooser for preventing random colors in the non clustered parts
 		// of the genome
@@ -235,21 +191,18 @@ public class GeneClusterExportDialog extends JDialog {
                 File file = validateSettings();
                 if (file != null) {
                     try (FileOutputStream out = new FileOutputStream(file)) {
-                        if (GeneClusterExportDialog.this.png) {
-                            ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "png", out);
-                            GeneClusterExportDialog.this.setVisible(false);
+                        switch ((PictureFormat)exportFormatComboBox.getSelectedItem()) {
+                            case PNG:
+                                ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "png", out);
+                                break;
+                            case JPG:
+                                ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "jpg", out);
+                                break;
+                            case PDF:
+                                GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(out);
+                                gcw.write(GeneClusterExportDialog.this.clusterPics);
                         }
-
-                        if (GeneClusterExportDialog.this.jpg) {
-                            ImageIO.write(GeneClusterExportDialog.this.clusterPics.createImage(), "jpg", out);
-                            GeneClusterExportDialog.this.setVisible(false);
-                        }
-
-                        if (GeneClusterExportDialog.this.pdf) {
-                            GeneClusterToPDFWriter gcw = new GeneClusterToPDFWriter(out);
-                            gcw.write(GeneClusterExportDialog.this.clusterPics);
-                            GeneClusterExportDialog.this.setVisible(false);
-                        }
+                        GeneClusterExportDialog.this.setVisible(false);
                     }  catch (IOException | DocumentException e) {
                         if (GeckoInstance.getInstance().getGui() != null)
                             JOptionPane.showMessageDialog(GeneClusterExportDialog.this, "Error in output", "Error", JOptionPane.ERROR_MESSAGE);
@@ -258,121 +211,54 @@ public class GeneClusterExportDialog extends JDialog {
                 }
             }
         });
-		
-		JLabel author = new JLabel("Author:  ");
-		
-		// add single components to the two main panels
-		mainPanel1.add(storLocLabel);
-		JPanel storPanel = new JPanel();
-		storPanel.setLayout(new BorderLayout());
-		storPanel.add(storingLocation, BorderLayout.WEST);
-		storPanel.add(browseButton, BorderLayout.CENTER);
-		mainPanel1.add(storPanel);
-		//mainPanel1.add(storingLocation);
-		mainPanel1.add(useGenomeNamesCheckBox);
-		mainPanel1.add(geneNamingComboBox);
-		//mainPanel1.add(extraData);
-		mainPanel1.add(ovlapStatus1);
-		mainPanel1.add(ovlapStatus2);
-		JPanel authorPane = new JPanel();
-		authorPane.setLayout(new BorderLayout());
-		authorPane.add(author, BorderLayout.WEST);
-		authorPane.add(this.authorName, BorderLayout.CENTER);
-		mainPanel1.add(authorPane);
-		
-		
-		// output format chooser
-		JLabel exportFormats = new JLabel("Export formats: ");
-		JRadioButton pngExport = new JRadioButton();
-		pngExport.setText(".png");
-		
-		pngExport.addItemListener(new ItemListener() {
 
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				int status = e.getStateChange();
-				
-				if (status == ItemEvent.SELECTED) {
-
-					pdf = false;
-					png = true;
-					jpg = false;
-
+        exportFormatComboBox = new JComboBox<>(PictureFormat.values());
+        exportFormatComboBox.setEditable(false);
+        exportFormatComboBox.setMaximumRowCount(PictureFormat.values().length);
+        exportFormatComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     matchFileEndingToFiletype();
-				}
-			}
-		});
-		
-		JRadioButton jpgExport = new JRadioButton();
-		jpgExport.setText(".jpg");
-		
-		jpgExport.addItemListener(new ItemListener() {
+                }
+            }
+        });
 
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				int status = e.getStateChange();
-				
-				if (status == ItemEvent.SELECTED) {
+        final JCheckBox clusterHeaderCheckbox = new JCheckBox();
+        clusterHeaderCheckbox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                clusterPics.setClusterHeader(clusterHeaderCheckbox.isSelected());
+                updateImage();
+            }
+        });
+        clusterHeaderCheckbox.setSelected(true);
 
-					pdf = false;
-					png = false;
-					jpg = true;
-
-                    matchFileEndingToFiletype();
-				}
-			}
-		});
-
-		JRadioButton pdfExport = new JRadioButton();
-		pdfExport.setText(".pdf");
-		pdfExport.setSelected(true);
-		
-		pdfExport.addItemListener(new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				int status = e.getStateChange();
-				
-				if (status == ItemEvent.SELECTED) {
-
-					pdf = true;
-					png = false;
-					jpg = false;
-
-                    matchFileEndingToFiletype();
-				}
-			}
-		});
-		
-		ButtonGroup formatOptions = new ButtonGroup();
-		formatOptions.add(pdfExport);
-		formatOptions.add(jpgExport);
-		formatOptions.add(pngExport);
-		
-		mainPanel1.add(exportFormats);
-		mainPanel1.add(pngExport);
-		mainPanel1.add(jpgExport);
-		mainPanel1.add(pdfExport);
-		
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new BorderLayout());
-		buttonPanel.add(cancelButton, BorderLayout.WEST);
-		buttonPanel.add(exportButton, BorderLayout.EAST);
-		mainPanel1.add(buttonPanel);
+        DefaultFormBuilder leftPanelBuilder = new DefaultFormBuilder(new FormLayout("p, 4dlu, p"));
+        leftPanelBuilder.append(storingLocation, browseButton);
+        leftPanelBuilder.append("Print genome names", useGenomeNamesCheckBox);
+        leftPanelBuilder.append("Print Gene using:", geneNamingComboBox);
+        leftPanelBuilder.append("Author:", authorName);
+        leftPanelBuilder.append("Export format:", exportFormatComboBox);
+        leftPanelBuilder.append("Add cluster header:", clusterHeaderCheckbox);
+        leftPanelBuilder.append(exportButton, cancelButton);
+        JPanel leftPanel = leftPanelBuilder.getPanel();
+        leftPanel.setBackground(this.getBackground());
 		
 		// add main panels to the window
-		this.add(mainPanel1, BorderLayout.WEST); 
+		this.add(leftPanel, BorderLayout.WEST);
 		
 		// create a scrollPanel with the cluster image
-		clusterPics = new GeneClusterPicture(clusterSelection, (NameType)geneNamingComboBox.getSelectedItem(), useGenomeNamesCheckBox.isSelected());
+		clusterPics = new GeneClusterPicture(clusterSelection, (NameType)geneNamingComboBox.getSelectedItem(), clusterHeaderCheckbox.isSelected(), useGenomeNamesCheckBox.isSelected());
 		prev = new Preview(clusterPics.createImage());
 		JScrollPane previewScroll = new JScrollPane(prev);
 		previewScroll.setEnabled(true);
 		previewScroll.setBackground(Color.white);
 		previewScroll.setDoubleBuffered(true);
 		previewScroll.setBorder(BorderFactory.createEmptyBorder());
-		
-		//previewScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        JPanel mainPanel2 = new JPanel();
+        mainPanel2.setLayout(new BorderLayout());
 		mainPanel2.add(previewScroll);
 		this.add(mainPanel2, BorderLayout.CENTER);
 		this.pack();
@@ -404,12 +290,17 @@ public class GeneClusterExportDialog extends JDialog {
     private void matchFileEndingToFiletype() {
         int dot = GeneClusterExportDialog.this.storingLocation.getText().lastIndexOf(".");
         String newFilename = GeneClusterExportDialog.this.storingLocation.getText().substring(0, dot);
-        if (pdf)
-            storingLocation.setText(newFilename + ".pdf");
-        if (png)
-            storingLocation.setText(newFilename + ".png");
-        if (jpg)
-            storingLocation.setText(newFilename + ".jpg");
+        switch ((PictureFormat)exportFormatComboBox.getSelectedItem()) {
+            case JPG:
+                storingLocation.setText(newFilename + ".jpg");
+                break;
+            case PNG:
+                storingLocation.setText(newFilename + ".png");
+                break;
+            case PDF:
+                storingLocation.setText(newFilename + ".pdf");
+                break;
+        }
     }
 	
 	private void updateImage() {
@@ -439,53 +330,6 @@ public class GeneClusterExportDialog extends JDialog {
 		}
 		
 		return false;
-	}
-	
-	/**
-	 * The method checks whether the given file (given as string) has the correct file extension.
-	 * 
-	 * @param absoluteFile String with the absolute file path
-	 * @return the fixed file path as String
-	 */
-	private String checkAndFixFileExtension(String absoluteFile) {
-		
-		// get the correct file extension
-		String suffix = ".pdf";
-
-		if (jpg) {
-			
-			suffix = ".jpg";
-		}
-		
-		if (png) {
-			
-			suffix = ".png";
-		}
-		
-		String absoluteFileFixed = absoluteFile;
-		
-		// fix file extension if the user entered a other extension than the selected one
-		if ((absoluteFile.contains(".png") || absoluteFile.contains(".jpg")) && this.pdf) {
-			
-			absoluteFileFixed = absoluteFile.replaceAll("\\.png|\\.jpg", ".pdf");
-		}
-		
-		if ((absoluteFile.contains(".jpg") || absoluteFile.contains(".pdf")) && this.png) {
-			
-			absoluteFileFixed = absoluteFile.replaceAll("\\.pdf|\\.jpg", ".png");
-		}
-		
-		if ((absoluteFile.contains(".png") || absoluteFile.contains(".pdf")) && this.jpg) {
-			
-			absoluteFileFixed = absoluteFile.replaceAll("\\.pdf|\\.png", ".jpg");
-		}
-		
-		if (!absoluteFile.contains(".jpg") && !absoluteFile.contains(".png") && !absoluteFile.contains(".pdf")) {
-			
-			absoluteFileFixed = absoluteFile + suffix;
-		}
-		
-		return absoluteFileFixed;
 	}
 
     /**

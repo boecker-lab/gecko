@@ -126,7 +126,10 @@ public class GeneClusterPicture {
 	 * The length of the longest genome name from the clustered genomes.
 	 */
 	private int maxGenomeNameLength;
-	
+
+    /**
+     * The width needed for all the genome names or numbers.
+     */
 	private int nameWidth;
 	
 	/**
@@ -138,14 +141,25 @@ public class GeneClusterPicture {
 	 * Current position in the geneColor array.
 	 */
 	private int colorPos = 0;
+
+
+    /**
+     * If a cluster header shall be printed for each cluster.
+     */
+    private boolean clusterHeader;
+
+    /**
+     * The cluster header
+     */
+    private final String headerString;
 	
 	/**
 	 * The number of additional genes that is shown on each side of the longest cluster occurrence.
 	 */
 	private static final int NR_ADDITIONAL_GENES = 0;
 
-    public GeneClusterPicture(GeneCluster selectedCluster, GenomePainting.NameType nameType, boolean gnames) {
-        this(selectedCluster.getDefaultLocationSelection(GeckoInstance.getInstance().getGenomes(),false), nameType, gnames);
+    public GeneClusterPicture(GeneCluster selectedCluster, GenomePainting.NameType nameType, boolean clusterHeader, boolean gnames) {
+        this(selectedCluster.getDefaultLocationSelection(GeckoInstance.getInstance().getGenomes(),false), nameType, clusterHeader, gnames);
     }
 
 	/**
@@ -155,10 +169,15 @@ public class GeneClusterPicture {
      * @param nameType either id, name or locus_tag
      * @param gnames true if the genome name shall replace the number
      */
-	public GeneClusterPicture(GeneClusterLocationSelection clusterLocation, GenomePainting.NameType nameType, boolean gnames) {
+	public GeneClusterPicture(GeneClusterLocationSelection clusterLocation, GenomePainting.NameType nameType, boolean clusterHeader, boolean gnames) {
 		this.clusterSelection = clusterLocation;
 		this.gNames = gnames;
 		this.setNameType(nameType);
+        headerString = String.format("ID: %d, Total Distance: %d, Score: %1.3f",
+                clusterSelection.getCluster().getId(),
+                clusterSelection.getCluster().getMinTotalDist(),
+                clusterSelection.getCluster().getBestScore());
+        this.clusterHeader = clusterHeader;
 	}
 	
     private int[] getSubselection() {
@@ -170,13 +189,18 @@ public class GeneClusterPicture {
 	 * 
 	 * @param gNames new boolean value
 	 */
-	public void setGnames (boolean gNames) {		
+	public void setGnames(boolean gNames) {
 		this.gNames = gNames;
 		
 		if (this.maxGenomeNameLength == 0) {
 			resetPageSize();
 		}
 	}
+
+    public void setClusterHeader(boolean clusterHeader) {
+        this.clusterHeader = clusterHeader;
+        resetPageSize();
+    }
 	
 	/**
 	 * Set the name type, either id, name or locus_tag
@@ -222,7 +246,8 @@ public class GeneClusterPicture {
 	
 	private void resetPageSize() {
 		calcLengths(nameType);
-		this.pageHeight = clusterSelection.getCluster().getSize() * (this.elemHeight + 2 * this.vgap);
+		this.pageHeight = clusterSelection.getCluster().getSize() * (this.elemHeight + 2 * this.vgap) +
+                (!clusterHeader ? 0 : (this.elemHeight + 2 * this.vgap));
 				
 		// we have to set the width here in the constructor it does not work
 		if (this.nameType != GenomePainting.NameType.ID)
@@ -245,13 +270,20 @@ public class GeneClusterPicture {
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, this.pageWidth, this.pageHeight);
 		g.setFont(new Font("Monospaced", Font.PLAIN, 10));
+
+        if (clusterHeader) {
+            g.setColor(Color.BLACK);
+            g.drawString(headerString,  4, y + 12);
+            y += elemHeight + 2 * vgap;
+            g.setColor(Color.WHITE);
+        }
 		
 		for (int i = 0; i < clusterSelection.getTotalGenomeNumber(); i++) {
 			// if the length is 0 the genome isn't contained in the cluster
 			if (getSubselection()[i] != GeneClusterOccurrence.GENOME_NOT_INCLUDED) {
                 paintGenome(g, i, y);
 				// move to the next line
-				y = y + elemHeight + 2 * vgap;
+				y += elemHeight + 2 * vgap;
 			}
 		}
 	}
@@ -261,52 +293,6 @@ public class GeneClusterPicture {
 		BufferedImage image = new BufferedImage(this.pageWidth,  this.pageHeight, BufferedImage.TYPE_INT_RGB);
 		paint(image.getGraphics());
 		return image;
-	}
-
-    private Color getColor(GeneFamily geneFamily) {
-        switch (useColorMap){
-            case geckoGlobal:
-                return GeckoInstance.getInstance().getGeneColor(geneFamily);
-            case clusterLocal:
-                if (colorMap == null)
-                    colorMap = GeneFamily.prepareColorMap(clusterSelection.getGeneFamilies(), null, clusterSelection.getCluster().getId());
-                return colorMap.get(geneFamily);
-            case standardColors:
-                return getStandardColor(geneFamily);
-            default:
-                logger.error("Should not happen, wrong/unused type in ColorMapType! Type set to {}", useColorMap.toString());
-                return null;
-        }
-    }
-	
-	/**
-	 * The method takes a color from the array geneColors and associate the color with a 
-	 * given gene family and returns the color. If the id already exists just the
-	 * color will be returned without any new association.
-	 * 
-	 * @param geneFamily the gene family
-	 * @return returns the color for the gene element of the given gene ID
-	 */
-	private Color getStandardColor(GeneFamily geneFamily) {
-		Color out = null;
-		
-		if (geneFamily.isSingleGeneFamily()) {
-			out = Color.GRAY;
-		}
-		else {
-			if (newColorMap.containsKey(geneFamily)) {
-				out = newColorMap.get(geneFamily);
-			}
-			else {		
-				if (colorPos < geneColors.length) {
-					out = geneColors[colorPos];
-					newColorMap.put(geneFamily, out);
-					colorPos++;
-				}
-			}
-		}
-		
-		return out;
 	}
 
 	public int getPageWidth() {
@@ -395,5 +381,51 @@ public class GeneClusterPicture {
             currentColor = ColorUtils.getTranslucentColor(currentColor);
         }
         return GenomePainting.paintGene(g, gene, flipped, nameType, partOfCluster ? Color.ORANGE : Color.WHITE, currentColor, x, y, elemWidth, elemHeight, hgap, vgap);
+    }
+
+    private Color getColor(GeneFamily geneFamily) {
+        switch (useColorMap){
+            case geckoGlobal:
+                return GeckoInstance.getInstance().getGeneColor(geneFamily);
+            case clusterLocal:
+                if (colorMap == null)
+                    colorMap = GeneFamily.prepareColorMap(clusterSelection.getGeneFamilies(), null, clusterSelection.getCluster().getId());
+                return colorMap.get(geneFamily);
+            case standardColors:
+                return getStandardColor(geneFamily);
+            default:
+                logger.error("Should not happen, wrong/unused type in ColorMapType! Type set to {}", useColorMap.toString());
+                return null;
+        }
+    }
+
+    /**
+     * The method takes a color from the array geneColors and associate the color with a
+     * given gene family and returns the color. If the id already exists just the
+     * color will be returned without any new association.
+     *
+     * @param geneFamily the gene family
+     * @return returns the color for the gene element of the given gene ID
+     */
+    private Color getStandardColor(GeneFamily geneFamily) {
+        Color out = null;
+
+        if (geneFamily.isSingleGeneFamily()) {
+            out = Color.GRAY;
+        }
+        else {
+            if (newColorMap.containsKey(geneFamily)) {
+                out = newColorMap.get(geneFamily);
+            }
+            else {
+                if (colorPos < geneColors.length) {
+                    out = geneColors[colorPos];
+                    newColorMap.put(geneFamily, out);
+                    colorPos++;
+                }
+            }
+        }
+
+        return out;
     }
 }

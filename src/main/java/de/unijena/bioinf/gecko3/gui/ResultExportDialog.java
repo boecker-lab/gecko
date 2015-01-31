@@ -73,6 +73,7 @@ public class ResultExportDialog extends JDialog {
 			}
 		});
 		final JComboBox<ExportType> exportTypeCompoBox = new JComboBox<>(ExportType.getSupported());
+        exportTypeCompoBox.setEditable(false);
 		exportTypeCompoBox.setMaximumRowCount(ExportType.getSupported().length);
 		exportTypeCompoBox.addItemListener(new ItemListener() {
 			@Override
@@ -85,6 +86,7 @@ public class ResultExportDialog extends JDialog {
 		});
 
 		final JComboBox<ResultFilter> resultFilterComboBox = new JComboBox<>(ResultFilter.values());
+        resultFilterComboBox.setEditable(false);
 
         generalOptionsBuilder.append(new JLabel("Choose Export Type"), exportTypeCompoBox);
         generalOptionsBuilder.nextLine();
