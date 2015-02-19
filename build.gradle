@@ -1,6 +1,9 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 version = 3
 
 mainClassName = 'de.unijena.bioinf.gecko3.Gecko3'
