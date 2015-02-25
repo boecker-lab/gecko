@@ -5,7 +5,7 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 group = "de.unijena.bioinf.gecko3"
-version = 3
+version = "3.0.1-SNAPSHOT"
 
 mainClassName = 'de.unijena.bioinf.gecko3.Gecko3'
 
@@ -55,10 +55,8 @@ task createMoreStartScripts(type: CreateStartScripts) {
 }
 
 distZip {
-    archiveName "Gecko" + version+'.zip'
+    archiveName "Gecko" + version + '.zip'
 }
-
-
 
 test {
     testLogging.showStandardStreams = true
