@@ -5,7 +5,7 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 group = "de.unijena.bioinf.gecko3"
-version = "3.0.1-SNAPSHOT"
+version = 3
 
 mainClassName = 'de.unijena.bioinf.gecko3.Gecko3'
 
@@ -34,6 +34,10 @@ jar {
     manifest {
         attributes 'Main-Class' : mainClassName
     }
+
+    from('.') {
+        include('COPYING.LESSER')
+    }
 }
 
 task createMoreStartScripts(type: CreateStartScripts) {
@@ -51,6 +55,10 @@ task createMoreStartScripts(type: CreateStartScripts) {
     applicationDistribution.from(outputDir) {
         include "${applicationName}", "${applicationName}.bat"
         into 'bin'
+    }
+
+    applicationDistribution.from('.') {
+        include('COPYING.LESSER')
     }
 }
 
