@@ -22,7 +22,6 @@ package de.unijena.bioinf.gecko3.commandLine;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.Parameter;
 import de.unijena.bioinf.gecko3.io.ExportType;
-import de.unijena.bioinf.gecko3.io.ResultWriter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -167,7 +166,6 @@ public class CommandLineOptions {
 
     /**
      * Validates all the parameters
-     * @return
      */
     public void validate(CmdLineParser parser) throws CmdLineException {
         if (gui && distanceTable == null && maxDistance < 0 && minClusterSize < 0){

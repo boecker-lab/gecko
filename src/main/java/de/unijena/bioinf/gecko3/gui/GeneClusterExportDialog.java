@@ -46,7 +46,7 @@ import java.io.IOException;
  * This class implements an dialog for setting option to export a GeneCluster
  * (picture in MultipleGenomesBrowser) into a pdf file and several image formats.
  * 
- * @author Hans-Martin Haase <hans-martin.haase at uni-jena dot de>
+ * @author Hans-Martin Haase
  * @version 0.15
  */
 public class GeneClusterExportDialog extends JDialog {
@@ -336,7 +336,7 @@ public class GeneClusterExportDialog extends JDialog {
      * The class implements a simple preview for the pdf file created with the
      * GeneClusterToPDFWriter.
      *
-     * @author Hans-Martin Haase <hans-martin dot haase at uni-jena dot de>
+     * @author Hans-Martin Haase
      *
      */
     private static class Preview extends JPanel {
@@ -353,7 +353,7 @@ public class GeneClusterExportDialog extends JDialog {
         /**
          * The constructor sets the global variable clusterPicture and sets a basic layout.
          *
-         * @param toShow BufferdImage from GeneClusterToPDFWriter
+         * @param toShow BufferedImage from GeneClusterToPDFWriter
          */
         public Preview (BufferedImage toShow) {
             this.setImage(toShow);

@@ -29,7 +29,7 @@ import java.util.List;
  * This class models an occurrence of a {@link GeneCluster} (which is uniquely
  * identified by the set of genes it contains).
  * 
- * @author Leon Kuchenbecker <lkuchenb@inf.fu-berlin.de>
+ * @author Leon Kuchenbecker
  *
  */
 public class GeneClusterOccurrence implements Serializable {

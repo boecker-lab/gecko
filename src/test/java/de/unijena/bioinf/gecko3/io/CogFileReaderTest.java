@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  * JUnit test for the new class InputFileReader.
  * 
  * 
- * @author Hans-Martin Haase <hans-martin dot haase at uni-jena dot de>
+ * @author Hans-Martin Haase
  * @version 0.10
  */
 public class CogFileReaderTest {

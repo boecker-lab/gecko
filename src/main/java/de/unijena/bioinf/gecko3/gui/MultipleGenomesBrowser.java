@@ -39,7 +39,7 @@ import java.util.List;
  * functions for setting up the mgb.
  * 
  * This class contains modifications (genomeBrowserFilter, related variables and getter/setter)
- * made by Hans-Martin Haase <hans-martin.haase@uni-jena.de>
+ * made by Hans-Martin Haase
  * 
  * @author original author unknown
  */

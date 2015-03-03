@@ -23,7 +23,7 @@ import java.util.EventListener;
 
 /**
  * 
- * @author Leon Kuchenbecker <lkuchenb@inf.fu-berlin.de>
+ * @author Leon Kuchenbecker
  *
  */
 public interface ClusterSelectionListener extends EventListener {

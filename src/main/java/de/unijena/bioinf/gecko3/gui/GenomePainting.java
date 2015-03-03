@@ -133,7 +133,7 @@ public class GenomePainting {
 
     /**
      * Paints one gene, the gene text is automatically generated from the gene id, the gecko gene label map and the nameType,
-     * the orientation is generated from the gene id (id < 0 = NEGATIVE, id > 0 = POSITIVE)
+     * the orientation is generated from the gene id (id &lt; 0 = NEGATIVE, id &gt; 0 = POSITIVE)
      * @param g the Graphics
      * @param gene the gene
      * @param flipped if the gene shall be painted flipped

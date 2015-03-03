@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 /**
  * 
- * @author Leon Kuchenbecker <lkuchenb@inf.fu-berlin.de>
+ * @author Leon Kuchenbecker
  *
  */
 public class LocationSelectionEvent extends ClusterSelectionEvent {

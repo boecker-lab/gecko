@@ -29,7 +29,7 @@ import java.util.List;
 
 public class IntArray{
     /**
-     * Constructs an IntArray that holds the values from an List<Integer>.
+     * Constructs an IntArray that holds the values from an List.
      * @param list the list of Integer who's values the IntArray will store.
      * @param zeroTerminate if the list should be zero terminated.
      */
@@ -55,8 +55,8 @@ public class IntArray{
     }
     
     /**
-     * Constructs an IntArray that holds the values from an List<Integer>.
-     * @param list the list of Integer who's values the IntArray will store.
+     * Constructs an int array.
+     * @param list the array who's values the array will store.
      * @param zeroTerminate if the list should be zero terminated.
      */
     public static int[] newIntArray(int[] list, boolean zeroTerminate) {
@@ -90,7 +90,7 @@ public class IntArray{
     }
 
     /**
-     * Factory method, that returns an new instance of IntArray that holds the values from an List<Integer>. The IntArray starts and ends with a terminal character 0.
+     * Factory method, that returns an new instance of IntArray that holds the values from an List. The IntArray starts and ends with a terminal character 0.
      * @param list the list of Integer who's values the IntArray will store.
      * @return the new instance of IntArray.
      */
@@ -99,7 +99,7 @@ public class IntArray{
     }
     
     /**
-     * Factory method, that returns an new instance of IntArray that holds the values from an List<Integer>. The IntArray starts and ends with a terminal character 0.
+     * Factory method, that returns an new instance of IntArray that holds the values from an List. The IntArray starts and ends with a terminal character 0.
      * @param list the list of Integer who's values the IntArray will store.
      * @return the new instance of IntArray.
      */

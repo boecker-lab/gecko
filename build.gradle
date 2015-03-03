@@ -5,7 +5,7 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 group = "de.unijena.bioinf.gecko3"
-version = "3.0.1-SNAPSHOT"
+version = 3
 
 mainClassName = 'de.unijena.bioinf.gecko3.Gecko3'
 
@@ -38,6 +38,21 @@ jar {
     from('.') {
         include('COPYING.LESSER')
     }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }
 
 task createMoreStartScripts(type: CreateStartScripts) {

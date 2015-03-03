@@ -35,7 +35,7 @@ import java.util.*;
  * The class implements a reader for .gck files (session files).
  * The code is exported from GeckoInstance.java and modified.
  * 
- * @author Hans-Martin Haase <hans-martin dot haase at uni-jena dot de>
+ * @author Hans-Martin Haase
  * @version 0.03
  */
 public class GckFileReader implements GeckoDataReader {

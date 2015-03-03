@@ -36,7 +36,7 @@ import java.util.Map;
  * and other available options.
  * There are also methods available which return and convert the image data.
  * 
- * @author Hans-Martin Haase <hmhaase at pclinuxosusers dot de>
+ * @author Hans-Martin Haase
  * @version 0.12
  */
 public class GeneClusterPicture {

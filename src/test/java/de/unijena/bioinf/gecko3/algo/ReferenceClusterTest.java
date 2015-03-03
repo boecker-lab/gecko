@@ -36,7 +36,7 @@ import static de.unijena.bioinf.gecko3.algo.GeneClusterTestUtils.compareReferenc
 /**
  * The class tests the computeClusters algorithm from the Gecko3 program
  * 
- * @author Hans-Martin Haase <hans-martin.haase@uni-jena.de>
+ * @author Hans-Martin Haase
  * @version 0.54
  *
  */

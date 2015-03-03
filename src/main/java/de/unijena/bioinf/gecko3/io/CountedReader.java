@@ -48,7 +48,8 @@ public class CountedReader implements AutoCloseable {
 	/**
 	 * Skips a given number of lines
 	 * @param l The line to skip to. The next readLine() call will return the contents of line l if it exists.
-	 * @throws IOException, EOFException If the number given -1 exceeds the length of the content.
+	 * @throws IOException If the number given -1 exceeds the length of the content.
+     * @throws EOFException If the number given -1 exceeds the length of the content.
 	 * @throws LinePassedException If the readers pointer already points at a line after the given line number
 	 */
 	public void jumpToLine(int l) throws IOException, LinePassedException {
