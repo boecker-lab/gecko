@@ -92,5 +92,5 @@ distZip {
 
 test {
     testLogging.showStandardStreams = true
-    ignoreFailures = true
+    //ignoreFailures = true
 }

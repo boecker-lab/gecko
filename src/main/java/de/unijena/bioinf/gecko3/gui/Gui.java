@@ -184,7 +184,6 @@ public class Gui {
 		menuFile.add(importGenomesAction);
 		menuFile.add(saveSessionAction);
 		menuFile.add(exportResultsAction);
-		menuFile.add(loadClusterAnnotationsAction);
 		menuFile.addSeparator();
 		menuFile.add(exitAction);
 		
@@ -481,7 +480,6 @@ public class Gui {
 		mgbViewSwitcher.setEnabled(clusterBrowserActive);
 		searchField.setEnabled(clusterBrowserActive);
 		exportResultsAction.setEnabled(clusterBrowserActive);
-		loadClusterAnnotationsAction.setEnabled(clusterBrowserActive);
 	}
 	
 	public void changeMode(Mode mode) {
@@ -837,46 +835,6 @@ public class Gui {
 			mainframe.requestFocus();
 		}
 	};
-	
-	private final Action loadClusterAnnotationsAction = new AbstractAction() {
-		private static final long serialVersionUID = 1148103871109191664L;
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser fc = new JFileChooser(gecko.getCurrentWorkingDirectoryOrFile());
-			
-			for (;;) {	
-				int state = fc.showOpenDialog(null);
-				
-				if (state == JFileChooser.APPROVE_OPTION) {
-					File f = fc.getSelectedFile();
-                    gecko.setCurrentWorkingDirectoryOrFile(f);
-					
-					if (f.exists()) {	
-						if (f.isDirectory()) {
-							JOptionPane.showMessageDialog(mainframe, "You cannot choose a directory", "Error", JOptionPane.ERROR_MESSAGE);
-							continue;
-						}
-
-						GeckoInstance geckoInstance = GeckoInstance.getInstance();
-						List<GeneCluster> newCluster = ClusterAnnotationReader.readClusterAnnotations(f, geckoInstance.getData());
-						
-						if (newCluster == null)
-							JOptionPane.showMessageDialog(mainframe, "An error occured while reading the annotations!", "Error", JOptionPane.ERROR_MESSAGE);
-						else {
-                            List<GeneCluster> clusterWithPValue = geckoInstance.computeReferenceStatistics(newCluster);
-							geckoInstance.mergeClusters(clusterWithPValue, null);
-						}									
-						break;
-					}
-				}
-				else 
-				{
-					break;
-				}
-			}
-		}
-	};
 
 	
 	private void initActions() {
@@ -910,10 +868,6 @@ public class Gui {
 		exportResultsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		saveSessionAction.setEnabled(false);
-		
-		loadClusterAnnotationsAction.putValue(Action.NAME, "Load clusters...");
-		loadClusterAnnotationsAction.putValue(Action.SHORT_DESCRIPTION, "Load clusters...");
-		loadClusterAnnotationsAction.setEnabled(false);
 		
 		clearSelectionAction.putValue(Action.SHORT_DESCRIPTION, "Clear selection");
 		clearSelectionAction.putValue(Action.SMALL_ICON, createImageIcon("images/cancel.png"));

@@ -146,9 +146,6 @@ public class ClusterAnnotationReaderTest {
         List<GeneCluster> res = GeckoInstance.computeClustersJava(data, p, null);
 		
 		compareClusters(res, clusters, false);
-		
-		//GeneCluster[] newClusters = GeckoInstance.getInstance().computeReferenceStatistics(computeGenomes, p, readClusters, GeckoInstance.getInstance());
-		//compareClusters(res, newClusters, true);
 	}
 	
 	@Test
@@ -162,10 +159,5 @@ public class ClusterAnnotationReaderTest {
 		List<GeneCluster> clusters = ClusterAnnotationReader.readClusterAnnotations(annotationFile, data);
 		assertNotNull(clusters);
 		assertEquals(12, clusters.size());
-		GeckoInstance geckoInstance = GeckoInstance.getInstance();
-		geckoInstance.setGeckoInstanceData(data);
-        List<GeneCluster> clusterWithPValue = geckoInstance.computeReferenceStatistics(clusters);
-		
-		compareClusters(clusters, clusterWithPValue, false);
 	}
 }

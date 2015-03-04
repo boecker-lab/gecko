@@ -853,19 +853,12 @@ public class ReferenceClusterTest
 
         // def result 1
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
-        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
+        ExpectedDeltaLocationValues dLoc1_3 = new ExpectedDeltaLocationValues(0, 1, 2, 1);
         List<Integer> genes1 = Arrays.asList(1, 2, 3);
         int[] minimumDistances1 = new int[]{0, 1, 1};
 
-        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_2}};
-
-        // def result 2
-        ExpectedDeltaLocationValues dLoc2_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
-        ExpectedDeltaLocationValues dLoc2_2 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
-        List<Integer> genes2 = Arrays.asList(1, 2, 3);
-        int[] minimumDistances2 = new int[]{1, 0, 0};
-
-        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues2 = {{dLoc2_1},{dLoc2_2}};
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_2},{dLoc1_3}};
 
         ExpectedReferenceClusterValues[] referenceClusterValues = {
                 new ExpectedReferenceClusterValues(
@@ -873,17 +866,8 @@ public class ReferenceClusterTest
                         minimumDistances1,
                         0,
                         0,
-                        2,
-                        expectedDeltaLocationValues1),
-                new ExpectedReferenceClusterValues(
-                        genes2,
-                        minimumDistances2,
-                        0,
-                        0,
-                        2,
-                        expectedDeltaLocationValues2
-                )
-        };
+                        3,
+                        expectedDeltaLocationValues1)};
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
