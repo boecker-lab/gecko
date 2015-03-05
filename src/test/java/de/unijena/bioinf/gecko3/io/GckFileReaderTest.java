@@ -90,16 +90,6 @@ public class GckFileReaderTest {
         testReadingClusters(cogFile, gckFile, p);
     }
 
-    @Test
-    @Category(PerformanceTest.class)
-    public void readFileStringDBPartialClusters()  throws IOException, ParseException{
-        File cogFile = new File(getClass().getResource("/stringDBPartial.cog").getFile());
-        File gckFile = new File(getClass().getResource("/stringDBPartialClusters.gck").getFile());
-
-        Parameter p = new Parameter(3, 7, 50, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
-        testReadingClusters(cogFile, gckFile, p);
-    }
-
     private static void testReadingDataWithoutClusters(File cogInfile, File gckInfile) throws IOException, ParseException {
         CogFileReader cogFileReader = new CogFileReader(cogInfile);
 
