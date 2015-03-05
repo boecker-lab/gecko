@@ -22,7 +22,9 @@ package de.unijena.bioinf.gecko3.io;
 import de.unijena.bioinf.gecko3.GeckoInstance;
 import de.unijena.bioinf.gecko3.datastructures.*;
 import de.unijena.bioinf.gecko3.algo.GeneClusterTestUtils;
+import de.unijena.bioinf.gecko3.testUtils.PerformanceTest;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,20 +81,22 @@ public class GckFileReaderTest {
     }
 
     @Test
+    @Category(PerformanceTest.class)
     public void readFileStatisticsClusters()  throws IOException, ParseException{
         File cogFile = new File(getClass().getResource("/statistics.cog").getFile());
         File gckFile = new File(getClass().getResource("/statisticsClusters.gck").getFile());
 
-        Parameter p = new Parameter(3, 7, 10, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+        Parameter p = new Parameter(3, 5, 10, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
         testReadingClusters(cogFile, gckFile, p);
     }
 
     @Test
+    @Category(PerformanceTest.class)
     public void readFileStringDBPartialClusters()  throws IOException, ParseException{
         File cogFile = new File(getClass().getResource("/stringDBPartial.cog").getFile());
         File gckFile = new File(getClass().getResource("/stringDBPartialClusters.gck").getFile());
 
-        Parameter p = new Parameter(3, 7, 10, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+        Parameter p = new Parameter(3, 7, 50, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
         testReadingClusters(cogFile, gckFile, p);
     }
 

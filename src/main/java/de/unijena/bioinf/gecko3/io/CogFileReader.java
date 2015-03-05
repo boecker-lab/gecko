@@ -285,6 +285,8 @@ public class CogFileReader implements GeckoDataReader {
             this.genomes[i++] = x;
         }
 
+        Arrays.sort(genomes);
+
         return new DataSet(
                 genomes,
                 maxIdLength,

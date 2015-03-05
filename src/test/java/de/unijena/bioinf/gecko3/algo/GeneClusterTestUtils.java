@@ -287,17 +287,37 @@ public class GeneClusterTestUtils {
         assertNotNull(settings.expectedResultFile);
         GeckoDataReader resultReader = new GckFileReader(settings.expectedResultFile);
         DataSet expectedData = resultReader.readData();
+
         // Test unreduced
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet actualData = reader.readData();
+
+        if (settings.p.getRefType() == Parameter.ReferenceType.genome && settings.referenceGenome != null) {
+            for (int i=0; i<actualData.getGenomes().length; i++){
+                if (settings.referenceGenome.equals(actualData.getGenomes()[i].getName())){
+                    actualData.reorderGenomes(i);
+                    break;
+                }
+            }
+        }
 
         List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(actualData, settings.p, settings.genomeGroups, false, null);
         actualData.setClusters(javaRes, settings.p);
 		
 		compareGeneClusters(expectedData.getClusters(), javaRes, PValueComparison.COMPARE_NONE);
+
         // Test with memory reduction
         CogFileReader reducedReader = new CogFileReader(settings.dataFile);
         DataSet reducedData = reducedReader.readData();
+
+        if (settings.p.getRefType() == Parameter.ReferenceType.genome && settings.referenceGenome != null) {
+            for (int i=0; i<reducedData.getGenomes().length; i++){
+                if (settings.referenceGenome.equals(reducedData.getGenomes()[i].getName())){
+                    reducedData.reorderGenomes(i);
+                    break;
+                }
+            }
+        }
 
         List<GeneCluster> reducedRes = GeckoInstance.computeClustersJava(reducedData, settings.p, settings.genomeGroups, true, null);
         reducedData.setClusters(reducedRes, settings.p);
@@ -320,6 +340,15 @@ public class GeneClusterTestUtils {
         CogFileReader reader = new CogFileReader(settings.dataFile);
         DataSet data = reader.readData();
 
+        if (settings.p.getRefType() == Parameter.ReferenceType.genome && settings.referenceGenome != null) {
+            for (int i=0; i<data.getGenomes().length; i++){
+                if (settings.referenceGenome.equals(data.getGenomes()[i].getName())){
+                    data.reorderGenomes(i);
+                    break;
+                }
+            }
+        }
+
         List<GeneCluster> javaRes = GeckoInstance.computeClustersJava(data, settings.p, settings.genomeGroups, null);
         data.setClusters(javaRes, settings.p);
 
@@ -332,9 +361,9 @@ public class GeneClusterTestUtils {
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionDataD2S4Q2();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionBugD2S5Q2();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q2Grouping();
-        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
+        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterD3S6Q4();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.fiveProteobacterDeltaTable();
-        //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10FixedRef();
+        ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.statisticsDataD5S8Q10EColiRef();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionWithSuboptimalOccurrenceD3S5();
         //ReferenceClusterTestSettings testType = ReferenceClusterTestSettings.memoryReductionMultipleZerosD3S5();
         try{

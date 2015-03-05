@@ -91,6 +91,18 @@ distZip {
 }
 
 test {
+    useJUnit {
+        excludeCategories 'de.unijena.bioinf.gecko3.testUtils.SlowTest'
+    }
+
     testLogging.showStandardStreams = true
     //ignoreFailures = true
+}
+
+task slowTest(type: Test) {
+    useJUnit {
+        includeCategories 'de.unijena.bioinf.gecko3.testUtils.SlowTest'
+    }
+
+    testLogging.showStandardStreams = true
 }

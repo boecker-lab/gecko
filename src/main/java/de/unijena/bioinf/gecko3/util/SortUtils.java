@@ -50,10 +50,6 @@ class GenomeOccurenceComparator implements Comparator<GenomeOccurrence>, Seriali
 
 class GenomeOccurenceStartComparator implements Comparator<GenomeOccurrence>, Serializable {
 	public int compare(GenomeOccurrence o1, GenomeOccurrence o2) {
-		if (o1.getStart_line()<o2.getStart_line())
-			return -1;
-		if (o1.getStart_line()==o2.getStart_line())
-			return 0;
-		return 1;
+        return o1.getStart_line() - o2.getStart_line();
 	}
 }

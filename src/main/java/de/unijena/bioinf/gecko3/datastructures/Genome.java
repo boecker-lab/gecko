@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.util.*;
 
 
-public class Genome implements Serializable {
+public class Genome implements Serializable, Comparable<Genome> {
 	private static final long serialVersionUID = 370380955909547007L;
 
     private static final Logger logger = LoggerFactory.getLogger(Genome.class);
@@ -131,4 +131,8 @@ public class Genome implements Serializable {
 			return getName();
 	}
 
+    @Override
+    public int compareTo(Genome o) {
+        return this.getName().compareTo(o.getName());
+    }
 }

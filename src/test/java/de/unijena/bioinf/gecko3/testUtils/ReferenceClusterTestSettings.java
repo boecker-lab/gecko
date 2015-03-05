@@ -33,6 +33,7 @@ import java.util.Set;
  */
 public class ReferenceClusterTestSettings {
     public Parameter p;
+    public String referenceGenome;
     public File dataFile;
     public File expectedResultFile;
     public File resultOutputFile;
@@ -169,22 +170,24 @@ public class ReferenceClusterTestSettings {
         return settings;
     }
 
-    public static ReferenceClusterTestSettings statisticsDataD5S8Q10FixedRef() {
+    public static ReferenceClusterTestSettings statisticsDataD5S8Q10EColiRef() {
+        final String fileName = "statisticsDataD4S8Q25EColiRef.gck";
         ReferenceClusterTestSettings settings = new ReferenceClusterTestSettings();
         settings.p = new Parameter(
-                5,
+                4,
                 8,
-                10,
+                25,
                 Parameter.OperationMode.reference,
                 Parameter.ReferenceType.genome
         );
+        settings.referenceGenome = "Escherichia_coli_str_K-12_substr_MG1655";
         settings.dataFile = new File(GeneClusterTestUtils.class.getResource("/statistics.cog").getFile());
 
         settings.expectedResultFile = null;
-        if (GeneClusterTestUtils.class.getResource("/statisticsDataD5S8Q10FixedRef.gck") != null)
-            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/statisticsDataD5S8Q10FixedRef.gck").getFile());
+        if (GeneClusterTestUtils.class.getResource("/"+fileName) != null)
+            settings.expectedResultFile = new File(GeneClusterTestUtils.class.getResource("/"+fileName).getFile());
 
-        settings.resultOutputFile = new File("src/test/resources/statisticsDataD5S8Q10FixedRef.gck");
+        settings.resultOutputFile = new File(fileName);
         settings.genomeGroups = null;
         return settings;
     }
