@@ -178,8 +178,7 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
 		for (int i=0; i<refGenomeCount; i++)
 			detectReferenceGeneClusterFromSingleGenome(i, refClusterList);
 		
-		long calcTime = System.nanoTime();		
-		System.out.println("Doing Statistics!");
+		long calcTime = System.nanoTime();
 		
 		for (ReferenceCluster cluster : refClusterList) {
             cluster.setGeneContent(genomes);
@@ -188,8 +187,13 @@ public class ReferenceClusterAlgorithm implements AlgorithmProgressProvider {
         }
 
         genomes.removeCalculationFields();
-		
-		Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
+
+        if (!param.noStatistics()) {
+            System.out.println("Doing Statistics!");
+            Statistics.computeReferenceStatistics(genomes, refClusterList, param.getMaximumDelta(), param.useSingleReference(), nrOfGenomeGroups, genomeGroupMapping, progressListeners);
+        } else {
+            System.out.println("Not computing statistics!");
+        }
 		
 		long statTime = System.nanoTime();
 		System.out.println(String.format("Calculation: %fs",(calcTime - startTime)/1.0E09));

@@ -76,12 +76,17 @@ public class CommandLineOptions {
             "The name has to be uniquely contained at the beginning of a single genome.")
     private String referenceGenomeName = "";
 
+    @Option(name = "-rIR", aliases = "--refInRef", usage = "Also search for occurrences of cluster in reference genome.")
+    private boolean refInRef = false;
+
+    @Option(name = "--noStatistics", usage = "Do not compute cluster statistics.")
+    private boolean noStatistics = false;
+
     /*
      * Files
      */
     @Option(name="-in", aliases = "--Infile", required = true, usage = "The .gck or .cog input file.")
     private File infile = null;
-
 
     @Option(name="-gL", aliases = "--genomeList", handler=GenomeListOptionHandler.class, usage = "The indices of the genomes that shall be imported from the .cog file.\n" +
             "A String containing a comma separated list of integers (\"1, 3, 5, 8\").\n" +
@@ -158,6 +163,14 @@ public class CommandLineOptions {
 
     public boolean noComputation() {
         return noComputation;
+    }
+
+    public boolean refInRef() {
+        return refInRef;
+    }
+
+    public boolean noStatistics() {
+        return noStatistics;
     }
 
     public boolean showHelp() {

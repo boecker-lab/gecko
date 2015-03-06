@@ -38,30 +38,16 @@ public class AlgorithmParameters{
     
     private final boolean singleReference;
     private final boolean refInRef;
-    
-	public AlgorithmParameters(int delta, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference) {
-		this(delta, minClusterSize, q, nrOfGenomes, alphabetSize, singleReference, false);
-	}
 
-	public AlgorithmParameters(int delta, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
-		this(delta, null, minClusterSize, q, nrOfGenomes, alphabetSize, singleReference, refInRef);
-	}
-	
-	public AlgorithmParameters(int[][] deltaTable, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference) {
-		this(deltaTable, minClusterSize, q, nrOfGenomes, alphabetSize, singleReference, false);
-	}
-	
-	public AlgorithmParameters(int[][] deltaTable, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
-		this(-1, deltaTable, minClusterSize, q, nrOfGenomes, alphabetSize, singleReference, refInRef);
-	}
+    private final boolean noStatistics;
 	
 	public AlgorithmParameters(Parameter p, int alphabetSize, int nrOfGenomes) {
-		this(p.getDelta(), p.getDeltaTable(), p.getMinClusterSize(), p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != Parameter.ReferenceType.allAgainstAll), p.searchRefInRef());
+		this(p.getDelta(), p.getDeltaTable(), p.getMinClusterSize(), p.getQ(), nrOfGenomes, alphabetSize, (p.getRefType() != Parameter.ReferenceType.allAgainstAll), p.searchRefInRef(), p.noStatistics());
 		if (!p.useJavaAlgorithm())
 			throw new IllegalArgumentException("Parameters not compatible to Java mode.");
 	}
 	
-	private AlgorithmParameters(int delta, int[][] deltaTable, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef) {
+	private AlgorithmParameters(int delta, int[][] deltaTable, int minClusterSize, int q, int nrOfGenomes, int alphabetSize, boolean singleReference, boolean refInRef, boolean noStatistics) {
 		if (delta >= 0 && deltaTable != null)
 			throw new IllegalArgumentException("Invalid delta and deltaTable values. Cannot use both!");
 		if (delta < 0 && deltaTable == null)
@@ -94,6 +80,7 @@ public class AlgorithmParameters{
         this.alphabetSize = alphabetSize;
         this.singleReference = singleReference;
         this.refInRef = refInRef;
+        this.noStatistics = noStatistics;
 	}
 	
 	/**
@@ -228,11 +215,14 @@ public class AlgorithmParameters{
     public boolean useSingleReference() {
     	return singleReference;
     }
-    
 
 	public boolean searchRefInRef() {
 		return refInRef;
 	}
+
+    public boolean noStatistics() {
+        return noStatistics;
+    }
 
     public String toString() {
 		if (delta >= 0)

@@ -237,10 +237,10 @@ public class GckFileReader implements GeckoDataReader {
 
         try{
             int delta = Integer.parseInt(parameters[5]);
-            this.parameters = new Parameter(delta, minClusterSize, quorum, oMode, rType, searchRefInRef);
+            this.parameters = new Parameter(delta, minClusterSize, quorum, oMode, rType, searchRefInRef, false);
         } catch (NumberFormatException e) {
             int[][] deltaTable = StringParsing.parseDeltaTable(parameters[5]);
-            this.parameters = new Parameter(deltaTable, minClusterSize, quorum, oMode, rType, searchRefInRef);
+            this.parameters = new Parameter(deltaTable, minClusterSize, quorum, oMode, rType, searchRefInRef, false);
         }
 
         line = reader.readLine().trim();

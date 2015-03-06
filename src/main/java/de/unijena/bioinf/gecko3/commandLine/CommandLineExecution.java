@@ -60,14 +60,12 @@ public class CommandLineExecution {
                 if (index == -1)
                     throw new IllegalArgumentException(String.format("Error! Reference genome name (%s) is not contained in any genome name!", options.getReferenceGenomeName()));
 
-                Genome first = genomes[0];
-                genomes[0] = genomes[index];
-                genomes[index] = first;
+                GeckoInstance.getInstance().reorderGenomes(index);
             }
 
             Parameter parameter;
             if (options.getMaxDistance() >= 0)
-                parameter = new Parameter(options.getMaxDistance(), options.getMinClusterSize(), options.getMinCoveredGenomes(), options.getOperationMode(), refType);
+                parameter = new Parameter(options.getMaxDistance(), options.getMinClusterSize(), options.getMinCoveredGenomes(), options.getOperationMode(), refType, options.refInRef(), options.noStatistics());
             else {
                 int[][] distanceValues = options.getDistanceTable();
                 int[][] distanceTable = new int[distanceValues.length][];
@@ -83,7 +81,7 @@ public class CommandLineExecution {
                             minSize = i;
                     }
                 }
-                parameter = new Parameter(distanceTable, minSize, options.getMinCoveredGenomes(), options.getOperationMode(), refType);
+                parameter = new Parameter(distanceTable, minSize, options.getMinCoveredGenomes(), options.getOperationMode(), refType, options.refInRef(), options.noStatistics());
             }
 
             // compute the clusters

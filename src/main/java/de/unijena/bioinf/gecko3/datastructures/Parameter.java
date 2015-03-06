@@ -182,13 +182,14 @@ public class Parameter {
 	private final ReferenceType refType;
 	private final OperationMode operationMode;
 	private final boolean searchRefInRef;
+    private final boolean noStatistics;
     private int alphabetSize;
 	
 	public Parameter(int delta, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType) {
-		this(delta, minClusterSize, q, operationMode, refType, false);
+		this(delta, minClusterSize, q, operationMode, refType, false, false);
 	}
 	
-	public Parameter(int delta, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
+	public Parameter(int delta, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef, boolean noStatistics) {
 		if (searchRefInRef && operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Searching the reference occurrence in the reference genome is only compatible with reference mode!");
 		if (delta < 0)
@@ -202,13 +203,14 @@ public class Parameter {
 		this.refType = refType;
 		this.alphabetSize = -1;
 		this.searchRefInRef = searchRefInRef;
+        this.noStatistics = noStatistics;
 	}
 	
 	public Parameter(int[][] deltaTable, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType) {
-		this(deltaTable, minClusterSize, q, operationMode, refType, false);
+		this(deltaTable, minClusterSize, q, operationMode, refType, false, false);
 	}
 	
-	public Parameter(int[][] deltaTable, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef) {
+	public Parameter(int[][] deltaTable, int minClusterSize, int q, OperationMode operationMode, ReferenceType refType, boolean searchRefInRef, boolean noStatistics) {
 		if (operationMode != OperationMode.reference)
 			throw new IllegalArgumentException("Delta table is only compatible with reference mode!");
 
@@ -229,6 +231,7 @@ public class Parameter {
 		this.refType = refType;
 		this.alphabetSize = -1;
 		this.searchRefInRef = searchRefInRef;
+        this.noStatistics = noStatistics;
     }
 	
 	public ReferenceType getRefType() {
@@ -278,8 +281,12 @@ public class Parameter {
 	public boolean searchRefInRef() {
 		return searchRefInRef;
 	}
-	
-	public boolean useJavaAlgorithm() {
+
+    public boolean noStatistics() {
+        return noStatistics;
+    }
+
+    public boolean useJavaAlgorithm() {
 		return operationMode == OperationMode.reference;
 	}
 }

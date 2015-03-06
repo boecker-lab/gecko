@@ -892,7 +892,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 2, 5, 1, 2, 0}}, {{0, 3, 4, 5, 4, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(0, 2, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
+		Parameter p = new Parameter(0, 2, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true, false);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
@@ -923,7 +923,7 @@ public class ReferenceClusterTest
 		int genomes[][][] = {{{0, 1, 3, 2, 5, 1, 2, 0}}, {{0, 3, 4, 5, 4, 0}}};
 
 		// def parameters
-		Parameter p = new Parameter(1, 3, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true);
+		Parameter p = new Parameter(1, 3, 1, Parameter.OperationMode.reference, Parameter.ReferenceType.allAgainstAll, true, false);
 
         // def result (using p values from calculated result)
         ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
