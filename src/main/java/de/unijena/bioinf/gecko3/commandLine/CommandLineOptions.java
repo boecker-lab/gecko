@@ -65,7 +65,7 @@ public class CommandLineOptions {
     @Option(name="-q", aliases = "--quorum", usage = "The minimum number of covered genomes.")
     private int minCoveredGenomes = 0;
 
-    @Option(name="-gGF", aliases = "--genomeGroupingFactor", usage = "All genomes with lower breakpoint distance are treated as one group.")
+    //@Option(name="-gGF", aliases = "--genomeGroupingFactor", usage = "All genomes with lower breakpoint distance are treated as one group.")
     private double genomeGroupingFactor = 1.1;
 
     //@Option(name="-o", aliases = "--operationMode", usage = "The operation mode, [reference] cluster (default), [median] gene cluster, or [center] gene cluster.")
