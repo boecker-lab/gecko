@@ -47,11 +47,6 @@ public class DataSet {
     private final GeneFamilySet geneFamilySet;
     private Map<GeneFamily, Color> colorMap;
 
-    /**
-     * Just a lazy initialized helper for getGeneFamily
-     */
-    Map<String, GeneFamily> geneFamilyMap;
-
     public static DataSet getEmptyDataSet() {
         return emptyDataSet;
     }
