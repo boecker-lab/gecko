@@ -282,6 +282,7 @@ class Statistics implements AlgorithmProgressProvider {
 			}
 			for (int j=Math.min(i+1, pValue.length)-offset; j>=0; j--){
 				if (j > 1){
+					// (Qj - Qj*Pi) * (Q(j-1)*Pi)
 					Probability mul1 = qArray[j].multiply(pValue[i]); // Qj - Qj*Pi
 					Probability sub = qArray[j].subtract(mul1);       // == Qj*(1-Pi)
 
