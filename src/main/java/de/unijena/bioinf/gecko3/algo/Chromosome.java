@@ -239,6 +239,26 @@ class Chromosome {
         }
         return numCount;
     }
+
+    /**
+     * Checks if the character at position l-1 appears in the interval [l, r]
+     * @param l
+     * @param r
+     * @return
+     */
+    public boolean previousInInterval(int l, int r) {
+        return nextOcc[l-1] <= r;
+    }
+
+    /**
+     * Checks if the character at position r+1 appears in the interval [l, r]
+     * @param l
+     * @param r
+     * @return
+     */
+    public boolean nextInInterval(int l, int r) {
+        return prevOcc[r+1] >= l;
+    }
     
     /**
      * Computes the difference between NUM[l1][r1] and NUM[l2][r2]
@@ -351,7 +371,7 @@ class Chromosome {
                 }
 
                 if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
-                    if(this.getNUMDiff(j, i, j+1, i) > 0) {                         // if unmarked char found for the 1st time
+                    if(!this.previousInInterval(j+1, i)) {              // if unmarked char found for the 1st time
                         L[i][d] = j;
                         d++;
                     }
@@ -483,7 +503,7 @@ class Chromosome {
                     continue;
                 }
                 if (rank.getRank(genes[j]) > rank.getRank(genes[i])) {  // if unmarked char found
-                    if(this.getNUMDiff(i, j, i, j-1) > 0) {                         // if unmarked char found for the 1st time
+                    if(!this.nextInInterval(i, j-1)) {                         // if unmarked char found for the 1st time
                         R[i][d] = j;
                         d++;
                     }
