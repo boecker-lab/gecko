@@ -155,7 +155,7 @@ class GenomeList {
      * @param refGenomeNr the number of the genome the reference chromosome is located on.
      */
     public void updateLeftBorder(int leftBorder, Chromosome refChr, int refGenomeNr) {
-        rank.updateRank(refChr, leftBorder, alphabetSize);  //TODO rank really in seqSet? Alternative Rank in Pattern
+        rank.updateRank(refChr, leftBorder);  //TODO rank really in seqSet? Alternative Rank in Pattern
 
         this.updateL(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));
         this.updateR(refGenomeNr, leftBorder, refChr.getGene(leftBorder - 1));

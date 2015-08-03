@@ -27,7 +27,6 @@ import de.unijena.bioinf.gecko3.datastructures.GeneCluster;
 import de.unijena.bioinf.gecko3.datastructures.Parameter;
 
 import java.math.BigDecimal;
-import java.nio.channels.ClosedByInterruptException;
 import java.util.*;
 import java.util.concurrent.CancellationException;
 
