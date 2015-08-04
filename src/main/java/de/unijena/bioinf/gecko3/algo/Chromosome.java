@@ -21,10 +21,7 @@ package de.unijena.bioinf.gecko3.algo;
 
 import de.unijena.bioinf.gecko3.algo.util.IntArray;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Chromosome stores the gene sequence of one chromosome.
@@ -258,6 +255,72 @@ class Chromosome {
      */
     public boolean nextInInterval(int l, int r) {
         return prevOcc[r+1] >= l;
+    }
+
+    /**
+     * Tests if both intervals [l1, r1] and [l2, r2] contain identical characters.
+     * @param l1
+     * @param r1
+     * @param l2
+     * @param r2
+     * @return
+     */
+    public boolean intervalContentIdentical(int l1, int r1, int l2, int r2) {
+        if (l1 == l2) {
+            int rightmostToTest = Math.max(r1, r2);
+            int leftmostToTest = Math.min(r1, r2);
+            for (int i=rightmostToTest; i>leftmostToTest; i--){
+                if (prevOcc[i] < l1)
+                    return false;
+            }
+        }
+
+        if (r1 == r2) {
+            int leftmostToTest = Math.min(l1, l2);
+            int rightmostToTest = Math.max(l1, l2);
+            for (int i=rightmostToTest; i<leftmostToTest; i++){
+                if (nextOcc[i] > r1)
+                    return false;
+            }
+        }
+
+        // test larger interval first, can often stop if too many found
+        int largeL, largeR, smallL, smallR;
+        // maximum num in the smaller interval
+        int maxNUM;
+        if (r1-l1 >= r2-l2) {
+            largeL = l1;
+            largeR = r1;
+            smallL = l2;
+            smallR = r2;
+            maxNUM = r2-l2+1;
+        } else {
+            largeL = l2;
+            largeR = r2;
+            smallL = l1;
+            smallR = r1;
+            maxNUM = r1-l1+1;
+        }
+
+        int numCount = 0;
+        for (int i=largeL; i<=largeR; i++) {
+            if (prevOcc[i] < largeL){
+                numCount++;
+                if (numCount > maxNUM)
+                    return false;
+            }
+        }
+
+        for (int i=smallL; i<=smallR; i++) {
+            if (prevOcc[i] < smallL) {
+                numCount--;
+            } else {
+                maxNUM--;
+                if (numCount > maxNUM)
+                    return false;
+            }
+        }
+        return 0 == numCount;
     }
     
     /**
