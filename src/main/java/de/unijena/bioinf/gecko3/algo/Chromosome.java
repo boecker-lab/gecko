@@ -40,12 +40,6 @@ class Chromosome {
     private int[][] R_prime;
 
     private int delta;
-    
-    // values used for lazy updating L_prime and R_prime
-    private boolean updatePrimes;
-    private int leftBorderForPrimes;
-    private int geneForPrimes;
-    private Rank rank;
     private int alphabetSize;
 
     /**
@@ -106,7 +100,8 @@ class Chromosome {
      * @param maxDelta the maximum allowed distance
      */
     public void initializeForCalculation(int alphabetSize, int maxDelta) {
-        this.pos = this.computePOS(alphabetSize);
+        this.alphabetSize = alphabetSize;
+        this.pos = this.computePOS();
 
         this.L = new int[this.genes.length][];
         this.R = new int[this.genes.length][];
@@ -120,11 +115,11 @@ class Chromosome {
         }
         this.delta = maxDelta;
 
-        this.prevOcc = this.computePrevOcc(alphabetSize);
-        this.nextOcc = this.computeNextOcc(alphabetSize);
+        this.prevOcc = this.computePrevOcc();
+        this.nextOcc = this.computeNextOcc();
     }
 
-    private int[][] computePOS(int alphabetSize) {
+    private int[][] computePOS() {
         List<LinkedList<Integer>> tmp = new ArrayList<>(alphabetSize+1);
         for (int i=0; i<=alphabetSize; i++) {
             tmp.add(null);
@@ -154,7 +149,7 @@ class Chromosome {
         return newPos;
     }
     
-    private int[] computePrevOcc(int alphabetSize) {
+    private int[] computePrevOcc() {
         int[] occ = new int[alphabetSize + 1];//max(this.genes)+1];
         int[] newPrevOcc = new int[this.getEffectiveGeneNumber() + 2];//max(this.genes)+1];
 
@@ -168,7 +163,7 @@ class Chromosome {
         return newPrevOcc;
     }
 
-    private int[] computeNextOcc(int alphabetSize) {
+    private int[] computeNextOcc() {
         int[] occ = IntArray.newIntArray(alphabetSize + 1, this.getEffectiveGeneNumber() + 1);
         int[] newNextOcc = IntArray.newIntArray(this.getEffectiveGeneNumber() + 2, this.getEffectiveGeneNumber() + 1);
 
@@ -322,64 +317,6 @@ class Chromosome {
         }
         return 0 == numCount;
     }
-    
-    /**
-     * Computes the difference between NUM[l1][r1] and NUM[l2][r2]
-     * @param l1 left border of interval 1
-     * @param r1 right border of interval 1
-     * @param l2 left border of interval 2
-     * @param r2 right border of interval 2
-     * @return difference between NUM[l1][r1] and NUM[l2][r2]
-     */
-    public int getNUMDiff(int l1, int r1, int l2, int r2) {
-    	int numCount = 0;
-    	
-    	// if only right border changes
-    	if (r1 >= r2 && l1 == l2){
-    		for (int i=r1; i>r2; i--)
-    			if (prevOcc[i] < l1)
-    				numCount++;
-    		return numCount;
-    	}
-    	
-    	// if only right border changes
-    	if (r1 < r2 && l1 == l2)
-    	{
-    		for (int i=r2; i>r1; i--)
-    			if (prevOcc[i] < l1)
-    				numCount--;
-    		return numCount;
-    	}
-    	
-    	// if only left border changes
-    	if (l1 <= l2 && r1 == r2)
-    	{
-    		for (int i=l1; i<l2; i++)
-    			if (nextOcc[i] > r1)
-    				numCount++;
-    		return numCount;
-    	}
-    	
-    	// if only left border changes
-    	if (l1 > l2 && r1 == r2)
-    	{
-    		for (int i=l2; i<l1; i++)
-    			if (nextOcc[i] > r1)
-    				numCount--;
-    		return numCount;
-    	}
-
-    	// if both border change, very slow!
-    	for (int i=l1; i<=r1; i++)
-    		if(prevOcc[i] < l1)
-    			numCount++;
-
-    	for (int i=l2; i<=r2; i++)
-    		if(prevOcc[i] < l2)
-    			numCount--;
-
-    	return numCount;
-    }
 
     /**
      * Returns the list of positions of the specified character c.
@@ -525,7 +462,7 @@ class Chromosome {
      * Resets the matrix L to its default value 0.
      */
     private void resetL () {
-        for (int i=0; i<genes.length; i++) {
+        for (int i=0; i<L.length; i++) {
             IntArray.reset(L[i], 0);
         }
     }
@@ -588,11 +525,10 @@ class Chromosome {
                 continue;
             if (lastOcc != this.getEffectiveGeneNumber() + 1) {                                            // if c_old has already occurred in the list
                 if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
-
                     for (int l = 1; l <= delta + 1; l++) {                              // test if entries for position i in array R change,
-                        if (this.getR(j, l) > lastOcc) {                            // because c_old is a new mismatch left of i
+                        if (R[j][l] > lastOcc) {                            // because c_old is a new mismatch left of i
                             for (int p = delta + 1; p > l; p--)
-                                R[j][p] = this.getR(j, p - 1);                   // shift all higher entries in R
+                                R[j][p] = R[j][p - 1];                   // shift all higher entries in R
                             R[j][l] = lastOcc;                                // and insert the new mismatch position
                             break;                                                  // no further changes in R[j] possible
                         }
@@ -657,7 +593,7 @@ class Chromosome {
      * Resets the matrix R to its default value chr.size()+1.
      */
     private void resetR () {
-        for (int i=0; i<genes.length; i++) {
+        for (int i=0; i<R.length; i++) {
             IntArray.reset(R[i], this.getEffectiveGeneNumber()+1);
         }
     }
@@ -671,7 +607,161 @@ class Chromosome {
     public int getR (int pos, int diff) {
         return R[pos][diff];
     }
-    
+
+    /**
+     * Resets the matrix L_prime to its default value 0.
+     */
+    private void resetL_prime () {
+        for (int i=0; i<L_prime.length; i++) {
+            IntArray.reset(L_prime[i], 0);
+        }
+    }
+
+    void computeL_prime(Rank rank) {
+        resetL_prime();
+        for(int j=1;j<=this.getEffectiveGeneNumber();j++){
+            if(genes[j]<0)
+                continue;
+            if(rank.getRank(genes[j])<=alphabetSize+1) {
+                for(int d=1; d<=delta+1; d++) {
+                    for(int l=this.L[j][d]+1; l<=j; l++) {
+                        if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
+                            L_prime[j][d] = l;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static class RankedNeighbors {
+        final int position;
+        final int[] neighbors;
+        int arrayIndex;
+        int lastRank;
+
+        RankedNeighbors(int position, int c, int delta, Rank rank){
+            this.position = position;
+            this.neighbors = new int[delta+1];
+            arrayIndex = 0;
+            lastRank = rank.getRank(c);
+        }
+
+        public boolean testAndAddPosition(int position, int rank) {
+            if (rank < lastRank) {
+                neighbors[arrayIndex] = position;
+                arrayIndex++;
+            }
+            return arrayIndex == neighbors.length;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            RankedNeighbors that = (RankedNeighbors) o;
+
+            return (position == that.position);
+        }
+
+        @Override
+        public int hashCode() {
+            return position;
+        }
+    }
+
+    private Map<Integer, int[]> getNextRankingsRightOfChar(Rank rank, int c){
+        Map<Integer, int[]> lowerRankedNeighbors = new HashMap<>();
+        Set<RankedNeighbors> updatingNeighbors = new HashSet<>();
+        int oldRank = rank.getRank(c);
+
+        for (int i=1; i<=getEffectiveGeneNumber(); i++) {
+            if (genes[i] < 0)
+                continue;
+            if (genes[i] == c) {
+                updatingNeighbors.add(new RankedNeighbors(i, c, delta, rank));
+            } else if (rank.getRank(genes[i]) < oldRank) {
+                Iterator<RankedNeighbors> iterator = updatingNeighbors.iterator();
+                while (iterator.hasNext()){
+                    RankedNeighbors neighbors = iterator.next();
+                    if (neighbors.testAndAddPosition(i, rank.getRank(genes[i]))) {
+                        lowerRankedNeighbors.put(neighbors.position, neighbors.neighbors);
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+        return lowerRankedNeighbors;
+    }
+
+    /**
+     * Updates or computes the matrix L.
+     * <br>L holds the max. maxDist positions of the next unmarked characters left of each position in the chromosome.
+     * <br>rank is used to determine unmarked characters. An unmarked character must have a higher rank then the character at the current position.
+     * @param rank the rank array of the current reference interval.
+     * @param c_old the character that was last added to the reference interval. Must not be < 0.
+     */
+    void updateL_prime(Rank rank, int c_old){
+        updateL_primeCharacterRankSmallerC_Old(rank, c_old);
+        updateL_primeCharacterEqualsC_Old(rank, c_old);
+    }
+
+    private void updateL_primeCharacterRankSmallerC_Old(Rank rank, int c_old) {
+        Map<Integer, int[]> lowerRankedNeighbors = getNextRankingsRightOfChar(rank, c_old);
+
+        for (int i=1;i<=this.getEffectiveGeneNumber(); i++){
+            if (genes[i]<0)
+                continue;
+            if (rank.getRank(genes[i]) < rank.getRank(c_old)) {
+                for (int d=1; d<delta+1; d++) {
+                    if (genes[L_prime[i][d]] == c_old) {
+                        int[] newPossitions = lowerRankedNeighbors.get(L_prime[i][d]);
+                        for (int j=0; j< newPossitions.length; j++){
+                            if (rank.getRank(genes[newPossitions[j]]) <= rank.getRank(genes[i])) {
+                                L_prime[i][d] = newPossitions[j];
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateL_primeCharacterEqualsC_Old(Rank rank, int c_old) {
+        for (int i=1;i<=this.getEffectiveGeneNumber(); i++){
+        }
+    }
+
+    /**
+     * Resets the matrix R_prime to its default value chr.size()+1.
+     */
+    private void resetR_prime () {
+        for (int i=0; i<R_prime.length; i++) {
+            IntArray.reset(R_prime[i], this.getEffectiveGeneNumber()+1);
+        }
+    }
+
+    void computeR_prime(Rank rank) {
+        resetR_prime();
+        for(int j=1;j<=this.getEffectiveGeneNumber();j++){
+            if (genes[j]<0)
+                continue;
+            if(rank.getRank(genes[j])<=alphabetSize+1) {
+                for(int d=1; d<=delta+1; d++) {
+                    for(int l=R[j][d]-1; l>=j; l--) {
+                        if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
+                            R_prime[j][d] = l;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void updateL_R_prime(Rank rank, int leftBorder, int c_old, int alphabetSize) {
     	this.rank = rank;
     	this.leftBorderForPrimes = leftBorder;
