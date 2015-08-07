@@ -105,7 +105,7 @@ class GenomeList {
     	if (!containsReferenceCopy)
     		throw new RuntimeException("Trying to remove non existing reference copy!");
     	
-    	genomes.remove(genomes.size()-1);
+    	genomes.remove(genomes.size() - 1);
     	param.decreaseNrOfGenomes();
     	this.containsReferenceCopy = false;
     }
@@ -225,12 +225,19 @@ class GenomeList {
         }
     }
     
-    private void updateL_R_prime(int refGenomeNr, int leftBorder, int gene) {
+    private void updateL_R_prime(int refGenomeNr, int leftBorder, int c_old) {
 		for (int k=0; k<this.size(); k++) {
-			if (k != refGenomeNr) {
-				for (Chromosome c: genomes.get(k)) {
-					c.updateL_R_prime(rank, leftBorder, gene, alphabetSize);
-				}
+			if (k==refGenomeNr)
+                continue;
+
+            for (Chromosome c: genomes.get(k)) {
+                if (leftBorder==1) {
+                    c.computeL_prime(rank);
+                    c.computeR_prime(rank);
+                } else {
+                    c.updateL_prime(rank, c_old);
+                    c.updateR_prime(rank, c_old);
+                }
 			}
 		}
 		
