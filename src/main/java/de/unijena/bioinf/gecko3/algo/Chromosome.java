@@ -763,24 +763,24 @@ class Chromosome {
     }
 
     public void updateL_R_prime(Rank rank, int leftBorder, int c_old, int alphabetSize) {
-    	this.rank = rank;
+    	/*this.rank = rank;
     	this.leftBorderForPrimes = leftBorder;
     	this.geneForPrimes = c_old;
     	this.alphabetSize = alphabetSize;
-    	this.updatePrimes = true;
+    	this.updatePrimes = true;*/
     }
     
     public int getL_prime (int pos, int diff) {
-    	if (updatePrimes) {
+    	/*if (updatePrimes) {
     		updateL_prime();
     		updateR_prime();
     		this.updatePrimes = false;
-    	}
+    	}*/
         return L_prime[pos][diff];
     }
     
     private void updateL_prime() {
-    	int maxUpdateRank;
+    	/*int maxUpdateRank;
     	if (geneForPrimes<0){
     		maxUpdateRank = alphabetSize;
     	} else {
@@ -799,20 +799,20 @@ class Chromosome {
 					}
 				}
 			}
-    	}
+    	}*/
     }
     
     public int getR_prime (int pos, int diff) {
-    	if (updatePrimes) {
+    	/*if (updatePrimes) {
     		updateL_prime();
     		updateR_prime();
     		this.updatePrimes = false;
-    	}
+    	}*/
         return R_prime[pos][diff];
     }
     
     private void updateR_prime() {
-    	int maxUpdateRank;
+    	/*int maxUpdateRank;
     	if (geneForPrimes<0){
     		maxUpdateRank = alphabetSize;
     	} else {
@@ -831,7 +831,7 @@ class Chromosome {
 					}
 				}
 			}
-    	}
+    	}*/
     }
 
     @Override public String toString() {
