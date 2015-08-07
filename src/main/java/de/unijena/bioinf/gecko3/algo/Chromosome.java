@@ -622,13 +622,13 @@ class Chromosome {
         for(int j=1;j<=this.getEffectiveGeneNumber();j++){
             if(genes[j]<0)
                 continue;
-            if(rank.getRank(genes[j])<=alphabetSize+1) {
-                for(int d=1; d<=delta+1; d++) {
-                    for(int l=this.L[j][d]+1; l<=j; l++) {
-                        if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
-                            L_prime[j][d] = l;
-                            break;
-                        }
+            int last_match = j;
+            for(int d=1; d<=delta+1; d++) {
+                for(int l=this.L[j][d]+1; l<=last_match; l++) {
+                    if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
+                        L_prime[j][d] = l;
+                        last_match = l;
+                        break;
                     }
                 }
             }
@@ -731,7 +731,17 @@ class Chromosome {
     }
 
     private void updateL_primeCharacterEqualsC_Old(Rank rank, int c_old) {
-        for (int i=1;i<=this.getEffectiveGeneNumber(); i++){
+        int[] pos = getPOS(c_old);
+
+        for (int pos_c_old : pos) {
+            for(int d=1; d<=delta+1; d++) {
+                for(int l=this.L[pos_c_old][d]+1; l<=pos_c_old; l++) {
+                    if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(c_old)) {
+                        L_prime[pos_c_old][d] = l;
+                        break;
+                    }
+                }
+            }
         }
     }
 
