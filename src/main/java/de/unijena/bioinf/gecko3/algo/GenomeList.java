@@ -234,7 +234,7 @@ class GenomeList {
                 if (leftBorder==1) {
                     c.computeL_prime(rank);
                     c.computeR_prime(rank);
-                } else {
+                } else if (c_old >= 0) {
                     c.updateL_prime(rank, c_old);
                     c.updateR_prime(rank, c_old);
                 }

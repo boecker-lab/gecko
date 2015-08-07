@@ -415,6 +415,9 @@ class Chromosome {
      * @param c_old must not be < 0
      */
     private void updateL_characterEqualsC_Old(Rank rank, int c_old){
+        if (getPOS(c_old).length == 0)
+            return;
+
         int[] c_old_L = new int[delta+2];
 
         for (int j=1; j<=this.getEffectiveGeneNumber(); j++) {
@@ -687,7 +690,7 @@ class Chromosome {
             if (genes[i] < 0)
                 continue;
             if (genes[i] == c) {
-                updatingNeighbors.add(new RankedNeighbors(i, c, delta, rank, 0));
+                updatingNeighbors.add(new RankedNeighbors(i, c, delta, rank, getEffectiveGeneNumber()+1));
             } else if (rank.getRank(genes[i]) < oldRank) {
                 Iterator<RankedNeighbors> iterator = updatingNeighbors.iterator();
                 while (iterator.hasNext()){
@@ -797,7 +800,7 @@ class Chromosome {
             if (genes[i] < 0)
                 continue;
             if (genes[i] == c) {
-                updatingNeighbors.add(new RankedNeighbors(i, c, delta, rank, getEffectiveGeneNumber()+1));
+                updatingNeighbors.add(new RankedNeighbors(i, c, delta, rank, 0));
             } else if (rank.getRank(genes[i]) < oldRank) {
                 Iterator<RankedNeighbors> iterator = updatingNeighbors.iterator();
                 while (iterator.hasNext()){
