@@ -395,6 +395,9 @@ class Chromosome {
      * @param c_old must not be < 0
      */
     private void updateL_characterEqualsC_Old(Rank rank, int c_old){
+        if (getPOS(c_old).length == 0)
+            return;
+
         int[] c_old_L = new int[delta+2];
 
         for (int j=1; j<=this.getEffectiveGeneNumber(); j++) {
@@ -528,6 +531,9 @@ class Chromosome {
      * @param c_old must not be < 0
      */
     private void updateR_characterEqualsC_Old(Rank rank, int c_old){
+        if (getPOS(c_old).length == 0)
+            return;
+
         int[] c_old_R = IntArray.newIntArray(delta+2, this.getEffectiveGeneNumber()+1);
 
         for (int j=this.getEffectiveGeneNumber(); j>=1; j--) {
