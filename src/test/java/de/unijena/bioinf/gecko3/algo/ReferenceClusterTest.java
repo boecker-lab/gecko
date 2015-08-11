@@ -453,6 +453,38 @@ public class ReferenceClusterTest
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
 
+    /**
+     * Test the update of L_prime in case c_old is a new gap in the interval
+     */
+    @Test
+    public void testComputeClustersL_PrimeUpdate()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, 5, 3, 0}}, {{0, 4, 6, 7, 2, 1, 1, 5, 0}}};
+
+        Parameter p = new Parameter(1, 3, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+
+        // def result 1
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 3, 0);
+        ExpectedDeltaLocationValues dLoc1_2 = new ExpectedDeltaLocationValues(0, 4, 7, 0);
+        List<Integer> genes1 = Arrays.asList(1, 2, 5);
+        int[] minimumDistances1 = new int[]{0, 0};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_2}};
+
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances1,
+                        0,
+                        0,
+                        2,
+                        expectedDeltaLocationValues1)
+        };
+
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+    }
+
 	@Test
 	public void testComputeClusters5()
 	{
