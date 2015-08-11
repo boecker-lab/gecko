@@ -395,8 +395,7 @@ class Chromosome {
                 if (rank.getRank(genes[j]) < rank.getRank(c_old)) {             // if rank of character smaller than the new rank of c_old
                     for (int l=1; l<=delta+1; l++) {                              // test if entries for position i in array L change,
                         if  (this.getL(j, l) < lastOcc) {                            // because c_old is a new mismatch left of i
-                            for (int p=delta+1; p>l; p--)
-                                L[j][p] = this.getL(j, p-1);                   // shift all higher entries in L
+                            System.arraycopy(L[j], l, L[j], l+1, (L[j].length-l)-1); // shift all higher entries in L
                             L[j][l] = lastOcc;                                // and insert the new mismatch position
                             break;                                                  // no further changes in L[j] possible
                         }
@@ -415,9 +414,6 @@ class Chromosome {
      * @param c_old must not be < 0
      */
     private void updateL_characterEqualsC_Old(Rank rank, int c_old){
-        if (getPOS(c_old).length == 0)
-            return;
-
         int[] c_old_L = new int[delta+2];
 
         for (int j=1; j<=this.getEffectiveGeneNumber(); j++) {
@@ -457,6 +453,9 @@ class Chromosome {
      * @param c_old the character that was last added to the reference interval. Must not be < 0.
      */
     void updateL(Rank rank, int c_old){
+        if (getPOS(c_old).length == 0)
+            return;
+
         updateL_characterRankSmallerC_Old(rank, c_old);
         updateL_characterEqualsC_Old(rank, c_old);
     }
@@ -530,8 +529,7 @@ class Chromosome {
                 if (rank.getRank(genes[j]) < rank.getRank(c_old)) {       // if rank of character smaller than the new rank of c_old
                     for (int l = 1; l <= delta + 1; l++) {                              // test if entries for position i in array R change,
                         if (R[j][l] > lastOcc) {                            // because c_old is a new mismatch left of i
-                            for (int p = delta + 1; p > l; p--)
-                                R[j][p] = R[j][p - 1];                   // shift all higher entries in R
+                            System.arraycopy(R[j], l, R[j], l+1, (R[j].length-l)-1); // shift all higher entries in R
                             R[j][l] = lastOcc;                                // and insert the new mismatch position
                             break;                                                  // no further changes in R[j] possible
                         }
@@ -588,6 +586,9 @@ class Chromosome {
      * @param c_old the character that was last added to the reference interval. Must not be < 0
      */
     void updateR(Rank rank, int c_old){
+        if (getPOS(c_old).length == 0)
+            return;
+
         updateR_characterRankSmallerC_Old(rank, c_old);
         updateR_characterEqualsC_Old(rank, c_old);
     }
@@ -609,46 +610,6 @@ class Chromosome {
      */
     public int getR (int pos, int diff) {
         return R[pos][diff];
-    }
-
-    /**
-     * Helper class for the computation of the next RankedNeighbors
-     */
-    private static class RankedNeighbors {
-        final int position;
-        final int[] neighbors;
-        int arrayIndex;
-        int lastRank;
-
-        RankedNeighbors(int position, int c, int delta, Rank rank, int defaultValue){
-            this.position = position;
-            this.neighbors = IntArray.newIntArray(delta+1, defaultValue);
-            arrayIndex = 0;
-            lastRank = rank.getRank(c);
-        }
-
-        public boolean testAndAddPosition(int position, int rank) {
-            if (rank < lastRank) {
-                neighbors[arrayIndex] = position;
-                arrayIndex++;
-            }
-            return arrayIndex == neighbors.length;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            RankedNeighbors that = (RankedNeighbors) o;
-
-            return (position == that.position);
-        }
-
-        @Override
-        public int hashCode() {
-            return position;
-        }
     }
 
     /**
@@ -708,6 +669,9 @@ class Chromosome {
      * @param c_old the character that was last added to the reference interval. Must not be < 0.
      */
     void updateL_prime(Rank rank, int c_old){
+        if (getPOS(c_old).length == 0)
+            return;
+
         updateL_primeCharacterRankSmallerC_Old(rank, c_old);
         updateL_primeCharacterEqualsC_Old(rank, c_old);
     }
@@ -818,6 +782,9 @@ class Chromosome {
      * @param c_old the character that was last added to the reference interval. Must not be < 0.
      */
     void updateR_prime(Rank rank, int c_old){
+        if (getPOS(c_old).length == 0)
+            return;
+
         updateR_primeCharacterRankSmallerC_Old(rank, c_old);
         updateR_primeCharacterEqualsC_Old(rank, c_old);
     }
