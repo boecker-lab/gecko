@@ -238,7 +238,6 @@ class GenomeList {
                     c.updateL_prime(rank, c_old);
                     c.updateR_prime(rank, c_old);
                 }
-                c.updateL_R_prime_OLD(rank, leftBorder, c_old);
 			}
 		}
 		

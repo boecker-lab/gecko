@@ -39,9 +39,6 @@ class Chromosome {
     private int[][] L_prime;
     private int[][] R_prime;
 
-    private int[][] L_prime_OLD;
-    private int[][] R_prime_OLD;
-
     private int delta;
     private int alphabetSize;
 
@@ -110,15 +107,11 @@ class Chromosome {
         this.R = new int[this.genes.length][];
         this.L_prime = new int[this.genes.length][];
         this.R_prime = new int[this.genes.length][];
-        this.L_prime_OLD = new int[this.genes.length][];
-        this.R_prime_OLD = new int[this.genes.length][];
         for (int i = 0; i < this.genes.length; i++) {
             L[i] = new int[maxDelta + 2];
             R[i] = IntArray.newIntArray(maxDelta + 2, this.getEffectiveGeneNumber() + 1);
             L_prime[i] = new int[maxDelta + 2];
             R_prime[i] = IntArray.newIntArray(maxDelta + 2, this.getEffectiveGeneNumber() + 1);
-            L_prime_OLD[i] = new int[maxDelta + 2];
-            R_prime_OLD[i] = IntArray.newIntArray(maxDelta + 2, this.getEffectiveGeneNumber() + 1);
         }
         this.delta = maxDelta;
 
@@ -618,67 +611,6 @@ class Chromosome {
         return R[pos][diff];
     }
 
-    public void updateL_R_prime_OLD(Rank rank, int leftBorder, int c_old) {
-        updateL_prime_OLD(rank, leftBorder, c_old);
-        updateR_prime_OLD(rank, leftBorder, c_old);
-    }
-
-    private void comparePrimes(int[][] expected, int[][] actual, String type) {
-        for (int i=0; i<expected.length; i++) {
-            for (int j=0; j<expected[i].length; j++)
-                if (expected[i][j] != actual[i][j])
-                    System.out.println(type);
-        }
-    }
-
-    private void updateL_prime_OLD(Rank rank, int leftBorder, int c_old) {
-        int maxUpdateRank;
-        if (c_old<0){
-            maxUpdateRank = alphabetSize;
-        } else {
-            maxUpdateRank = (leftBorder==1) ? alphabetSize+1 : rank.getRank(c_old);
-        }
-        for(int j=1;j<=this.getEffectiveGeneNumber();j++){
-            if(genes[j]<0)
-                continue;
-            if(rank.getRank(genes[j])<=maxUpdateRank) {
-                for(int d=1; d<=delta+1; d++) {
-                    for(int l=this.L[j][d]+1; l<=j; l++) {
-                        if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
-                            L_prime_OLD[j][d] = l;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        //comparePrimes(L_prime_OLD, L_prime, "L");
-    }
-
-    private void updateR_prime_OLD(Rank rank, int leftBorder, int c_old) {
-        int maxUpdateRank;
-        if (c_old<0){
-            maxUpdateRank = alphabetSize;
-        } else {
-            maxUpdateRank = (leftBorder==1) ? alphabetSize+1 : rank.getRank(c_old);
-        }
-        for(int j=1;j<=this.getEffectiveGeneNumber();j++){
-            if (genes[j]<0)
-                continue;
-            if(rank.getRank(genes[j])<=maxUpdateRank) {
-                for(int d=1; d<=delta+1; d++) {
-                    for(int l=this.R[j][d]-1; l>=j; l--) {
-                        if(genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(genes[j])) {
-                            R_prime_OLD[j][d] = l;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        //comparePrimes(R_prime_OLD, R_prime, "R");
-    }
-
     /**
      * Helper class for the computation of the next RankedNeighbors
      */
@@ -940,14 +872,10 @@ class Chromosome {
     }
 
     public int getL_prime (int pos, int diff) {
-        if (L_prime[pos][diff] != L_prime_OLD[pos][diff])
-            throw new RuntimeException("L");
         return L_prime[pos][diff];
     }
     
     public int getR_prime (int pos, int diff) {
-        if (R_prime[pos][diff] != R_prime_OLD[pos][diff])
-            throw new RuntimeException("R");
         return R_prime[pos][diff];
     }
 
