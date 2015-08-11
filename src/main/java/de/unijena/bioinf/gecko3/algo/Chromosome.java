@@ -749,38 +749,14 @@ class Chromosome {
         }
     }
 
-    private Map<Integer, int[]> getNextRankingsRightOfChar(Rank rank, int c){
-        Map<Integer, int[]> lowerRankedNeighbors = new HashMap<>();
-        Set<RankedNeighbors> updatingNeighbors = new HashSet<>();
-        int oldRank = rank.getRank(c);
-
-        for (int i=1; i<=getEffectiveGeneNumber(); i++) {
-            if (genes[i] < 0)
-                continue;
-            if (genes[i] == c) {
-                updatingNeighbors.add(new RankedNeighbors(i, c, delta, rank, getEffectiveGeneNumber()+1));
-            } else if (rank.getRank(genes[i]) < oldRank) {
-                Iterator<RankedNeighbors> iterator = updatingNeighbors.iterator();
-                while (iterator.hasNext()){
-                    RankedNeighbors neighbors = iterator.next();
-                    if (neighbors.testAndAddPosition(i, rank.getRank(genes[i]))) {
-                        lowerRankedNeighbors.put(neighbors.position, neighbors.neighbors);
-                        iterator.remove();
-                    }
-                }
-            }
-        }
-        for (RankedNeighbors neighbors : updatingNeighbors)
-            lowerRankedNeighbors.put(neighbors.position, neighbors.neighbors);
-        return lowerRankedNeighbors;
-    }
-
-    int[] getNextRankingsRightOfPos(Rank rank, int pos){
+    int[] getNextRankingsRightOfPos(Rank rank, int pos, int c_old){
         int[] lowerRankingNeighbors = IntArray.newIntArray(delta+1,  getEffectiveGeneNumber()+1);
 
         int index = 0;
-        int lastRank = rank.getRank(genes[pos]);
+        int lastRank = rank.getRank(c_old);
         for (int i=pos+1; i<=getEffectiveGeneNumber(); i++) {
+            if (genes[i] < 0)
+                continue;
             if (rank.getRank(genes[i]) < lastRank) {
                 lowerRankingNeighbors[index] = i;
                 lastRank = rank.getRank(genes[i]);
@@ -805,25 +781,22 @@ class Chromosome {
     }
 
     private void updateL_primeCharacterRankSmallerC_Old(Rank rank, int c_old) {
-        Map<Integer, int[]> lowerRankedNeighbors = getNextRankingsRightOfChar(rank, c_old);
+        Map<Integer, int[]> lowerRankedNeighbors = new HashMap<>();
 
         for (int i=1;i<=this.getEffectiveGeneNumber(); i++){
             if (genes[i]<0)
                 continue;
             if (rank.getRank(genes[i]) < rank.getRank(c_old)) {
                 for (int d=1; d<=delta+1; d++) {
-                    int[] newPossitions = null;
-                    if (genes[L_prime[i][d]] == c_old)
-                        newPossitions = lowerRankedNeighbors.get(L_prime[i][d]);
-                    else if (L[i][d] >= L_prime[i][d]) {
-                        for (int d_j = d; d >= 1; d_j--) {
-                            if (genes[L[i][d_j]] == c_old) {
-                                newPossitions = lowerRankedNeighbors.get(L[i][d_j]);
-                                break;
-                            }
+                    if (genes[L_prime[i][d]] == c_old || L[i][d] >= L_prime[i][d]) {
+                        // get update position
+                        int pos = Math.max(L_prime[i][d], L[i][d]);
+
+                        int[] newPossitions = lowerRankedNeighbors.get(pos);
+                        if (newPossitions == null) {
+                            newPossitions = getNextRankingsRightOfPos(rank, pos, c_old);
+                            lowerRankedNeighbors.put(pos, newPossitions);
                         }
-                    }
-                    if (newPossitions != null) {
                         for (int j=0; j< newPossitions.length; j++){
                             if (rank.getRank(genes[newPossitions[j]]) <= rank.getRank(genes[i])) {
                                 L_prime[i][d] = newPossitions[j];
@@ -848,10 +821,10 @@ class Chromosome {
                         L_prime[pos_c_old][d] = l;
                         notFound = false;
                     }
-                    if (notFound)
-                        L_prime[pos_c_old][d] = L_prime[pos_c_old][d-1];
-                    last_match = L[pos_c_old][d]+1;
                 }
+                if (notFound)
+                    L_prime[pos_c_old][d] = L_prime[pos_c_old][d-1];
+                last_match = L[pos_c_old][d]+1;
             }
         }
     }
@@ -886,38 +859,14 @@ class Chromosome {
         }
     }
 
-    private Map<Integer, int[]> getNextRankingsLeftOfChar(Rank rank, int c){
-        Map<Integer, int[]> lowerRankedNeighbors = new HashMap<>();
-        Set<RankedNeighbors> updatingNeighbors = new HashSet<>();
-        int oldRank = rank.getRank(c);
-
-        for (int i=getEffectiveGeneNumber(); i>=1; i--) {
-            if (genes[i] < 0)
-                continue;
-            if (genes[i] == c) {
-                updatingNeighbors.add(new RankedNeighbors(i, c, delta, rank, 0));
-            } else if (rank.getRank(genes[i]) < oldRank) {
-                Iterator<RankedNeighbors> iterator = updatingNeighbors.iterator();
-                while (iterator.hasNext()){
-                    RankedNeighbors neighbors = iterator.next();
-                    if (neighbors.testAndAddPosition(i, rank.getRank(genes[i]))) {
-                        lowerRankedNeighbors.put(neighbors.position, neighbors.neighbors);
-                        iterator.remove();
-                    }
-                }
-            }
-        }
-        for (RankedNeighbors neighbors : updatingNeighbors)
-            lowerRankedNeighbors.put(neighbors.position, neighbors.neighbors);
-        return lowerRankedNeighbors;
-    }
-
-    int[] getNextRankingsLeftOfPos(Rank rank, int pos){
+    int[] getNextRankingsLeftOfPos(Rank rank, int pos, int c_old){
         int[] lowerRankingNeighbors = IntArray.newIntArray(delta + 1, 0);
 
         int index = 0;
-        int lastRank = rank.getRank(genes[pos]);
+        int lastRank = rank.getRank(c_old);
         for (int i=pos-1; i>=1; i--) {
+            if (genes[i] < 0)
+                continue;
             if (rank.getRank(genes[i]) < lastRank) {
                 lowerRankingNeighbors[index] = i;
                 lastRank = rank.getRank(genes[i]);
@@ -942,27 +891,22 @@ class Chromosome {
     }
 
     private void updateR_primeCharacterRankSmallerC_Old(Rank rank, int c_old) {
-        Map<Integer, int[]> lowerRankedNeighbors = getNextRankingsLeftOfChar(rank, c_old);
+        Map<Integer, int[]> lowerRankedNeighbors = new HashMap<>();
 
         for (int i=this.getEffectiveGeneNumber();i>=1; i--){
             if (genes[i]<0)
                 continue;
             if (rank.getRank(genes[i]) < rank.getRank(c_old)) {
                 for (int d=1; d<=delta+1; d++) {
-                    // check if needs to be updated and get possible update positions
-                    int[] newPossitions = null;
-                    if (genes[R_prime[i][d]] == c_old)
-                        newPossitions = lowerRankedNeighbors.get(R_prime[i][d]);
-                    else if (R[i][d] <= R_prime[i][d]) {
-                        for (int d_j = d; d >= 1; d_j--) {
-                            if (genes[R[i][d_j]] == c_old) {
-                                newPossitions = lowerRankedNeighbors.get(R[i][d_j]);
-                                break;
-                            }
-                        }
-                    }
+                    if (genes[R_prime[i][d]] == c_old || R[i][d] <= R_prime[i][d]) {
+                        // get update position
+                        int pos = Math.min(R_prime[i][d], R[i][d]);
 
-                    if (newPossitions != null) {
+                        int[] newPossitions = lowerRankedNeighbors.get(pos);
+                        if (newPossitions == null) {
+                            newPossitions = getNextRankingsLeftOfPos(rank, pos, c_old);
+                            lowerRankedNeighbors.put(pos, newPossitions);
+                        }
                         for (int j=0; j< newPossitions.length; j++){
                             if (rank.getRank(genes[newPossitions[j]]) <= rank.getRank(genes[i])) {
                                 R_prime[i][d] = newPossitions[j];
