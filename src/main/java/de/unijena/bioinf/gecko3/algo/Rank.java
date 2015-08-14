@@ -100,7 +100,7 @@ class Rank{
                     break;                                  // update can be stopped, as the rank of all other characters is unchanged
                 }
             }
-            if (chr.getGene(leftBorder-1)>=0 && i==chr.getEffectiveGeneNumber()+1) { // if character at position leftBorder-1 is not part of the interval
+            if (i==chr.getEffectiveGeneNumber()+1) {        // if character at position leftBorder-1 is not part of the interval
                 rank[chr.getGene(leftBorder-1)] = DEFAULT_RANK;      // he is assigned the default rank
             }
         }
