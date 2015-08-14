@@ -880,23 +880,85 @@ class Chromosome {
         }
     }
 
+    private static class UpdateRPrime {
+        final int p;
+        final int[] primes;
+        final int[] R;
+        int lastToUpdate;
+
+        UpdateRPrime(int pos, int delta, int[] R) {
+            p=pos;
+            primes = new int[delta+2];
+            lastToUpdate = 1;
+            primes[1] = pos;
+            this.R = R;
+        }
+
+        /**
+         * Updates the prime for the new match position
+         * @param matchPosition the next position of a matching character
+         * @return true if done updating, false otherwise
+         */
+        boolean updatePosition(int matchPosition) {
+            while (lastToUpdate < primes.length && R[lastToUpdate] < matchPosition ) {
+                if (lastToUpdate < primes.length-1)
+                    primes[lastToUpdate+1] = primes[lastToUpdate];
+                lastToUpdate++;
+            }
+
+            if (lastToUpdate == primes.length)
+                return true;
+
+            primes[lastToUpdate] = matchPosition;
+            return false;
+        }
+
+        int[] getRPrime() {
+            while (lastToUpdate < primes.length-1) {
+                primes[lastToUpdate+1] = primes[lastToUpdate];
+                lastToUpdate++;
+            }
+            return primes;
+        }
+    }
+
     private void updateR_primeCharacterEqualsC_Old(Rank rank, int c_old) {
         int[] pos = getPOS(c_old);
+        Set<UpdateRPrime> currentlyUpdating = new HashSet<>();
 
-        for (int pos_c_old : pos) {
-            int lastEnd = pos_c_old-1;  // we only need to scan before the last scanned position for different d
-            for(int d=1; d<=delta+1; d++) {
-                boolean notFound = true;
-                for (int l = R[pos_c_old][d] - 1; l > lastEnd && notFound; l--) {
-                    if (genes[l] >= 0 && rank.getRank(genes[l]) <= rank.getRank(c_old)) {
-                        R_prime[pos_c_old][d] = l;
-                        notFound = false;
+        for (int pos_index=0; pos_index<pos.length; pos_index++) {
+            // Start new iteration from next unused pos
+            int nextPos = pos_index<pos.length-1 ? pos[pos_index+1] : getEffectiveGeneNumber()+1;
+            currentlyUpdating.add(new UpdateRPrime(pos[pos_index], delta, R[pos[pos_index]]));
+
+            // iterate from the position right of pos, as long as we are currently updating an Rprime
+            int i = pos[pos_index]+1;
+            while (!currentlyUpdating.isEmpty() && i < getEffectiveGeneNumber()+1){
+                if (nextPos==i){
+                    currentlyUpdating.add(new UpdateRPrime(i, delta, R[i]));
+                    pos_index++;
+                    nextPos = pos_index<pos.length-1 ? pos[pos_index+1] : getEffectiveGeneNumber()+1;
+                }
+
+                // if marked gene found
+                if(genes[i] >= 0 && rank.getRank(genes[i]) <= rank.getRank(c_old)) {
+                    Iterator<UpdateRPrime> iterator = currentlyUpdating.iterator();
+                    while (iterator.hasNext()) {
+                        UpdateRPrime updateRPrime = iterator.next();
+                        if (updateRPrime.updatePosition(i)){
+                            R_prime[updateRPrime.p] = updateRPrime.getRPrime();
+                            iterator.remove();
+                        }
                     }
                 }
-                if (notFound)
-                    R_prime[pos_c_old][d] = R_prime[pos_c_old][d - 1];
-                lastEnd = R[pos_c_old][d] - 1;
+
+                i++;
             }
+
+        }
+        // Get all unfinished Primes
+        for (UpdateRPrime updateRPrime : currentlyUpdating){
+            R_prime[updateRPrime.p] = updateRPrime.getRPrime();
         }
     }
 
