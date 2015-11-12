@@ -77,15 +77,17 @@ class Rank{
      * @param chr the chromosome the rank is calculated for.
      * @param leftBorder the start position of the interval on the chromosome.
      */
-    public void updateRank(Chromosome chr, int leftBorder){
+    public void updateRank(Chromosome chr, final int leftBorder){
         if (leftBorder==1) {                                        // if starting to iterate through a new sequence (leftBorder is 1)
             this.computeRank(chr);                    // Rank has to be calculated anew
         }
         else {
+            if (chr.getGene(leftBorder-1)<0)        // if character at position leftBorder-1 was negative, rank does not change
+                return;
             int maxRank = 0;
             int i;
             for (i=leftBorder; i<=chr.getEffectiveGeneNumber(); i++) {                 // Iterate through substrings starting with leftBorder
-                if (chr.getGene(i)<0 || chr.getGene(leftBorder-1)<0)
+                if (chr.getGene(i)<0)
                     continue;
             	if (chr.getGene(i)!=chr.getGene(leftBorder-1)) {                        // if character is not equal to the character at position leftBorder-1
                 	if (!chr.nextInInterval(leftBorder-1, i-1)) {                       // only update if first occurrence after position i
@@ -98,7 +100,7 @@ class Rank{
                     break;                                  // update can be stopped, as the rank of all other characters is unchanged
                 }
             }
-            if (chr.getGene(leftBorder-1)>=0 && i==chr.getEffectiveGeneNumber()+1) {                                      // if character at position leftBorder-1 is not part of the interval
+            if (i==chr.getEffectiveGeneNumber()+1) {        // if character at position leftBorder-1 is not part of the interval
                 rank[chr.getGene(leftBorder-1)] = DEFAULT_RANK;      // he is assigned the default rank
             }
         }
