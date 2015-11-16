@@ -83,7 +83,7 @@ public class GeneClusterExportDialog extends JDialog {
 	/**
 	 * The object which contains/creates the image content
 	 */
-	private GeneClusterPicture clusterPics;
+	private final GeneClusterPicture clusterPics;
 	
 	/**
 	 * The preview area on the gui
@@ -104,6 +104,13 @@ public class GeneClusterExportDialog extends JDialog {
 		this.rootPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
 		this.setLayout(new BorderLayout());
 		this.setIconImages(parent.getIconImages());
+
+        // create the cluster picture
+        boolean useGenomeNames = false;
+        boolean printClusterHeader = true;
+        NameType defaultNameType = NameType.ID;
+        clusterPics = new GeneClusterPicture(clusterSelection, defaultNameType, printClusterHeader, useGenomeNames);
+        prev = new Preview(clusterPics.createImage());
 
 		// description label for the text field
 		this.storingLocation.setText(System.getProperty("user.dir") + File.separatorChar + FILENAME + ".pdf");
@@ -131,8 +138,7 @@ public class GeneClusterExportDialog extends JDialog {
 		
 		// check box for using genome names instead of the internal mapped number
 		JCheckBox useGenomeNamesCheckBox = new JCheckBox();
-		useGenomeNamesCheckBox.setText("Print genome names");
-		
+        useGenomeNamesCheckBox.setSelected(useGenomeNames);
 		useGenomeNamesCheckBox.addItemListener(new ItemListener() {
 
             @Override
@@ -150,7 +156,7 @@ public class GeneClusterExportDialog extends JDialog {
 
 		
 		final JComboBox geneNamingComboBox = new JComboBox(GenomePainting.NameType.values());
-		geneNamingComboBox.setSelectedIndex(0);
+		geneNamingComboBox.setSelectedItem(defaultNameType);
 		geneNamingComboBox.addActionListener(new ActionListener() {
 			
 			@Override
@@ -225,6 +231,7 @@ public class GeneClusterExportDialog extends JDialog {
         });
 
         final JCheckBox clusterHeaderCheckbox = new JCheckBox();
+        clusterHeaderCheckbox.setSelected(printClusterHeader);
         clusterHeaderCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -232,7 +239,6 @@ public class GeneClusterExportDialog extends JDialog {
                 updateImage();
             }
         });
-        clusterHeaderCheckbox.setSelected(true);
 
         DefaultFormBuilder leftPanelBuilder = new DefaultFormBuilder(new FormLayout("p, 4dlu, p"));
         leftPanelBuilder.append(storingLocation, browseButton);
@@ -249,8 +255,6 @@ public class GeneClusterExportDialog extends JDialog {
 		this.add(leftPanel, BorderLayout.WEST);
 		
 		// create a scrollPanel with the cluster image
-		clusterPics = new GeneClusterPicture(clusterSelection, (NameType)geneNamingComboBox.getSelectedItem(), clusterHeaderCheckbox.isSelected(), useGenomeNamesCheckBox.isSelected());
-		prev = new Preview(clusterPics.createImage());
 		JScrollPane previewScroll = new JScrollPane(prev);
 		previewScroll.setEnabled(true);
 		previewScroll.setBackground(Color.white);
