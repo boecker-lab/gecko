@@ -44,7 +44,6 @@ public class Gecko3 {
     private static final Logger logger = LoggerFactory.getLogger(Gecko3.class);
 
     public static void main (String[] args) {
-        Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
         String lcOSName = System.getProperty("os.name").toLowerCase();
         logger.info("You are running {}-Java on {}", System.getProperty("os.arch"), System.getProperty("os.name"));
 
@@ -63,6 +62,10 @@ public class Gecko3 {
                 printUsage(System.err, parser, e);
                 return;
             }
+        }
+
+        if (!options.useGui()) {
+            Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
         }
 
         if ((args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) || options.showHelp()) {
@@ -85,8 +88,6 @@ public class Gecko3 {
         } catch (ClassNotFoundException | UnsupportedLookAndFeelException | InstantiationException | IllegalAccessException e) {
             logger.warn("Unable to set look and feel", e);
         }
-
-        boolean libgeckoLoaded = false;
 
         GeckoInstance instance = GeckoInstance.getInstance();
         instance.setGeckoInstanceData(DataSet.getEmptyDataSet());
