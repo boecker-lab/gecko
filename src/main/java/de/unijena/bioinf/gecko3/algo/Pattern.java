@@ -190,7 +190,7 @@ class Pattern {
                         // test compactness
                         int left_essential = chr.getL_prime(charPos, dLeft);
                         int right_essential = chr.getR_prime(charPos, dRight);
-                        if (chr.getNUMDiff(leftBorder + 1, rightBorder - 1, left_essential, right_essential) != 0)
+                        if (!chr.intervalContentIdentical(leftBorder+1, rightBorder-1, left_essential, right_essential))
                             continue;
 
                         int charSetSize = chr.getNUM(leftBorder + 1, rightBorder - 1);

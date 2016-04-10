@@ -130,7 +130,54 @@ public class ReferenceClusterDistanceMatrixTest {
 
         GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
 	}
-	
+
+    @Test
+    public void testComputeClustersBugInR_prime()
+    {
+        // def array for computation
+        int genomes[][][] = {{{0, 1, 2, 5 , 4, 6, 3 , 8, 0}}, {{0, 3, 2, 1, 9, 4, 7, 5, 8, 0}}};
+
+        // def parameters
+        int[][] distanceMatrix = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {3, 3, 3}};
+        Parameter p = new Parameter(distanceMatrix, 2, 2, Parameter.OperationMode.reference, Parameter.ReferenceType.genome);
+
+        // def result 1
+        ExpectedDeltaLocationValues dLoc1_1 = new ExpectedDeltaLocationValues(0, 1, 2, 0);
+        ExpectedDeltaLocationValues dLoc1_3 = new ExpectedDeltaLocationValues(0, 2, 3, 0);
+        List<Integer> genes1 = Arrays.asList(1, 2);
+        int[] minimumDistances1 = new int[]{0, 0};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues1 = {{dLoc1_1},{dLoc1_3}};
+
+        // def result 2
+        ExpectedDeltaLocationValues dLoc2_1 = new ExpectedDeltaLocationValues(0, 1, 7, 0);
+        ExpectedDeltaLocationValues dLoc2_2 = new ExpectedDeltaLocationValues(0, 1, 8, 3);
+        List<Integer> genes2 = Arrays.asList(1, 2, 3, 4, 5, 6, 8);
+        int[] minimumDistances2 = new int[]{0, 3};
+
+        ExpectedDeltaLocationValues[][] expectedDeltaLocationValues2 = {{dLoc2_1},{dLoc2_2}};
+
+        ExpectedReferenceClusterValues[] referenceClusterValues = {
+                new ExpectedReferenceClusterValues(
+                        genes1,
+                        minimumDistances1,
+                        0,
+                        0,
+                        2,
+                        expectedDeltaLocationValues1),
+                new ExpectedReferenceClusterValues(
+                        genes2,
+                        minimumDistances2,
+                        0,
+                        0,
+                        2,
+                        expectedDeltaLocationValues2
+                )
+        };
+
+        GeneClusterTestUtils.performTest(p, genomes, referenceClusterValues);
+    }
+
 	@Test
 	public void testComputeClusters4() 
 	{

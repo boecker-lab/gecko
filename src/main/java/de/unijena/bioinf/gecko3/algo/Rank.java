@@ -59,14 +59,14 @@ class Rank{
      * @param chr the chromosome.
      */
     void computeRank(Chromosome chr){
-        IntArray.reset(rank, DEFAULT_RANK);                               // initialise rank table with the default value
-        rank[0] = MAX_RANK;                            // the terminal characters have character 0 and the highest rank
+        IntArray.reset(rank, DEFAULT_RANK);                                 // initialise rank table with the default value
+        rank[0] = MAX_RANK;                                                 // the terminal characters have character 0 and the highest rank
 
         int r=1;
-        for (int i=1; i<=chr.getEffectiveGeneNumber(); i++) {                      // all characters in the chromosome
+        for (int i=1; i<=chr.getEffectiveGeneNumber(); i++) {               // all characters in the chromosome
             if (chr.getGene(i)>=0){
-            	if (rank[chr.getGene(i)]==DEFAULT_RANK) {        // who are not already set to a rank
-            		rank[chr.getGene(i)] = r++;                  // get ranked by their first occurrence in the chromosome
+            	if (rank[chr.getGene(i)]==DEFAULT_RANK) {                   // who are not already set to a rank
+            		rank[chr.getGene(i)] = r++;                             // get ranked by their first occurrence in the chromosome
             	}
             }
         }
@@ -77,29 +77,30 @@ class Rank{
      * @param chr the chromosome the rank is calculated for.
      * @param leftBorder the start position of the interval on the chromosome.
      */
-    public void updateRank(Chromosome chr, int leftBorder){
+    public void updateRank(Chromosome chr, final int leftBorder){
         if (leftBorder==1) {                                        // if starting to iterate through a new sequence (leftBorder is 1)
             this.computeRank(chr);                    // Rank has to be calculated anew
         }
         else {
+            if (chr.getGene(leftBorder-1)<0)        // if character at position leftBorder-1 was negative, rank does not change
+                return;
             int maxRank = 0;
             int i;
             for (i=leftBorder; i<=chr.getEffectiveGeneNumber(); i++) {                 // Iterate through substrings starting with leftBorder
-                if (chr.getGene(i)<0 || chr.getGene(leftBorder-1)<0)
+                if (chr.getGene(i)<0)
                     continue;
             	if (chr.getGene(i)!=chr.getGene(leftBorder-1)) {                        // if character is not equal to the character at position leftBorder-1
-                	if (chr.getNUMDiff(leftBorder-1, i, leftBorder-1, i-1) > 0) {   // only update if first occurrence after position i
-                        rank[chr.getGene(i)] = rank[chr.getGene(i)]-1;           // new rank = old rank - 1
-                        maxRank = Math.max(maxRank, rank[chr.getGene(i)]);               // max rank in the interval [leftBorder, i]
+                	if (!chr.nextInInterval(leftBorder-1, i-1)) {                       // only update if first occurrence after position i
+                        rank[chr.getGene(i)] = rank[chr.getGene(i)]-1;                  // new rank = old rank - 1
+                        maxRank = Math.max(maxRank, rank[chr.getGene(i)]);              // max rank in the interval [leftBorder, i]
                     }
                 }
                 else {                                      // if first occurrence of character at position leftBorder-1 is found
                     rank[chr.getGene(i)] = maxRank+1;       // character has maximal rank
-                    if(chr.getGene(i)<0) rank[0]--;
                     break;                                  // update can be stopped, as the rank of all other characters is unchanged
                 }
             }
-            if (chr.getGene(leftBorder-1)>=0 && i==chr.getEffectiveGeneNumber()+1) {                                      // if character at position leftBorder-1 is not part of the interval
+            if (i==chr.getEffectiveGeneNumber()+1) {        // if character at position leftBorder-1 is not part of the interval
                 rank[chr.getGene(leftBorder-1)] = DEFAULT_RANK;      // he is assigned the default rank
             }
         }
