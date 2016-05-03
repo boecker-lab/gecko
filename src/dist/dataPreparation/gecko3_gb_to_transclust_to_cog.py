@@ -30,10 +30,12 @@ def gb_to_fasta(infile):
 
 def run_blastAll(faaFiles, workingDir, title="transclust", dbName="db", evalue="0.01", num_threads="4"):
     fasta_files = ' '.join(faaFiles)
-    subprocess.call(["makeblastdb", "-dbtype", "prot", "-title", title, "-out", dbName, "-in", fasta_files])
-    mergeFiles(workingDir, ".faa", "merged.faa")
+    db = os.path.join(workingDir,dbName)
+    subprocess.call(["makeblastdb", "-dbtype", "prot", "-title", title, "-out", db, "-in", fasta_files])
+    merged_faa = os.path.join(workingDir, "merged.faa")
+    mergeFiles(workingDir, ".faa", merged_faa)
     print "Running blast"
-    subprocess.call(["blastp", "-db", dbName, "-query", "merged.faa", "-evalue",  evalue, "-outfmt", "6", "-num_threads", num_threads, "-out", "merged.blast2p"])
+    subprocess.call(["blastp", "-db", db, "-query", merged_faa, "-evalue",  evalue, "-outfmt", "6", "-num_threads", num_threads, "-out", os.path.join(workingDir,"merged.blast2p")])
 
 
 def make_blast_db_command_string(faa_files, db_name, title="transclust"):
@@ -51,8 +53,9 @@ def generate_merged_blastAll_command(faaFiles, workingDir, dbName="db", evalue=0
         output.write("#!/bin/bash\n")
         blast_db_command = make_blast_db_command_string(faaFiles, dbName)
         output.write(blast_db_command)
-        mergeFiles(workingDir, ".faa", "merged.faa")
-        blastCommand = make_blast_command_string("merged.faa", dbName, evalue, num_threads, "merged.blast2p")
+        merged_faa = os.path.join(workingDir, "merged.faa")
+        mergeFiles(workingDir, ".faa", merged_faa)
+        blastCommand = make_blast_command_string(merged_faa, dbName, evalue, num_threads, "merged.blast2p")
         output.write(blastCommand)
 
 
@@ -114,8 +117,8 @@ def mergeFiles(workingDir, extension, mergedFile):
 
 
 def mergeBlast(workingDir):
-    mergeFiles(workingDir, ".blast2p", "merged.blast2p")
-    mergeFiles(workingDir, ".faa", "merged.faa")
+    mergeFiles(workingDir, ".blast2p", os.path.join(workingDir,"merged.blast2p"))
+    mergeFiles(workingDir, ".faa", os.path.join(workingDir,"merged.faa"))
 
 
 def extractGeneFamiliesForParameter(workingDir, parameter=None):
@@ -165,29 +168,6 @@ def extractGeneFamilySizePerParamter(datafile):
                 parameterGeneFamilies[parameter][i] = genes
                 i += 1
     return parameterGeneFamilies
-
-
-def statistics(workingDir):
-    datafile = os.path.join(workingDir, "transclustResults.txt")
-    if not os.path.exists(datafile):
-        sys.exit("Transclust result file %s missing!" % datafile)
-    geneFamiliesPerParameter = extractGeneFamilySizePerParamter(datafile)
-
-    # generate mapping
-    sizeMap = dict()
-    for parameter in sorted(geneFamiliesPerParameter):
-        for family in geneFamiliesPerParameter[parameter].values():
-            if not len(family) in sizeMap:
-                sizeMap[len(family)] = dict()
-
-            if not parameter in sizeMap[len(family)]:
-                sizeMap[len(family)][parameter] = 1
-            else:
-                sizeMap[len(family)][parameter] += 1
-    # print mapping
-    print "\t"+"\t".join(str(x) for x in sorted(geneFamiliesPerParameter))
-    for key in sorted(sizeMap):
-        print str(key)+"\t" + "\t".join(str(sizeMap[key].get(x, 0)) for x in sorted(geneFamiliesPerParameter))
 
 
 def validFeature(seq_feature):
@@ -386,32 +366,12 @@ def getCoreGeneAnnotations(idToGenomeToAnnotation, nrOfGenomes):
                 coreGenes[family] = genomeAnnotationMapping
     return coreGenes
 
-
-def annotateGenome(workingDir, parameter=45):
-    fileToAnnotate = os.path.join(workingDir, "morax_mx.gb")
-    outfile = os.path.join(workingDir, "annotations.txt")
-
-    seq_recordIds = []
-    with open(fileToAnnotate, "r") as input_handle:
-        for seq_record in SeqIO.parse(input_handle, "genbank"):
-            seq_recordIds.append(seq_record.id)
-    geneFamilies = extractGeneFamiliesForParameter(workingDir, parameter)
-    genBankFiles = getAllFiles(workingDir, ".gb")
-    genBankFiles.remove(fileToAnnotate)
-
-    idToGenomeToAnnotation = getGeneFamilyAnnotations(genBankFiles, geneFamilies)
-    coreGenes = getCoreGeneAnnotations(idToGenomeToAnnotation, len(genBankFiles))
-
-    mapAnnotationsToGenome(fileToAnnotate, geneFamilies, coreGenes, outfile)
-
 options = {
-    "-doLocalBlast": doLocalBlast,
-    "-prepareSingleBlast": prepareSingleBlast,
-    "-prepareSplitBlast": prepareSplitBlast,
-    "-mergeBlast": mergeBlast,
-    #"-statistics": statistics,
-    "-transclustToCog": transclustToCog,
-   # "-annotateGenome": annotateGenome,
+    "-doLocalBlast": (doLocalBlast, "Step 1_A: Run a local blast+ installation to generate similarity data"),
+    "-prepareSingleBlast": (prepareSingleBlast, "Step 1_B: Prepare bash script for remote blast+ computation"),
+    "-prepareSplitBlast": (prepareSplitBlast, "Step 1_C (1): Prepare bash script for remote bast+ computation, one blast job per genome"),
+    "-mergeBlast": (mergeBlast, "Step 1_C (2): Merge the blast results from step 1, prepares transclust data"),
+    "-transclustToCog": (transclustToCog, "Step 2: Transform the transclust results to a Gecko3 input file")
 }
 
 
@@ -420,8 +380,8 @@ def printUsage():
     print "That directory should not contain any other files!"
     print "Files in the directory will be deleted without warning!"
     print "Valid commands are:"
-    for key in options:
-        print key
+    for key,value in options.items() :
+        print key + ": " + value[1]
 
 
 def main():
@@ -437,7 +397,7 @@ def main():
         printUsage()
         sys.exit("Directory %s not found!" % workingDir)
 
-    options[command](workingDir)
+    options[command][0](workingDir)
 
 if __name__ == "__main__":
     main()

@@ -282,6 +282,7 @@ class Statistics implements AlgorithmProgressProvider {
 			}
 			for (int j=Math.min(i+1, pValue.length)-offset; j>=0; j--){
 				if (j > 1){
+					// (Qj - Qj*Pi) * (Q(j-1)*Pi)
 					Probability mul1 = qArray[j].multiply(pValue[i]); // Qj - Qj*Pi
 					Probability sub = qArray[j].subtract(mul1);       // == Qj*(1-Pi)
 
@@ -382,7 +383,6 @@ class Statistics implements AlgorithmProgressProvider {
 		Binomial binomial = null;
 		if (probOfC < 1.0) //!=
 			binomial = new Binomial(L, probOfC, random);
-			//Illegal argument (5 1,2 random) <= 0.0
 
 		for (int d_plus = Math.max(0, d-(sizeOfC-2)); d_plus<=d; d_plus++){
 			if (binomial != null) {

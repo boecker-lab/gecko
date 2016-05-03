@@ -34,7 +34,7 @@ class Pattern {
     private int r;                                          // right boarder of the reference interval
     private int lastChar;                                   // last added character
     private int pSize;                                      // the number of characters in the pattern
-    private final int[] occ;                           // occurrence array of the pattern  //TODO either a BoolArray or store the number of occurrences and not just if it occurs.
+    private final boolean[] occ;                           // occurrence array of the pattern
     private final int[] minDist;                       // minimal distance between the pattern and each sequence
     private final int[] maxRemDist;                    // maximum distance left for occurrences in each sequence
     
@@ -54,7 +54,7 @@ class Pattern {
         this.r = -1;
         this.lastChar = 0;
         this.pSize = 0;
-        this.occ = new int[alphabetSize+1];
+        this.occ = new boolean[alphabetSize+1];
         this.minDist = new int[K];
         this.maxRemDist = IntArray.newIntArray(K, param.getMaximumDelta());
     }
@@ -76,11 +76,11 @@ class Pattern {
     }
 
     /**
-     * Returns the number of occurrences of c in the pattern.
+     * Returns if c occurs in the pattern.
      * @param c the character the occurrence is checked of.
-     * @return the number of times c occurred.
+     * @return if c occurs in the pattern.
      */
-    int nrOccurrences(int c) {
+    private boolean hasOccurrence(int c) {
         return occ[c];
     }
 
@@ -113,7 +113,7 @@ class Pattern {
         this.lastChar = c;
         this.r = r;
         if (c>=0) {
-            occ[c]++;
+            occ[c] = true;
             pSize++;
         }
         else
@@ -136,7 +136,7 @@ class Pattern {
             return false;
 
         while (i < refChr.getEffectiveGeneNumber() && refChr.getGene(i + 1) > 0
-                && (nrOccurrences(refChr.getGene(i + 1)) > 0 || refChr.getGene(i + 1) == c)) // expand until the pattern is right maximal
+                && (hasOccurrence(refChr.getGene(i + 1)) || refChr.getGene(i + 1) == c)) // expand until the pattern is right maximal
             i++;
 
         addToPattern(c, i);
@@ -188,7 +188,9 @@ class Pattern {
                             continue;
 
                         // test compactness
-                        if (chr.getNUMDiff(leftBorder + 1, rightBorder - 1, chr.getL_prime(charPos, dLeft), chr.getR_prime(charPos, dRight)) != 0)
+                        int left_essential = chr.getL_prime(charPos, dLeft);
+                        int right_essential = chr.getR_prime(charPos, dRight);
+                        if (!chr.intervalContentIdentical(leftBorder+1, rightBorder-1, left_essential, right_essential))
                             continue;
 
                         int charSetSize = chr.getNUM(leftBorder + 1, rightBorder - 1);

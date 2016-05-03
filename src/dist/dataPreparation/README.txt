@@ -70,9 +70,7 @@ USING THIS SCRIPT
     If you select different values for From and To, clusterings for multiple density parameters will be generated and all be
     stored in the same file. In the next step, only the first density parameter will be used!
 
-5.  Run "python gecko3_gb_to_transclust_to_cog.py --transclustToCogOptimistic <WD>"
-    or
-    "python gecko3_gb_to_transclust_to_cog.py --transclustToCogConservative <WD>"
+5.  Run "python gecko3_gb_to_transclust_to_cog.py --transclustToCog <WD>"
     to generated the gecko3 input file transclust.cog.
 
 sampleData.zip contains multiple GenBank files for Synechocystis and M. tuberculosis and the resulting cog file

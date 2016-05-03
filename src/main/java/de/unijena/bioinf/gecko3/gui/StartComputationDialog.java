@@ -411,7 +411,7 @@ public class StartComputationDialog extends JDialog {
                 refCombo.setSelectedItem(referenceType);
 
             // Quorum
-            if (q == 0)
+            if (q == 0 || q >= qCombo.getItemCount())
                 qCombo.setSelectedIndex(0);
             else
                 qCombo.setSelectedIndex(q-1);
