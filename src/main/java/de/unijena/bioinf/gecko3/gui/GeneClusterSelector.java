@@ -77,6 +77,15 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
     private static final short COL_SCORE_CORRECTED = 4;
     private static final short COL_GENES = 5;
 
+    private final String[] columnToolTips = {
+            "Cluster Id",
+            "Number of Genes",
+            "Number of Genomes",
+            "Exponent of the p-value",
+            "Exponent of the fdr corrected p-value",
+            "Genes in the cluster"
+    };
+
 	
 	public GeneClusterSelector(final JTextField filterField) {
         filterSelection = ResultFilter.showFiltered;
@@ -117,7 +126,20 @@ public class GeneClusterSelector extends JPanel implements ClipboardOwner, DataL
 		checkBoxPanel.add(selectionComboBox);
 		checkBoxPanel.add(showSuboptimalCheckBox);
 		this.add(checkBoxPanel, BorderLayout.PAGE_END);
-		table = new JTable();
+		table = new JTable(){
+            //Implement table header tool tips.
+            protected JTableHeader createDefaultTableHeader() {
+                return new JTableHeader(columnModel) {
+                    public String getToolTipText(MouseEvent e) {
+                        String tip = null;
+                        java.awt.Point p = e.getPoint();
+                        int index = columnModel.getColumnIndexAtX(p.x);
+                        int realIndex = columnModel.getColumn(index).getModelIndex();
+                        return columnToolTips[realIndex];
+                    }
+                };
+            }
+        };
 		table.setBackground(Color.WHITE);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
