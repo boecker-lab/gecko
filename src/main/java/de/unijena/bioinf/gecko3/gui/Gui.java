@@ -688,7 +688,7 @@ public class Gui {
 									"<br>" +
 									"Tool for searching gene clusters" +
 									"<br>" +
-									"Version 1.0" +
+									"Version 3.1" +
 									"<br>" +
 									"2014, Sascha Winter, Hans-Martin Haase and Tobias Mann, Katharina Jahn and Leon Kuchenbecker" +
 									"<br>" +

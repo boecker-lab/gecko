@@ -6,7 +6,7 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 group = "de.unijena.bioinf.gecko3"
-version = "3.0.1-SNAPSHOT"
+version = "3.1"
 
 mainClassName = 'de.unijena.bioinf.gecko3.Gecko3'
 
