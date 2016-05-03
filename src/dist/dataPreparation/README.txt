@@ -53,11 +53,18 @@ USING THIS SCRIPT
 
 4.  Start Transclust in gui mode (e.g. "java -Xmx6G -jar Tranclust.jar -gui", the -Xmx6G will allow Tranclust to use 6 GB of memory, adjust
     the number to your system). In the menu, select File->Load->BLAST/FASTA file. Select merged.blast2p as blast and merged.faa as
-    fasta file. Set the BLAST cutoff to 0.01 (1.0E-2) and start. For the clustering tab, set the density parameter in From and To to either 35.0 (optimistic)
-    or 48.0 (conservative), as suggested in
+    fasta file. Set the BLAST cutoff to 0.01 (1.0E-2) and start.
+
+    Without further knowledge of the used data, we suggest sticking to the parameters evaluated in:
     Density parameter estimation for finding clusters of homologous proteins—tracing actinobacterial pathogenicity lifestyles.
     Roettger R, Kalaghatgi P, Sun P, Soares S, Azevedo V, Wittkop T, Baumbach J
-    Bioinformatics (2013) 29 (2): 215-222.
+    Bioinformatics (2013) 29 (2): 215-222. 
+
+    For the clustering tab, set the density parameter in From and To to anything between 35.0 (optimistic)
+    or 48.0 (conservative). For this range Roettger et. al. observed a standard deviation of only ~3% from the mean
+    for 20 random datasets. Values closer to 48.0 will generate less false positives inclusions in gene families, 
+    while values closer to 35.0 will lead to larger gene families.
+
     Click start clustering. Once clustering is done, in the menu File->Save->Save results file and save the results as
     transclustResults.txt in the <WD>.
     If you select different values for From and To, clusterings for multiple density parameters will be generated and all be
